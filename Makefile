@@ -1,16 +1,13 @@
 tetris_obj := main.o tetris-ram.o tetris.o
 cc65Path := tools/cc65/bin
 
-# Manually list prerequisites that are generated. Non-generated files will
-# automatically be computed.
+MD5 := md5sum -c
 
 tetris.nes: tetris.o main.o tetris-ram.o
 
 tetris:= tetris.nes
 
-
-# These are "true" phonies, and always execute something
-.PHONY: clean
+.PHONY: clean compare
 
 .SUFFIXES:
 
@@ -22,11 +19,14 @@ LDFLAGS =
 
 %: %.cfg
 		$(cc65Path)/ld65 $(LDFLAGS) -Ln $(basename $@).lbl --dbgfile $(basename $@).dbg -o $@ -C $< $(filter %.o,$^)
-
-
+		$(MD5) tetris.md5
+		
+		
+compare: $(tetris)
+		@$(MD5) tetris.md5
+		
 
 clean:
 	rm -f  $(tetris_obj) $(tetris) *.d tetris.dbg tetris.lbl 
-
-
-
+	
+	
