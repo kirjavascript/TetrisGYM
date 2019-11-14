@@ -19,7 +19,6 @@ LDFLAGS =
 
 %: %.cfg
 		$(cc65Path)/ld65 $(LDFLAGS) -Ln $(basename $@).lbl --dbgfile $(basename $@).dbg -o $@ -C $< $(filter %.o,$^)
-		$(MD5) tetris.md5
 		
 		
 compare: $(tetris)
