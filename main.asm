@@ -5482,17 +5482,39 @@ ending_palette:
         .byte   $0F,$15,$37,$12,$0F,$29,$37,$12
         .byte   $0F,$30,$27,$12,$0F,$17,$27,$12
         .byte   $0F,$15,$37,$FF
-defaultHighScoresTable:
-        .byte   $08,$0F,$17,$01,$12,$04,$0F,$14
-        .byte   $01,$13,$01,$0E,$0C,$01,$0E,$03
-        .byte   $05,$2B,$00,$00,$00,$00,$00,$00
-        .byte   $01,$0C,$05,$18,$2B,$2B,$14,$0F
-        .byte   $0E,$19,$2B,$2B,$0E,$09,$0E,$14
-        .byte   $05,$0E,$00,$00,$00,$00,$00,$00
-        .byte   $01,$00,$00,$00,$75,$00,$00,$50
-        .byte   $00,$00,$00,$00,$00,$20,$00,$00
-        .byte   $10,$00,$00,$05,$00,$00,$00,$00
-        .byte   $09,$05,$00,$00,$09,$05,$00,$00
+
+
+.include "charmap.asm"
+        ;the names use the follow charmap:
+        ;letters are stored by their number in the alphabet in hex (01-A, 02-B, etc...)
+        ;other characters: , = 25, / = 26, ( = 27, ) = 28, " = 29, . = 2A, space = 2B, - = 2C
+        ;are the following zeros an unused entry?
+defaultHighScoresTable: 
+        .byte  "HOWARD" ;$08,$0F,$17,$01,$12,$04
+        .byte  "OTASAN" ;$0F,$14,$01,$13,$01,$0E
+        .byte  "LANCE " ;$0C,$01,$0E,$03,$05,$2B
+        .byte  $00,$00,$00,$00,$00,$00 ;unknown
+        .byte  "ALEX  " ;$01,$0C,$05,$18,$2B,$2B
+        .byte  "TONY  " ;$14,$0F,$0E,$19,$2B,$2B 
+        .byte  "NINTEN" ;$0E,$09,$0E,$14,$05,$0E
+        .byte   $00,$00,$00,$00,$00,$00 ;unknown
+        ;High Scores are stored in BCD
+        .byte   $01,$00,$00 ;Game A 1st Entry Score, 10000
+        .byte   $00,$75,$00 ;Game A 2nd Entry Score, 7500 
+        .byte   $00,$50,$00 ;Game A 3rd Entry Score, 5000
+        .byte   $00,$00,$00 ;unknown
+        .byte   $00,$20,$00 ;Game B 1st Entry Score, 2000 
+        .byte   $00,$10,$00 ;Game B 2nd Entry Score, 1000
+        .byte   $00,$05,$00 ;Game B 3rd Entry Score, 500
+        .byte   $00,$00,$00 ;unknown
+        .byte   $09 ;Game A 1st Entry Level
+        .byte   $05 ;Game A 2nd Entry Level
+        .byte   $00 ;Game A 3nd Entry Level
+        .byte   $00 ;unknown
+        .byte   $09 ;Game B 1st Entry Level
+        .byte   $05 ;Game B 2nd Entry Level
+        .byte   $00 ;Game B 3rd Entry Level
+        .byte   $00 ;unknown
         .byte   $FF
 legal_screen_nametable:
         .incbin "gfx/nametables/legal_screen_nametable.bin"

@@ -1,7 +1,10 @@
 tetris_obj := main.o tetris-ram.o tetris.o
-cc65Path := tools/cc65/bin
+cc65Path := tools/cc65
 
 MD5 := md5sum -c
+
+CA65 := $(cc65Path)/bin/ca65
+LD65 := $(cc65Path)/bin/ld65
 
 tetris.nes: tetris.o main.o tetris-ram.o
 
@@ -11,14 +14,14 @@ tetris:= tetris.nes
 
 .SUFFIXES:
 
-CAFLAGS = -g
+CAFLAGS =
 LDFLAGS =
 
 %.o: %.asm
-		$(cc65Path)/ca65 $(CAFLAGS) --create-dep $@.d $< -o $@
+		$(CA65) $^ -o $@
 
 %: %.cfg
-		$(cc65Path)/ld65 $(LDFLAGS) -Ln $(basename $@).lbl --dbgfile $(basename $@).dbg -o $@ -C $< $(filter %.o,$^)
+		$(LD65) $(LDFLAGS) -Ln $(basename $@).lbl --dbgfile $(basename $@).dbg -o $@ -C $< $(filter %.o,$^)
 		
 		
 compare: $(tetris)
