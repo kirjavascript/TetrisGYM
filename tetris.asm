@@ -20,4 +20,7 @@ INES_SRAM   = 0 ; 1 = battery backed SRAM at $6000-7FFF
 
 
 .segment "CHR"
-.incbin "gfx/tetris-chr.bin"
+.incbin "gfx/titlemenuTileset.chr"
+.incbin "gfx/typeBEndingTileset.chr"
+.incbin "gfx/typeAEndingTileset.chr"
+.incbin "gfx/gameTileset.chr"
