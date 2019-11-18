@@ -7,7 +7,7 @@ Dependencies:
 
 Set up the repository.
 
-	git clone https://github.com/huderlem/kirbydreamland
+	git clone https://github.com/huderlem/TetrisNESDisasm
 	cd TetrisNESDisasm
 
 To build `tetris.nes`:
@@ -37,8 +37,8 @@ Select the following packages:
 
 Then set up the repository. In the **Cygwin terminal**:
 
-	git clone https://github.com/CelestialAmber/TetrisNESDisasm.git
-	cd kirbydreamland
+	git clone https://github.com/CelestialAmber/TetrisNESDisasm
+	cd TetrisNESDisasm
 
 To build `tetris.nes`:
 
