@@ -2,7 +2,7 @@
 
 	sudo apt-get install make gcc bison git python
 	
-	git clone https://github.com/huderlem/TetrisNESDisasm
+	git clone https://github.com/CelestialAmber/TetrisNESDisasm
 	cd TetrisNESDisasm
 
 To build `tetris.nes`:
@@ -14,8 +14,8 @@ To build `tetris.nes`:
 
 In **Terminal**, run:
 
-	git clone https://github.com/pret/pokered
-	cd pokered
+	git clone https://github.com/CelestialAmber/TetrisNESDisasm
+	cd TetrisNESDisasm
 	
 To build `tetris.nes`:
 
