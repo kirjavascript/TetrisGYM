@@ -1,5 +1,6 @@
 ;charmap for high score names
 ;all the other text with letters is embedded in the nametable/graphics data
+;(except for the Game A/B letter on some things, and maybe others)
 .charmap 'A', $01
 .charmap 'B', $02
 .charmap 'C', $03

@@ -226,6 +226,9 @@ SND_CHN         := $4015
 JOY1            := $4016
 JOY2_APUFC      := $4017                        ; read: bits 0-4 joy data lines (bit 0 being normal controller), bits 6-7 are FC inhibit and mode
 
+MMC1_CHR0       := $BFFF
+MMC1_CHR1       := $DFFF
+
 .segment        "PRG_chunk1": absolute
 
 ; incremented to reset MMC1 reg
@@ -5485,10 +5488,7 @@ ending_palette:
 
 
 .include "charmap.asm"
-        ;the names use the follow charmap:
-        ;letters are stored by their number in the alphabet in hex (01-A, 02-B, etc...)
-        ;other characters: , = 25, / = 26, ( = 27, ) = 28, " = 29, . = 2A, space = 2B, - = 2C
-        ;are the following zeros an unused entry?
+        ;are the following zeros unused entries for each high score table?
 defaultHighScoresTable: 
         .byte  "HOWARD" ;$08,$0F,$17,$01,$12,$04
         .byte  "OTASAN" ;$0F,$14,$01,$13,$01,$0E
@@ -5526,11 +5526,6 @@ level_menu_nametable:
         .incbin "gfx/nametables/level_menu_nametable.bin"
 game_nametable:
         .incbin "gfx/nametables/game_nametable.bin"
-MMC1_CHR0:
-        .byte   $31
-
-.include "data/dmcdata.asm"
-
 enter_high_score_nametable:
         .incbin "gfx/nametables/enter_high_score_nametable.bin"
 high_scores_nametable:
@@ -5570,8 +5565,6 @@ unreferenced_data1:
 
 .include "data/demo_data.asm"
 
-MMC1_CHR1:
-        .byte   $BF
 ; canon is updateAudio
 updateAudio_jmp:
         jmp     updateAudio

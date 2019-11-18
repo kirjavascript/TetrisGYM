@@ -98,4 +98,4 @@ demoTetriminoTypeTable:
         .byte   $63,$31,$18,$0C,$06,$03,$81,$40
         .byte   $A0,$D0,$68,$34,$1A,$0D,$86,$C3
         .byte   $78,$BC,$DE,$EF,$77,$3B,$1D,$8E
-        .byte   $C7,$E3,$F1,$F8,$FC,$FE,$7F
+        .byte   $C7,$E3,$F1,$F8,$FC,$FE,$7F,$BF
