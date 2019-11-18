@@ -1,12 +1,7 @@
 # Linux
 
-Dependencies:
-
 	sudo apt-get install make gcc bison git python
-	sudo easy_install pip
-
-Set up the repository.
-
+	
 	git clone https://github.com/huderlem/TetrisNESDisasm
 	cd TetrisNESDisasm
 
@@ -17,25 +12,27 @@ To build `tetris.nes`:
 
 # OS X
 
-In the shell, run:
+In **Terminal**, run:
 
-	xcode-select --install
+	git clone https://github.com/pret/pokered
+	cd pokered
+	
+To build `tetris.nes`:
 
-Then follow the Linux instructions.
-
+	make
 
 # Windows
 
-To build on Windows, install [**Cygwin**](http://cygwin.com/install.html) with the default settings.
+Download [**Cygwin**](http://cygwin.com/install.html): **setup-x86_64.exe** for 64-bit Windows, **setup-x86.exe** for 32-bit.
 
-Dependencies are downloaded in the installer rather than the command line.
-Select the following packages:
-* make
-* git
-* gcc-core
-* python
+Run setup and leave the default settings. At "Select Packages", choose to install the following:
 
-Then set up the repository. In the **Cygwin terminal**:
+- `make`
+- `git`
+- `gcc-core`
+- `python`
+
+In the **Cygwin terminal**, enter these commands:
 
 	git clone https://github.com/CelestialAmber/TetrisNESDisasm
 	cd TetrisNESDisasm
