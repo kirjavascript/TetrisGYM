@@ -1,7 +1,7 @@
 # Linux
 
 	sudo apt-get install make gcc bison git python
-	
+	pip install pypng
 	git clone https://github.com/CelestialAmber/TetrisNESDisasm
 	cd TetrisNESDisasm
 
@@ -13,9 +13,11 @@ To build `tetris.nes`:
 # OS X
 
 In **Terminal**, run:
-
+	
+	pip install pypng
 	git clone https://github.com/CelestialAmber/TetrisNESDisasm
 	cd TetrisNESDisasm
+
 	
 To build `tetris.nes`:
 
@@ -32,8 +34,11 @@ Run setup and leave the default settings. At "Select Packages", choose to instal
 - `gcc-core`
 - `python`
 
+
+
 In the **Cygwin terminal**, enter these commands:
 
+	pip install pypng
 	git clone https://github.com/CelestialAmber/TetrisNESDisasm
 	cd TetrisNESDisasm
 
