@@ -18,7 +18,7 @@ tetris:= tetris.nes
 .PHONY: clean compare tools
 
 
-CAFLAGS =
+CAFLAGS = -g
 LDFLAGS =
 
 compare: $(tetris)
@@ -39,7 +39,7 @@ endif
 
 %.o: dep = $(shell tools/cTools/scan_includes $(@D)/$*.asm)
 $(tetris_obj): %.o: %.asm $$(dep)
-		$(CA65) $*.asm -o $@
+		$(CA65) $(CAFLAGS) $*.asm -o $@
 
 %: %.cfg
 		$(LD65) $(LDFLAGS) -Ln $(basename $@).lbl --dbgfile $(basename $@).dbg -o $@ -C $< $(tetris_obj)
