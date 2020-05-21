@@ -1,6 +1,6 @@
 # Tetris
 
-This is a disassembly of Tetris(NES).
+This is a disassembly of Tetris (NES).
 
 It builds the following rom:
 
