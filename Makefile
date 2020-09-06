@@ -1,10 +1,9 @@
 tetris_obj := main.o tetris-ram.o tetris.o
-cc65Path := tools/cc65
 
 MD5 := md5sum -c
 
-CA65 := $(cc65Path)/bin/ca65
-LD65 := $(cc65Path)/bin/ld65
+CA65 := /usr/bin/ca65
+LD65 := /usr/bin/ld65
 nesChrEncode := python tools/nes_chr_encode.py
 
 tetris.nes: tetris.o main.o tetris-ram.o
@@ -43,11 +42,8 @@ $(tetris_obj): %.o: %.asm $$(dep)
 
 %: %.cfg
 		$(LD65) $(LDFLAGS) -Ln $(basename $@).lbl --dbgfile $(basename $@).dbg -o $@ -C $< $(tetris_obj)
-		
-				
+
+
 
 %.chr: %.png
 		$(nesChrEncode) $< $@
-
-	
-	
