@@ -9,6 +9,7 @@ rng_seed        := $0017
 spawnID         := $0019
 spawnCount      := $001A
 verticalBlankingInterval:= $0033
+unused_0E       := $0034                              ; Always $0E
 tetriminoX      := $0040                        ; Player data is $20 in size. It is copied here from $60 or $80, processed, then copied back
 tetriminoY      := $0041
 currentPiece    := $0042                        ; Current piece as an orientation ID
@@ -120,9 +121,12 @@ AUDIOTMP3       := $00E2
 AUDIOTMP4       := $00E3
 AUDIOTMP5       := $00E4
 musicChanTmpAddr:= $00E6
+music_unused2   := $00EA                        ; Always 0
+soundRngSeed    := $00EB                        ; Set, but not read
 currentSoundEffectSlot:= $00ED                  ; Temporary
 musicChannelOffset:= $00EE                      ; Temporary. Added to $4000-3 for MMIO
 currentAudioSlot:= $00EF                        ; Temporary
+unreferenced_buttonMirror := $00F1              ; Mirror of $F5-F8
 newlyPressedButtons_player1:= $00F5             ; $80-a $40-b $20-select $10-start $08-up $04-down $02-left $01-right
 newlyPressedButtons_player2:= $00F6
 heldButtons_player1:= $00F7
@@ -160,6 +164,7 @@ musicChanNoteDurationRemaining:= $06B4
 musicChanNoteDuration:= $06B8
 musicChanProgLoopCounter:= $06BC                ; As driven by bytecode instructions
 musicStagingSq1Sweep:= $06C0                    ; Used as if size 4, but since Tri/Noise does nothing when written for sweep, the other two entries can have any value without changing behavior
+musicChanNote:= $06C3
 musicChanInhibit:= $06C8                        ; Always zero
 musicTrack_dec  := $06CC                        ; $00-$09
 musicChanVolFrameCounter:= $06CD                ; Pos 0/1 are unused
@@ -190,6 +195,7 @@ soundEffectSlot2Playing:= $06FA
 soundEffectSlot3Playing:= $06FB
 soundEffectSlot4Playing:= $06FC
 currentlyPlayingMusicTrack:= $06FD              ; Copied from musicTrack
+unreferenced_soundRngTmp:= $06FF
 highScoreNames  := $0700
 highScoreScoresA:= $0730
 highScoreScoresB:= $073C
@@ -377,7 +383,7 @@ initRamContinued:
         jsr     updateAudioWaitForNmiAndEnablePpuRendering
         jsr     updateAudioWaitForNmiAndResetOamStaging
         lda     #$0E
-        sta     $34
+        sta     unused_0E
         lda     #$00
         sta     gameModeState
         sta     gameMode
@@ -5212,6 +5218,7 @@ copyAddrAtReturnAddressToTmp_incrReturnAddrBy2:
         sta     stack+4,x
         rts
 
+;reg x: zeropage addr of seed; reg y: size of seed
 generateNextPseudorandomNumber:
         lda     tmp1,x
         and     #$02
@@ -5683,7 +5690,7 @@ computeSoundEffMethod:
         sta     AUDIOTMP4
         jmp     @ret
 
-unreferenced_code1:
+unreferenced_soundRng:
         lda     $EB
         and     #$02
         sta     $06FF
@@ -5691,9 +5698,10 @@ unreferenced_code1:
         and     #$02
         eor     $06FF
         clc
-        beq     LE0B0
+        beq     @insertRandomBit
         sec
-LE0B0:  ror     $EB
+@insertRandomBit:
+        ror     $EB
         ror     $EC
         rts
 
@@ -5819,7 +5827,7 @@ updateSoundEffectSlotShared_rts:
 LE1D8:  lda     #$0F
         sta     SND_CHN
         lda     #$55
-        sta     $EB
+        sta     soundRngSeed
         jsr     soundEffectSlot2_makesNoSound
         rts
 
@@ -6360,7 +6368,7 @@ updateMusicFrame_setChanLo:
         and     #$E0
         beq     @ret
         sta     AUDIOTMP1
-        lda     $06C3,x
+        lda     musicChanNote,x
         cmp     #$02
         beq     @incAndRet
         ldy     musicChannelOffset
@@ -6380,7 +6388,7 @@ musicLoOffset_8AndC:
         tay
         lda     loOff9To0FallTable,y
         pha
-        lda     $06C3,x
+        lda     musicChanNote,x
         cmp     #$46
         bne     LE613
         pla
@@ -6403,7 +6411,7 @@ musicLoOffset_4:
         bne     musicLoOffset_setLo
 ; Every frame is the same
 musicLoOffset_minus2_6:
-        lda     $06C3,x
+        lda     musicChanNote,x
         cmp     #$4C
         bcc     @unnecessaryBranch
         lda     #$FE
@@ -6509,7 +6517,7 @@ loadMusicTrack:
         sta     musicChanNoteDurationRemaining+2
         sta     musicChanNoteDurationRemaining+3
         lda     #$00
-        sta     $EA
+        sta     music_unused2
         ldy     #$08
 @zeroFillDeref:
         sta     musicDataChanPtrDeref+7,y
@@ -6568,7 +6576,7 @@ updateMusicFrame_setChanVol:
         and     #$1F
         beq     @ret
         sta     AUDIOTMP2
-        lda     $06C3,x
+        lda     musicChanNote,x
         cmp     #$02
         beq     @muteAndAdvanceFrame
         ldy     #$00
@@ -6823,7 +6831,7 @@ updateMusicFrame_updateChannel:
         tay
 @processNote:
         tya
-        sta     $06C3,x
+        sta     musicChanNote,x
         txa
         cmp     #$03
         beq     @playDmcAndNoise_jmp
