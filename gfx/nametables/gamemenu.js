@@ -2,7 +2,7 @@ const { readFileSync, writeFileSync } = require('fs');
 
 const buffer = readFileSync('./game_type_menu_nametable_clean.bin');
 
-const lookup = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ-.\'>qweadzxc############################################################################################################################################################################################################### ';
+const lookup = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ-.\'>################qweadzxc############################################################################################################################################################################################### ';
 console.log(lookup.length)
 // [...buffer].forEach(d => console.log(d))
 

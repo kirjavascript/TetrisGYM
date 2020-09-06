@@ -2285,7 +2285,7 @@ sprite52CathedralDomeRocketJet2:
         .byte   $08,$48,$23,$04,$10,$58,$23,$04
         .byte   $FF
 sprite53MusicTypeCursor:
-        .byte   $00,$27,$00,$00,$00,$27,$40,$4A
+        .byte   $00,$27,$00,$00,$00,$FF,$40,$4A
         .byte   $FF
 sprite54Penguin1:
         .byte   $E8,$A9,$21,$00,$E8,$AA,$21,$08
