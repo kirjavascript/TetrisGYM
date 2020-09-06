@@ -8,7 +8,8 @@ spawnID:	.res 1	; $0019
 spawnCount:	.res 1	; $001A
 .res 24
 verticalBlankingInterval:	.res 1	; $0033
-.res 12
+unused_0E: .res 1 ; $0034
+.res 11
 tetriminoX:	.res 1	; $0040
 tetriminoY:	.res 1	; $0041
 currentPiece:	.res 1	; $0042
@@ -128,11 +129,15 @@ AUDIOTMP4:	.res 1	; $00E3
 AUDIOTMP5:	.res 1	; $00E4
 .res 1
 musicChanTmpAddr:	.res 2	; $00E6
-.res 5
+.res 2
+music_unused2: .res 1  ; $00EA
+soundRngSeed: .res 2  ; $00EB
 currentSoundEffectSlot:	.res 1	; $00ED
 musicChannelOffset:	.res 1	; $00EE
 currentAudioSlot:	.res 1	; $00EF
-.res 5
+.res 1
+unreferenced_buttonMirror:  .res 3  ; $00F1
+.res 1
 newlyPressedButtons:	.res 1	; $00F5
 pressedButtons:	.res 1	; $00F6
 getHeldButtons:	.res 1	; $00F7
@@ -180,7 +185,9 @@ musicChanNoteDurationRemaining:	.res $04	; $06B4
 musicChanNoteDuration:	.res $04	; $06B8
 musicChanProgLoopCounter:	.res $04	; $06BC
 musicStagingSq1Sweep:	.res $02	; $06C0
-.res 6
+.res 2
+musicChanNote:  .res 4  ; $06C3
+.res 1
 musicChanInhibit:	.res $03	; $06C8
 .res 1
 musicTrack_dec:	.res 1	; $06CC
@@ -214,7 +221,8 @@ soundEffectSlot2Playing:	.res 1	; $06FA
 soundEffectSlot3Playing:	.res 1	; $06FB
 soundEffectSlot4Playing:	.res 1	; $06FC
 currentlyPlayingMusicTrack:	.res 1	; $06FD
-.res 2
+.res 1
+unreferenced_soundRngTmp:  .res 1  ; $06FF
 highScoreNames:	.res $30	; $0700
 highScoreScoresA:	.res $C	; $0730
 highScoreScoresB:	.res $C	; $073C
