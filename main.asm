@@ -776,6 +776,9 @@ L830B:  lda     #$FF
         asl     a
 
 .if PRACTISE_MODE ; adjust music menu sprites
+        .repeat 10
+            nop
+        .endrep
         nop
         clc
         adc     #$57
@@ -784,11 +787,6 @@ L830B:  lda     #$FF
         sta     spriteIndexInOamContentLookup
         lda     #$1F
         sta     spriteXOffset
-        lda     frameCounter
-        and     #$03
-        bne     @flickerCursorPair2
-        lda     #$02
-        sta     spriteIndexInOamContentLookup
 .else
         asl     a
         clc
