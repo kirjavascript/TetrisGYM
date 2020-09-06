@@ -3,7 +3,8 @@ FAST_LEGAL := 1
 NO_DEMO := 1
 NO_LEGAL := 1
 NO_TITLE := 1
-NO_GAMETYPE := 1
+NO_MUSIC := 1
+NO_GAMETYPE := 0
 
         .setcpu "6502"
 
@@ -630,16 +631,13 @@ render_mode_legal_and_title_screens:
 
 gameMode_gameTypeMenu:
 .if NO_GAMETYPE
-        lda     #$03
-        sta     musicType
         inc     gameMode
         rts
-        nop
 .else
         inc     initRam
+.endif
         lda     #$10
         jsr     setMMC1Control
-.endif
         lda     #$01
         sta     renderMode
         jsr     updateAudioWaitForNmiAndDisablePpuRendering
@@ -3610,12 +3608,18 @@ gameMode_startDemo:
 
 ; canon is adjustMusicSpeed
 setMusicTrack:
+.if NO_MUSIC
+.repeat 14
+            nop
+.endrep
+.else
         sta     musicTrack
         lda     gameMode
         cmp     #$05
         bne     @ret
         lda     #$FF
         sta     musicTrack
+.endif
 @ret:   rts
 
 ; A+B+Select+Start
