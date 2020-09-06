@@ -1,3 +1,7 @@
+; Petrus - The Tetris Practise ROM
+;
+; @author kirjava
+
 ROCKET_LIMIT := $63 ; $3
 FAST_LEGAL := 1
 NO_DEMO := 1
@@ -6,11 +10,12 @@ NO_TITLE := 1
 NO_MUSIC := 1
 NO_GAMETYPE := 0
 NO_NO_NEXT_BOX := 1
-PRACTISE_MODE := 1
 
-practiseType := $00C2 ; musicType
+PRACTISE_MODE := 1
 MODE_NORMAL := 0
 MODE_LEVEL29 := 1
+MODE_ALWAYSREADY := 2
+practiseType := $00C2 ; musicType
 
         .setcpu "6502"
 
@@ -7419,6 +7424,7 @@ practiseLevelMenuPatch:
     lda     practiseType
     cmp     #MODE_LEVEL29
     beq     @lvl29
+
     inc     initRam
     jmp     gameMode_levelMenuContinue
 
