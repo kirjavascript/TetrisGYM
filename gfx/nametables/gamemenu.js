@@ -3,12 +3,11 @@ const { readFileSync, writeFileSync } = require('fs');
 const buffer = readFileSync('./game_type_menu_nametable.bin');
 
 const lookup = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ-.\'>################qweadzxc############################################################################################################################################################################################### ';
-console.log(lookup.length)
 
 const chars = [...buffer].map(value => lookup[value] || '#');
-// do the art, too
 
 console.log(chars.join('').match(/.{35}/g).join('\n'));
+
 const tiles = `
 W0W################################
 WWW################################
