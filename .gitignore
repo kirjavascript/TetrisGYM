@@ -1,3 +1,6 @@
 *.nes
 *.o
 *.chr
+tetris.lst
+tetris.lbl
+tetris.dbg
