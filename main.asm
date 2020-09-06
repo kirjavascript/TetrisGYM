@@ -3,6 +3,7 @@ FAST_LEGAL := 1
 NO_DEMO := 1
 NO_LEGAL := 1
 NO_TITLE := 1
+NO_GAMETYPE := 1
 
         .setcpu "6502"
 
@@ -628,9 +629,17 @@ render_mode_legal_and_title_screens:
         rts
 
 gameMode_gameTypeMenu:
+.if NO_GAMETYPE
+        lda     #$03
+        sta     musicType
+        inc     gameMode
+        rts
+        nop
+.else
         inc     initRam
         lda     #$10
         jsr     setMMC1Control
+.endif
         lda     #$01
         sta     renderMode
         jsr     updateAudioWaitForNmiAndDisablePpuRendering
