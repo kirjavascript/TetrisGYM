@@ -662,13 +662,15 @@ L830B:  lda     #$FF
         ldy     #$02
         jsr     memset_page
         lda     newlyPressedButtons_player1
-        cmp     #$01
-        bne     @rightNotPressed
-        lda     #$01
-        sta     gameType
-        lda     #$01
-        sta     soundEffectSlot1Init
-        jmp     @leftNotPressed
+
+        jmp @leftNotPressed
+        ; cmp     #$01
+        ; bne     @rightNotPressed
+        ; lda     #$01
+        ; sta     gameType
+        ; lda     #$01
+        ; sta     soundEffectSlot1Init
+        ; jmp     @leftNotPressed
 
 @rightNotPressed:
         lda     newlyPressedButtons_player1
@@ -685,8 +687,8 @@ L830B:  lda     #$FF
         lda     #$01
         sta     soundEffectSlot1Init
         lda     musicType
-        cmp     #$03
-        beq     @upNotPressed
+        ; cmp     #$03
+        ; beq     @upNotPressed
         inc     musicType
         ldx     musicType
         lda     musicSelectionTable,x
@@ -742,8 +744,8 @@ L830B:  lda     #$FF
         lda     #$01
         sta     spriteIndexInOamContentLookup
         lda     frameCounter
-        and     #$03
-        bne     @flickerCursorPair1
+        ; and     #$03
+        ; bne     @flickerCursorPair1
         lda     #$02
         sta     spriteIndexInOamContentLookup
 @flickerCursorPair1:
@@ -761,10 +763,10 @@ L830B:  lda     #$FF
         lda     #$67
         sta     spriteXOffset
         lda     frameCounter
-        and     #$03
-        bne     @flickerCursorPair2
-        lda     #$02
-        sta     spriteIndexInOamContentLookup
+        ; and     #$03
+        ; bne     @flickerCursorPair2
+        ; lda     #$02
+        ; sta     spriteIndexInOamContentLookup
 @flickerCursorPair2:
         jsr     loadSpriteIntoOamStaging
         jsr     updateAudioWaitForNmiAndResetOamStaging
