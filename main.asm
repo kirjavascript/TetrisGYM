@@ -1,3 +1,9 @@
+ROCKET_LIMIT := $63 ; $3
+FAST_LEGAL := 1
+NO_DEMO := 1
+NO_LEGAL := 1
+NO_TITLE := 1
+
         .setcpu "6502"
 
 tmp1            := $0000
@@ -495,7 +501,11 @@ playState_player2ControlsActiveTetrimino:
         rts
 
 gameMode_legalScreen:
+.if NO_LEGAL
+        jmp @continueToNextScreen
+.else
         jsr     updateAudio2
+.endif
         lda     #$00
         sta     renderMode
         jsr     updateAudioWaitForNmiAndDisablePpuRendering
@@ -517,7 +527,11 @@ gameMode_legalScreen:
         ldy     #$02
         jsr     memset_page
         lda     #$FF
+.if FAST_LEGAL
+        jsr     developRts
+.else
         jsr     sleep_for_a_vblanks
+.endif
         lda     #$FF
         sta     generalCounter
 @waitForStartButton:
@@ -532,7 +546,11 @@ gameMode_legalScreen:
         rts
 
 gameMode_titleScreen:
+.if NO_TITLE
+        jmp @continueToNextScreen
+.else
         jsr     updateAudio2
+.endif
         lda     #$00
         sta     renderMode
         sta     $D0
@@ -571,16 +589,24 @@ gameMode_titleScreen:
 @startButtonPressed:
         lda     #$02
         sta     soundEffectSlot1Init
+@continueToNextScreen:
         inc     gameMode
         rts
 
 ; Start demo
 @timeout:
+.if NO_DEMO
+        .REPEAT 7
+            nop
+        .endrep
+        jmp @waitForStartButton
+.else
         lda     #$02
         sta     soundEffectSlot1Init
         lda     #$06
         sta     gameMode
         rts
+.endif
 
 render_mode_legal_and_title_screens:
         lda     currentPpuCtrl
@@ -3014,10 +3040,14 @@ playState_updateGameOverCurtain:
         cmp     #$02
         beq     @exitGame
         lda     player1_score+2
-        cmp     #$03
+        cmp     #ROCKET_LIMIT
         bcc     @checkForStartButton
         lda     #$80
+.if FAST_LEGAL
+        jsr     developRts
+.else
         jsr     sleep_for_a_vblanks
+.endif
         jsr     endingAnimation_maybe
         jmp     @exitGame
 
@@ -7293,7 +7323,9 @@ music_endings_noiseScript:
 
 .segment        "unreferenced_data4": absolute
 
-.include "data/unreferenced_data4.asm"
+; .include "data/unreferenced_data4.asm"
+developRts:
+    rts
 
 ; End of "unreferenced_data4" segment
 .code
