@@ -4,7 +4,7 @@ MD5 := md5sum -c
 
 CA65 := /usr/bin/ca65
 LD65 := /usr/bin/ld65
-nesChrEncode := python tools/nes_chr_encode.py
+nesChrEncode := python tools/nes-util/nes_chr_encode.py
 
 tetris.nes: tetris.o main.o tetris-ram.o
 

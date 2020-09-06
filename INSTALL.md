@@ -1,7 +1,7 @@
 # Linux
 
 	sudo apt-get install make gcc bison git python
-	pip install pypng
+	pip install pillow
 	git clone https://github.com/CelestialAmber/TetrisNESDisasm
 	cd TetrisNESDisasm
 
@@ -14,7 +14,7 @@ To build `tetris.nes`:
 
 In **Terminal**, run:
 	
-	pip install pypng
+	pip install pillow
 	git clone https://github.com/CelestialAmber/TetrisNESDisasm
 	cd TetrisNESDisasm
 
@@ -38,7 +38,7 @@ Run setup and leave the default settings. At "Select Packages", choose to instal
 
 In the **Cygwin terminal**, enter these commands:
 
-	pip install pypng
+	pip install pillow
 	git clone https://github.com/CelestialAmber/TetrisNESDisasm
 	cd TetrisNESDisasm
 

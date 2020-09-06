@@ -1,6 +1,7 @@
 *.nes
 *.o
 *.chr
+*.pyc
 tetris.lst
 tetris.lbl
 tetris.dbg
