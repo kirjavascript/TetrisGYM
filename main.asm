@@ -4,7 +4,7 @@ NO_DEMO := 1
 NO_LEGAL := 1
 NO_TITLE := 1
 NO_MUSIC := 1
-NO_GAMETYPE := 1
+NO_GAMETYPE := 0
 NO_NO_NEXT_BOX := 1
 
         .setcpu "6502"
@@ -688,8 +688,8 @@ L830B:  lda     #$FF
         lda     #$01
         sta     soundEffectSlot1Init
         lda     musicType
-        ; cmp     #$03
-        ; beq     @upNotPressed
+        cmp     #$06 ; 03
+        beq     @upNotPressed
         inc     musicType
         ldx     musicType
         lda     musicSelectionTable,x
@@ -738,35 +738,35 @@ L830B:  lda     #$FF
         asl     a
         asl     a
         clc
-        adc     #$3F
-        sta     spriteXOffset
-        lda     #$3F
-        sta     spriteYOffset
-        lda     #$01
-        sta     spriteIndexInOamContentLookup
-        lda     frameCounter
+        ; adc     #$3F
+        ; sta     spriteXOffset
+        ; lda     #$3F
+        ; sta     spriteYOffset
+        ; lda     #$01
+        ; sta     spriteIndexInOamContentLookup
+        ; lda     frameCounter
         ; and     #$03
         ; bne     @flickerCursorPair1
-        lda     #$02
-        sta     spriteIndexInOamContentLookup
+        ; lda     #$02
+        ; sta     spriteIndexInOamContentLookup
 @flickerCursorPair1:
-        jsr     loadSpriteIntoOamStaging
+        ; jsr     loadSpriteIntoOamStaging
         lda     musicType
         asl     a
         asl     a
         asl     a
-        asl     a
+        ; asl     a
         clc
-        adc     #$8F
+        adc     #$57
         sta     spriteYOffset
         lda     #$53
         sta     spriteIndexInOamContentLookup
-        lda     #$67
+        lda     #$1F
         sta     spriteXOffset
-        lda     frameCounter
+        ; lda     frameCounter
         ; and     #$03
         ; bne     @flickerCursorPair2
-        ; lda     #$02
+        lda     #$02
         ; sta     spriteIndexInOamContentLookup
 @flickerCursorPair2:
         jsr     loadSpriteIntoOamStaging
