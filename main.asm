@@ -1157,8 +1157,8 @@ gameModeState_initGameState:
         sta     player2_vramRow
         sta     player1_fallTimer
         sta     player2_fallTimer
-        sta     totalGarbageInactivePlayer
-        sta     totalGarbage
+        sta     pendingGarbage
+        sta     pendingGarbageInactivePlayer
         sta     player1_score
         sta     player1_score+1
         sta     player1_score+2
@@ -1263,10 +1263,10 @@ savePlayer1State:
         lda     numberOfPlayers
         cmp     #$01
         beq     @ret
-        ldx     totalGarbageInactivePlayer
-        lda     totalGarbage
-        sta     totalGarbageInactivePlayer
-        stx     totalGarbage
+        ldx     pendingGarbage
+        lda     pendingGarbageInactivePlayer
+        sta     pendingGarbage
+        stx     pendingGarbageInactivePlayer
 @ret:   rts
 
 ; Copies $40 to $80
@@ -1278,10 +1278,10 @@ savePlayer2State:
         dex
         cpx     #$FF
         bne     @whileXNotNeg1
-        ldx     totalGarbageInactivePlayer
-        lda     totalGarbage
-        sta     totalGarbageInactivePlayer
-        stx     totalGarbage
+        ldx     pendingGarbage
+        lda     pendingGarbageInactivePlayer
+        sta     pendingGarbage
+        stx     pendingGarbageInactivePlayer
         rts
 
 initPlayfieldIfTypeB:
@@ -3134,8 +3134,8 @@ playState_checkForCompletedRows:
         ldy     completedLines
         lda     garbageLines,y
         clc
-        adc     totalGarbage
-        sta     totalGarbage
+        adc     pendingGarbageInactivePlayer
+        sta     pendingGarbageInactivePlayer
         lda     #$00
         sta     vramRow
         sta     rowY
@@ -3157,7 +3157,7 @@ playState_receiveGarbage:
         lda     numberOfPlayers
         cmp     #$01
         beq     @ret
-        ldy     totalGarbageInactivePlayer
+        ldy     pendingGarbage
         beq     @ret
         lda     vramRow
         cmp     #$20
@@ -3195,7 +3195,7 @@ playState_receiveGarbage:
         cpy     #$C8
         bne     @fillGarbage
         lda     #$00
-        sta     totalGarbageInactivePlayer
+        sta     pendingGarbage
         sta     vramRow
 @ret:  inc     playState
 @delay:  rts
@@ -3856,9 +3856,9 @@ showHighScores:
         lda     numberOfPlayers
         cmp     #$01
         beq     showHighScores_real
-        jmp     LA085
+        jmp     showHighScores_ret
 
-showHighScores_real:  
+showHighScores_real:
         jsr     bulkCopyToPpu      ;not using @-label due to MMC1_Control in PAL
 MMC1_Control    := * + 1
         .addr   high_scores_nametable
@@ -3890,7 +3890,7 @@ MMC1_Control    := * + 1
         adc     generalCounter
         tay
         ldx     #$06
-@copyChar: 
+@copyChar:
         lda     highScoreNames,y
         sty     generalCounter
         tay
@@ -4380,7 +4380,7 @@ playState_bTypeGoalCheck:
         jsr     setMusicTrack
         ldy     #$46
         ldx     #$00
-@copySuccessGraphic:  
+@copySuccessGraphic:
         lda     typebSuccessGraphic,x
         cmp     #$80
         beq     @graphicCopied
