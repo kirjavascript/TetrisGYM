@@ -665,7 +665,7 @@ L830B:  lda     #$FF
         jsr     memset_page
         lda     newlyPressedButtons_player1
 
-.if PRACTISE_MODE
+.if PRACTISE_MODE ; skip mode menu
         jmp @leftNotPressed
         .repeat 13
             nop
@@ -696,7 +696,7 @@ L830B:  lda     #$FF
         sta     soundEffectSlot1Init
         lda     musicType
 
-.if PRACTISE_MODE
+.if PRACTISE_MODE ; menu items
         cmp     #$06
 .else
         cmp     #$03
@@ -751,7 +751,7 @@ L830B:  lda     #$FF
         asl     a
         clc
 
-.if PRACTISE_MODE
+.if PRACTISE_MODE ; skip mode menu sprites
         .repeat 25
             nop
         .endrep
@@ -775,7 +775,7 @@ L830B:  lda     #$FF
         asl     a
         asl     a
 
-.if PRACTISE_MODE
+.if PRACTISE_MODE ; adjust music menu sprites
         nop
         clc
         adc     #$57
