@@ -1,14 +1,12 @@
 const { readFileSync, writeFileSync } = require('fs');
 
-const buffer = readFileSync('./game_type_menu_nametable_clean.bin');
+const buffer = readFileSync('./game_type_menu_nametable.bin');
 
 const lookup = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ-.\'>################qweadzxc############################################################################################################################################################################################### ';
 console.log(lookup.length)
-// [...buffer].forEach(d => console.log(d))
-
-// TODO: conditionally insert clean
 
 const chars = [...buffer].map(value => lookup[value] || '#');
+// do the art, too
 
 console.log(chars.join('').match(/.{35}/g).join('\n'));
 const tiles = `
@@ -50,4 +48,4 @@ Z#W###000#####000#####000##AAAAAAAA
         buffer[i] = lookup.indexOf(d);
     }
 });
-writeFileSync('./game_type_menu_nametable.bin', buffer);
+writeFileSync('./game_type_menu_nametable_practise.bin', buffer);

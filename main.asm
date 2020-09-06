@@ -6,6 +6,7 @@ NO_TITLE := 1
 NO_MUSIC := 1
 NO_GAMETYPE := 0
 NO_NO_NEXT_BOX := 1
+PRACTISE_MODE := 1
 
         .setcpu "6502"
 
@@ -664,14 +665,20 @@ L830B:  lda     #$FF
         jsr     memset_page
         lda     newlyPressedButtons_player1
 
+.if PRACTISE_MODE
         jmp @leftNotPressed
-        ; cmp     #$01
-        ; bne     @rightNotPressed
-        ; lda     #$01
-        ; sta     gameType
-        ; lda     #$01
-        ; sta     soundEffectSlot1Init
-        ; jmp     @leftNotPressed
+        .repeat 13
+            nop
+        .endrep
+.else
+        cmp     #$01
+        bne     @rightNotPressed
+        lda     #$01
+        sta     gameType
+        lda     #$01
+        sta     soundEffectSlot1Init
+        jmp     @leftNotPressed
+.endif
 
 @rightNotPressed:
         lda     newlyPressedButtons_player1
@@ -688,7 +695,12 @@ L830B:  lda     #$FF
         lda     #$01
         sta     soundEffectSlot1Init
         lda     musicType
-        cmp     #$06 ; 03
+
+.if PRACTISE_MODE
+        cmp     #$06
+.else
+        cmp     #$03
+.endif
         beq     @upNotPressed
         inc     musicType
         ldx     musicType
@@ -738,24 +750,33 @@ L830B:  lda     #$FF
         asl     a
         asl     a
         clc
-        ; adc     #$3F
-        ; sta     spriteXOffset
-        ; lda     #$3F
-        ; sta     spriteYOffset
-        ; lda     #$01
-        ; sta     spriteIndexInOamContentLookup
-        ; lda     frameCounter
-        ; and     #$03
-        ; bne     @flickerCursorPair1
-        ; lda     #$02
-        ; sta     spriteIndexInOamContentLookup
+
+.if PRACTISE_MODE
+        .repeat 25
+            nop
+        .endrep
+.else
+        adc     #$3F
+        sta     spriteXOffset
+        lda     #$3F
+        sta     spriteYOffset
+        lda     #$01
+        sta     spriteIndexInOamContentLookup
+        lda     frameCounter
+        and     #$03
+        bne     @flickerCursorPair1
+        lda     #$02
+        sta     spriteIndexInOamContentLookup
 @flickerCursorPair1:
-        ; jsr     loadSpriteIntoOamStaging
+        jsr     loadSpriteIntoOamStaging
+.endif
         lda     musicType
         asl     a
         asl     a
         asl     a
-        ; asl     a
+
+.if PRACTISE_MODE
+        nop
         clc
         adc     #$57
         sta     spriteYOffset
@@ -763,11 +784,26 @@ L830B:  lda     #$FF
         sta     spriteIndexInOamContentLookup
         lda     #$1F
         sta     spriteXOffset
-        ; lda     frameCounter
-        ; and     #$03
-        ; bne     @flickerCursorPair2
+        lda     frameCounter
+        and     #$03
+        bne     @flickerCursorPair2
         lda     #$02
-        ; sta     spriteIndexInOamContentLookup
+        sta     spriteIndexInOamContentLookup
+.else
+        asl     a
+        clc
+        adc     #$8F
+        sta     spriteYOffset
+        lda     #$53
+        sta     spriteIndexInOamContentLookup
+        lda     #$67
+        sta     spriteXOffset
+        lda     frameCounter
+        and     #$03
+        bne     @flickerCursorPair2
+        lda     #$02
+        sta     spriteIndexInOamContentLookup
+.endif
 @flickerCursorPair2:
         jsr     loadSpriteIntoOamStaging
         jsr     updateAudioWaitForNmiAndResetOamStaging
@@ -2285,7 +2321,11 @@ sprite52CathedralDomeRocketJet2:
         .byte   $08,$48,$23,$04,$10,$58,$23,$04
         .byte   $FF
 sprite53MusicTypeCursor:
+.if PRACTISE_MODE
         .byte   $00,$27,$00,$00,$00,$FF,$40,$4A
+.else
+        .byte   $00,$27,$00,$00,$00,$27,$40,$4A
+.endif
         .byte   $FF
 sprite54Penguin1:
         .byte   $E8,$A9,$21,$00,$E8,$AA,$21,$08
@@ -5579,7 +5619,11 @@ legal_screen_nametable:
 title_screen_nametable:
         .incbin "gfx/nametables/title_screen_nametable.bin"
 game_type_menu_nametable:
+.if PRACTISE_MODE
+        .incbin "gfx/nametables/game_type_menu_nametable_practise.bin"
+.else
         .incbin "gfx/nametables/game_type_menu_nametable.bin"
+.endif
 level_menu_nametable:
         .incbin "gfx/nametables/level_menu_nametable.bin"
 game_nametable:
