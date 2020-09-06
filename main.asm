@@ -91,8 +91,8 @@ heldButtons     := $00B6                        ; Active player's buttons
 activePlayer    := $00B7                        ; Which player is being processed (data in $40)
 playfieldAddr   := $00B8                        ; HI byte is leftPlayfield in canon. Current playfield being processed: $0400 (left; 1st player) or $0500 (right; 2nd player)
 allegro         := $00BA
-totalGarbageInactivePlayer:= $00BB              ; This is exchanged with totalGarbage when swapping players
-totalGarbage    := $00BC
+pendingGarbage  := $00BB                        ; Garbage waiting to be delivered to the current player. This is exchanged with pendingGarbageInactivePlayer when swapping players.
+pendingGarbageInactivePlayer := $00BC           ; canon is totalGarbage
 renderMode      := $00BD
 numberOfPlayers := $00BE
 nextPiece       := $00BF                        ; Stored by its orientation ID
@@ -3126,17 +3126,18 @@ playState_checkForCompletedRows:
 playState_receiveGarbage:
         lda     numberOfPlayers
         cmp     #$01
-        beq     L9B50
+        beq     @ret
         ldy     totalGarbageInactivePlayer
-        beq     L9B50
+        beq     @ret
         lda     vramRow
         cmp     #$20
-        bmi     L9B52
+        bmi     @delay
         lda     multBy10Table,y
         sta     generalCounter2
         lda     #$00
         sta     generalCounter
-L9B1C:  ldy     generalCounter2
+@shiftPlayfieldUp:
+        ldy     generalCounter2
         lda     (playfieldAddr),y
         ldy     generalCounter
         sta     (playfieldAddr),y
@@ -3144,30 +3145,30 @@ L9B1C:  ldy     generalCounter2
         inc     generalCounter2
         lda     generalCounter2
         cmp     #$C8
-        bne     L9B1C
+        bne     @shiftPlayfieldUp
         iny
         ldx     #$00
-L9B31:  cpx     garbageHole
-        beq     @garbageEmptySpace
+@fillGarbage:
+        cpx     garbageHole
+        beq     @hole
         lda     #$78
-        jmp     @placeGarbage
-
-@garbageEmptySpace:
+        jmp     @set
+@hole:
         lda     #$FF
-@placeGarbage:
+@set:
         sta     (playfieldAddr),y
         inx
         cpx     #$0A
-        bne     L9B45
+        bne     @inc
         ldx     #$00
-L9B45:  iny
+@inc:   iny
         cpy     #$C8
-        bne     L9B31
+        bne     @fillGarbage
         lda     #$00
         sta     totalGarbageInactivePlayer
         sta     vramRow
-L9B50:  inc     playState
-L9B52:  rts
+@ret:  inc     playState
+@delay:  rts
 
 garbageLines:
         .byte   $00,$00,$01,$02,$04
@@ -3824,19 +3825,21 @@ L9FE9:  ldy     #$00
 showHighScores:
         lda     numberOfPlayers
         cmp     #$01
-        beq     L9FFB
+        beq     showHighScores_real
         jmp     LA085
 
-L9FFB:  jsr     bulkCopyToPpu
+showHighScores_real:  
+        jsr     bulkCopyToPpu      ;not using @-label due to MMC1_Control in PAL
 MMC1_Control    := * + 1
         .addr   high_scores_nametable
         lda     #$00
         sta     generalCounter2
         lda     gameType
-        beq     LA00C
+        beq     @copyEntry
         lda     #$04
         sta     generalCounter2
-LA00C:  lda     generalCounter2
+@copyEntry:
+        lda     generalCounter2
         and     #$03
         asl     a
         tax
@@ -3857,7 +3860,8 @@ LA00C:  lda     generalCounter2
         adc     generalCounter
         tay
         ldx     #$06
-LA031:  lda     highScoreNames,y
+@copyChar: 
+        lda     highScoreNames,y
         sty     generalCounter
         tay
         lda     highScoreCharToTile,y
@@ -3865,7 +3869,7 @@ LA031:  lda     highScoreNames,y
         sta     PPUDATA
         iny
         dex
-        bne     LA031
+        bne     @copyChar
         lda     #$FF
         sta     PPUDATA
         lda     generalCounter2
@@ -3892,12 +3896,12 @@ LA031:  lda     highScoreNames,y
         inc     generalCounter2
         lda     generalCounter2
         cmp     #$03
-        beq     LA085
+        beq     showHighScores_ret
         cmp     #$07
-        beq     LA085
-        jmp     LA00C
+        beq     showHighScores_ret
+        jmp     @copyEntry
 
-LA085:  rts
+showHighScores_ret:  rts
 
 highScorePpuAddrTable:
         .dbyt   $2289,$22C9,$2309
@@ -4339,22 +4343,23 @@ gameModeState_startButtonHandling:
 
 playState_bTypeGoalCheck:
         lda     gameType
-        beq     LA42B
+        beq     @ret
         lda     lines
-        bne     LA42B
+        bne     @ret
         lda     #$02
         jsr     setMusicTrack
         ldy     #$46
         ldx     #$00
-LA403:  lda     unknown15_table,x
+@copySuccessGraphic:  
+        lda     typebSuccessGraphic,x
         cmp     #$80
-        beq     LA411
+        beq     @graphicCopied
         sta     (playfieldAddr),y
         inx
         iny
-        jmp     LA403
+        jmp     @copySuccessGraphic
 
-LA411:  lda     #$00
+@graphicCopied:  lda     #$00
         sta     player1_vramRow
         jsr     sleep_for_14_vblanks
         lda     #$00
@@ -4367,10 +4372,10 @@ LA411:  lda     #$00
         inc     gameModeState
         rts
 
-LA42B:  inc     playState
+@ret:  inc     playState
         rts
 
-unknown15_table:
+typebSuccessGraphic:
         .byte   $38,$39,$39,$39,$39,$39,$39,$39
         .byte   $39,$3A,$3B,$1C,$1E,$0C,$0C,$0E
         .byte   $1C,$1C,$28,$3C,$3D,$3E,$3E,$3E
