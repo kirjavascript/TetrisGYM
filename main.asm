@@ -1,4 +1,4 @@
-; Petrus - The Tetris Practise ROM
+; Petrus - A Tetris Practise ROM
 ;
 ; @author kirjava
 

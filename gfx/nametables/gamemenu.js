@@ -14,8 +14,8 @@ WWW################################
 W#W#qwwwwwwwwwwwwwwwwwwwwwwwwwwwwe#
 W#W#a                            d#
 W#W#a                            d#
-W#W#a      THE PRACTISE ROM      d#
-W#W#a                            d#
+W#W#a          A TETRIS          d#
+W#W#a        PRACTISE ROM        d#
 W#W#a                            d#
 X0W#a                            d#
 XWW#a                            d#
