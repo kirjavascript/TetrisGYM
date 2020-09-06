@@ -4,7 +4,8 @@ NO_DEMO := 1
 NO_LEGAL := 1
 NO_TITLE := 1
 NO_MUSIC := 1
-NO_GAMETYPE := 0
+NO_GAMETYPE := 1
+NO_NO_NEXT_BOX := 1
 
         .setcpu "6502"
 
@@ -1732,8 +1733,15 @@ L8B9D:  lda     orientationTable,y
         rts
 
 stageSpriteForNextPiece:
+.if NO_NO_NEXT_BOX
+        nop
+        nop
+        nop
+        nop
+.else
         lda     displayNextPiece
         bne     @ret
+.endif
         lda     #$C8
         sta     spriteXOffset
         lda     #$77
