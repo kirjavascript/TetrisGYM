@@ -3,5 +3,5 @@ make
 stat -c %s tetris.ips
 
 if [ "$1" == "run" ]; then
-    fceux ./tetris.nes
+    mesen ./tetris.nes
 fi
