@@ -8,6 +8,10 @@ NO_GAMETYPE := 0
 NO_NO_NEXT_BOX := 1
 PRACTISE_MODE := 1
 
+practiseType := $00C2 ; musicType
+MODE_NORMAL := 0
+MODE_LEVEL29 := 1
+
         .setcpu "6502"
 
 tmp1            := $0000
@@ -814,7 +818,12 @@ L830B:  lda     #$FF
         jmp     L830B
 
 gameMode_levelMenu:
+.if PRACTISE_MODE
+        jmp     practiseLevelMenuPatch
+gameMode_levelMenuContinue:
+.else
         inc     initRam
+.endif
         lda     #$10
         jsr     setMMC1Control
         jsr     updateAudio2
@@ -7401,9 +7410,27 @@ music_endings_noiseScript:
 
 .segment        "unreferenced_data4": absolute
 
-; .include "data/unreferenced_data4.asm"
 developRts:
     rts
+
+.if PRACTISE_MODE
+
+practiseLevelMenuPatch:
+    lda     practiseType
+    cmp     #MODE_LEVEL29
+    beq     @lvl29
+    inc     initRam
+    jmp     gameMode_levelMenuContinue
+
+@lvl29:
+    lda     #$00
+    sta     gameModeState
+    inc     gameMode
+    lda     #29
+    sta     player1_startLevel
+    rts
+
+.endif
 
 ; End of "unreferenced_data4" segment
 .code

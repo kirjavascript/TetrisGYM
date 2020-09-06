@@ -4,7 +4,7 @@ const buffer = readFileSync('./game_type_menu_nametable.bin');
 
 const lookup = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ-.\'>################qweadzxc############################################################################################################################################################################################### ';
 
-const chars = [...buffer].map(value => lookup[value] || '#');
+const chars = [...buffer].map(value => lookup[value] || '__NOWAYNOWAY');
 
 console.log(chars.join('').match(/.{35}/g).join('\n'));
 
@@ -21,9 +21,9 @@ X0W#a                            d#
 XWW#a                            d#
 X#W#a                            d#
 X#W#a    NORMAL                  d#
+X#W#a    LEVEL 29                d#
 X#W#a    T-SPINS                 d#
 X#W#a    OTHER SPIN SETUPS       d#
-X#W#a    LEVEL 29 TRAINER        d#
 X#W#a    ALWAYS TETRIS READY     d#
 Y0W#a    DROUGHT MODIFIER        d#
 YWW#a    SOMETHING ELSE          d#
