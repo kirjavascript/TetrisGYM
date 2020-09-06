@@ -1,4 +1,3 @@
-clean.nes
-tetris.nes
+*.nes
 *.o
 *.chr

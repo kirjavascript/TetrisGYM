@@ -220,7 +220,7 @@ NOISE_HI        := $400F
 DMC_FREQ        := $4010
 DMC_RAW         := $4011
 DMC_START       := $4012                        ; start << 6 + $C000
-DMC_LEN         := $4013                        ; len << 4 + 1 
+DMC_LEN         := $4013                        ; len << 4 + 1
 OAMDMA          := $4014
 SND_CHN         := $4015
 JOY1            := $4016
@@ -5489,21 +5489,21 @@ ending_palette:
 
 .include "charmap.asm"
         ;are the following zeros unused entries for each high score table?
-defaultHighScoresTable: 
+defaultHighScoresTable:
         .byte  "HOWARD" ;$08,$0F,$17,$01,$12,$04
         .byte  "OTASAN" ;$0F,$14,$01,$13,$01,$0E
         .byte  "LANCE " ;$0C,$01,$0E,$03,$05,$2B
         .byte  $00,$00,$00,$00,$00,$00 ;unknown
         .byte  "ALEX  " ;$01,$0C,$05,$18,$2B,$2B
-        .byte  "TONY  " ;$14,$0F,$0E,$19,$2B,$2B 
+        .byte  "TONY  " ;$14,$0F,$0E,$19,$2B,$2B
         .byte  "NINTEN" ;$0E,$09,$0E,$14,$05,$0E
         .byte   $00,$00,$00,$00,$00,$00 ;unknown
         ;High Scores are stored in BCD
         .byte   $01,$00,$00 ;Game A 1st Entry Score, 10000
-        .byte   $00,$75,$00 ;Game A 2nd Entry Score, 7500 
+        .byte   $00,$75,$00 ;Game A 2nd Entry Score, 7500
         .byte   $00,$50,$00 ;Game A 3rd Entry Score, 5000
         .byte   $00,$00,$00 ;unknown
-        .byte   $00,$20,$00 ;Game B 1st Entry Score, 2000 
+        .byte   $00,$20,$00 ;Game B 1st Entry Score, 2000
         .byte   $00,$10,$00 ;Game B 2nd Entry Score, 1000
         .byte   $00,$05,$00 ;Game B 3rd Entry Score, 500
         .byte   $00,$00,$00 ;unknown
@@ -6622,7 +6622,7 @@ updateMusicFrame_setChanVol:
 @muteAndAdvanceFrame:
         ldy     #$10
         bne     @advanceFrameAndSetVol
-;  
+;
 updateMusicFrame_progLoadNextScript:
         iny
         lda     (musicChanTmpAddr),y
@@ -6683,7 +6683,7 @@ updateMusicFrame_progLoadRoutine:
         lda     #$01
         sta     musicChanNoteDurationRemaining,x
         bne     updateMusicFrame_updateChannel
-;  
+;
 updateMusicFrame_progNextRoutine_jmp:
         jmp     updateMusicFrame_progNextRoutine
 
@@ -6861,7 +6861,7 @@ updateMusicFrame_updateChannel:
         lda     #$10
         sta     AUDIOTMP1
         bne     @checkChanControl
-;  
+;
 @loadVolume:
         lda     musicChanVolume,x
         sta     AUDIOTMP1
@@ -7345,4 +7345,3 @@ LFFFF           := * + 1
 
 ; End of "VECTORS" segment
 .code
-
