@@ -2,6 +2,7 @@
 ;
 ; @author kirjava
 
+
 ROCKET_LIMIT := $63 ; $3
 FAST_LEGAL := 1
 BETTER_PAUSE := 1
@@ -19,7 +20,14 @@ MODE_ALWAYSTETRISREADY := 2
 MODES_QUANTITY := 6
 practiseType := $00C2 ; musicType
 
+.macro padNOP qty
+    .repeat qty
+        nop
+    .endrep
+.endmacro
+
         .setcpu "6502"
+.include './macros.asm'
 
 tmp1            := $0000
 tmp2            := $0001
@@ -617,9 +625,7 @@ gameMode_titleScreen:
 ; Start demo
 @timeout:
 .if NO_DEMO
-        .REPEAT 7
-            nop
-        .endrep
+padNOP 7
         jmp @waitForStartButton
 .else
         lda     #$02
@@ -684,9 +690,7 @@ L830B:  lda     #$FF
 
 .if PRACTISE_MODE ; skip mode menu
         jmp @leftNotPressed
-        .repeat 13
-            nop
-        .endrep
+padNOP  13
 .else
         cmp     #$01
         bne     @rightNotPressed
@@ -769,9 +773,7 @@ L830B:  lda     #$FF
         clc
 
 .if PRACTISE_MODE ; skip mode menu sprites
-        .repeat 25
-            nop
-        .endrep
+padNOP  25
 .else
         adc     #$3F
         sta     spriteXOffset
@@ -793,9 +795,7 @@ L830B:  lda     #$FF
         asl     a
 
 .if PRACTISE_MODE ; adjust music menu sprites
-        .repeat 10
-            nop
-        .endrep
+padNOP  10
         nop
         clc
         adc     #$57
@@ -3679,9 +3679,7 @@ gameMode_startDemo:
 ; canon is adjustMusicSpeed
 setMusicTrack:
 .if NO_MUSIC
-.repeat 14
-            nop
-.endrep
+padNOP 14
 .else
         sta     musicTrack
         lda     gameMode
@@ -4414,9 +4412,7 @@ gameModeState_startButtonHandling:
 
 .if BETTER_PAUSE
 @startPressed:
-.repeat 3
-        nop
-.endrep
+padNOP  $3
         lda     #$05
         sta     musicStagingNoiseHi
         lda     #$00
