@@ -14,7 +14,8 @@ NO_NO_NEXT_BOX := 1
 PRACTISE_MODE := 1
 MODE_NORMAL := 0
 MODE_LEVEL29 := 1
-MODE_ALWAYSREADY := 2
+MODE_ALWAYSTETRISREADY := 2
+MODES_QUANTITY := 6
 practiseType := $00C2 ; musicType
 
         .setcpu "6502"
@@ -711,8 +712,8 @@ L830B:  lda     #$FF
         sta     soundEffectSlot1Init
         lda     musicType
 
-.if PRACTISE_MODE ; menu items
-        cmp     #$06
+.if PRACTISE_MODE ; menu item qty
+        cmp     #MODES_QUANTITY
 .else
         cmp     #$03
 .endif
