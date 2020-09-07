@@ -4,6 +4,7 @@
 
 ROCKET_LIMIT := $63 ; $3
 FAST_LEGAL := 1
+BETTER_PAUSE := 1
 NO_DEMO := 1
 NO_LEGAL := 1
 NO_TITLE := 1
@@ -4411,8 +4412,36 @@ gameModeState_startButtonHandling:
         bne     @startPressed
         jmp     @ret
 
-; Do nothing if curtain is being lowered
+.if BETTER_PAUSE
 @startPressed:
+.repeat 3
+        nop
+.endrep
+        lda     #$05
+        sta     musicStagingNoiseHi
+        lda     #$00
+        sta     renderMode
+        jsr     updateAudioAndWaitForNmi
+        lda     #$1E
+        sta     PPUMASK
+        lda     #$FF
+        ldx     #$02
+        ldy     #$02
+        jsr     memset_page
+@pauseLoop:
+
+        lda     #$74
+        sta     spriteXOffset
+        lda     #$37
+        sta     spriteYOffset
+        lda     #$05
+        sta     spriteIndexInOamContentLookup
+        jsr     loadSpriteIntoOamStaging
+        jsr     stageSpriteForCurrentPiece
+        jsr     stageSpriteForNextPiece
+.else
+@startPressed:
+; Do nothing if curtain is being lowered
         lda     player1_playState
         cmp     #$0A
         bne     @pause
@@ -4430,6 +4459,7 @@ gameModeState_startButtonHandling:
         ldy     #$02
         jsr     memset_page
 @pauseLoop:
+
         lda     #$70
         sta     spriteXOffset
         lda     #$77
@@ -4437,6 +4467,7 @@ gameModeState_startButtonHandling:
         lda     #$05
         sta     spriteIndexInOamContentLookup
         jsr     loadSpriteIntoOamStaging
+.endif
         lda     newlyPressedButtons_player1
         cmp     #$10
         beq     @resume
@@ -5609,9 +5640,9 @@ ending_palette:
         ;are the following zeros unused entries for each high score table?
 defaultHighScoresTable:
 .if PRACTISE_MODE
-        .byte  "ALEXEY"
         .byte  "LUCY  "
-        .byte  "BV 09 "
+        .byte  "BV    "
+        .byte  "TIM   "
 .else
         .byte  "HOWARD" ;$08,$0F,$17,$01,$12,$04
         .byte  "OTASAN" ;$0F,$14,$01,$13,$01,$0E
@@ -5624,9 +5655,9 @@ defaultHighScoresTable:
         .byte   $00,$00,$00,$00,$00,$00 ;unknown
         ;High Scores are stored in BCD
 .if PRACTISE_MODE
-        .byte   $00,$00,$00 ;Game A 1st Entry Score, 10000
-        .byte   $00,$00,$00 ;Game A 2nd Entry Score, 7500
-        .byte   $00,$00,$00 ;Game A 3rd Entry Score, 5000
+        .byte   $00,$00,$00
+        .byte   $00,$00,$00
+        .byte   $00,$00,$00
 .else
         .byte   $01,$00,$00 ;Game A 1st Entry Score, 10000
         .byte   $00,$75,$00 ;Game A 2nd Entry Score, 7500
