@@ -1,9 +1,11 @@
 ; Petrus - A Tetris Practise ROM
 ;
-; @author kirjava
+; @author Kirjava
+; @github kirjavascript/PetrusNES
+; @disassembly CelestialAmber/TetrisNESDisasm
 
 
-ROCKET_LIMIT := $63 ; $3
+ROCKET_LIMIT := $0 ; $3
 FAST_LEGAL := 1
 BETTER_PAUSE := 1
 NO_DEMO := 1
@@ -27,7 +29,6 @@ practiseType := $00C2 ; musicType
 .endmacro
 
         .setcpu "6502"
-.include './macros.asm'
 
 tmp1            := $0000
 tmp2            := $0001
