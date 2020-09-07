@@ -20,7 +20,7 @@ PRACTISE_MODE := 1
 MODE_NORMAL := 0
 MODE_LEVEL29 := 1
 MODE_ALWAYSTETRISREADY := 2
-MODES_QUANTITY := 3
+MODES_QUANTITY := 2
 practiseType := $00C2 ; musicType
 
 .macro padNOP qty
@@ -460,7 +460,11 @@ branchOnGameMode:
 gameModeState_updatePlayer1:
         jsr     makePlayer1Active
         jsr     branchOnPlayStatePlayer1
+.if PRACTISE_MODE
+        jsr     practiseAdvanceGamePatch
+.else
         jsr     stageSpriteForCurrentPiece
+.endif
         jsr     savePlayer1State
         jsr     stageSpriteForNextPiece
         inc     gameModeState
@@ -7519,6 +7523,30 @@ practiseCompleteRowPatch:
 @continue:
     jmp     playState_completeRowContinue
 
+practiseAdvanceGamePatch:
+    jsr     stageSpriteForCurrentPiece
+
+    lda     practiseType
+    cmp     #MODE_ALWAYSTETRISREADY
+    bne     @skip
+
+    lda $4C7
+    cmp #$7B
+    beq @skip
+    lda #$7B
+    ldx #$28
+@loop:
+    sta $049F,X
+    dex
+    bne @loop
+@skipEmpty:
+    lda #$EF
+    sta $04A9
+    sta $04B3
+    sta $04BD
+    sta $04C7
+@skip:
+        rts
 
         ; tay
         ; ldx     #$0A
