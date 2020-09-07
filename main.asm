@@ -5608,26 +5608,44 @@ ending_palette:
 .include "charmap.asm"
         ;are the following zeros unused entries for each high score table?
 defaultHighScoresTable:
+.if PRACTISE_MODE
+        .byte  "ALEXEY"
+        .byte  "LUCY  "
+        .byte  "BV 09 "
+.else
         .byte  "HOWARD" ;$08,$0F,$17,$01,$12,$04
         .byte  "OTASAN" ;$0F,$14,$01,$13,$01,$0E
         .byte  "LANCE " ;$0C,$01,$0E,$03,$05,$2B
+.endif
         .byte  $00,$00,$00,$00,$00,$00 ;unknown
         .byte  "ALEX  " ;$01,$0C,$05,$18,$2B,$2B
         .byte  "TONY  " ;$14,$0F,$0E,$19,$2B,$2B
         .byte  "NINTEN" ;$0E,$09,$0E,$14,$05,$0E
         .byte   $00,$00,$00,$00,$00,$00 ;unknown
         ;High Scores are stored in BCD
+.if PRACTISE_MODE
+        .byte   $00,$00,$00 ;Game A 1st Entry Score, 10000
+        .byte   $00,$00,$00 ;Game A 2nd Entry Score, 7500
+        .byte   $00,$00,$00 ;Game A 3rd Entry Score, 5000
+.else
         .byte   $01,$00,$00 ;Game A 1st Entry Score, 10000
         .byte   $00,$75,$00 ;Game A 2nd Entry Score, 7500
         .byte   $00,$50,$00 ;Game A 3rd Entry Score, 5000
+.endif
         .byte   $00,$00,$00 ;unknown
         .byte   $00,$20,$00 ;Game B 1st Entry Score, 2000
         .byte   $00,$10,$00 ;Game B 2nd Entry Score, 1000
         .byte   $00,$05,$00 ;Game B 3rd Entry Score, 500
         .byte   $00,$00,$00 ;unknown
+.if PRACTISE_MODE
+        .byte   $00 ;Game A 1st Entry Level
+        .byte   $00 ;Game A 2nd Entry Level
+        .byte   $00 ;Game A 3nd Entry Level
+.else
         .byte   $09 ;Game A 1st Entry Level
         .byte   $05 ;Game A 2nd Entry Level
         .byte   $00 ;Game A 3nd Entry Level
+.endif
         .byte   $00 ;unknown
         .byte   $09 ;Game B 1st Entry Level
         .byte   $05 ;Game B 2nd Entry Level
