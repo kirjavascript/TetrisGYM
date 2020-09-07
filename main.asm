@@ -20,7 +20,7 @@ PRACTISE_MODE := 1
 MODE_NORMAL := 0
 MODE_LEVEL29 := 1
 MODE_ALWAYSTETRISREADY := 2
-MODES_QUANTITY := 6
+MODES_QUANTITY := 3
 practiseType := $00C2 ; musicType
 
 .macro padNOP qty
@@ -3146,12 +3146,10 @@ playState_updateGameOverCurtain:
 @ret2:  rts
 
 playState_checkForCompletedRows:
-        ; inc     playState
-        ; rts
         lda     vramRow
         cmp     #$20
         bpl     @updatePlayfieldComplete
-        jmp     @ret
+        jmp     playState_checkForCompletedRows_return
 
 @updatePlayfieldComplete:
         lda     tetriminoY
@@ -3170,8 +3168,15 @@ playState_checkForCompletedRows:
         clc
         adc     generalCounter
         sta     generalCounter
+
+.if PRACTISE_MODE
+        jsr practiseCompleteRowPatch
+@burnLines:
+.else
         tay
         ldx     #$0A
+.endif
+
 @checkIfRowComplete:
         lda     (playfieldAddr),y
         cmp     #$EF
@@ -3188,6 +3193,7 @@ playState_checkForCompletedRows:
         ldy     generalCounter
         dey
 @movePlayfieldDownOneRow:
+
         lda     (playfieldAddr),y
         ldx     #$0A
         stx     playfieldAddr
@@ -3197,7 +3203,6 @@ playState_checkForCompletedRows:
         dey
         cpy     #$FF
         bne     @movePlayfieldDownOneRow
-@skip:
         lda     #$EF
         ldy     #$00
 @clearRowTopRow:
@@ -3217,7 +3222,7 @@ playState_checkForCompletedRows:
         inc     lineIndex
         lda     lineIndex
         cmp     #$04
-        bmi     @ret
+        bmi     playState_checkForCompletedRows_return
         ldy     completedLines
         lda     garbageLines,y
         clc
@@ -3234,11 +3239,14 @@ playState_checkForCompletedRows:
 @skipTetrisSoundEffect:
         inc     playState
         lda     completedLines
-        bne     @ret
+        bne     playState_checkForCompletedRows_return
+@skipLines:
+playState_completeRowContinue:
         inc     playState
         lda     #$07
         sta     soundEffectSlot1Init
-@ret:   rts
+playState_checkForCompletedRows_return:
+        rts
 
 playState_receiveGarbage:
         lda     numberOfPlayers
@@ -7485,7 +7493,7 @@ practiseLevelMenuPatch:
     cmp     #MODE_LEVEL29
     beq     @lvl29
 
-    inc     initRam
+    inc     initRam ; patched command
     jmp     gameMode_levelMenuContinue
 
 @lvl29:
@@ -7495,6 +7503,32 @@ practiseLevelMenuPatch:
     lda     #29
     sta     player1_startLevel
     rts
+
+practiseCompleteRowPatch:
+    tay ; patched command
+    ldx     #$0A ; patched command
+
+    lda     practiseType
+    cmp     #MODE_ALWAYSTETRISREADY
+    bne     @skip
+    lda     generalCounter
+    cmp     #$A0
+    bpl     @continue
+@skip:
+    rts
+@continue:
+    jmp     playState_completeRowContinue
+
+
+        ; tay
+        ; ldx     #$0A
+
+        ; lda     practiseType
+        ; cmp     #MODE_ALWAYSTETRISREADY
+        ; bne     @burnLines
+        ; lda     generalCounter
+        ; cmp     #$A0
+        ; bpl     @skipLines
 
 .endif
 
