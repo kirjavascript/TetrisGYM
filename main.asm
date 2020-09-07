@@ -5,7 +5,8 @@
 ; @upstream CelestialAmber/TetrisNESDisasm
 ; @disassembly ejona86/taus
 
-ROCKET_LIMIT := $FF ; $3
+ROCKET_LIMIT := $FF
+SCORE_LIMIT := $FF
 FAST_LEGAL := 1
 BETTER_PAUSE := 1
 NO_DEMO := 1
@@ -3196,6 +3197,7 @@ playState_checkForCompletedRows:
         dey
         cpy     #$FF
         bne     @movePlayfieldDownOneRow
+@skip:
         lda     #$EF
         ldy     #$00
 @clearRowTopRow:
@@ -3457,7 +3459,7 @@ L9C75:  lda     score+2
         sta     score+2
 L9C84:  lda     score+2
         and     #$F0
-        cmp     #$A0
+        cmp     #SCORE_LIMIT
         bcc     L9C94
         lda     #$99
         sta     score
@@ -5650,7 +5652,7 @@ defaultHighScoresTable:
 .if PRACTISE_MODE
         .byte  "LUCY  "
         .byte  "BV    "
-        .byte  "TIM   "
+        .byte  "EJONA "
 .else
         .byte  "HOWARD" ;$08,$0F,$17,$01,$12,$04
         .byte  "OTASAN" ;$0F,$14,$01,$13,$01,$0E
@@ -5663,9 +5665,9 @@ defaultHighScoresTable:
         .byte   $00,$00,$00,$00,$00,$00 ;unknown
         ;High Scores are stored in BCD
 .if PRACTISE_MODE
-        .byte   $00,$00,$03
-        .byte   $00,$00,$02
-        .byte   $00,$00,$01
+        .byte   $00,$00,$00
+        .byte   $00,$00,$00
+        .byte   $00,$00,$00
 .else
         .byte   $01,$00,$00 ;Game A 1st Entry Score, 10000
         .byte   $00,$75,$00 ;Game A 2nd Entry Score, 7500
