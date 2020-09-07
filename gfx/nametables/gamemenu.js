@@ -20,13 +20,13 @@ W#W#a                            d#
 X0W#a                            d#
 XWW#a                            d#
 X#W#a                            d#
-X#W#a    NORMAL !                d#
-X#W#a    LEVEL 29 !              d#
+X#W#a    NORMAL                  d#
+X#W#a    LEVEL 29                d#
 X#W#a    ALWAYS TETRIS READY     d#
-X#W#a    T-SPINS                 d#
-X#W#a    OTHER SPIN SETUPS       d#
-Y0W#a    DROUGHT MODIFIER        d#
-YWW#a    SOMETHING ELSE          d#
+X#W#a    T-SPINS X               d#
+X#W#a    OTHER SPIN SETUPS X     d#
+Y0W#a    DROUGHT MODIFIER X      d#
+YWW#a    SOMETHING ELSE X        d#
 Y#W#a                            d#
 Y#W#a                            d#
 Y#W#a                            d#

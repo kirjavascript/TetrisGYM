@@ -2,20 +2,20 @@
 ;
 ; @author Kirjava
 ; @github kirjavascript/PetrusNES
-; @disassembly CelestialAmber/TetrisNESDisasm
+; @upstream CelestialAmber/TetrisNESDisasm
+; @disassembly ejona86/taus
 
-
-ROCKET_LIMIT := $0 ; $3
+ROCKET_LIMIT := $FF ; $3
 FAST_LEGAL := 1
 BETTER_PAUSE := 1
 NO_DEMO := 1
 NO_LEGAL := 1
 NO_TITLE := 1
 NO_MUSIC := 1
-NO_GAMETYPE := 0
 NO_NO_NEXT_BOX := 1
-
+NO_GAMETYPE := 0
 PRACTISE_MODE := 1
+
 MODE_NORMAL := 0
 MODE_LEVEL29 := 1
 MODE_ALWAYSTETRISREADY := 2
@@ -531,13 +531,18 @@ playState_player2ControlsActiveTetrimino:
         rts
 
 gameMode_legalScreen:
-.if NO_LEGAL
+.if PRACTISE_MODE ; boot
+        lda     #$80
+        sta     player1_startLevel
+        jmp @continueToNextScreen
+.elseif NO_LEGAL
+padNOP  4
         jmp @continueToNextScreen
 .else
         jsr     updateAudio2
-.endif
         lda     #$00
         sta     renderMode
+.endif
         jsr     updateAudioWaitForNmiAndDisablePpuRendering
         jsr     disableNmi
         lda     #$00
@@ -3140,6 +3145,8 @@ playState_updateGameOverCurtain:
 @ret2:  rts
 
 playState_checkForCompletedRows:
+        ; inc     playState
+        ; rts
         lda     vramRow
         cmp     #$20
         bpl     @updatePlayfieldComplete
@@ -5656,9 +5663,9 @@ defaultHighScoresTable:
         .byte   $00,$00,$00,$00,$00,$00 ;unknown
         ;High Scores are stored in BCD
 .if PRACTISE_MODE
-        .byte   $00,$00,$00
-        .byte   $00,$00,$00
-        .byte   $00,$00,$00
+        .byte   $00,$00,$03
+        .byte   $00,$00,$02
+        .byte   $00,$00,$01
 .else
         .byte   $01,$00,$00 ;Game A 1st Entry Score, 10000
         .byte   $00,$75,$00 ;Game A 2nd Entry Score, 7500
