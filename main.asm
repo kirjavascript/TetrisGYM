@@ -7530,16 +7530,20 @@ practiseAdvanceGamePatch:
     cmp     #MODE_ALWAYSTETRISREADY
     bne     @skip
 
-    ; lda $4C7 ; check first digit is painted or not
-    ; cmp #$7B
-    ; beq @skip
+    lda $4C7 ; check first hole is filled
+    cmp #$EF
+    bne @clearWell
+
+    lda $4C7 ; check first digit is painted or not
+    cmp #$7B
+    beq @skip
     lda #$7B
     ldx #$28
 @loop:
     sta $049F,X
     dex
     bne @loop
-@skipEmpty:
+@clearWell:
     lda #$EF
     sta $04A9
     sta $04B3
