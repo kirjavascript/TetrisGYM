@@ -3700,7 +3700,11 @@ gameModeState_checkForResetKeyCombo:
         rts
 
 @reset: jsr     updateAudio2
+.if PRACTISE_MODE
+        lda     #$02
+.else
         lda     #$00
+.endif
         sta     gameMode
         rts
 
@@ -4429,7 +4433,7 @@ padNOP  $3
 
         lda     #$74
         sta     spriteXOffset
-        lda     #$37
+        lda     #$7B
         sta     spriteYOffset
         lda     #$05
         sta     spriteIndexInOamContentLookup
