@@ -458,13 +458,13 @@ branchOnGameMode:
         .addr   gameMode_playAndEndingHighScore_jmp
         .addr   gameMode_startDemo
 gameModeState_updatePlayer1:
-        jsr     makePlayer1Active
-        jsr     branchOnPlayStatePlayer1
 .if PRACTISE_MODE
         jsr     practiseAdvanceGamePatch
 .else
-        jsr     stageSpriteForCurrentPiece
+        jsr     makePlayer1Active
 .endif
+        jsr     branchOnPlayStatePlayer1
+        jsr     stageSpriteForCurrentPiece
         jsr     savePlayer1State
         jsr     stageSpriteForNextPiece
         inc     gameModeState
@@ -7524,15 +7524,23 @@ practiseCompleteRowPatch:
     jmp     playState_completeRowContinue
 
 practiseAdvanceGamePatch:
-    jsr     stageSpriteForCurrentPiece ; patched command
+    jsr     makePlayer1Active ; patched command
+
+    ; use unused RAM
+    ; gameModeState
 
     lda     practiseType
     cmp     #MODE_ALWAYSTETRISREADY
     bne     @skip
 
-    lda $4C7 ; check first hole is filled
-    cmp #$EF
-    bne @clearWell
+    ; TODO: fix when burning more than one line / when burning below the tetris
+    ; TODO: check playState
+    ; TODO: find spare RAM
+    ; maybe check if current piece is line piece then play animation
+
+    ; lda $4C7 ; check first hole is filled
+    ; cmp #$EF
+    ; bne @clearWell
 
     lda $4C7 ; check first digit is painted or not
     cmp #$7B
@@ -7544,23 +7552,13 @@ practiseAdvanceGamePatch:
     dex
     bne @loop
 @clearWell:
-    lda #$EF
-    sta $04A9
-    sta $04B3
-    sta $04BD
-    sta $04C7
+    ; lda #$EF
+    ; sta $04A9
+    ; sta $04B3
+    ; sta $04BD
+    ; sta $04C7
 @skip:
         rts
-
-        ; tay
-        ; ldx     #$0A
-
-        ; lda     practiseType
-        ; cmp     #MODE_ALWAYSTETRISREADY
-        ; bne     @burnLines
-        ; lda     generalCounter
-        ; cmp     #$A0
-        ; bpl     @skipLines
 
 .endif
 
