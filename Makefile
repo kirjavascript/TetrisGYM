@@ -17,7 +17,7 @@ tetris:= tetris.nes
 .PHONY: clean compare tools
 
 
-CAFLAGS = -l *.lst -g
+CAFLAGS = -l tetris.lst -g
 LDFLAGS =
 
 compare: $(tetris)

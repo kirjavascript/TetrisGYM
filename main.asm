@@ -4461,6 +4461,7 @@ gameModeState_startButtonHandling:
         lda     renderMode
         cmp     #$03
         bne     @ret
+
         lda     newlyPressedButtons_player1
         and     #$10
         bne     @startPressed
@@ -7606,8 +7607,9 @@ practisePausePatch:
 ; use an X sprite
 
 DEBUG_ORIGINAL_Y := tmp1
-DEBUG_ORIGINAL_CURRENT_PIECE := tmp1
+DEBUG_ORIGINAL_CURRENT_PIECE := tmp2
 DEBUG_LEVELEDIT := unused_0E
+DRAW_FLAG := music_unused2
 
 
         lda     tetriminoX
@@ -7622,9 +7624,9 @@ DEBUG_LEVELEDIT := unused_0E
         and     #BUTTON_SELECT
         beq     @notPressedSelect
         ; flip debug bit
-        lda DEBUG_LEVELEDIT
-        eor #1
-        sta DEBUG_LEVELEDIT
+        lda     DEBUG_LEVELEDIT
+        eor     #1
+        sta     DEBUG_LEVELEDIT
 @notPressedSelect:
 
         ; update position
@@ -7691,8 +7693,8 @@ DEBUG_LEVELEDIT := unused_0E
         rts
 
 handleLevelEditor:
-        jsr     savePlayer1State
-        ;21 for mapping
+
+        ; handle drawing
 
         ; load X
         lda     tetriminoX
@@ -7716,8 +7718,43 @@ handleLevelEditor:
         sta     spriteIndexInOamContentLookup
         jsr     loadSpriteIntoOamStaging
 
+        ; handle editing
 
-    rts
+; EF / 7B
+        lda     newlyPressedButtons_player1
+        and     #BUTTON_B
+        beq     @notPressedB
+
+        lda     #$EF
+        sta     $049F
+        jmp     @renderPlayfield
+
+@notPressedB:
+
+        lda     newlyPressedButtons_player1
+        and     #BUTTON_A
+        beq     @notPressedA
+
+        lda     #$7B
+        sta     $049F
+        jmp     @renderPlayfield
+        rts
+
+@notPressedA:
+
+        ; jsr     stageSpriteForCurrentPiece ; patched command
+        jsr     savePlayer1State
+        rts
+
+@renderPlayfield:
+        lda     #$1E
+        sta     PPUMASK
+        lda     #$00
+        sta     musicStagingNoiseHi
+        sta     player1_vramRow
+        lda     #$03
+        sta     renderMode
+        rts
 
 ; YY AA II XX
 spriteDebugLevelSelect:
