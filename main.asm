@@ -1918,7 +1918,11 @@ oamContentLookup:
         .addr   sprite13LPieceOffset
         .addr   sprite14OPieceOffset
         .addr   sprite15IPieceOffset
+.if PRACTISE_MODE
+        .addr   spriteDebugLevelSelect
+.else
         .addr   sprite16KidIcarus1
+.endif
         .addr   sprite17KidIcarus2
         .addr   sprite18Link1
         .addr   sprite19Link2
@@ -7595,6 +7599,8 @@ practiseAdvanceGamePatch:
 practisePausePatch:
 ; DEBUG_MODE
 ; select to enable debug - change sprite
+; create arbitrary bounds and dont use isPosition valid until unpause
+
 
 ; level editor
 ; use an X sprite
@@ -7621,25 +7627,7 @@ DEBUG_LEVELEDIT := unused_0E
         sta DEBUG_LEVELEDIT
 @notPressedSelect:
 
-
-        lda     newlyPressedButtons_player1
-        and     #BUTTON_B
-        beq     @notPressedB
-        lda     currentPiece
-        cmp     #$1
-        bmi     @notPressedB
-        dec     currentPiece
-@notPressedB:
-
-        lda     newlyPressedButtons_player1
-        and     #BUTTON_A
-        beq     @notPressedA
-        lda     currentPiece
-        cmp     #$12
-        bpl     @notPressedB
-        inc     currentPiece
-@notPressedA:
-
+        ; update position
         lda     newlyPressedButtons_player1
         and     #BUTTON_UP
         beq     @notPressedUp
@@ -7662,15 +7650,33 @@ DEBUG_LEVELEDIT := unused_0E
         inc     tetriminoX
 @notPressingRight:
 
-        jsr     isPositionValid
-        bne     @restore_
-
-        jsr     savePlayer1State
-
         ; check mode
         lda     DEBUG_LEVELEDIT
         and     #1
         bne     handleLevelEditor
+
+        ; handle piece
+        jsr     isPositionValid
+        bne     @restore_
+        jsr     savePlayer1State
+
+        lda     newlyPressedButtons_player1
+        and     #BUTTON_B
+        beq     @notPressedB
+        lda     currentPiece
+        cmp     #$1
+        bmi     @notPressedB
+        dec     currentPiece
+@notPressedB:
+
+        lda     newlyPressedButtons_player1
+        and     #BUTTON_A
+        beq     @notPressedA
+        lda     currentPiece
+        cmp     #$12
+        bpl     @notPressedB
+        inc     currentPiece
+@notPressedA:
 
         jsr     stageSpriteForCurrentPiece ; patched command
         rts
@@ -7685,16 +7691,37 @@ DEBUG_LEVELEDIT := unused_0E
         rts
 
 handleLevelEditor:
+        jsr     savePlayer1State
+        ;21 for mapping
 
-        lda     #$60
+        ; load X
+        lda     tetriminoX
+        asl
+        asl
+        asl
+        clc
+        adc     #$60
         sta     spriteXOffset
-        lda     #$57
+
+        ; load Y
+        lda     tetriminoY
+        asl
+        asl
+        asl
+        clc
+        adc     #$30
         sta     spriteYOffset
-        lda     #$05
+
+        lda     #$16
         sta     spriteIndexInOamContentLookup
         jsr     loadSpriteIntoOamStaging
 
+
     rts
+
+; YY AA II XX
+spriteDebugLevelSelect:
+        .byte   $00,$21,$20,$00,$FF
 
 
 .endif
