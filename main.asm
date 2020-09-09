@@ -7688,9 +7688,6 @@ DEBUG_LEVELEDIT := unused_0E
         rts
 
 
-; RESULT := music_unused2
-; RESULT := tmp3
-
 handleLevelEditor:
 
         ; handle drawing
@@ -7722,7 +7719,7 @@ handleLevelEditor:
         lda     newlyPressedButtons_player1
         and     #BUTTON_B
         beq     @notPressedB
-        jsr     getPos
+        jsr     @getPos
         ldx     tmp3
         lda     #$EF
         sta     $0400, x
@@ -7733,9 +7730,9 @@ handleLevelEditor:
         lda     newlyPressedButtons_player1
         and     #BUTTON_A
         beq     @notPressedA
-        jsr     getPos
+        jsr     @getPos
         ldx     tmp3
-        lda     #$00
+        lda     #$7B
         sta     $0400, x
         jmp     @renderPlayfield
 
