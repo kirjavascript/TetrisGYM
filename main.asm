@@ -7738,7 +7738,6 @@ handleLevelEditor:
 
 @notPressedA:
 
-        ; jsr     stageSpriteForCurrentPiece ; patched command
         jsr     savePlayer1State
         rts
 
