@@ -1,6 +1,6 @@
 const { readFileSync, writeFileSync } = require('fs');
 
-const buffer = readFileSync('./game_type_menu_nametable.bin');
+const buffer = readFileSync(__dirname + '/game_type_menu_nametable.bin');
 
 const lookup = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ-.\'>################qweadzxc###############/##!###########()############################################################################################################################################################### ';
 
@@ -35,7 +35,7 @@ Y#W#a                            d#
 Y#W#a                            d#
 Z0W#a                            d#
 ZWW#a                            d#
-Z#W#aV0                   KIRJAVAd#
+Z#W#a(PROTOTYPE)          KIRJAVAd#
 Z#W#zxxxxxxxxxxxxxxxxxxxxxxxxxxxxc#
 Z#W################################
 Z#W################################
@@ -48,4 +48,4 @@ Z#W###000#####000#####000##AAAAAAAA
         buffer[i] = lookup.indexOf(d);
     }
 });
-writeFileSync('./game_type_menu_nametable_practise.bin', buffer);
+writeFileSync(__dirname + '/game_type_menu_nametable_practise.bin', buffer);

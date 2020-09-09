@@ -5,6 +5,8 @@
 ; @upstream CelestialAmber/TetrisNESDisasm
 ; @disassembly ejona86/taus
 
+; constants
+
 ROCKET_LIMIT := $FF
 SCORE_LIMIT := $FF
 FAST_LEGAL := 1
@@ -17,11 +19,24 @@ NO_NO_NEXT_BOX := 1
 NO_GAMETYPE := 0
 PRACTISE_MODE := 1
 
+BUTTON_RIGHT := $1
+BUTTON_LEFT := $2
+BUTTON_DOWN := $4
+BUTTON_UP := $8
+BUTTON_B := $40
+BUTTON_A := $80
+BUTTON_SELECT := $20
+
 MODE_NORMAL := 0
 MODE_LEVEL29 := 1
 MODE_ALWAYSTETRISREADY := 2
 MODES_QUANTITY := 2
+
+; RAM
+
 practiseType := $00C2 ; musicType
+
+; macros
 
 .macro padNOP qty
     .repeat qty
@@ -4448,6 +4463,7 @@ gameModeState_startButtonHandling:
         jmp     @ret
 
 .if BETTER_PAUSE
+padNOP  $3
 @startPressed:
         lda     #$05
         sta     musicStagingNoiseHi
@@ -4469,13 +4485,12 @@ gameModeState_startButtonHandling:
         lda     #$05
         sta     spriteIndexInOamContentLookup
         jsr     loadSpriteIntoOamStaging
-        jsr     stageSpriteForCurrentPiece
         jsr     stageSpriteForNextPiece
 
 .if PRACTISE_MODE
         jsr     practisePausePatch
 .else
-padNOP  $3 ; patch as a JSR in practise mode
+        jsr     stageSpriteForCurrentPiece
 .endif
 
 .else
@@ -7579,41 +7594,70 @@ practiseAdvanceGamePatch:
 
 practisePausePatch:
 ; DEBUG_MODE
-; optional -> toggle sprite mapping
-; shift_tetrimino:
-; select to change piece
+; select to enable debug - change sprite
+
+; level editor
+; use an X sprite
+
+DEBUG_ORIGINAL_Y := tmp1
+DEBUG_ORIGINAL_CURRENT_PIECE := tmp1
+DEBUG_LEVELEDIT := unused_0E
+
 
         lda     tetriminoX
         sta     originalY
         lda     tetriminoY
-        sta     tmp1
+        sta     DEBUG_ORIGINAL_Y
         lda     currentPiece
-        sta     tmp2
+        sta     DEBUG_ORIGINAL_CURRENT_PIECE
 
+        ; toggle mode
         lda     newlyPressedButtons_player1
-        and     #$20
+        and     #BUTTON_SELECT
         beq     @notPressedSelect
-        inc     currentPiece
+        ; flip debug bit
+        lda DEBUG_LEVELEDIT
+        eor #1
+        sta DEBUG_LEVELEDIT
 @notPressedSelect:
 
+
         lda     newlyPressedButtons_player1
-        and     #$08
+        and     #BUTTON_B
+        beq     @notPressedB
+        lda     currentPiece
+        cmp     #$1
+        bmi     @notPressedB
+        dec     currentPiece
+@notPressedB:
+
+        lda     newlyPressedButtons_player1
+        and     #BUTTON_A
+        beq     @notPressedA
+        lda     currentPiece
+        cmp     #$12
+        bpl     @notPressedB
+        inc     currentPiece
+@notPressedA:
+
+        lda     newlyPressedButtons_player1
+        and     #BUTTON_UP
         beq     @notPressedUp
         dec     tetriminoY
 @notPressedUp:
 
         lda     newlyPressedButtons_player1
-        and     #$04
+        and     #BUTTON_DOWN
         beq     @notPressedDown
         inc     tetriminoY
 @notPressedDown:
         lda     newlyPressedButtons_player1
-        and     #$02
+        and     #BUTTON_LEFT
         beq     @notPressedLeft
         dec     tetriminoX
 @notPressedLeft:
         lda     newlyPressedButtons_player1
-        and     #$01
+        and     #BUTTON_RIGHT
         beq     @notPressingRight
         inc     tetriminoX
 @notPressingRight:
@@ -7621,19 +7665,37 @@ practisePausePatch:
         jsr     isPositionValid
         bne     @restore_
 
-        jsr     stageSpriteForCurrentPiece
-        jsr     stageSpriteForNextPiece
+        jsr     savePlayer1State
 
-    rts
+        ; check mode
+        lda     DEBUG_LEVELEDIT
+        and     #1
+        bne     handleLevelEditor
+
+        jsr     stageSpriteForCurrentPiece ; patched command
+        rts
 
 @restore_:
         lda     originalY
         sta     tetriminoX
-        lda     tmp1
+        lda     DEBUG_ORIGINAL_Y
         sta     tetriminoY
-        lda     tmp2
+        lda     DEBUG_ORIGINAL_CURRENT_PIECE
         sta     currentPiece
-   rts
+        rts
+
+handleLevelEditor:
+
+        lda     #$60
+        sta     spriteXOffset
+        lda     #$57
+        sta     spriteYOffset
+        lda     #$05
+        sta     spriteIndexInOamContentLookup
+        jsr     loadSpriteIntoOamStaging
+
+    rts
+
 
 .endif
 
