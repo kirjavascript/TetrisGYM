@@ -14,16 +14,16 @@ WWW################################
 W#W#qwwwwwwwwwwwwwwwwwwwwwwwwwwwwe#
 W#W#a                            d#
 W#W#a                            d#
-W#W#a          A TETRIS          d#
-W#W#a        PRACTISE ROM        d#
+W#W#a                            d#
+W#W#a                            d#
 W#W#a                            d#
 X0W#a                            d#
 XWW#a                            d#
 X#W#a                            d#
-X#W#a    NORMAL                  d#
+X#W#a    PLAY                    d#
 X#W#a    LEVEL 29                d#
 X#W#a    ALWAYS TETRIS READY     d#
-X#W#a                            d#
+X#W#a    DEBUG MODE          1   d#
 X#W#a                            d#
 Y0W#a                            d#
 YWW#a                            d#
@@ -35,7 +35,7 @@ Y#W#a                            d#
 Y#W#a                            d#
 Z0W#a                            d#
 ZWW#a                            d#
-Z#W#aV1                   KIRJAVAd#
+Z#W#aV0                   KIRJAVAd#
 Z#W#zxxxxxxxxxxxxxxxxxxxxxxxxxxxxc#
 Z#W################################
 Z#W################################
@@ -43,6 +43,7 @@ Z#W#AAA################PAA#Y000####
 Z#W###000#####000#####000##AAAAAAAA
 `;
 [...tiles.trim().split('\n').join('')].forEach((d, i) => {
+    // TODO: patch logo
     if (d !== '#') {
         buffer[i] = lookup.indexOf(d);
     }

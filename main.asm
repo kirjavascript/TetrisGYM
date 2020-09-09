@@ -1982,6 +1982,16 @@ sprite01GameTypeCursor:
 ; Used as a sort of NOOP for cursors
 sprite02Blank:
         .byte   $00,$FF,$00,$00,$FF
+.if PRACTISE_MODE
+sprite03PausePalette6:
+        .byte   $00,$0D,$00,$00,$00,$0E,$00,$08
+        .byte   $00,$0B,$00,$10,$00,$1E,$00,$18
+        .byte   $00,$10,$00,$20,$FF
+sprite05PausePalette4:
+        .byte   $00,$0D,$00,$00,$00,$0E,$00,$08
+        .byte   $00,$0B,$00,$10,$00,$1E,$00,$18
+        .byte   $00,$10,$00,$20,$FF
+.else
 sprite03PausePalette6:
         .byte   $00,$19,$02,$00,$00,$0A,$02,$08
         .byte   $00,$1E,$02,$10,$00,$1C,$02,$18
@@ -1990,6 +2000,7 @@ sprite05PausePalette4:
         .byte   $00,$19,$00,$00,$00,$0A,$00,$08
         .byte   $00,$1E,$00,$10,$00,$1C,$00,$18
         .byte   $00,$0E,$00,$20,$FF
+.endif
 sprite06TPiece:
         .byte   $00,$7B,$02,$FC,$00,$7B,$02,$04
         .byte   $00,$7B,$02,$0C,$08,$7B,$02,$04
@@ -4438,7 +4449,6 @@ gameModeState_startButtonHandling:
 
 .if BETTER_PAUSE
 @startPressed:
-padNOP  $3
         lda     #$05
         sta     musicStagingNoiseHi
         lda     #$00
@@ -4461,6 +4471,13 @@ padNOP  $3
         jsr     loadSpriteIntoOamStaging
         jsr     stageSpriteForCurrentPiece
         jsr     stageSpriteForNextPiece
+
+.if PRACTISE_MODE
+        jsr     practisePausePatch
+.else
+padNOP  $3 ; patch as a JSR in practise mode
+.endif
+
 .else
 @startPressed:
 ; Do nothing if curtain is being lowered
@@ -7538,9 +7555,9 @@ practiseAdvanceGamePatch:
     ; TODO: find spare RAM
     ; maybe check if current piece is line piece then play animation
 
-    ; lda $4C7 ; check first hole is filled
-    ; cmp #$EF
-    ; bne @clearWell
+    lda $4C7 ; check first hole is filled
+    cmp #$EF
+    bne @clearWell
 
     lda $4C7 ; check first digit is painted or not
     cmp #$7B
@@ -7552,13 +7569,62 @@ practiseAdvanceGamePatch:
     dex
     bne @loop
 @clearWell:
-    ; lda #$EF
-    ; sta $04A9
-    ; sta $04B3
-    ; sta $04BD
-    ; sta $04C7
+    lda #$EF
+    sta $04A9
+    sta $04B3
+    sta $04BD
+    sta $04C7
 @skip:
-        rts
+    rts
+
+practisePausePatch:
+; DEBUG_MODE
+; optional -> toggle sprite mapping
+; shift_tetrimino:
+; select to change piece
+        ; inc     currentPiece
+
+        lda     tetriminoX
+        sta     originalY
+        lda     tetriminoY
+        sta     tmp1
+
+        lda     newlyPressedButtons_player1
+        and     #$08
+        beq     @notPressedUp
+        dec     tetriminoY
+@notPressedUp:
+
+        lda     newlyPressedButtons_player1
+        and     #$04
+        beq     @notPressedDown
+        inc     tetriminoY
+@notPressedDown:
+        lda     newlyPressedButtons_player1
+        and     #$02
+        beq     @notPressedLeft
+        dec     tetriminoX
+@notPressedLeft:
+        lda     newlyPressedButtons_player1
+        and     #$01
+        beq     @notPressingRight
+        inc     tetriminoX
+@notPressingRight:
+
+        jsr     isPositionValid
+        bne     @restore_
+
+        jsr     stageSpriteForCurrentPiece
+        jsr     stageSpriteForNextPiece
+
+    rts
+
+@restore_:
+        lda     originalY
+        sta     tetriminoX
+        lda     tmp1
+        sta     tetriminoY
+   rts
 
 .endif
 
