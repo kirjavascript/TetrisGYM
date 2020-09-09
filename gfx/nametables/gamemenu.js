@@ -12,7 +12,7 @@ const tiles = `
 W0W################################
 WWW################################
 W#W#qwwwwwwwwwwwwwwwwwwwwwwwwwwwwe#
-W#W#a                            d#
+W#W#aPETRUS (PROTOTYPE)          d#
 W#W#a                            d#
 W#W#a                            d#
 W#W#a                            d#
@@ -35,7 +35,7 @@ Y#W#a                            d#
 Y#W#a                            d#
 Z0W#a                            d#
 ZWW#a                            d#
-Z#W#a(PROTOTYPE)          KIRJAVAd#
+Z#W#a                     KIRJAVAd#
 Z#W#zxxxxxxxxxxxxxxxxxxxxxxxxxxxxc#
 Z#W################################
 Z#W################################

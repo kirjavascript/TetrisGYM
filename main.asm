@@ -7601,16 +7601,11 @@ practisePausePatch:
 ; DEBUG_MODE
 ; select to enable debug - change sprite
 ; create arbitrary bounds and dont use isPosition valid until unpause
-
-
-; level editor
-; use an X sprite
+; change mapping to show above
 
 DEBUG_ORIGINAL_Y := tmp1
 DEBUG_ORIGINAL_CURRENT_PIECE := tmp2
 DEBUG_LEVELEDIT := unused_0E
-DRAW_FLAG := music_unused2
-
 
         lda     tetriminoX
         sta     originalY
@@ -7692,6 +7687,10 @@ DRAW_FLAG := music_unused2
         sta     currentPiece
         rts
 
+
+; RESULT := music_unused2
+; RESULT := tmp3
+
 handleLevelEditor:
 
         ; handle drawing
@@ -7711,7 +7710,7 @@ handleLevelEditor:
         asl
         asl
         clc
-        adc     #$30
+        adc     #$2F
         sta     spriteYOffset
 
         lda     #$16
@@ -7720,13 +7719,13 @@ handleLevelEditor:
 
         ; handle editing
 
-; EF / 7B
         lda     newlyPressedButtons_player1
         and     #BUTTON_B
         beq     @notPressedB
-
+        jsr     getPos
+        ldx     tmp3
         lda     #$EF
-        sta     $049F
+        sta     $0400, x
         jmp     @renderPlayfield
 
 @notPressedB:
@@ -7734,11 +7733,11 @@ handleLevelEditor:
         lda     newlyPressedButtons_player1
         and     #BUTTON_A
         beq     @notPressedA
-
-        lda     #$7B
-        sta     $049F
+        jsr     getPos
+        ldx     tmp3
+        lda     #$00
+        sta     $0400, x
         jmp     @renderPlayfield
-        rts
 
 @notPressedA:
 
@@ -7756,9 +7755,37 @@ handleLevelEditor:
         sta     renderMode
         rts
 
+@getPos:
+        ; multiply by 10
+        lda tetriminoY       ;Start with RESULT = tetriminoY
+        sta tmp3
+        lda tetriminoY+1
+        sta tmp3+1
+        asl tmp3
+        rol tmp3+1  ;tmp3 = 2*tetriminoY
+        asl tmp3
+        rol tmp3+1  ;tmp3 = 4*tetriminoY
+        clc
+        lda tetriminoY
+        adc tmp3
+        sta tmp3
+        lda tetriminoY+1
+        adc tmp3+1
+        sta tmp3+1  ;tmp3 = 5*tetriminoY
+        asl tmp3
+        rol tmp3+1  ;tmp3 = 10*tetriminoY
+
+        ; add values
+        ldx tetriminoX
+@loop:
+        inc     tmp3
+        dex
+        bne @loop
+        rts
+
 ; YY AA II XX
 spriteDebugLevelSelect:
-        .byte   $00,$21,$20,$00,$FF
+        .byte   $00,$21,$00,$00,$FF
 
 
 .endif
