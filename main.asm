@@ -7582,12 +7582,19 @@ practisePausePatch:
 ; optional -> toggle sprite mapping
 ; shift_tetrimino:
 ; select to change piece
-        ; inc     currentPiece
 
         lda     tetriminoX
         sta     originalY
         lda     tetriminoY
         sta     tmp1
+        lda     currentPiece
+        sta     tmp2
+
+        lda     newlyPressedButtons_player1
+        and     #$20
+        beq     @notPressedSelect
+        inc     currentPiece
+@notPressedSelect:
 
         lda     newlyPressedButtons_player1
         and     #$08
@@ -7624,6 +7631,8 @@ practisePausePatch:
         sta     tetriminoX
         lda     tmp1
         sta     tetriminoY
+        lda     tmp2
+        sta     currentPiece
    rts
 
 .endif
