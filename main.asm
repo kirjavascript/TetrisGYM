@@ -1145,6 +1145,9 @@ gameModeState_initGameBackground:
         .addr   game_palette
         jsr     bulkCopyToPpu
         .addr   game_nametable
+.if PRACTISE_MODE ; hide A-TYPE
+padNOP $13
+.else
         lda     #$20
         sta     PPUADDR
         lda     #$83
@@ -1153,6 +1156,7 @@ gameModeState_initGameBackground:
         bne     @typeB
         lda     #$0A
         sta     PPUDATA
+.endif
         lda     #$20
         sta     PPUADDR
         lda     #$B8
@@ -5755,7 +5759,11 @@ game_type_menu_nametable:
 level_menu_nametable:
         .incbin "gfx/nametables/level_menu_nametable.bin"
 game_nametable:
+.if PRACTISE_MODE
+        .incbin "gfx/nametables/game_nametable_practise.bin"
+.else
         .incbin "gfx/nametables/game_nametable.bin"
+.endif
 enter_high_score_nametable:
         .incbin "gfx/nametables/enter_high_score_nametable.bin"
 high_scores_nametable:
@@ -7599,9 +7607,6 @@ practiseAdvanceGamePatch:
 
 practisePausePatch:
 ; DEBUG_MODE
-; select to enable debug - change sprite
-; create arbitrary bounds and dont use isPosition valid until unpause
-; change mapping to show above
 
 DEBUG_ORIGINAL_Y := tmp1
 DEBUG_ORIGINAL_CURRENT_PIECE := tmp2
@@ -7782,7 +7787,6 @@ handleLevelEditor:
 ; YY AA II XX
 spriteDebugLevelSelect:
         .byte   $00,$21,$00,$00,$FF
-
 
 .endif
 
