@@ -4489,7 +4489,7 @@ padNOP  $3
 
         lda     #$74
         sta     spriteXOffset
-        lda     #$7B
+        lda     #$38
         sta     spriteYOffset
         lda     #$05
         sta     spriteIndexInOamContentLookup
@@ -7581,7 +7581,7 @@ practiseAdvanceGamePatch:
     ; TODO: fix when burning more than one line / when burning below the tetris
     ; TODO: check playState
     ; TODO: find spare RAM
-    ; maybe check if current piece is line piece then play animation
+    ; remove line pieces
 
     lda $4C7 ; check first hole is filled
     cmp #$EF
@@ -7750,7 +7750,6 @@ handleLevelEditor:
         lda     #$1E
         sta     PPUMASK
         lda     #$00
-        sta     musicStagingNoiseHi
         sta     player1_vramRow
         lda     #$03
         sta     renderMode
@@ -7758,30 +7757,30 @@ handleLevelEditor:
 
 @getPos:
         ; multiply by 10
-        lda tetriminoY       ;Start with RESULT = tetriminoY
-        sta tmp3
-        lda tetriminoY+1
-        sta tmp3+1
-        asl tmp3
-        rol tmp3+1  ;tmp3 = 2*tetriminoY
-        asl tmp3
-        rol tmp3+1  ;tmp3 = 4*tetriminoY
+        lda     tetriminoY       ;Start with RESULT = tetriminoY
+        sta     tmp3
+        lda     tetriminoY+1
+        sta     tmp3+1
+        asl     tmp3
+        rol     tmp3+1  ;tmp3 = 2*tetriminoY
+        asl     tmp3
+        rol     tmp3+1  ;tmp3 = 4*tetriminoY
         clc
-        lda tetriminoY
-        adc tmp3
-        sta tmp3
-        lda tetriminoY+1
-        adc tmp3+1
-        sta tmp3+1  ;tmp3 = 5*tetriminoY
-        asl tmp3
-        rol tmp3+1  ;tmp3 = 10*tetriminoY
+        lda     tetriminoY
+        adc     tmp3
+        sta     tmp3
+        lda     tetriminoY+1
+        adc     tmp3+1
+        sta     tmp3+1  ;tmp3 = 5*tetriminoY
+        asl     tmp3
+        rol     tmp3+1  ;tmp3 = 10*tetriminoY
 
         ; add values
-        ldx tetriminoX
+        ldx     tetriminoX
 @loop:
         inc     tmp3
         dex
-        bne @loop
+        bne     @loop
         rts
 
 ; YY AA II XX
