@@ -42,9 +42,10 @@ Z#W################################
 Z#W           ###  ######  #Y######
 Z#W#Y####  #Y####  ######  FFFFFFFF
 `;
+const game = Buffer.from(buffer);
 [...tiles.trim().split('\n').join('')].forEach((d, i) => {
     if (d !== '#') {
-        buffer[i] = lookup.indexOf(d);
+        game[i] = lookup.indexOf(d);
     }
 });
-writeFileSync(__dirname + '/game_nametable_practise.bin', buffer);
+writeFileSync(__dirname + '/game_nametable_practise.bin', game);

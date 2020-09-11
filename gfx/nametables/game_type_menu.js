@@ -42,10 +42,11 @@ Z#W################################
 Z#W#AAA################PAA#Y000####
 Z#W###000#####000#####000##AAAAAAAA
 `;
+const practise = Buffer.from(buffer);
 [...tiles.trim().split('\n').join('')].forEach((d, i) => {
     // TODO: patch logo
     if (d !== '#') {
-        buffer[i] = lookup.indexOf(d);
+        practise[i] = lookup.indexOf(d);
     }
 });
-writeFileSync(__dirname + '/game_type_menu_nametable_practise.bin', buffer);
+writeFileSync(__dirname + '/game_type_menu_nametable_practise.bin', practise);

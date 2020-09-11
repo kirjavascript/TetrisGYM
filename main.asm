@@ -17,7 +17,8 @@ NO_TITLE := 1
 NO_MUSIC := 1
 NO_NO_NEXT_BOX := 1
 NO_GAMETYPE := 0
-PRACTISE_MODE := 1
+PRACTISE_MODE := 0
+DEBUG_MODE := 1
 
 BUTTON_RIGHT := $1
 BUTTON_LEFT := $2
@@ -1922,7 +1923,7 @@ oamContentLookup:
         .addr   sprite13LPieceOffset
         .addr   sprite14OPieceOffset
         .addr   sprite15IPieceOffset
-.if PRACTISE_MODE
+.if DEBUG_MODE
         .addr   spriteDebugLevelSelect
 .else
         .addr   sprite16KidIcarus1
@@ -2005,7 +2006,7 @@ sprite01GameTypeCursor:
 ; Used as a sort of NOOP for cursors
 sprite02Blank:
         .byte   $00,$FF,$00,$00,$FF
-.if PRACTISE_MODE
+.if DEBUG_MODE
 sprite03PausePalette6:
         .byte   $00,$0D,$00,$00,$00,$0E,$00,$08
         .byte   $00,$0B,$00,$10,$00,$1E,$00,$18
@@ -4489,14 +4490,14 @@ padNOP  $3
 
         lda     #$74
         sta     spriteXOffset
-        lda     #$38
+        lda     #$58
         sta     spriteYOffset
         lda     #$05
         sta     spriteIndexInOamContentLookup
         jsr     loadSpriteIntoOamStaging
         jsr     stageSpriteForNextPiece
 
-.if PRACTISE_MODE
+.if DEBUG_MODE
         jsr     practisePausePatch
 .else
         jsr     stageSpriteForCurrentPiece
@@ -5704,12 +5705,12 @@ ending_palette:
 defaultHighScoresTable:
 .if PRACTISE_MODE
         .byte  "LUCY  "
-        .byte  "BV    "
+        .byte  "BV09  "
         .byte  "EJONA "
 .else
         .byte  "HOWARD" ;$08,$0F,$17,$01,$12,$04
         .byte  "OTASAN" ;$0F,$14,$01,$13,$01,$0E
-        .byte  "LANCE " ;$0C,$01,$0E,$03,$05,$2B
+        .byte  "KIRJAV" ;$0C,$01,$0E,$03,$05,$2B ; LANCE
 .endif
         .byte  $00,$00,$00,$00,$00,$00 ;unknown
         .byte  "ALEX  " ;$01,$0C,$05,$18,$2B,$2B
@@ -7605,12 +7606,16 @@ practiseAdvanceGamePatch:
 @skip:
     rts
 
+.endif
+
+.if DEBUG_MODE
+
 practisePausePatch:
-; DEBUG_MODE
 
 DEBUG_ORIGINAL_Y := tmp1
 DEBUG_ORIGINAL_CURRENT_PIECE := tmp2
 DEBUG_LEVELEDIT := unused_0E
+DEBUG_NEXTCOUNTER := nextPiece_2player
 
         lda     tetriminoX
         sta     originalY
@@ -7662,6 +7667,25 @@ DEBUG_LEVELEDIT := unused_0E
         bne     @restore_
         jsr     savePlayer1State
 
+        ; handle next piece
+        lda     heldButtons_player1
+        and     #BUTTON_B
+        beq     @notPressedBothB
+        lda     newlyPressedButtons_player1
+        and     #BUTTON_A
+        beq     @notPressedBothB
+        jmp     @changeNext
+@notPressedBothB:
+        lda     heldButtons_player1
+        and     #BUTTON_A
+        beq     @notPressedBothA
+        lda     newlyPressedButtons_player1
+        and     #BUTTON_B
+        beq     @notPressedBothA
+        jmp     @changeNext
+@notPressedBothA:
+
+        ; change current piece
         lda     newlyPressedButtons_player1
         and     #BUTTON_B
         beq     @notPressedB
@@ -7676,9 +7700,10 @@ DEBUG_LEVELEDIT := unused_0E
         beq     @notPressedA
         lda     currentPiece
         cmp     #$12
-        bpl     @notPressedB
+        bpl     @notPressedA
         inc     currentPiece
 @notPressedA:
+@draw:
 
         jsr     stageSpriteForCurrentPiece ; patched command
         rts
@@ -7691,6 +7716,20 @@ DEBUG_LEVELEDIT := unused_0E
         lda     DEBUG_ORIGINAL_CURRENT_PIECE
         sta     currentPiece
         rts
+
+@changeNext:
+        lda     DEBUG_NEXTCOUNTER
+        and     #7
+        cmp     #7
+        bne     @notDupe
+        inc     DEBUG_NEXTCOUNTER
+@notDupe:
+        tax
+        lda     spawnTable,x
+        sta     nextPiece
+
+        inc     DEBUG_NEXTCOUNTER
+        jmp     @draw
 
 
 handleLevelEditor:
@@ -7786,7 +7825,6 @@ handleLevelEditor:
 ; YY AA II XX
 spriteDebugLevelSelect:
         .byte   $00,$21,$00,$00,$FF
-
 .endif
 
 ; End of "unreferenced_data4" segment
