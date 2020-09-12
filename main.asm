@@ -16,7 +16,7 @@ NO_LEGAL := 1
 NO_TITLE := 1
 NO_MUSIC := 1
 NO_NO_NEXT_BOX := 1
-NO_GAMETYPE := 0
+NO_GAMETYPE := 1
 PRACTISE_MODE := 0
 DEBUG_MODE := 1
 
@@ -7639,6 +7639,7 @@ DEBUG_NEXTCOUNTER := nextPiece_2player
         and     #BUTTON_UP
         beq     @notPressedUp
         dec     tetriminoY
+
 @notPressedUp:
 
         lda     newlyPressedButtons_player1
@@ -7704,7 +7705,6 @@ DEBUG_NEXTCOUNTER := nextPiece_2player
         inc     currentPiece
 @notPressedA:
 @draw:
-
         jsr     stageSpriteForCurrentPiece ; patched command
         rts
 
@@ -7786,8 +7786,6 @@ handleLevelEditor:
         rts
 
 @renderPlayfield:
-        lda     #$1E
-        sta     PPUMASK
         lda     #$00
         sta     player1_vramRow
         lda     #$03
@@ -7796,23 +7794,9 @@ handleLevelEditor:
 
 @getPos:
         ; multiply by 10
-        lda     tetriminoY       ;Start with RESULT = tetriminoY
+        ldx     tetriminoY
+        lda     multBy10Table,x
         sta     tmp3
-        lda     tetriminoY+1
-        sta     tmp3+1
-        asl     tmp3
-        rol     tmp3+1  ;tmp3 = 2*tetriminoY
-        asl     tmp3
-        rol     tmp3+1  ;tmp3 = 4*tetriminoY
-        clc
-        lda     tetriminoY
-        adc     tmp3
-        sta     tmp3
-        lda     tetriminoY+1
-        adc     tmp3+1
-        sta     tmp3+1  ;tmp3 = 5*tetriminoY
-        asl     tmp3
-        rol     tmp3+1  ;tmp3 = 10*tetriminoY
 
         ; add values
         ldx     tetriminoX
