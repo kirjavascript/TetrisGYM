@@ -33,9 +33,11 @@ MODE_LEVEL29 := 1
 MODE_ALWAYSTETRISREADY := 2
 MODES_QUANTITY := 2
 
+
 ; RAM
 
 practiseType := $00C2 ; musicType
+; $755 - $7FF appears free
 
 ; macros
 
@@ -1132,7 +1134,11 @@ render_mode_menu_screens:
         sta     ppuScrollX
         sta     PPUSCROLL
         sta     ppuScrollY
+.if PRACTISE_MODE
+        jsr     practiseMenuRenderPatch
+.else
         sta     PPUSCROLL
+.endif
         rts
 
 gameModeState_initGameBackground:
@@ -7538,73 +7544,87 @@ developRts:
 
 .if PRACTISE_MODE
 
-practiseLevelMenuPatch:
-    lda     practiseType
-    cmp     #MODE_LEVEL29
-    beq     @lvl29
+menuVars := $755
 
-    inc     initRam ; patched command
-    jmp     gameMode_levelMenuContinue
+practiseMenuRenderPatch:
+        sta     PPUSCROLL ; ptached command
+
+        lda     #$20
+        sta     PPUADDR
+        lda     #$82
+        sta     PPUADDR
+        lda     practiseType
+        sta     PPUDATA
+
+        rts
+
+practiseLevelMenuPatch:
+        lda     practiseType
+        cmp     #MODE_LEVEL29
+        beq     @lvl29
+
+        inc     initRam ; patched command
+        jmp     gameMode_levelMenuContinue
 
 @lvl29:
-    lda     #$00
-    sta     gameModeState
-    inc     gameMode
-    lda     #29
-    sta     player1_startLevel
-    rts
+        lda     #$00
+        sta     gameModeState
+        inc     gameMode
+        lda     #29
+        sta     player1_startLevel
+        rts
 
 practiseCompleteRowPatch:
-    tay ; patched command
-    ldx     #$0A ; patched command
+        tay ; patched command
+        ldx     #$0A ; patched command
 
-    lda     practiseType
-    cmp     #MODE_ALWAYSTETRISREADY
-    bne     @skip
-    lda     generalCounter
-    cmp     #$A0
-    bpl     @continue
+        lda     practiseType
+        cmp     #MODE_ALWAYSTETRISREADY
+        bne     @skip
+        lda     generalCounter
+        cmp     #$A0
+        bpl     @continue
 @skip:
-    rts
+        rts
 @continue:
-    jmp     playState_completeRowContinue
+        jmp     playState_completeRowContinue
 
 practiseAdvanceGamePatch:
-    jsr     makePlayer1Active ; patched command
+        jsr     makePlayer1Active ; patched command
 
-    ; use unused RAM
-    ; gameModeState
+        ; use unused RAM
+        ; gameModeState
 
-    lda     practiseType
-    cmp     #MODE_ALWAYSTETRISREADY
-    bne     @skip
+        lda     practiseType
+        cmp     #MODE_ALWAYSTETRISREADY
+        bne     @skip
 
-    ; TODO: fix when burning more than one line / when burning below the tetris
-    ; TODO: check playState
-    ; TODO: find spare RAM
-    ; remove line pieces
+        ; TODO: fix when burning more than one line / when burning below the tetris
+        ; TODO: check playState
+        ; TODO: find spare RAM
+        ; remove line pieces
 
-    lda $4C7 ; check first hole is filled
-    cmp #$EF
-    bne @clearWell
+        lda $4C7 ; check first hole is filled
+        cmp #$EF
+        bne @clearWell
 
-    lda $4C7 ; check first digit is painted or not
-    cmp #$7B
-    beq @skip
-    lda #$7B
-    ldx #$28
+        lda $4C7 ; check first digit is painted or not
+        cmp #$7B
+        beq @skip
+        lda #$7B
+        ldx #$28
 @loop:
-    sta $049F,X
-    dex
-    bne @loop
+        sta $049F,X
+        dex
+        bne @loop
 @clearWell:
-    lda #$EF
-    sta $04A9
-    sta $04B3
-    sta $04BD
-    sta $04C7
+        lda #$EF
+        sta $04A9
+        sta $04B3
+        sta $04BD
+        sta $04C7
 @skip:
-    rts
+        rts
 
 .endif
 
