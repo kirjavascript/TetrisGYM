@@ -23,7 +23,7 @@ X#W#a                            d#
 X#W#a    PLAY                    d#
 X#W#a    LEVEL 29                d#
 X#W#a    ALWAYS TETRIS READY     d#
-X#W#a    DEBUG MODE          1   d#
+X#W#a    DEBUG MODE              d#
 X#W#a                            d#
 Y0W#a                            d#
 YWW#a                            d#

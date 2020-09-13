@@ -31,7 +31,7 @@ BUTTON_SELECT := $20
 MODE_NORMAL := 0
 MODE_LEVEL29 := 1
 MODE_ALWAYSTETRISREADY := 2
-MODES_QUANTITY := 2
+MODES_QUANTITY := 3
 
 
 ; RAM
@@ -718,8 +718,9 @@ L830B:  lda     #$FF
         lda     newlyPressedButtons_player1
 
 .if PRACTISE_MODE ; skip mode menu
+        jsr practiseMenuControlPatch
         jmp @leftNotPressed
-padNOP  13
+padNOP  10
 .else
         cmp     #$01
         bne     @rightNotPressed
@@ -7544,18 +7545,60 @@ developRts:
 
 .if PRACTISE_MODE
 
-menuVars := $755
+menuVars := $760
 
 practiseMenuRenderPatch:
         sta     PPUSCROLL ; ptached command
 
-        lda     #$20
-        sta     PPUADDR
-        lda     #$82
-        sta     PPUADDR
-        lda     practiseType
-        sta     PPUDATA
+        lda     gameMode
+        cmp     #2
+        bne     @notGameType
 
+
+
+        ; lda     #$21
+        ; sta     PPUADDR
+        ; lda     #$62
+        ; sta     PPUADDR
+        ; lda     practiseType
+        ; ; lda     menuVars, x
+        ; sta     PPUDATA
+
+        ldx     #$3
+@loop:
+        lda     #$21
+        sta     PPUADDR
+        txa
+        asl
+        asl
+        asl
+        asl
+        asl
+        adc     #$62
+        sta     PPUADDR
+        lda     menuVars, x
+        sta     PPUDATA
+        inc     tmp3
+        dex
+        bpl     @loop
+
+@notGameType:
+
+        rts
+
+practiseMenuControlPatch:
+        lda     newlyPressedButtons_player1
+        cmp     #BUTTON_LEFT
+        bne     @skipLeft
+        ldx     practiseType
+        dec     menuVars, x
+@skipLeft:
+        lda     newlyPressedButtons_player1
+        cmp     #BUTTON_RIGHT
+        bne     @skipRight
+        ldx     practiseType
+        inc     menuVars, x
+@skipRight:
         rts
 
 practiseLevelMenuPatch:
