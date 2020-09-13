@@ -12,7 +12,7 @@ const tiles = `
 W0W################################
 WWW################################
 W#W#qwwwwwwwwwwwwwwwwwwwwwwwwwwwwe#
-W#W#aPETRUS (PROTOTYPE)          d#
+W#W#aTETRIS GYM (PROTOTYPE)      d#
 W#W#a                            d#
 W#W#a                            d#
 W#W#a                            d#

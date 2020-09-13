@@ -1,7 +1,7 @@
-; Petrus - A Tetris Practise ROM
+; TetrisGYM - A Tetris Practise ROM
 ;
 ; @author Kirjava
-; @github kirjavascript/PetrusNES
+; @github kirjavascript/TetrisGYM
 ; @upstream CelestialAmber/TetrisNESDisasm
 ; @disassembly ejona86/taus
 
@@ -16,8 +16,8 @@ NO_LEGAL := 1
 NO_TITLE := 1
 NO_MUSIC := 1
 NO_NO_NEXT_BOX := 1
-NO_GAMETYPE := 1
-PRACTISE_MODE := 0
+NO_GAMETYPE := 0
+PRACTISE_MODE := 1
 DEBUG_MODE := 1
 
 BUTTON_RIGHT := $1
