@@ -31,13 +31,19 @@ BUTTON_SELECT := $20
 MODE_NORMAL := 0
 MODE_LEVEL29 := 1
 MODE_ALWAYSTETRISREADY := 2
-MODES_QUANTITY := 3
+MODE_DEBUG := 3
+
+MODES_QUANTITY := 4
+MODE_CONFIG_OFFSET = 3
 
 
 ; RAM
 
 practiseType := $00C2 ; musicType
 ; $755 - $7FF appears free
+menuVars := $760
+debugFlag := $760
+
 
 ; macros
 
@@ -748,7 +754,7 @@ padNOP  10
         lda     musicType
 
 .if PRACTISE_MODE ; menu item qty
-        cmp     #MODES_QUANTITY
+        cmp     #MODES_QUANTITY-1
 .else
         cmp     #$03
 .endif
@@ -2015,9 +2021,9 @@ sprite02Blank:
         .byte   $00,$FF,$00,$00,$FF
 .if DEBUG_MODE
 sprite03PausePalette6:
-        .byte   $00,$0D,$00,$00,$00,$0E,$00,$08
-        .byte   $00,$0B,$00,$10,$00,$1E,$00,$18
-        .byte   $00,$10,$00,$20,$FF
+        .byte   $00,$19,$00,$00,$00,$0A,$00,$08
+        .byte   $00,$1E,$00,$10,$00,$1C,$00,$18
+        .byte   $00,$0E,$00,$20,$FF
 sprite05PausePalette4:
         .byte   $00,$0D,$00,$00,$00,$0E,$00,$08
         .byte   $00,$0B,$00,$10,$00,$1E,$00,$18
@@ -4494,16 +4500,14 @@ padNOP  $3
         ldy     #$02
         jsr     memset_page
 @pauseLoop:
-
         lda     #$74
         sta     spriteXOffset
         lda     #$58
         sta     spriteYOffset
-        lda     #$05
+        lda     #$03
         sta     spriteIndexInOamContentLookup
         jsr     loadSpriteIntoOamStaging
         jsr     stageSpriteForNextPiece
-
 .if DEBUG_MODE
         jsr     practisePausePatch
 .else
@@ -7545,26 +7549,14 @@ developRts:
 
 .if PRACTISE_MODE
 
-menuVars := $760
-
 practiseMenuRenderPatch:
-        sta     PPUSCROLL ; ptached command
+        sta     PPUSCROLL ; patched command
 
         lda     gameMode
         cmp     #2
         bne     @notGameType
 
-
-
-        ; lda     #$21
-        ; sta     PPUADDR
-        ; lda     #$62
-        ; sta     PPUADDR
-        ; lda     practiseType
-        ; ; lda     menuVars, x
-        ; sta     PPUDATA
-
-        ldx     #$3
+        ldx     #$0
 @loop:
         lda     #$21
         sta     PPUADDR
@@ -7574,11 +7566,10 @@ practiseMenuRenderPatch:
         asl
         asl
         asl
-        adc     #$62
+        adc     #$DC
         sta     PPUADDR
         lda     menuVars, x
         sta     PPUDATA
-        inc     tmp3
         dex
         bpl     @loop
 
@@ -7587,19 +7578,43 @@ practiseMenuRenderPatch:
         rts
 
 practiseMenuControlPatch:
+        ; TODO: add lookup for sizes
+
+        ; load config type from offset
+        lda     practiseType
+        cmp     #MODE_CONFIG_OFFSET
+        bmi     @skip
+        lda     practiseType
+        sbc     #MODE_CONFIG_OFFSET
+        tax
+
+        ; check if pressing left
         lda     newlyPressedButtons_player1
         cmp     #BUTTON_LEFT
         bne     @skipLeft
-        ldx     practiseType
+        ; check if zero
+        lda     menuVars, x
+        cmp     #0
+        beq     @skipLeft
+        ; dec value
         dec     menuVars, x
 @skipLeft:
+
+        ; check if pressing right
         lda     newlyPressedButtons_player1
         cmp     #BUTTON_RIGHT
         bne     @skipRight
-        ldx     practiseType
+        ; check if within the offset
+        lda     menuVars, x
+        cmp     practiseMenuConfigSizeLookup, x
+        bpl     @skipRight
         inc     menuVars, x
 @skipRight:
+@skip:
         rts
+
+practiseMenuConfigSizeLookup:
+        .byte   $01
 
 practiseLevelMenuPatch:
         lda     practiseType
@@ -7686,6 +7701,12 @@ DEBUG_NEXTCOUNTER := nextPiece_2player
         sta     DEBUG_ORIGINAL_Y
         lda     currentPiece
         sta     DEBUG_ORIGINAL_CURRENT_PIECE
+
+.if PRACTISE_MODE
+        lda     debugFlag
+        cmp     #0
+        beq     @draw
+.endif
 
         ; toggle mode
         lda     newlyPressedButtons_player1
