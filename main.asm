@@ -4499,7 +4499,7 @@ gameModeState_startButtonHandling:
         jmp     @ret
 
 .if BETTER_PAUSE
-padNOP  $3
+padNOP  $2
 @startPressed:
         lda     #$05
         sta     musicStagingNoiseHi
@@ -4517,13 +4517,16 @@ padNOP  $3
         sta     spriteXOffset
         lda     #$58
         sta     spriteYOffset
-        lda     #$03
+        ; put 3 or 5 in a
+        lda     debugFlag
+        asl
+        adc     #3
         sta     spriteIndexInOamContentLookup
         jsr     loadSpriteIntoOamStaging
-        jsr     stageSpriteForNextPiece
 .if DEBUG_MODE
         jsr     practisePausePatch
 .else
+        jsr     stageSpriteForNextPiece
         jsr     stageSpriteForCurrentPiece
 .endif
 
@@ -7803,6 +7806,7 @@ DEBUG_NEXTCOUNTER := nextPiece_2player
 @notPressedA:
 @draw:
         jsr     stageSpriteForCurrentPiece ; patched command
+        jsr     stageSpriteForNextPiece ; patched command
         rts
 
 @restore_:
@@ -7830,6 +7834,8 @@ DEBUG_NEXTCOUNTER := nextPiece_2player
 
 
 handleLevelEditor:
+
+        jsr     stageSpriteForNextPiece ; patched command
 
         ; handle drawing
 
