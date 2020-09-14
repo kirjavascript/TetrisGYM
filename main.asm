@@ -32,8 +32,9 @@ MODE_NORMAL := 0
 MODE_LEVEL29 := 1
 MODE_ALWAYSTETRISREADY := 2
 MODE_DEBUG := 3
+MODE_DAS := 4
 
-MODES_QUANTITY := 4
+MODES_QUANTITY := 5
 MODE_CONFIG_OFFSET = 3
 
 
@@ -43,6 +44,7 @@ practiseType := $00C2 ; musicType
 ; $755 - $7FF appears free
 menuVars := $760
 debugFlag := $760
+dasModifier := $761
 
 
 ; macros
@@ -563,17 +565,20 @@ gameMode_legalScreen:
 .if PRACTISE_MODE ; boot
         lda     #$80
         sta     player1_startLevel
-        jmp @continueToNextScreen
+        lda     #$10
+        sta     dasModifier
+        jmp     @continueToNextScreen
+        nop
 .elseif NO_LEGAL
-padNOP  4
-        jmp @continueToNextScreen
+        jmp     @continueToNextScreen
+padNOP  10
 .else
         jsr     updateAudio2
         lda     #$00
         sta     renderMode
-.endif
         jsr     updateAudioWaitForNmiAndDisablePpuRendering
         jsr     disableNmi
+.endif
         lda     #$00
         jsr     changeCHRBank0
         lda     #$00
@@ -838,7 +843,7 @@ padNOP  10
         sta     spriteYOffset
         lda     #$53
         sta     spriteIndexInOamContentLookup
-        lda     #$1F
+        lda     #$17
         sta     spriteXOffset
 .else
         asl     a
@@ -1622,7 +1627,11 @@ framesPerDropTable:
         .byte   $03,$03,$03,$02,$02,$02,$02,$02
         .byte   $02,$02,$02,$02,$02,$01
 unreferenced_framesPerDropTable:
+.if PRACTISE_MODE ; das
+        .byte   $01
+.else
         .byte   $01,$01
+.endif
 shift_tetrimino:
         lda     tetriminoX
         sta     originalY
@@ -1637,7 +1646,11 @@ shift_tetrimino:
         beq     @ret
         inc     autorepeatX
         lda     autorepeatX
-        cmp     #$10
+.if PRACTISE_MODE ; das
+        cmp     dasModifier
+.else
+        cmp     #10
+.endif
         bmi     @ret
         lda     #$0A
         sta     autorepeatX
@@ -7556,7 +7569,7 @@ practiseMenuRenderPatch:
         cmp     #2
         bne     @notGameType
 
-        ldx     #$0
+        ldx     #$1
 @loop:
         lda     #$21
         sta     PPUADDR
@@ -7614,7 +7627,7 @@ practiseMenuControlPatch:
         rts
 
 practiseMenuConfigSizeLookup:
-        .byte   $01
+        .byte   $01, $20
 
 practiseLevelMenuPatch:
         lda     practiseType
