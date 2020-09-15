@@ -7587,7 +7587,10 @@ practiseMenuRenderPatch:
 
         ldx     #$2
 @loop:
-        lda     #$21
+        txa
+        ror
+        ror
+        adc     #$21
         sta     PPUADDR
         txa
         asl
