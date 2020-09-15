@@ -19,6 +19,7 @@ NO_NO_NEXT_BOX := 1
 NO_GAMETYPE := 0
 PRACTISE_MODE := 1
 DEBUG_MODE := 1
+AUTO_WIN := 1
 
 BUTTON_RIGHT := $1
 BUTTON_LEFT := $2
@@ -33,8 +34,9 @@ MODE_LEVEL29 := 1
 MODE_ALWAYSTETRISREADY := 2
 MODE_DEBUG := 3
 MODE_DAS := 4
+MODE_DROUGHT := 5
 
-MODES_QUANTITY := 5
+MODES_QUANTITY := 6
 MODE_CONFIG_OFFSET = 3
 
 
@@ -43,8 +45,9 @@ MODE_CONFIG_OFFSET = 3
 practiseType := $00C2 ; musicType
 ; $755 - $7FF appears free
 menuVars := $760
-debugFlag := $760
-dasModifier := $761
+debugFlag := menuVars+0
+dasModifier := menuVars+1
+droughtModifier := menuVars+2
 
 
 ; macros
@@ -3036,9 +3039,15 @@ L992A:  cmp     #$07
         jmp     L992A
 
 L9934:  tax
+.if PRACTISE_MODE
+useNewSpawnID:
+        jmp     practisePickTetriminoPatch
+padNOP 2
+.else
         lda     spawnTable,x
 useNewSpawnID:
         sta     spawnID
+.endif
         rts
 
 tetriminoTypeFromOrientation:
@@ -3244,7 +3253,11 @@ playState_checkForCompletedRows:
 
 @checkIfRowComplete:
         lda     (playfieldAddr),y
+.if     AUTO_WIN
+        cmp     #$0
+.else
         cmp     #$EF
+.endif
         beq     @rowNotComplete
         iny
         dex
@@ -7572,7 +7585,7 @@ practiseMenuRenderPatch:
         cmp     #2
         bne     @notGameType
 
-        ldx     #$1
+        ldx     #$2
 @loop:
         lda     #$21
         sta     PPUADDR
@@ -7590,12 +7603,9 @@ practiseMenuRenderPatch:
         bpl     @loop
 
 @notGameType:
-
         rts
 
 practiseMenuControlPatch:
-        ; TODO: add lookup for sizes
-
         ; load config type from offset
         lda     practiseType
         cmp     #MODE_CONFIG_OFFSET
@@ -7630,7 +7640,23 @@ practiseMenuControlPatch:
         rts
 
 practiseMenuConfigSizeLookup:
-        .byte   $01, $20
+        .byte   $01, $23, $12
+
+practisePickTetriminoPatch:
+        lda     spawnTable,x ; patched command
+        sta     spawnID
+        cmp     #$12
+        bne     @finish
+        lda     spawnCount
+        and     #$F
+        adc     #1 ; always adds 1 so code continues at normal if droughtModifier is 0
+        cmp     droughtModifier
+        bmi     @pickRando
+        lda     spawnID
+@finish:
+        rts
+@pickRando:
+        jmp     pickRandomTetrimino
 
 practiseLevelMenuPatch:
         lda     practiseType

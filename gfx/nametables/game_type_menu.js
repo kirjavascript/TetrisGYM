@@ -25,7 +25,7 @@ X#W#a   LEVEL 29                 d#
 X#W#a   ALWAYS TETRIS READY      d#
 X#W#a   DEBUG MODE               d#
 X#W#a   DAS                      d#
-Y0W#a                            d#
+Y0W#a   DROUGHT                  d#
 YWW#a                            d#
 Y#W#a                            d#
 Y#W#a                            d#
