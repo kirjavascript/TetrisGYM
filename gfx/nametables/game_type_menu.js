@@ -10,9 +10,9 @@ console.log(chars.join('').match(/.{35}/g).join('\n'));
 
 const tiles = `
 W0W################################
-WWW################################
-W#W#qwwwwwwwwwwwwwwwwwwwwwwwwwwwwe#
-W#W#aTETRIS GYM (PROTOTYPE)      d#
+WWW####qwwwwwwwwwwwwwwwwwwwwwwe####
+W#W#qwwaTETRIS GYM (PROTOTYPE)dwwe#
+W#W#a  zxxxxxxxxxxxxxxxxxxxxxxc  d#
 W#W#a                            d#
 W#W#a                            d#
 W#W#a                            d#

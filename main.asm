@@ -7644,7 +7644,7 @@ practiseMenuConfigSizeLookup:
 
 practisePickTetriminoPatch:
         lda     spawnTable,x ; patched command
-        sta     spawnID
+        sta     spawnID ; patched command
         cmp     #$12
         bne     @finish
         lda     spawnCount
