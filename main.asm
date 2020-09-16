@@ -5806,7 +5806,11 @@ game_nametable:
         .incbin "gfx/nametables/game_nametable.bin"
 .endif
 enter_high_score_nametable:
+.if PRACTISE_MODE
+        .incbin "gfx/nametables/enter_high_score_nametable_practise.bin"
+.else
         .incbin "gfx/nametables/enter_high_score_nametable.bin"
+.endif
 high_scores_nametable:
         .incbin "gfx/nametables/high_scores_nametable.bin"
 height_menu_nametablepalette_patch:
