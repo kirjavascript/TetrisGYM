@@ -22,11 +22,11 @@ XWW#a                            d#
 X#W#a                            d#
 X#W#a   PLAY                     d#
 X#W#a   LEVEL 29                 d#
-X#W#a   ALWAYS TETRIS READY      d#
+X#W#a   T-SPINS                  d#
 X#W#a   DEBUG MODE               d#
 X#W#a   DAS                      d#
 Y0W#a   DROUGHT                  d#
-YWW#a                            d#
+YWW#a   FLOOR                    d#
 Y#W#a                            d#
 Y#W#a                            d#
 Y#W#a                            d#

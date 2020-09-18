@@ -31,12 +31,13 @@ BUTTON_SELECT := $20
 
 MODE_NORMAL := 0
 MODE_LEVEL29 := 1
-MODE_ALWAYSTETRISREADY := 2
+MODE_TSPINS := 2
 MODE_DEBUG := 3
 MODE_DAS := 4
 MODE_DROUGHT := 5
+MODE_FLOOR := 6
 
-MODES_QUANTITY := 6
+MODES_QUANTITY := 7
 MODE_CONFIG_OFFSET = 3
 
 
@@ -48,6 +49,7 @@ menuVars := $760
 debugFlag := menuVars+0
 dasModifier := menuVars+1
 droughtModifier := menuVars+2
+floorModifier := menuVars+3
 
 
 ; macros
@@ -5744,9 +5746,9 @@ ending_palette:
         ;are the following zeros unused entries for each high score table?
 defaultHighScoresTable:
 .if PRACTISE_MODE
-        .byte  "LUCY  "
-        .byte  "BV09  "
-        .byte  "EJONA "
+        .byte  "000000"
+        .byte  "000000"
+        .byte  "000000"
 .else
         .byte  "HOWARD" ;$08,$0F,$17,$01,$12,$04
         .byte  "OTASAN" ;$0F,$14,$01,$13,$01,$0E
@@ -7589,7 +7591,7 @@ practiseMenuRenderPatch:
         cmp     #2
         bne     @notGameType
 
-        ldx     #$2
+        ldx     #$3
 @loop:
         txa
         ror
@@ -7647,7 +7649,7 @@ practiseMenuControlPatch:
         rts
 
 practiseMenuConfigSizeLookup:
-        .byte   $01, $23, $12
+        .byte   $01, $23, $12, $F
 
 practisePickTetriminoPatch:
         lda     spawnTable,x ; patched command
@@ -7656,7 +7658,7 @@ practisePickTetriminoPatch:
         bne     @finish
         lda     spawnCount
         and     #$F
-        adc     #1 ; always adds 1 so code continues at normal if droughtModifier is 0
+        adc     #1 ; always adds 1 so code continues as normal if droughtModifier is 0
         cmp     droughtModifier
         bmi     @pickRando
         lda     spawnID
@@ -7684,17 +7686,17 @@ practiseLevelMenuPatch:
 practiseCompleteRowPatch:
         tay ; patched command
         ldx     #$0A ; patched command
-
-        lda     practiseType
-        cmp     #MODE_ALWAYSTETRISREADY
-        bne     @skip
-        lda     generalCounter
-        cmp     #$A0
-        bpl     @continue
-@skip:
         rts
-@continue:
-        jmp     playState_completeRowContinue
+        ; lda     practiseType
+        ; cmp     #MODE_TSPINS
+        ; bne     @skip
+        ; lda     generalCounter
+        ; cmp     #$A0
+        ; bpl     @continue
+; @skip:
+        ; rts
+; @continue:
+        ; jmp     playState_completeRowContinue
 
 practiseAdvanceGamePatch:
         jsr     makePlayer1Active ; patched command
@@ -7703,33 +7705,84 @@ practiseAdvanceGamePatch:
         ; gameModeState
 
         lda     practiseType
-        cmp     #MODE_ALWAYSTETRISREADY
+        cmp     #MODE_TSPINS
         bne     @skip
+
+        lda $4C7
+        cmp #$7B
+        beq @skip
+
+        lda #$EF
+        ldx #$49
+@loop:
+        sta $0460,X
+        dex
+        bne @loop
+        lda #$7B
+        ldx #$1E
+@loop2:
+        sta $04A9,X
+        dex
+        bne @loop2
+    ; setup tspin
+        ldx #$17
+        ldy #$2
+        jsr generateNextPseudorandomNumber
+        lda $17
+        and #$7
+        tax ; RNG1-7 in X
+
+        lda #$EF
+
+        sta $04B4,X
+        sta $04B5,X
+        sta $04B6,X
+
+        sta $04BF,X
+
+    ; 'randomly' add increase
+        lda $3FF
+        cmp #$0
+        bne @noInc
+        lda #1
+        sta $3FF
+        inx
+        jmp @hadInc
+@noInc:
+        lda #0
+        sta $3FF
+@hadInc:
+
+        lda #$EF
+        sta $04AA,X
+        sta $04AB,X
+@skipTSpin:
+
 
         ; TODO: fix when burning more than one line / when burning below the tetris
         ; TODO: check playState
         ; TODO: find spare RAM
         ; remove line pieces
 
-        lda $4C7 ; check first hole is filled
-        cmp #$EF
-        bne @clearWell
+        ; lda $4C7 ; check first hole is filled
+        ; cmp #$EF
+        ; bne @clearWell
 
-        lda $4C7 ; check first digit is painted or not
-        cmp #$7B
-        beq @skip
-        lda #$7B
-        ldx #$28
-@loop:
-        sta $049F,X
-        dex
-        bne @loop
-@clearWell:
-        lda #$EF
-        sta $04A9
-        sta $04B3
-        sta $04BD
-        sta $04C7
+        ; lda $4C7 ; check first digit is painted or not
+        ; cmp #$7B
+        ; beq @skip
+        ; lda #$7B
+        ; ldx #$28
+; @loop:
+        ; sta $049F,X
+        ; dex
+        ; bne @loop
+; @clearWell:
+        ; lda #$EF
+        ; sta $04A9
+        ; sta $04B3
+        ; sta $04BD
+        ; sta $04C7
 @skip:
         rts
 
