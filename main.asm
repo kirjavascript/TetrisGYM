@@ -7686,7 +7686,7 @@ practiseRowCompletePatch:
         cmp     #$1A
         bmi     @skipCheck
 
-@normal ; normal behaviour
+@normal: ; normal behaviour
         lda     (playfieldAddr),y ; patched command
         cmp     #$EF ; patched command
         rts
