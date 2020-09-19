@@ -19,7 +19,6 @@ NO_NO_NEXT_BOX := 1
 NO_GAMETYPE := 0
 PRACTISE_MODE := 1
 DEBUG_MODE := 1
-AUTO_WIN := 0
 
 BUTTON_RIGHT := $1
 BUTTON_LEFT := $2
@@ -3244,23 +3243,19 @@ playState_checkForCompletedRows:
         clc
         adc     generalCounter
         sta     generalCounter
-
-.if PRACTISE_MODE
-        jsr practiseCompleteRowPatch
-@burnLines:
-.else
         tay
         ldx     #$0A
-.endif
 
 @checkIfRowComplete:
-        lda     (playfieldAddr),y
-.if     AUTO_WIN
-        cmp     #$0
-.else
-        cmp     #$EF
-.endif
+.if PRACTISE_MODE
+        jsr     practiseRowCompletePatch
+        nop
         beq     @rowNotComplete
+.else
+        lda     (playfieldAddr),y
+        cmp     #$EF
+        beq     @rowNotComplete
+.endif
         iny
         dex
         bne     @checkIfRowComplete
@@ -3273,7 +3268,6 @@ playState_checkForCompletedRows:
         ldy     generalCounter
         dey
 @movePlayfieldDownOneRow:
-
         lda     (playfieldAddr),y
         ldx     #$0A
         stx     playfieldAddr
@@ -7649,7 +7643,7 @@ practiseMenuControlPatch:
         rts
 
 practiseMenuConfigSizeLookup:
-        .byte   $01, $23, $12, $F
+        .byte   $01, $23, $12, $C
 
 practisePickTetriminoPatch:
         lda     spawnTable,x ; patched command
@@ -7683,20 +7677,26 @@ practiseLevelMenuPatch:
         sta     player1_startLevel
         rts
 
-practiseCompleteRowPatch:
-        tay ; patched command
-        ldx     #$0A ; patched command
+practiseRowCompletePatch:
+        lda     practiseType
+        cmp     #MODE_FLOOR
+        bne     @normal
+
+        ; skip rows
+        cmp     #$1A
+        bmi     @skipCheck
+
+@normal ; normal behaviour
+        lda     (playfieldAddr),y ; patched command
+        cmp     #$EF ; patched command
         rts
-        ; lda     practiseType
-        ; cmp     #MODE_TSPINS
-        ; bne     @skip
-        ; lda     generalCounter
-        ; cmp     #$A0
-        ; bpl     @continue
-; @skip:
-        ; rts
-; @continue:
-        ; jmp     playState_completeRowContinue
+
+@skipCheck:
+        ; jump to @rowNotComplete
+        lda     #$EF
+        cmp     #$EF
+        rts
+
 
 practiseAdvanceGamePatch:
         jsr     makePlayer1Active ; patched command
@@ -7704,85 +7704,80 @@ practiseAdvanceGamePatch:
         ; use unused RAM
         ; gameModeState
 
-        lda     practiseType
-        cmp     #MODE_TSPINS
-        bne     @skip
+        ; lda     practiseType
+        ; cmp     #MODE_TSPINS
+        ; bne     @skip
 
-        lda $4C7
-        cmp #$7B
-        beq @skip
-
-        lda #$EF
-        ldx #$49
-@loop:
-        sta $0460,X
-        dex
-        bne @loop
-        lda #$7B
-        ldx #$1E
-@loop2:
-        sta $04A9,X
-        dex
-        bne @loop2
-    ; setup tspin
-        ldx #$17
-        ldy #$2
-        jsr generateNextPseudorandomNumber
-        lda $17
-        and #$7
-        tax ; RNG1-7 in X
-
-        lda #$EF
-
-        sta $04B4,X
-        sta $04B5,X
-        sta $04B6,X
-
-        sta $04BF,X
-
-    ; 'randomly' add increase
-        lda $3FF
-        cmp #$0
-        bne @noInc
-        lda #1
-        sta $3FF
-        inx
-        jmp @hadInc
-@noInc:
-        lda #0
-        sta $3FF
-@hadInc:
-
-        lda #$EF
-        sta $04AA,X
-        sta $04AB,X
-@skipTSpin:
-
-
-        ; TODO: fix when burning more than one line / when burning below the tetris
-        ; TODO: check playState
-        ; TODO: find spare RAM
-        ; remove line pieces
-
-        ; lda $4C7 ; check first hole is filled
-        ; cmp #$EF
-        ; bne @clearWell
-
-        ; lda $4C7 ; check first digit is painted or not
+        ; lda $4C7
         ; cmp #$7B
         ; beq @skip
-        ; lda #$7B
-        ; ldx #$28
+
+        ; lda #$EF
+        ; ldx #$49
 ; @loop:
-        ; sta $049F,X
+        ; sta $0460,X
         ; dex
         ; bne @loop
-; @clearWell:
+        ; lda #$7B
+        ; ldx #$1E
+; @loop2:
+        ; sta $04A9,X
+        ; dex
+        ; bne @loop2
+    ; ; setup tspin
+        ; ldx #$17
+        ; ldy #$2
+        ; jsr generateNextPseudorandomNumber
+        ; lda $17
+        ; and #$7
+        ; tax ; RNG1-7 in X
+
         ; lda #$EF
-        ; sta $04A9
-        ; sta $04B3
-        ; sta $04BD
-        ; sta $04C7
+
+        ; sta $04B4,X
+        ; sta $04B5,X
+        ; sta $04B6,X
+
+        ; sta $04BF,X
+
+    ; ; 'randomly' add increase
+        ; lda $3FF
+        ; cmp #$0
+        ; bne @noInc
+        ; lda #1
+        ; sta $3FF
+        ; inx
+        ; jmp @hadInc
+; @noInc:
+        ; lda #0
+        ; sta $3FF
+; @hadInc:
+
+        ; lda #$EF
+        ; sta $04AA,X
+        ; sta $04AB,X
+; @skipTSpin:
+
+
+
+        lda     practiseType
+        cmp     #MODE_FLOOR
+        bne     @skip
+
+        ; offset to skip drawing rows from
+        lda #$D
+        sbc floorModifier
+        tax
+
+        lda multBy10Table, x
+        tax
+        ; tile to draw is $7B
+        lda #$7B
+@loop:
+        sta $0446,X
+        inx
+        cpx #$82
+        bmi @loop
 @skip:
         rts
 
