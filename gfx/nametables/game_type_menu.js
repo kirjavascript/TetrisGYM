@@ -23,11 +23,11 @@ X#W#a                            d#
 X#W#a   PLAY                     d#
 X#W#a   LEVEL 29                 d#
 X#W#a   T-SPINS                  d#
-X#W#a   DEBUG MODE               d#
-X#W#a   DAS                      d#
+X#W#a   PRESETS                  d#
+X#W#a   FLOOR                    d#
 Y0W#a   DROUGHT                  d#
-YWW#a   FLOOR                    d#
-Y#W#a                            d#
+YWW#a   DAS                      d#
+Y#W#a   DEBUG MODE               d#
 Y#W#a                            d#
 Y#W#a                            d#
 Y#W#a                            d#

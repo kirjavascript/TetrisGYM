@@ -31,12 +31,13 @@ BUTTON_SELECT := $20
 MODE_NORMAL := 0
 MODE_LEVEL29 := 1
 MODE_TSPINS := 2
-MODE_DEBUG := 3
-MODE_DAS := 4
+MODE_PRESETS := 3
+MODE_FLOOR := 4
 MODE_DROUGHT := 5
-MODE_FLOOR := 6
+MODE_DAS := 6
+MODE_DEBUG := 7
 
-MODES_QUANTITY := 7
+MODE_QUANTITY := 8
 MODE_CONFIG_OFFSET = 3
 
 
@@ -45,10 +46,11 @@ MODE_CONFIG_OFFSET = 3
 practiseType := $00C2 ; musicType
 ; $755 - $7FF appears free
 menuVars := $760
-debugFlag := menuVars+0
-dasModifier := menuVars+1
+presetModifier := menuVars+0
+floorModifier := menuVars+1
 droughtModifier := menuVars+2
-floorModifier := menuVars+3
+dasModifier := menuVars+3
+debugFlag := menuVars+4
 
 
 ; macros
@@ -763,7 +765,7 @@ padNOP  10
         lda     musicType
 
 .if PRACTISE_MODE ; menu item qty
-        cmp     #MODES_QUANTITY-1
+        cmp     #MODE_QUANTITY-1
 .else
         cmp     #$03
 .endif
@@ -2464,6 +2466,7 @@ isPositionValid:
         clc
         adc     tetriminoY
         adc     #$02
+
         cmp     #$16
         bcs     @invalid
         lda     orientationTable,x
@@ -5740,9 +5743,9 @@ ending_palette:
         ;are the following zeros unused entries for each high score table?
 defaultHighScoresTable:
 .if PRACTISE_MODE
-        .byte  "000000"
-        .byte  "000000"
-        .byte  "000000"
+        .byte  "      "
+        .byte  "      "
+        .byte  "      "
 .else
         .byte  "HOWARD" ;$08,$0F,$17,$01,$12,$04
         .byte  "OTASAN" ;$0F,$14,$01,$13,$01,$0E
@@ -7585,7 +7588,7 @@ practiseMenuRenderPatch:
         cmp     #2
         bne     @notGameType
 
-        ldx     #$3
+        ldx     #$4
 @loop:
         txa
         ror
@@ -7643,7 +7646,7 @@ practiseMenuControlPatch:
         rts
 
 practiseMenuConfigSizeLookup:
-        .byte   $01, $23, $12, $C
+        .byte   $1, $C, $12, $23, $1
 
 practisePickTetriminoPatch:
         lda     spawnTable,x ; patched command
@@ -7682,8 +7685,13 @@ practiseRowCompletePatch:
         cmp     #MODE_FLOOR
         bne     @normal
 
-        ; skip rows
-        cmp     #$1A
+        ; ; skip rows
+        ; 1E
+        ; sbc     floorModifier
+        ; tax
+        ; ; use tmp1 etc to solve this
+
+        cmp     #$1E
         bmi     @skipCheck
 
 @normal: ; normal behaviour
@@ -7698,15 +7706,73 @@ practiseRowCompletePatch:
         rts
 
 
+layouts:
+        .byte layout1-layouts-1
+        .byte layout2-layouts-1
+layout1:
+        .byte $98, $AC, $BE, $C0, $C2, $FF
+layout2:
+        .byte $AA, $AB, $AC, $b4, $B5, $BE, $FF
+        ; write JS file to generate this
+
 practiseAdvanceGamePatch:
         jsr     makePlayer1Active ; patched command
 
-        ; use unused RAM
-        ; gameModeState
+        lda     practiseType
+        cmp     #MODE_PRESETS
+        bne     @skipPresets
+        jsr     advanceGamePreset
+@skipPresets:
 
-        ; lda     practiseType
-        ; cmp     #MODE_TSPINS
-        ; bne     @skip
+        lda     practiseType
+        cmp     #MODE_FLOOR
+        bne     @skipFloor
+        jsr     advanceGameFloor
+@skipFloor:
+
+        rts
+
+advanceGamePreset:
+        ; clear playfield
+        lda #$EF
+        ldx #$67
+@loop:
+        sta $0460, x
+        dex
+        bne @loop
+
+
+        ; render layout
+        ldx #0
+        stx generalCounter
+@drawNext:
+        ; get layout offset
+        ldy presetModifier
+        lda layouts, y
+
+        ; add index
+        adc generalCounter
+
+        ; load byte from layout
+        tax
+        ldy layouts, x
+
+        ; check if finished
+        cpy #$FF
+        beq @skip
+
+        ; draw from y
+        lda #$7B
+        sta $0400, y
+
+        ; loop
+        inc generalCounter
+        jmp @drawNext
+@skip:
+        rts
+
+
+@skipTSpin:
 
         ; lda $4C7
         ; cmp #$7B
@@ -7759,25 +7825,21 @@ practiseAdvanceGamePatch:
 ; @skipTSpin:
 
 
-
-        lda     practiseType
-        cmp     #MODE_FLOOR
-        bne     @skip
-
+advanceGameFloor:
         ; offset to skip drawing rows from
-        lda #$D
-        sbc floorModifier
+        lda     #$D
+        sbc     floorModifier
         tax
 
-        lda multBy10Table, x
+        lda     multBy10Table, x
         tax
         ; tile to draw is $7B
-        lda #$7B
+        lda     #$7B
 @loop:
-        sta $0446,X
+        sta     $0446,X
         inx
-        cpx #$82
-        bmi @loop
+        cpx     #$82
+        bmi     @loop
 @skip:
         rts
 
