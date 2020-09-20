@@ -38,7 +38,8 @@ MODE_DAS := 6
 MODE_DEBUG := 7
 
 MODE_QUANTITY := 8
-MODE_CONFIG_OFFSET = 3
+MODE_CONFIG_QUANTITY := 5
+MODE_CONFIG_OFFSET := MODE_QUANTITY - MODE_CONFIG_QUANTITY
 
 
 ; RAM
@@ -569,26 +570,36 @@ playState_player2ControlsActiveTetrimino:
 
 gameMode_legalScreen:
 .if PRACTISE_MODE ; boot
+        ; set start level to 18
         lda     #$80
         sta     player1_startLevel
+        ; zero out config memory
+        lda     #0
+        ldx     #MODE_CONFIG_QUANTITY
+@loop:
+        sta     menuVars, x
+        dex
+        bpl     @loop
+        ; set DAS to normal value
         lda     #$10
         sta     dasModifier
         jmp     @continueToNextScreen
         nop
 .elseif NO_LEGAL
         jmp     @continueToNextScreen
-padNOP  10
+padNOP  20
 .else
         jsr     updateAudio2
         lda     #$00
         sta     renderMode
         jsr     updateAudioWaitForNmiAndDisablePpuRendering
         jsr     disableNmi
-.endif
+
         lda     #$00
         jsr     changeCHRBank0
         lda     #$00
         jsr     changeCHRBank1
+.endif
         jsr     bulkCopyToPpu
         .addr   legal_screen_palette
         jsr     bulkCopyToPpu
@@ -7588,7 +7599,7 @@ practiseMenuRenderPatch:
         cmp     #2
         bne     @notGameType
 
-        ldx     #$4
+        ldx     #MODE_CONFIG_QUANTITY-1
 @loop:
         txa
         ror
