@@ -7717,15 +7717,6 @@ practiseRowCompletePatch:
         rts
 
 
-layouts:
-        .byte layout1-layouts-1
-        .byte layout2-layouts-1
-layout1:
-        .byte $98, $AC, $BE, $C0, $C2, $FF
-layout2:
-        .byte $AA, $AB, $AC, $b4, $B5, $BE, $FF
-        ; write JS file to generate this
-
 practiseAdvanceGamePatch:
         jsr     makePlayer1Active ; patched command
 
@@ -7743,12 +7734,14 @@ practiseAdvanceGamePatch:
 
         rts
 
+.include "presets.asm"
+
 advanceGamePreset:
         ; clear playfield
         lda #$EF
-        ldx #$67
+        ldx #$C8
 @loop:
-        sta $0460, x
+        sta $0400, x
         dex
         bne @loop
 
@@ -7759,14 +7752,14 @@ advanceGamePreset:
 @drawNext:
         ; get layout offset
         ldy presetModifier
-        lda layouts, y
+        lda presets, y
 
         ; add index
         adc generalCounter
 
         ; load byte from layout
         tax
-        ldy layouts, x
+        ldy presets, x
 
         ; check if finished
         cpy #$FF
