@@ -7657,7 +7657,7 @@ practiseMenuControlPatch:
         rts
 
 practiseMenuConfigSizeLookup:
-        .byte   $1, $C, $12, $23, $1
+        .byte   $5, $C, $12, $23, $1
 
 practisePickTetriminoPatch:
         lda     spawnTable,x ; patched command
@@ -7734,7 +7734,7 @@ practiseAdvanceGamePatch:
 
         rts
 
-.include "presets.asm"
+.include "presets/presets.asm"
 
 advanceGamePreset:
         ; clear playfield

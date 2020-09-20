@@ -22,15 +22,37 @@ const presets = [
         `X X X  XX `,
     ],
     [
+        `       XX `,
+        `XXX      X`,
+        `X        X`,
+        `XX       X`,
+    ],
+    [
         `XXX    XXX`,
         `XX      XX`,
         `X        X`,
-        `          `,
+    ],
+    [
+        ` XX       `,
         `X        X`,
-        `XX      XX`,
-        `XXX    XXX`,
-        `XX      XX`,
-        `X        X`,
+        `X         `,
+        `X      X X`,
+    ],
+    [
+        `    X X`,
+        `     X`,
+        `     X`,
+        `  X X X X`,
+        `  X X X X`,
+    ],
+    [
+        `    XXX`,
+        `    X`,
+        `    XXX`,
+        `      X`,
+        `    XXXX`,
+        `    X`,
+        `    XXX`,
     ],
 ];
 const tab = '        ';
@@ -52,4 +74,4 @@ presets.forEach((preset, i) => {
 });
 
 console.log(out);
-require('fs').writeFileSync('./presets.asm', out, 'utf8');
+require('fs').writeFileSync(__dirname + '/presets.asm', out, 'utf8');
