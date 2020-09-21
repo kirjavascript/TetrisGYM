@@ -41,18 +41,21 @@ MODE_QUANTITY := 8
 MODE_CONFIG_QUANTITY := 5
 MODE_CONFIG_OFFSET := MODE_QUANTITY - MODE_CONFIG_QUANTITY
 
-
 ; RAM
 
-practiseType := $00C2 ; musicType
-; $755 - $7FF appears free
+practiseType := musicType
+debugLevelEdit := unused_0E
+debugNextCounter := nextPiece_2player
+; $600 - $67F
+tspinLocation := $600
+; $760 - $7FF
 menuVars := $760
 presetModifier := menuVars+0
 floorModifier := menuVars+1
 droughtModifier := menuVars+2
 dasModifier := menuVars+3
 debugFlag := menuVars+4
-
+; $B00 - $BEF
 
 ; macros
 
@@ -7721,6 +7724,12 @@ practiseAdvanceGamePatch:
         jsr     makePlayer1Active ; patched command
 
         lda     practiseType
+        cmp     #MODE_TSPINS
+        bne     @skipTSpins
+        jsr     advanceGameTSpins
+@skipTSpins:
+
+        lda     practiseType
         cmp     #MODE_PRESETS
         bne     @skipPresets
         jsr     advanceGamePreset
@@ -7744,7 +7753,8 @@ advanceGamePreset:
         sta $0400, x
         dex
         bne @loop
-
+        ; press select to clear
+        ; OR preset for pieces
 
         ; render layout
         ldx #0
@@ -7776,39 +7786,44 @@ advanceGamePreset:
         rts
 
 
-@skipTSpin:
+advanceGameTSpins:
+        lda tspinLocation
+        cmp #0
+        bne @skip
 
-        ; lda $4C7
-        ; cmp #$7B
-        ; beq @skip
+        lda #1
+        sta tspinLocation
 
-        ; lda #$EF
-        ; ldx #$49
-; @loop:
-        ; sta $0460,X
-        ; dex
-        ; bne @loop
-        ; lda #$7B
-        ; ldx #$1E
-; @loop2:
-        ; sta $04A9,X
-        ; dex
-        ; bne @loop2
-    ; ; setup tspin
-        ; ldx #$17
-        ; ldy #$2
-        ; jsr generateNextPseudorandomNumber
-        ; lda $17
-        ; and #$7
-        ; tax ; RNG1-7 in X
+        ; clear playfield
+        lda #$EF
+        ldx #$49
+@loop:
+        sta $0460,X
+        dex
+        bne @loop
 
-        ; lda #$EF
+        ; draw 3 lines
+        lda #$7B
+        ldx #$1E
+@loop2:
+        sta $04A9,X
+        dex
+        bne @loop2
+    ; setup tspin
+        ldx #$17
+        ldy #$2
+        jsr generateNextPseudorandomNumber
+        lda $17
+        and #$7
+        tax ; RNG1-7 in X
 
-        ; sta $04B4,X
-        ; sta $04B5,X
-        ; sta $04B6,X
+        lda #$EF
 
-        ; sta $04BF,X
+        sta $04B4,X
+        sta $04B5,X
+        sta $04B6,X
+
+        sta $04BF,X
 
     ; ; 'randomly' add increase
         ; lda $3FF
@@ -7826,7 +7841,8 @@ advanceGamePreset:
         ; lda #$EF
         ; sta $04AA,X
         ; sta $04AB,X
-; @skipTSpin:
+@skip:
+        rts
 
 
 advanceGameFloor:
@@ -7855,8 +7871,6 @@ practisePausePatch:
 
 DEBUG_ORIGINAL_Y := tmp1
 DEBUG_ORIGINAL_CURRENT_PIECE := tmp2
-DEBUG_LEVELEDIT := unused_0E
-DEBUG_NEXTCOUNTER := nextPiece_2player
 
         lda     tetriminoX
         sta     originalY
@@ -7876,9 +7890,9 @@ DEBUG_NEXTCOUNTER := nextPiece_2player
         and     #BUTTON_SELECT
         beq     @notPressedSelect
         ; flip debug bit
-        lda     DEBUG_LEVELEDIT
+        lda     debugLevelEdit
         eor     #1
-        sta     DEBUG_LEVELEDIT
+        sta     debugLevelEdit
 @notPressedSelect:
 
         ; update position
@@ -7906,7 +7920,7 @@ DEBUG_NEXTCOUNTER := nextPiece_2player
 @notPressingRight:
 
         ; check mode
-        lda     DEBUG_LEVELEDIT
+        lda     debugLevelEdit
         and     #1
         bne     handleLevelEditor
 
@@ -7966,17 +7980,17 @@ DEBUG_NEXTCOUNTER := nextPiece_2player
         rts
 
 @changeNext:
-        lda     DEBUG_NEXTCOUNTER
+        lda     debugNextCounter
         and     #7
         cmp     #7
         bne     @notDupe
-        inc     DEBUG_NEXTCOUNTER
+        inc     debugNextCounter
 @notDupe:
         tax
         lda     spawnTable,x
         sta     nextPiece
 
-        inc     DEBUG_NEXTCOUNTER
+        inc     debugNextCounter
         jmp     @draw
 
 

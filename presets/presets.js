@@ -61,6 +61,8 @@ presets.forEach((_, i) => {
     out += `${tab} .byte preset${i}-presets-1\n`;
 });
 
+let total = presets.length;
+
 presets.forEach((preset, i) => {
     preset.length < 20 &&
         preset.splice(0, 0, ...Array.from({ length: 20 - preset.length }, () => ''));
@@ -70,8 +72,10 @@ presets.forEach((preset, i) => {
         .filter(d => d !== ' ');
     out += `preset${i}:\n`;
     out += `${tab} .byte ${bytes.map(b => '$' + b.toString(16)).join(', ')}, $FF\n`;
-
+    total += 1 + bytes.length;
 });
 
 console.log(out);
 require('fs').writeFileSync(__dirname + '/presets.asm', out, 'utf8');
+
+console.log(`>> bytes: ${total}`)
