@@ -7663,8 +7663,14 @@ practiseMenuConfigSizeLookup:
         .byte   $5, $C, $12, $23, $1
 
 practisePickTetriminoPatch:
+        lda     practiseType
+        cmp     #MODE_TSPINS
+        beq     @tspins
+
         lda     spawnTable,x ; patched command
         sta     spawnID ; patched command
+
+        ; drought
         cmp     #$12
         bne     @finish
         lda     spawnCount
@@ -7677,6 +7683,11 @@ practisePickTetriminoPatch:
         rts
 @pickRando:
         jmp     pickRandomTetrimino
+
+@tspins:
+        lda     #$2
+        sta     spawnID
+        rts
 
 practiseLevelMenuPatch:
         lda     practiseType
@@ -7746,6 +7757,10 @@ practiseAdvanceGamePatch:
 .include "presets/presets.asm"
 
 advanceGamePreset:
+        ; TODO
+        ; press select to clear
+        ; OR preset for pieces
+
         ; clear playfield
         lda #$EF
         ldx #$C8
@@ -7753,8 +7768,6 @@ advanceGamePreset:
         sta $0400, x
         dex
         bne @loop
-        ; press select to clear
-        ; OR preset for pieces
 
         ; render layout
         ldx #0
@@ -7787,9 +7800,21 @@ advanceGamePreset:
 
 
 advanceGameTSpins:
+        ; TODO
+        ; update highscore -> count tspins
         lda tspinLocation
         cmp #0
-        bne @skip
+        beq @skipPos
+
+        ldx #$17
+        ldy #$2
+        jsr generateNextPseudorandomNumber
+        lda $17
+        and #$7
+        ; RNG1-7
+        sta tspinLocation
+
+@skipPos:
 
         lda #1
         sta tspinLocation
@@ -7809,16 +7834,10 @@ advanceGameTSpins:
         sta $04A9,X
         dex
         bne @loop2
+
     ; setup tspin
-        ldx #$17
-        ldy #$2
-        jsr generateNextPseudorandomNumber
-        lda $17
-        and #$7
-        tax ; RNG1-7 in X
-
         lda #$EF
-
+        ldx tspinLocation
         sta $04B4,X
         sta $04B5,X
         sta $04B6,X
