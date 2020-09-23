@@ -16,6 +16,7 @@ NO_LEGAL := 1
 NO_TITLE := 1
 NO_MUSIC := 1
 NO_NO_NEXT_BOX := 1
+NO_CURTAIN := 1
 NO_GAMETYPE := 0
 PRACTISE_MODE := 1
 DEBUG_MODE := 1
@@ -49,6 +50,7 @@ debugNextCounter := nextPiece_2player
 ; $600 - $67F
 tspinX := $600
 tspinY := $601
+tspinZ := $602
 ; $760 - $7FF
 menuVars := $760
 presetModifier := menuVars+0
@@ -3183,7 +3185,11 @@ playState_lockTetrimino:
 playState_updateGameOverCurtain:
         lda     curtainRow
         cmp     #$14
+.if NO_CURTAIN
+        bne     @curtainFinished
+.else
         beq     @curtainFinished
+.endif
         lda     frameCounter
         and     #$03
         bne     @ret
@@ -7731,7 +7737,6 @@ practiseRowCompletePatch:
         cmp     #$EF
         rts
 
-
 practiseAdvanceGamePatch:
         jsr     makePlayer1Active ; patched command
 
@@ -7807,11 +7812,36 @@ advanceGameTSpins:
         ; update highscore -> count tspins
         ; update top
 
+        lda currentPiece
+        sta $606
+
+        ; see if the sprite has reached the right position
+        lda #8
+        sbc tspinX
+        cmp tetriminoX
+        bne @notFinished
+        lda #18
+        sbc tspinY
+        cmp tetriminoY
+        bne @notFinished
+        ; check the orientation
+        lda currentPiece
+        cmp #2
+        bne @notFinished
+
+        lda #$3
+        sta playState
+        lda #0
+        sta tspinX
+
+@notFinished:
+
         ; check if a tspin is setup
         lda tspinX
         cmp #0
-        bne @skipPos
+        bne renderTSpin
 
+generateNewTSpin:
         ldx #$17
         ldy #$2
         jsr generateNextPseudorandomNumber
@@ -7827,77 +7857,44 @@ advanceGameTSpins:
         ror
         ror
         and #3
-        ; adc #3
         sta tspinY
-@skipPos:
+        ; some other bit
+        txa
+        and #1
+        sta tspinZ
 
+renderTSpin:
         jsr clearPlayfield
 
         lda tspinY
         adc #1
-        ; sta $603
         jsr drawFloor
 
-    ; setup tspin
-
-        ; lda #$400
-        ; sbc tmp1
-        ; tax
-        ; lda tspinX
-        ; sbc tmp1
-        ; tax
-
-        ; ldx tspinX
-
-
-        ; get Y offset
+        ; get tspin offset
         ldx tspinY
         lda multBy10Table, x
         sta tmp1
 
-
         lda #$FF
         sbc tspinX ; sub X
-        ; sbc tspinY ; sub X
         sbc tmp1 ; sub Y
         tax
-
+        ; draw tspin
         lda #$EF
         sta $03bC, x
         sta $03bD, x
         sta $03bE, x
         sta $03c7, x
-        sta $03b2, x
         sta $03b3, x
+        ldy tspinZ
+        cpy #0
+        bne @noInc
+        inx
+        inx
+@noInc:
+        sta $03b2, x
 
-        ; ldx tspinX
-        ; lda #$EF
-        ; sta $04b4, x
-        ; sta $04b5, x
-        ; sta $04b6, x
-        ; sta $04bf, x
-        ; sta $04aa, x
-        ; sta $04ab, x
-
-    ; ; 'randomly' add increase
-        ; lda $3FF
-        ; cmp #$0
-        ; bne @noInc
-        ; lda #1
-        ; sta $3FF
-        ; inx
-        ; jmp @hadInc
-; @noInc:
-        ; lda #0
-        ; sta $3FF
-; @hadInc:
-
-        ; lda #$EF
-        ; sta $04AA,X
-        ; sta $04AB,X
-@skip:
         rts
-
 
 advanceGameFloor:
         lda     floorModifier
