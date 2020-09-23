@@ -47,7 +47,8 @@ practiseType := musicType
 debugLevelEdit := unused_0E
 debugNextCounter := nextPiece_2player
 ; $600 - $67F
-tspinLocation := $600
+tspinX := $600
+tspinY := $601
 ; $760 - $7FF
 menuVars := $760
 presetModifier := menuVars+0
@@ -7754,6 +7755,15 @@ practiseAdvanceGamePatch:
 
         rts
 
+clearPlayfield:
+        lda #$EF
+        ldx #$C8
+@loop:
+        sta $0400, x
+        dex
+        bne @loop
+        rts
+
 .include "presets/presets.asm"
 
 advanceGamePreset:
@@ -7761,14 +7771,7 @@ advanceGamePreset:
         ; press select to clear
         ; OR preset for pieces
 
-        ; clear playfield
-        lda #$EF
-        ldx #$C8
-@loop:
-        sta $0400, x
-        dex
-        bne @loop
-
+        jsr clearPlayfield
         ; render layout
         ldx #0
         stx generalCounter
@@ -7802,47 +7805,79 @@ advanceGamePreset:
 advanceGameTSpins:
         ; TODO
         ; update highscore -> count tspins
-        lda tspinLocation
+        ; update top
+
+        ; check if a tspin is setup
+        lda tspinX
         cmp #0
-        beq @skipPos
+        bne @skipPos
 
         ldx #$17
         ldy #$2
         jsr generateNextPseudorandomNumber
-        lda $17
+        lda rng_seed
+        tax
+        ; lower nybble
         and #$7
-        ; RNG1-7
-        sta tspinLocation
-
+        sta tspinX
+        ; high nybbleish
+        txa
+        ror
+        ror
+        ror
+        ror
+        and #3
+        ; adc #3
+        sta tspinY
 @skipPos:
 
-        lda #1
-        sta tspinLocation
+        jsr clearPlayfield
 
-        ; clear playfield
-        lda #$EF
-        ldx #$49
-@loop:
-        sta $0460,X
-        dex
-        bne @loop
-
-        ; draw 3 lines
-        lda #$7B
-        ldx #$1E
-@loop2:
-        sta $04A9,X
-        dex
-        bne @loop2
+        lda tspinY
+        adc #1
+        ; sta $603
+        jsr drawFloor
 
     ; setup tspin
-        lda #$EF
-        ldx tspinLocation
-        sta $04B4,X
-        sta $04B5,X
-        sta $04B6,X
 
-        sta $04BF,X
+        ; lda #$400
+        ; sbc tmp1
+        ; tax
+        ; lda tspinX
+        ; sbc tmp1
+        ; tax
+
+        ; ldx tspinX
+
+
+        ; get Y offset
+        ldx tspinY
+        lda multBy10Table, x
+        sta tmp1
+
+
+        lda #$FF
+        sbc tspinX ; sub X
+        ; sbc tspinY ; sub X
+        sbc tmp1 ; sub Y
+        tax
+
+        lda #$EF
+        sta $03bC, x
+        sta $03bD, x
+        sta $03bE, x
+        sta $03c7, x
+        sta $03b2, x
+        sta $03b3, x
+
+        ; ldx tspinX
+        ; lda #$EF
+        ; sta $04b4, x
+        ; sta $04b5, x
+        ; sta $04b6, x
+        ; sta $04bf, x
+        ; sta $04aa, x
+        ; sta $04ab, x
 
     ; ; 'randomly' add increase
         ; lda $3FF
@@ -7865,11 +7900,14 @@ advanceGameTSpins:
 
 
 advanceGameFloor:
-        ; offset to skip drawing rows from
+        lda     floorModifier
+drawFloor:
+        ; get correct offset
+        sta     tmp1
         lda     #$D
-        sbc     floorModifier
+        sbc     tmp1
         tax
-
+        ; x10
         lda     multBy10Table, x
         tax
         ; tile to draw is $7B
@@ -8079,14 +8117,11 @@ handleLevelEditor:
         ; multiply by 10
         ldx     tetriminoY
         lda     multBy10Table,x
-        sta     tmp3
 
-        ; add values
-        ldx     tetriminoX
-@loop:
-        inc     tmp3
-        dex
-        bne     @loop
+        ; add X
+        adc     tetriminoX
+        sta     tmp3
+        dec     tmp3
         rts
 
 ; YY AA II XX
