@@ -48,9 +48,10 @@ practiseType := musicType
 debugLevelEdit := unused_0E
 debugNextCounter := nextPiece_2player
 ; $600 - $67F
-tspinX := $600
-tspinY := $601
-tspinZ := $602
+spawnDelay := $600
+tspinX := $601
+tspinY := $602
+tspinType := $603
 ; $760 - $7FF
 menuVars := $760
 presetModifier := menuVars+0
@@ -503,7 +504,11 @@ gameModeState_updatePlayer1:
         jsr     makePlayer1Active
 .endif
         jsr     branchOnPlayStatePlayer1
+.if PRACTISE_MODE
+        jsr     practiseCurrentSpritePatch
+.else
         jsr     stageSpriteForCurrentPiece
+.endif
         jsr     savePlayer1State
         jsr     stageSpriteForNextPiece
         inc     gameModeState
@@ -2965,6 +2970,13 @@ playState_spawnNextTetrimino:
         lda     vramRow
         cmp     #$20
         bmi     @ret
+.if PRACTISE_MODE
+        lda     spawnDelay
+        beq     @notDelaying
+        dec     spawnDelay
+        jmp     @ret
+padNOP 27
+.else
         lda     numberOfPlayers
         cmp     #$01
         beq     @notDelaying
@@ -2985,6 +2997,8 @@ playState_spawnNextTetrimino:
         lda     twoPlayerPieceDelayCounter
         cmp     #$1C
         bne     @ret
+.endif
+
 @notDelaying:
         lda     #$00
         sta     twoPlayerPieceDelayCounter
@@ -7685,7 +7699,7 @@ practisePickTetriminoPatch:
         adc     #1 ; always adds 1 so code continues as normal if droughtModifier is 0
         cmp     droughtModifier
         bmi     @pickRando
-        lda     spawnID
+        lda     spawnID ; patched command
 @finish:
         rts
 @pickRando:
@@ -7714,6 +7728,10 @@ practiseLevelMenuPatch:
 
 practiseRowCompletePatch:
         lda     practiseType
+        cmp     #MODE_TSPINS
+        beq     @skipCheck
+
+        lda     practiseType
         cmp     #MODE_FLOOR
         bne     @normal
 
@@ -7723,7 +7741,7 @@ practiseRowCompletePatch:
         ; tax
         ; ; use tmp1 etc to solve this
 
-        cmp     #$1E
+        cpx     #$1E
         bmi     @skipCheck
 
 @normal: ; normal behaviour
@@ -7735,6 +7753,14 @@ practiseRowCompletePatch:
         ; jump to @rowNotComplete
         lda     #$EF
         cmp     #$EF
+        rts
+
+practiseCurrentSpritePatch:
+        lda     tetriminoX
+        cmp     #$EF
+        beq     @skip
+        jsr     stageSpriteForCurrentPiece ; patched
+@skip:
         rts
 
 practiseAdvanceGamePatch:
@@ -7811,9 +7837,8 @@ advanceGameTSpins:
         ; TODO
         ; update highscore -> count tspins
         ; update top
-
-        lda currentPiece
-        sta $606
+        ; patch complete row to ignore it
+        ; add entry delay
 
         ; see if the sprite has reached the right position
         lda #8
@@ -7825,14 +7850,21 @@ advanceGameTSpins:
         cmp tetriminoY
         bne @notFinished
         ; check the orientation
-        lda currentPiece
-        cmp #2
-        bne @notFinished
+        ; lda currentPiece
+        ; cmp #2
+        ; bne @notFinished
 
+        ; set successful tspin vars
         lda #$3
         sta playState
         lda #0
         sta tspinX
+        inc score
+
+        lda #$20
+        sta spawnDelay
+        lda #$EF ; magic number in practiseCurrentSpritePatch
+        sta tetriminoX
 
 @notFinished:
 
@@ -7861,7 +7893,7 @@ generateNewTSpin:
         ; some other bit
         txa
         and #1
-        sta tspinZ
+        sta tspinType
 
 renderTSpin:
         jsr clearPlayfield
@@ -7886,7 +7918,7 @@ renderTSpin:
         sta $03bE, x
         sta $03c7, x
         sta $03b3, x
-        ldy tspinZ
+        ldy tspinType
         cpy #0
         bne @noInc
         inx
