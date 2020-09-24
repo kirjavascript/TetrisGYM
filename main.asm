@@ -7838,7 +7838,6 @@ advanceGameTSpins:
         ; update highscore -> count tspins
         ; update top
         ; patch complete row to ignore it
-        ; add entry delay
 
         ; see if the sprite has reached the right position
         lda #8
