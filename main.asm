@@ -7850,9 +7850,9 @@ advanceGameTSpins:
         cmp tetriminoY
         bne @notFinished
         ; check the orientation
-        ; lda currentPiece
-        ; cmp #2
-        ; bne @notFinished
+        lda currentPiece
+        cmp #2
+        bne @notFinished
 
         ; set successful tspin vars
         lda #$3
