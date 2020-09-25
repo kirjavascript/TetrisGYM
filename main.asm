@@ -915,10 +915,14 @@ gameMode_levelMenuContinue:
         .addr   menu_palette
         jsr     bulkCopyToPpu
         .addr   level_menu_nametable
+.if PRACTISE_MODE ; skip a-type (force b-type)
+padNOP 9
+.else
         lda     gameType
         bne     @skipTypeBHeightDisplay
         jsr     bulkCopyToPpu
         .addr   height_menu_nametablepalette_patch
+.endif
 @skipTypeBHeightDisplay:
         jsr     showHighScores
         jsr     waitForVBlankAndEnableNmi
@@ -4347,6 +4351,9 @@ highScoreEntryScreen:
         .addr   menu_palette
         jsr     bulkCopyToPpu
         .addr   enter_high_score_nametable
+.if PRACTISE_MODE ; hide A-type
+padNOP 18
+.else
         lda     #$20
         sta     PPUADDR
         lda     #$6D
@@ -4355,6 +4362,7 @@ highScoreEntryScreen:
         clc
         adc     gameType
         sta     PPUDATA
+.endif
         jsr     showHighScores
         lda     #$02
         sta     renderMode
@@ -5825,24 +5833,23 @@ legal_screen_nametable:
         .incbin "gfx/nametables/legal_screen_nametable.bin"
 title_screen_nametable:
         .incbin "gfx/nametables/title_screen_nametable.bin"
-game_type_menu_nametable:
 .if PRACTISE_MODE
+game_type_menu_nametable:
         .incbin "gfx/nametables/game_type_menu_nametable_practise.bin"
+level_menu_nametable:
+        .incbin "gfx/nametables/level_menu_nametable_practise.bin"
+game_nametable:
+        .incbin "gfx/nametables/game_nametable_practise.bin"
+enter_high_score_nametable:
+        .incbin "gfx/nametables/enter_high_score_nametable_practise.bin"
 .else
+game_type_menu_nametable:
         .incbin "gfx/nametables/game_type_menu_nametable.bin"
-.endif
 level_menu_nametable:
         .incbin "gfx/nametables/level_menu_nametable.bin"
 game_nametable:
-.if PRACTISE_MODE
-        .incbin "gfx/nametables/game_nametable_practise.bin"
-.else
         .incbin "gfx/nametables/game_nametable.bin"
-.endif
 enter_high_score_nametable:
-.if PRACTISE_MODE
-        .incbin "gfx/nametables/enter_high_score_nametable_practise.bin"
-.else
         .incbin "gfx/nametables/enter_high_score_nametable.bin"
 .endif
 high_scores_nametable:
@@ -7757,7 +7764,7 @@ practiseRowCompletePatch:
 
 practiseCurrentSpritePatch:
         lda     tetriminoX
-        cmp     #$EF
+        cmp     #$EF ; set in tspin code
         beq     @skip
         jsr     stageSpriteForCurrentPiece ; patched
 @skip:
