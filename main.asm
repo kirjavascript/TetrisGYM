@@ -5772,7 +5772,11 @@ legal_screen_palette:
         .byte   $30,$3A,$15,$FF
 menu_palette:
         .byte   $3F,$00,$14,$0F,$30,$38,$00,$0F
+.if PRACTISE_MODE
+        .byte   $30,$16,$00,$0F,$30,$12,$00,$0F
+.else
         .byte   $30,$16,$00,$0F,$30,$21,$00,$0F
+.endif
         .byte   $16,$2A,$28,$0F,$30,$29,$27,$FF
 ending_palette:
         .byte   $3F,$00,$20,$12,$0F,$29,$37,$12
