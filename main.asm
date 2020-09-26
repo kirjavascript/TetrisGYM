@@ -7747,18 +7747,19 @@ practiseRowCompletePatch:
         bne     @normal
 
         ; floor patch stuff
-        lda     floorModifier
-        cmp     #0
+        stx     tmp3 ; store X
+
+        ldx     floorModifier
+        cpx     #0
         beq     @normal
-        ; floors are 8 bytes
-        asl
-        asl
-        asl
+        lda     multBy10Table, x
         sta     tmp1
         ; $c8 = no floor
         lda     #$c8
         sbc     tmp1
         sta     tmp1
+
+        ldx     tmp3 ; restore X
 
         cpy     tmp1
         bpl     @skipCheck
