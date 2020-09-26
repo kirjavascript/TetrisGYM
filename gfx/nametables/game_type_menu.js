@@ -5,7 +5,6 @@ const buffer = readFileSync(__dirname + '/game_type_menu_nametable.bin');
 let lookup = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ-.\'>################qweadzxc###############/##!###########()############################################################################################################################################################### ';
 
 lookup = [...lookup].map((d, i) => d === '#' ? String.fromCharCode(9472 + i) : d).join``
-// console.log(fullLookup);
 
 const chars = [...buffer].map(value => lookup[value] || '__NOWAYNOWAY');
 
@@ -42,8 +41,8 @@ Z#W#a                     KIRJAVAd#
 Z#W#zxxxxxxxxxxxxxxxxxxxxxxxxxxxxc#
 Z#W################################
 Z#W################################
-Z#W#AAA################PAA#Y000####
-Z#W###000#####000#####000##AAAAAAAA
+Z◀W▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪
+Z◠W▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪
 `;
 const practise = Buffer.from(buffer);
 [...tiles.trim().split('\n').join('')].forEach((d, i) => {
