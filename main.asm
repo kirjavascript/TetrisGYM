@@ -7746,14 +7746,22 @@ practiseRowCompletePatch:
         cmp     #MODE_FLOOR
         bne     @normal
 
-        ; ; skip rows
-        ; 1E
-        ; sbc     floorModifier
-        ; tax
-        ; ; use tmp1 etc to solve this
+        ; floor patch stuff
+        lda     floorModifier
+        cmp     #0
+        beq     @normal
+        ; floors are 8 bytes
+        asl
+        asl
+        asl
+        sta     tmp1
+        ; $c8 = no floor
+        lda     #$c8
+        sbc     tmp1
+        sta     tmp1
 
-        cpx     #$1E
-        bmi     @skipCheck
+        cpy     tmp1
+        bpl     @skipCheck
 
 @normal: ; normal behaviour
         lda     (playfieldAddr),y ; patched command

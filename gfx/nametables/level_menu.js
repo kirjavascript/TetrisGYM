@@ -2,7 +2,9 @@ const { readFileSync, writeFileSync } = require('fs');
 
 const buffer = readFileSync(__dirname + '/level_menu_nametable.bin');
 
-const lookup = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ-.\'>################qweadzxc###############/##!###########()############################################################################################################################################################### ';
+let lookup = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ-.\'>################qweadzxc###############/##!###########()############################################################################################################################################################### ';
+
+lookup = [...lookup].map((d, i) => d === '#' ? String.fromCharCode(9472 + i) : d).join``
 
 const chars = [...buffer].map(value => lookup[value] || '__NOWAYNOWAY');
 
