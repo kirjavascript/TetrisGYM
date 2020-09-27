@@ -27,8 +27,8 @@ X#W#a   LEVEL 29                 d#
 X#W#a   T-SPINS                  d#
 X#W#a   SETUPS                   d#
 X#W#a   FLOOR                    d#
-Y0W#a   DROUGHT                  d#
-YWW#a   DAS                      d#
+Y0W#a   TAP                      d#
+YWW#a   DROUGHT                  d#
 Y#W#a   DEBUG MODE               d#
 Y#W#a                            d#
 Y#W#a                            d#

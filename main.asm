@@ -34,8 +34,8 @@ MODE_LEVEL29 := 1
 MODE_TSPINS := 2
 MODE_PRESETS := 3
 MODE_FLOOR := 4
-MODE_DROUGHT := 5
-MODE_DAS := 6
+MODE_TAP := 5
+MODE_DROUGHT := 6
 MODE_DEBUG := 7
 
 MODE_QUANTITY := 8
@@ -56,8 +56,8 @@ tspinType := $603
 menuVars := $760
 presetModifier := menuVars+0
 floorModifier := menuVars+1
-droughtModifier := menuVars+2
-dasModifier := menuVars+3
+tapModifier := menuVars+2
+droughtModifier := menuVars+3
 debugFlag := menuVars+4
 ; $B00 - $BEF
 
@@ -591,26 +591,22 @@ gameMode_legalScreen:
         sta     menuVars, x
         dex
         bpl     @loop
-        ; set DAS to normal value
-        lda     #$10
-        sta     dasModifier
         jmp     @continueToNextScreen
         nop
 .elseif NO_LEGAL
         jmp     @continueToNextScreen
-padNOP  20
+padNOP  15
 .else
         jsr     updateAudio2
         lda     #$00
         sta     renderMode
         jsr     updateAudioWaitForNmiAndDisablePpuRendering
         jsr     disableNmi
-
         lda     #$00
         jsr     changeCHRBank0
+.endif
         lda     #$00
         jsr     changeCHRBank1
-.endif
         jsr     bulkCopyToPpu
         .addr   legal_screen_palette
         jsr     bulkCopyToPpu
@@ -1659,11 +1655,7 @@ framesPerDropTable:
         .byte   $03,$03,$03,$02,$02,$02,$02,$02
         .byte   $02,$02,$02,$02,$02,$01
 unreferenced_framesPerDropTable:
-.if PRACTISE_MODE ; das
-        .byte   $01
-.else
         .byte   $01,$01
-.endif
 shift_tetrimino:
         lda     tetriminoX
         sta     originalY
@@ -1678,11 +1670,7 @@ shift_tetrimino:
         beq     @ret
         inc     autorepeatX
         lda     autorepeatX
-.if PRACTISE_MODE ; das
-        cmp     dasModifier
-.else
         cmp     #10
-.endif
         bmi     @ret
         lda     #$0A
         sta     autorepeatX
@@ -7692,7 +7680,7 @@ practiseMenuControlPatch:
         rts
 
 practiseMenuConfigSizeLookup:
-        .byte   $5, $C, $12, $23, $1
+        .byte   $5, $C, $F, $12 $1
 
 practisePickTetriminoPatch:
         lda     practiseType
