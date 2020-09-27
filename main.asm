@@ -1670,7 +1670,7 @@ shift_tetrimino:
         beq     @ret
         inc     autorepeatX
         lda     autorepeatX
-        cmp     #10
+        cmp     #$10
         bmi     @ret
         lda     #$0A
         sta     autorepeatX
@@ -7680,7 +7680,7 @@ practiseMenuControlPatch:
         rts
 
 practiseMenuConfigSizeLookup:
-        .byte   $5, $C, $F, $12 $1
+        .byte   $5, $C, $F, $12, $1
 
 practisePickTetriminoPatch:
         lda     practiseType
@@ -7690,6 +7690,10 @@ practisePickTetriminoPatch:
         lda     practiseType
         cmp     #MODE_TSPINS
         beq     @tspins
+
+        lda     practiseType
+        cmp     #MODE_TAP
+        beq     @tap
 
         lda     spawnTable,x ; patched command
         sta     spawnID ; patched command
@@ -7710,6 +7714,11 @@ practisePickTetriminoPatch:
 
 @tspins:
         lda     #$2
+        sta     spawnID
+        rts
+
+@tap:
+        lda     #$12
         sta     spawnID
         rts
 
@@ -7802,6 +7811,12 @@ practiseCurrentSpritePatch:
 
 practiseAdvanceGamePatch:
         jsr     makePlayer1Active ; patched command
+
+        lda     practiseType
+        cmp     #MODE_TAP
+        bne     @skipTap
+        jsr     advanceGameTap
+@skipTap:
 
         lda     practiseType
         cmp     #MODE_TSPINS
@@ -7966,6 +7981,27 @@ drawFloor:
         lda     multBy10Table, x
         tax
         ; tile to draw is $7B
+        lda     #$7B
+@loop:
+        sta     $0446,X
+        inx
+        cpx     #$82
+        bmi     @loop
+@skip:
+        rts
+
+advanceGameTap:
+        jsr     clearPlayfield
+        lda     tapModifier
+        ; get correct offset
+        ; sta     tmp1
+        lda     #$F
+        sbc     tapModifier
+        tax
+        ; ; x10
+        lda     multBy10Table, x
+        tax
+        ; ; tile to draw is $7B
         lda     #$7B
 @loop:
         sta     $0446,X
