@@ -23,14 +23,10 @@ const presets = [
         `X      X X`,
     ], 'TJI'],
     [[
-        `    XXX`,
-        `    X`,
-        `    XXX`,
-        `      X`,
-        `    XXX`,
-        `    X`,
-        `    XXX`,
-    ], 'IJ'],
+        `XXX X XX X`,
+        `X    X`,
+        `XXX X XX X`,
+    ], 'I'],
     [[
         `          `,
         `          `,
@@ -57,7 +53,7 @@ const presets = [
 const tab = '        ';
 let out = 'presets:\n';
 presets.forEach((_, i) => {
-    out += `${tab} .byte preset${i}-presets-1\n`;
+    out += `${tab} .byte preset${i}-presets\n`;
 });
 
 let total = presets.length;

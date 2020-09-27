@@ -25,7 +25,7 @@ X#W#a                            d#
 X#W#a   PLAY                     d#
 X#W#a   LEVEL 29                 d#
 X#W#a   T-SPINS                  d#
-X#W#a   PRESETS                  d#
+X#W#a   SETUPS                   d#
 X#W#a   FLOOR                    d#
 Y0W#a   DROUGHT                  d#
 YWW#a   DAS                      d#

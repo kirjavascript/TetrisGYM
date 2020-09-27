@@ -7728,6 +7728,13 @@ practisePickTetriminoPatch:
 @presets:
         ; RNG in x
         stx     tmp1
+        ; store piece bitmask
+        ldy     presetModifier
+        lda     presets, y ; offset of preset in A
+        tay
+        lda     presets, y
+        sta     tmp2
+        sta     $610
         ; ldx
         lda     #1
 @shiftBit:
@@ -7738,9 +7745,7 @@ practisePickTetriminoPatch:
         jmp     @shiftBit
 @doneShifting:
         ; sta $60A
-        sta     tmp2 ; bitmask
-        ldy     presetModifier
-        lda     presets, y
+        ; sta     tmp2 ; bitmask
         and     tmp2
         bne     @pickRando
         ldx tmp1
@@ -7859,9 +7864,6 @@ advanceGamePreset:
         ; get layout offset
         ldy presetModifier
         lda presets, y
-
-        ; skip the pieces byte
-        adc #1
 
         ; add index
         adc generalCounter
