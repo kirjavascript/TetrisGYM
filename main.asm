@@ -7734,8 +7734,7 @@ practisePickTetriminoPatch:
         tay
         lda     presets, y
         sta     tmp2
-        sta     $610
-        ; ldx
+        ; create bit to compare with mask from RNG
         lda     #1
 @shiftBit:
         cpx     #0
@@ -7744,20 +7743,12 @@ practisePickTetriminoPatch:
         dex
         jmp     @shiftBit
 @doneShifting:
-        ; sta $60A
-        ; sta     tmp2 ; bitmask
         and     tmp2
         bne     @pickRando
-        ldx tmp1
+        ldx     tmp1 ; restore RNG
         lda     spawnTable,x
         sta     spawnID
         rts
-
-
-        ; get the particular bit
-        ; sta $60A
-
-        ; lda #$12 ; J and L
 
 practiseLevelMenuPatch:
         lda     practiseType
