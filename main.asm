@@ -7696,6 +7696,10 @@ practiseMenuConfigSizeLookup:
 
 practisePickTetriminoPatch:
         lda     practiseType
+        cmp     #MODE_PRESETS
+        beq     @presets
+
+        lda     practiseType
         cmp     #MODE_TSPINS
         beq     @tspins
 
@@ -7720,6 +7724,35 @@ practisePickTetriminoPatch:
         lda     #$2
         sta     spawnID
         rts
+
+@presets:
+        ; RNG in x
+        stx     tmp1
+        ; ldx
+        lda     #1
+@shiftBit:
+        cpx     #0
+        beq     @doneShifting
+        asl
+        dex
+        jmp     @shiftBit
+@doneShifting:
+        ; sta $60A
+        sta     tmp2 ; bitmask
+        ldy     presetModifier
+        lda     presets, y
+        and     tmp2
+        bne     @pickRando
+        ldx tmp1
+        lda     spawnTable,x
+        sta     spawnID
+        rts
+
+
+        ; get the particular bit
+        ; sta $60A
+
+        ; lda #$12 ; J and L
 
 practiseLevelMenuPatch:
         lda     practiseType
@@ -7818,10 +7851,6 @@ clearPlayfield:
 .include "presets/presets.asm"
 
 advanceGamePreset:
-        ; TODO
-        ; press select to clear
-        ; OR preset for pieces
-
         jsr clearPlayfield
         ; render layout
         ldx #0
@@ -7830,6 +7859,9 @@ advanceGamePreset:
         ; get layout offset
         ldy presetModifier
         lda presets, y
+
+        ; skip the pieces byte
+        adc #1
 
         ; add index
         adc generalCounter
@@ -7854,11 +7886,6 @@ advanceGamePreset:
 
 
 advanceGameTSpins:
-        ; TODO
-        ; update highscore -> count tspins
-        ; update top
-        ; patch complete row to ignore it
-
         ; see if the sprite has reached the right position
         lda #8
         sbc tspinX
@@ -7886,7 +7913,6 @@ advanceGameTSpins:
         sta tetriminoX
 
 @notFinished:
-
         ; check if a tspin is setup
         lda tspinX
         cmp #0

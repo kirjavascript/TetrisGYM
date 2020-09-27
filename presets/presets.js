@@ -1,5 +1,37 @@
 const presets = [
-    [
+    [[
+        `    X X`,
+        `     X`,
+        `     X`,
+        `  X X X X`,
+        `  X X X X`,
+    ], 'JL'],
+    [[
+        `XXX`,
+        `X`,
+        `XX`,
+    ], 'Z'],
+    [[
+        `XXX`,
+        `XX`,
+        `X`,
+    ], 'S'],
+    [[
+        ` XX       `,
+        `X        X`,
+        `X         `,
+        `X      X X`,
+    ], 'TJI'],
+    [[
+        `    XXX`,
+        `    X`,
+        `    XXX`,
+        `      X`,
+        `    XXX`,
+        `    X`,
+        `    XXX`,
+    ], 'IJ'],
+    [[
         `          `,
         `          `,
         `          `,
@@ -20,40 +52,7 @@ const presets = [
         `  X   X   `,
         `      X   `,
         `X X X  XX `,
-    ],
-    [
-        `       XX `,
-        `XXX      X`,
-        `X        X`,
-        `XX       X`,
-    ],
-    [
-        `XXX    XXX`,
-        `XX      XX`,
-        `X        X`,
-    ],
-    [
-        ` XX       `,
-        `X        X`,
-        `X         `,
-        `X      X X`,
-    ],
-    [
-        `    X X`,
-        `     X`,
-        `     X`,
-        `  X X X X`,
-        `  X X X X`,
-    ],
-    [
-        `    XXX`,
-        `    X`,
-        `    XXX`,
-        `      X`,
-        `    XXXX`,
-        `    X`,
-        `    XXX`,
-    ],
+    ], 'ILSOZJT'],
 ];
 const tab = '        ';
 let out = 'presets:\n';
@@ -63,7 +62,13 @@ presets.forEach((_, i) => {
 
 let total = presets.length;
 
-presets.forEach((preset, i) => {
+const pieceHash = (str) => {
+    let out = [...'1'.repeat(7)];
+    [...str].forEach(ch => out['ILSOZJT'.indexOf(ch)] = '0')
+    return Number('0b' + out.join``);
+};
+
+presets.forEach(([preset, pieces], i) => {
     preset.length < 20 &&
         preset.splice(0, 0, ...Array.from({ length: 20 - preset.length }, () => ''));
     preset = preset.map(d => d.padEnd(10, ' '));
@@ -71,8 +76,13 @@ presets.forEach((preset, i) => {
         .map((ch, i) => ch === 'X' ? i : ' ')
         .filter(d => d !== ' ');
     out += `preset${i}:\n`;
-    out += `${tab} .byte ${bytes.map(b => '$' + b.toString(16)).join(', ')}, $FF\n`;
-    total += 1 + bytes.length;
+    const bytesList = [
+        pieceHash(pieces),
+        ...bytes,
+        0xFF,
+    ];
+    out += `${tab} .byte ${bytesList.map(b => '$' + b.toString(16)).join(', ')}\n`;
+    total += bytesList.length;
 });
 
 console.log(out);
