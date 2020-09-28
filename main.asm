@@ -7680,7 +7680,7 @@ practiseMenuControlPatch:
         rts
 
 practiseMenuConfigSizeLookup:
-        .byte   $5, $C, $F, $12, $1
+        .byte   $5, $C, $20, $12, $1
 
 practisePickTetriminoPatch:
         lda     practiseType
@@ -7780,7 +7780,7 @@ practiseRowCompletePatch:
         beq     @normal
         lda     multBy10Table, x
         sta     tmp1
-        ; $c8 = no floor
+        ; $4c8 = last playfield byte
         lda     #$c8
         sbc     tmp1
         sta     tmp1
@@ -7992,23 +7992,37 @@ drawFloor:
 
 advanceGameTap:
         jsr     clearPlayfield
-        lda     tapModifier
-        ; get correct offset
-        ; sta     tmp1
-        lda     #$F
-        sbc     tapModifier
-        tax
-        ; ; x10
-        lda     multBy10Table, x
-        tax
-        ; ; tile to draw is $7B
-        lda     #$7B
-@loop:
-        sta     $0446,X
-        inx
-        cpx     #$82
+        ldx     tapModifier
+        ldy     #$BF ; left side
+        cpx     #$11
         bmi     @loop
-@skip:
+        ldy     #$C6 ; right side
+        txa
+        sbc     #$10
+        tax
+
+@loop:
+        lda     #$7B
+        sta     $400, y
+        ; this works
+        dey
+        dey
+        dey
+        dey
+        dey
+        dey
+        dey
+        dey
+        dey
+        dey
+
+        ; this doesnt work
+        ; tya
+        ; sbc #$A
+        ; tay
+
+        dex
+        bne     @loop
         rts
 
 .endif
