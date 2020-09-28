@@ -7993,6 +7993,8 @@ drawFloor:
 advanceGameTap:
         jsr     clearPlayfield
         ldx     tapModifier
+        cpx     #0
+        beq     @skip ; skip if zero
         ldy     #$BF ; left side
         cpx     #$11
         bmi     @loop
@@ -8004,25 +8006,14 @@ advanceGameTap:
 @loop:
         lda     #$7B
         sta     $400, y
-        ; this works
-        dey
-        dey
-        dey
-        dey
-        dey
-        dey
-        dey
-        dey
-        dey
-        dey
-
-        ; this doesnt work
-        ; tya
-        ; sbc #$A
-        ; tay
-
+        ; add 10 to y
+        tya
+        sec ;important
+        sbc     #$A
+        tay
         dex
         bne     @loop
+@skip:
         rts
 
 .endif
