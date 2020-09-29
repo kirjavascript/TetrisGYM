@@ -5648,10 +5648,6 @@ defaultHighScoresTable:
         .byte   $00 ;Game B 3rd Entry Level
         .byte   $00 ;unknown
         .byte   $FF
-legal_screen_nametable:
-        .incbin "gfx/nametables/legal_screen_nametable.bin"
-title_screen_nametable:
-        .incbin "gfx/nametables/title_screen_nametable.bin"
 .if PRACTISE_MODE
 game_type_menu_nametable:
         .incbin "gfx/nametables/game_type_menu_nametable_practise.bin"
