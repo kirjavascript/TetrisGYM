@@ -27,7 +27,7 @@ X#W#a   -TODO-                   d#
 X#W#a   T-SPINS                  d#
 X#W#a   SETUPS                   d#
 X#W#a   FLOOR                    d#
-Y0W#a   TAP                      d#
+Y0W#a   (QUICK)TAP               d#
 YWW#a   DROUGHT                  d#
 Y#W#a   DEBUG MODE               d#
 Y#W#a                            d#

@@ -18,9 +18,9 @@ W#W###a                        d###
 W#W###a                        d###
 W#W###a                        d###
 W#W###a                        d###
-W#W###a    #######             d###
-X0W###a    #LEVEL#             d###
-XWW###a    #######             d###
+W#W###a     ╄╅╅╅╅╅╆            d###
+X0W###a     ╇LEVEL╈            d###
+XWW###a     ╉╊╊╊╊╊╋            d###
 X#W###a  rtutututututy         d###
 X#W###a  f0f1f2f3f4f@h         d###
 X#W###a  jbkbkbkbkbkbl         d###
@@ -44,6 +44,9 @@ Z#W################################
 Z#W##########################    ##
 Z#W#000000##000000#########AAAAAAAA
 `;
+
+
+
 const practise = Buffer.from(buffer);
 [...tiles.trim().split('\n').join('')].forEach((d, i) => {
     // TODO: patch logo

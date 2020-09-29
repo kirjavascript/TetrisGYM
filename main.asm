@@ -964,6 +964,8 @@ gameMode_levelMenu_handleLevelHeightNavigation:
         lda     selectingLevelOrHeight
         bne     @upPressedForHeightSelection
         lda     startLevel
+        cmp     #$0A
+        beq     @checkAPressed ; dont do anything on 29
         cmp     #$05
         bmi     @checkAPressed
         sec
