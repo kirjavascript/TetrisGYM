@@ -911,14 +911,7 @@ gameMode_levelMenuContinue:
         .addr   menu_palette
         jsr     bulkCopyToPpu
         .addr   level_menu_nametable
-.if PRACTISE_MODE ; skip a-type (force b-type)
-padNOP 9
-.else
-        lda     gameType
-        bne     @skipTypeBHeightDisplay
-        jsr     bulkCopyToPpu
-        .addr   height_menu_nametablepalette_patch
-.endif
+        ; a-type nametable patch used to be here
 @skipTypeBHeightDisplay:
         jsr     showHighScores
         jsr     waitForVBlankAndEnableNmi
@@ -976,11 +969,11 @@ gameMode_levelMenu_processPlayer1Navigation:
         adc     #$0A
         sta     player1_startLevel
 @startAndANotPressed:
-        lda startLevel
+        lda     startLevel
         cmp     #$A
         bne     @skip29
-        lda #29
-        sta player1_startLevel
+        lda     #29
+        sta     player1_startLevel
 @skip29:
         lda     #$00
         sta     gameModeState
@@ -1035,10 +1028,10 @@ gameMode_levelMenu_handleLevelHeightNavigation:
         jmp     @checkLeftPressed
 
 @rightPressedForHeightSelection:
-        ; lda     startHeight
-        ; cmp     #$05
-        ; beq     @checkLeftPressed
-        ; inc     startHeight
+        lda     startHeight
+        cmp     #$05
+        beq     @checkLeftPressed
+        inc     startHeight
 @checkLeftPressed:
         lda     newlyPressedButtons
         cmp     #$02
@@ -1053,9 +1046,9 @@ gameMode_levelMenu_handleLevelHeightNavigation:
         jmp     @checkDownPressed
 
 @leftPressedForHeightSelection:
-        ; lda     startHeight
-        ; beq     @checkDownPressed
-        ; dec     startHeight
+        lda     startHeight
+        beq     @checkDownPressed
+        dec     startHeight
 @checkDownPressed:
         lda     newlyPressedButtons
         cmp     #$04
@@ -1073,12 +1066,12 @@ gameMode_levelMenu_handleLevelHeightNavigation:
         jmp     @checkUpPressed
 
 @downPressedForHeightSelection:
-        ; lda     startHeight
-        ; cmp     #$03
-        ; bpl     @checkUpPressed
-        ; inc     startHeight
-        ; inc     startHeight
-        ; inc     startHeight
+        lda     startHeight
+        cmp     #$03
+        bpl     @checkUpPressed
+        inc     startHeight
+        inc     startHeight
+        inc     startHeight
 @checkUpPressed:
         lda     newlyPressedButtons
         cmp     #$08
@@ -1176,7 +1169,7 @@ heightToPpuHighAddr:
 heightToPpuLowAddr:
         .byte   $9C,$AC,$BC,$9C,$AC,$BC
 musicSelectionTable:
-        ; .byte   $03,$04,$05,$FF,$06,$07,$08,$FF
+        .byte   $03,$04,$05,$FF,$06,$07,$08,$FF
 render_mode_menu_screens:
         lda     currentPpuCtrl
         and     #$FC
@@ -5858,17 +5851,6 @@ enter_high_score_nametable:
 .endif
 high_scores_nametable:
         .incbin "gfx/nametables/high_scores_nametable.bin"
-height_menu_nametablepalette_patch:
-        .byte   $3F,$0A,$01,$16,$20,$6D,$01,$0A
-        .byte   $20,$F3,$48,$FF,$21,$13,$48,$FF
-        .byte   $21,$33,$48,$FF,$21,$53,$47,$FF
-        .byte   $21,$73,$47,$FF,$21,$93,$47,$FF
-        .byte   $21,$B3,$47,$FF,$21,$D3,$47,$FF
-        .byte   $22,$33,$48,$FF,$22,$53,$48,$FF
-        .byte   $22,$73,$48,$FF,$22,$93,$47,$FF
-        .byte   $22,$B3,$47,$FF,$22,$D3,$47,$FF
-        .byte   $22,$F3,$47,$FF,$23,$13,$47,$FF
-        .byte   $FF
 type_b_lvl9_ending_nametable:
         .incbin "gfx/nametables/type_b_lvl9_ending_nametable.bin"
 type_b_ending_nametable:
