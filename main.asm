@@ -9,15 +9,9 @@
 
 ROCKET_LIMIT := $FF
 SCORE_LIMIT := $FF
-FAST_LEGAL := 1
 BETTER_PAUSE := 1
-NO_DEMO := 1
-NO_LEGAL := 1
-NO_TITLE := 1
 NO_MUSIC := 1
 NO_NO_NEXT_BOX := 1
-NO_CURTAIN := 1
-NO_GAMETYPE := 0
 PRACTISE_MODE := 1
 DEBUG_MODE := 1
 
@@ -579,8 +573,7 @@ playState_player2ControlsActiveTetrimino:
         jsr     drop_tetrimino
         rts
 
-gameMode_legalScreen:
-.if PRACTISE_MODE ; boot
+gameMode_legalScreen: ; boot
         ; set start level to 18
         lda     #$08
         sta     player1_startLevel
@@ -591,113 +584,12 @@ gameMode_legalScreen:
         sta     menuVars, x
         dex
         bpl     @loop
-        jmp     @continueToNextScreen
-        nop
-.elseif NO_LEGAL
-        jmp     @continueToNextScreen
-padNOP  15
-.else
-        jsr     updateAudio2
-        lda     #$00
-        sta     renderMode
-        jsr     updateAudioWaitForNmiAndDisablePpuRendering
-        jsr     disableNmi
-        lda     #$00
-        jsr     changeCHRBank0
-.endif
-        lda     #$00
-        jsr     changeCHRBank1
-        jsr     bulkCopyToPpu
-        .addr   legal_screen_palette
-        jsr     bulkCopyToPpu
-        .addr   legal_screen_nametable
-        jsr     waitForVBlankAndEnableNmi
-        jsr     updateAudioWaitForNmiAndResetOamStaging
-        jsr     updateAudioWaitForNmiAndEnablePpuRendering
-        jsr     updateAudioWaitForNmiAndResetOamStaging
-        lda     #$00
-        ldx     #$02
-        ldy     #$02
-        jsr     memset_page
-        lda     #$FF
-.if FAST_LEGAL
-        jsr     developRts
-.else
-        jsr     sleep_for_a_vblanks
-.endif
-        lda     #$FF
-        sta     generalCounter
-@waitForStartButton:
-        lda     newlyPressedButtons_player1
-        cmp     #$10
-        beq     @continueToNextScreen
-        jsr     updateAudioWaitForNmiAndResetOamStaging
-        dec     generalCounter
-        bne     @waitForStartButton
-@continueToNextScreen:
         inc     gameMode
         rts
 
 gameMode_titleScreen:
-.if NO_TITLE
-        jmp @continueToNextScreen
-.else
-        jsr     updateAudio2
-.endif
-        lda     #$00
-        sta     renderMode
-        sta     $D0
-        sta     displayNextPiece
-        jsr     updateAudioWaitForNmiAndDisablePpuRendering
-        jsr     disableNmi
-        lda     #$00
-        jsr     changeCHRBank0
-        lda     #$00
-        jsr     changeCHRBank1
-        jsr     bulkCopyToPpu
-        .addr   menu_palette
-        jsr     bulkCopyToPpu
-        .addr   title_screen_nametable
-        jsr     waitForVBlankAndEnableNmi
-        jsr     updateAudioWaitForNmiAndResetOamStaging
-        jsr     updateAudioWaitForNmiAndEnablePpuRendering
-        jsr     updateAudioWaitForNmiAndResetOamStaging
-        lda     #$00
-        ldx     #$02
-        ldy     #$02
-        jsr     memset_page
-        lda     #$00
-        sta     frameCounter+1
-@waitForStartButton:
-        jsr     updateAudioWaitForNmiAndResetOamStaging
-        lda     newlyPressedButtons_player1
-        cmp     #$10
-        beq     @startButtonPressed
-        lda     frameCounter+1
-        cmp     #$05
-        beq     @timeout
-        jmp     @waitForStartButton
-
-; Show menu screens
-@startButtonPressed:
-        lda     #$02
-        sta     soundEffectSlot1Init
-@continueToNextScreen:
         inc     gameMode
         rts
-
-; Start demo
-@timeout:
-.if NO_DEMO
-padNOP 7
-        jmp @waitForStartButton
-.else
-        lda     #$02
-        sta     soundEffectSlot1Init
-        lda     #$06
-        sta     gameMode
-        rts
-.endif
 
 render_mode_legal_and_title_screens:
         lda     currentPpuCtrl
@@ -719,12 +611,7 @@ render_mode_legal_and_title_screens:
         rts
 
 gameMode_gameTypeMenu:
-.if NO_GAMETYPE
-        inc     gameMode
-        rts
-.else
         inc     initRam
-.endif
         lda     #$10
         jsr     setMMC1Control
         lda     #$01
@@ -890,12 +777,7 @@ padNOP  10
         jmp     L830B
 
 gameMode_levelMenu:
-.if PRACTISE_MODE
-        jmp     practiseLevelMenuPatch
-gameMode_levelMenuContinue:
-.else
         inc     initRam
-.endif
         lda     #$10
         jsr     setMMC1Control
         jsr     updateAudio2
@@ -1874,12 +1756,7 @@ L8B9D:  lda     orientationTable,y
         rts
 
 stageSpriteForNextPiece:
-.if NO_NO_NEXT_BOX
-        nop
-        nop
-        nop
-        nop
-.else
+.if !NO_NO_NEXT_BOX
         lda     displayNextPiece
         bne     @ret
 .endif
@@ -3195,40 +3072,7 @@ playState_lockTetrimino:
 @ret:   rts
 
 playState_updateGameOverCurtain:
-        lda     curtainRow
-        cmp     #$14
-.if NO_CURTAIN
-        bne     @curtainFinished
-.else
-        beq     @curtainFinished
-.endif
-        lda     frameCounter
-        and     #$03
-        bne     @ret
-        ldx     curtainRow
-        bmi     @incrementCurtainRow
-        lda     multBy10Table,x
-        tay
-        lda     #$00
-        sta     generalCounter3
-        lda     #$13
-        sta     currentPiece
-@drawCurtainRow:
-        lda     #$4F
-        sta     (playfieldAddr),y
-        iny
-        inc     generalCounter3
-        lda     generalCounter3
-        cmp     #$0A
-        bne     @drawCurtainRow
-        lda     curtainRow
-        sta     vramRow
-@incrementCurtainRow:
-        inc     curtainRow
-        lda     curtainRow
-        cmp     #$14
-        bne     @ret
-@ret:   rts
+        ; skip curtain
 
 @curtainFinished:
         lda     numberOfPlayers
@@ -3238,11 +3082,6 @@ playState_updateGameOverCurtain:
         cmp     #ROCKET_LIMIT
         bcc     @checkForStartButton
         lda     #$80
-.if FAST_LEGAL
-        jsr     developRts
-.else
-        jsr     sleep_for_a_vblanks
-.endif
         jsr     endingAnimation_maybe
         jmp     @exitGame
 
@@ -3806,9 +3645,7 @@ gameMode_startDemo:
 
 ; canon is adjustMusicSpeed
 setMusicTrack:
-.if NO_MUSIC
-padNOP 14
-.else
+.if !NO_MUSIC
         sta     musicTrack
         lda     gameMode
         cmp     #$05
@@ -5783,44 +5620,26 @@ ending_palette:
 .include "charmap.asm"
         ;are the following zeros unused entries for each high score table?
 defaultHighScoresTable:
-.if PRACTISE_MODE
-        .byte  "      "
-        .byte  "      "
-        .byte  "      "
-.else
-        .byte  "HOWARD" ;$08,$0F,$17,$01,$12,$04
-        .byte  "OTASAN" ;$0F,$14,$01,$13,$01,$0E
-        .byte  "KIRJAV" ;$0C,$01,$0E,$03,$05,$2B ; LANCE
-.endif
+        .byte  "      " ; HOWARD
+        .byte  "      " ; OTASAN
+        .byte  "      " ; LANCE
         .byte  $00,$00,$00,$00,$00,$00 ;unknown
         .byte  "ALEX  " ;$01,$0C,$05,$18,$2B,$2B
         .byte  "TONY  " ;$14,$0F,$0E,$19,$2B,$2B
         .byte  "NINTEN" ;$0E,$09,$0E,$14,$05,$0E
         .byte   $00,$00,$00,$00,$00,$00 ;unknown
         ;High Scores are stored in BCD
-.if PRACTISE_MODE
         .byte   $00,$00,$00
         .byte   $00,$00,$00
         .byte   $00,$00,$00
-.else
-        .byte   $01,$00,$00 ;Game A 1st Entry Score, 10000
-        .byte   $00,$75,$00 ;Game A 2nd Entry Score, 7500
-        .byte   $00,$50,$00 ;Game A 3rd Entry Score, 5000
-.endif
         .byte   $00,$00,$00 ;unknown
         .byte   $00,$20,$00 ;Game B 1st Entry Score, 2000
         .byte   $00,$10,$00 ;Game B 2nd Entry Score, 1000
         .byte   $00,$05,$00 ;Game B 3rd Entry Score, 500
         .byte   $00,$00,$00 ;unknown
-.if PRACTISE_MODE
         .byte   $00 ;Game A 1st Entry Level
         .byte   $00 ;Game A 2nd Entry Level
         .byte   $00 ;Game A 3nd Entry Level
-.else
-        .byte   $09 ;Game A 1st Entry Level
-        .byte   $05 ;Game A 2nd Entry Level
-        .byte   $00 ;Game A 3nd Entry Level
-.endif
         .byte   $00 ;unknown
         .byte   $09 ;Game B 1st Entry Level
         .byte   $05 ;Game B 2nd Entry Level
@@ -5852,7 +5671,6 @@ enter_high_score_nametable:
 .endif
 high_scores_nametable:
         .incbin "gfx/nametables/high_scores_nametable.bin"
-height_menu_nametablepalette_patch:
 type_b_lvl9_ending_nametable:
         .incbin "gfx/nametables/type_b_lvl9_ending_nametable.bin"
 type_b_ending_nametable:
@@ -7741,22 +7559,6 @@ practisePickTetriminoPatch:
         ldx     tmp1 ; restore RNG
         lda     spawnTable,x
         sta     spawnID
-        rts
-
-practiseLevelMenuPatch:
-        lda     practiseType
-        cmp     #MODE_LEVEL29
-        beq     @lvl29
-
-        inc     initRam ; patched command
-        jmp     gameMode_levelMenuContinue
-
-@lvl29:
-        lda     #$00
-        sta     gameModeState
-        inc     gameMode
-        lda     #29
-        sta     player1_startLevel
         rts
 
 practiseRowCompletePatch:
