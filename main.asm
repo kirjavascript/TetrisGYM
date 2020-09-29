@@ -911,7 +911,7 @@ gameMode_levelMenuContinue:
         .addr   menu_palette
         jsr     bulkCopyToPpu
         .addr   level_menu_nametable
-        ; a-type nametable patch used to be here
+        ; type-a patching used to happen here
 @skipTypeBHeightDisplay:
         jsr     showHighScores
         jsr     waitForVBlankAndEnableNmi
@@ -926,12 +926,13 @@ gameMode_levelMenuContinue:
         sta     originalY
         sta     dropSpeed
 @forceStartLevelToRange:
+        ; account for level 29 when loading
         lda     player1_startLevel
         cmp     #29
         bne     @not29
         lda     #$0A
         sta     player1_startLevel
-        jmp gameMode_levelMenu_processPlayer1Navigation
+        jmp     gameMode_levelMenu_processPlayer1Navigation
 @not29:
         cmp     #$0A
         bcc     gameMode_levelMenu_processPlayer1Navigation
@@ -1022,16 +1023,16 @@ gameMode_levelMenu_handleLevelHeightNavigation:
         lda     selectingLevelOrHeight
         bne     @rightPressedForHeightSelection
         lda     startLevel
-        cmp     #$A
+        cmp     #$A ; used to be 9
         beq     @checkLeftPressed
         inc     startLevel
         jmp     @checkLeftPressed
 
 @rightPressedForHeightSelection:
-        lda     startHeight
-        cmp     #$05
-        beq     @checkLeftPressed
-        inc     startHeight
+        ; lda     startHeight
+        ; cmp     #$05
+        ; beq     @checkLeftPressed
+        ; inc     startHeight
 @checkLeftPressed:
         lda     newlyPressedButtons
         cmp     #$02
@@ -1046,9 +1047,9 @@ gameMode_levelMenu_handleLevelHeightNavigation:
         jmp     @checkDownPressed
 
 @leftPressedForHeightSelection:
-        lda     startHeight
-        beq     @checkDownPressed
-        dec     startHeight
+        ; lda     startHeight
+        ; beq     @checkDownPressed
+        ; dec     startHeight
 @checkDownPressed:
         lda     newlyPressedButtons
         cmp     #$04
@@ -1066,12 +1067,12 @@ gameMode_levelMenu_handleLevelHeightNavigation:
         jmp     @checkUpPressed
 
 @downPressedForHeightSelection:
-        lda     startHeight
-        cmp     #$03
-        bpl     @checkUpPressed
-        inc     startHeight
-        inc     startHeight
-        inc     startHeight
+        ; lda     startHeight
+        ; cmp     #$03
+        ; bpl     @checkUpPressed
+        ; inc     startHeight
+        ; inc     startHeight
+        ; inc     startHeight
 @checkUpPressed:
         lda     newlyPressedButtons
         cmp     #$08
@@ -1089,12 +1090,12 @@ gameMode_levelMenu_handleLevelHeightNavigation:
         jmp     @checkAPressed
 
 @upPressedForHeightSelection:
-        lda     startHeight
-        cmp     #$03
-        bmi     @checkAPressed
-        dec     startHeight
-        dec     startHeight
-        dec     startHeight
+        ; lda     startHeight
+        ; cmp     #$03
+        ; bmi     @checkAPressed
+        ; dec     startHeight
+        ; dec     startHeight
+        ; dec     startHeight
 @checkAPressed:
         lda     gameType
         beq     @showSelection
@@ -5851,6 +5852,7 @@ enter_high_score_nametable:
 .endif
 high_scores_nametable:
         .incbin "gfx/nametables/high_scores_nametable.bin"
+height_menu_nametablepalette_patch:
 type_b_lvl9_ending_nametable:
         .incbin "gfx/nametables/type_b_lvl9_ending_nametable.bin"
 type_b_ending_nametable:
