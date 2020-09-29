@@ -582,7 +582,7 @@ playState_player2ControlsActiveTetrimino:
 gameMode_legalScreen:
 .if PRACTISE_MODE ; boot
         ; set start level to 18
-        lda     #$80
+        lda     #$08
         sta     player1_startLevel
         ; zero out config memory
         lda     #0
@@ -934,6 +934,12 @@ padNOP 9
         sta     dropSpeed
 @forceStartLevelToRange:
         lda     player1_startLevel
+        cmp     #29
+        bne     @not29
+        lda     #$0A
+        sta     player1_startLevel
+        jmp gameMode_levelMenu_processPlayer1Navigation
+@not29:
         cmp     #$0A
         bcc     gameMode_levelMenu_processPlayer1Navigation
         sec
@@ -970,6 +976,12 @@ gameMode_levelMenu_processPlayer1Navigation:
         adc     #$0A
         sta     player1_startLevel
 @startAndANotPressed:
+        lda startLevel
+        cmp     #$A
+        bne     @skip29
+        lda #29
+        sta player1_startLevel
+@skip29:
         lda     #$00
         sta     gameModeState
         lda     #$02
@@ -1017,16 +1029,16 @@ gameMode_levelMenu_handleLevelHeightNavigation:
         lda     selectingLevelOrHeight
         bne     @rightPressedForHeightSelection
         lda     startLevel
-        cmp     #$09
+        cmp     #$A
         beq     @checkLeftPressed
         inc     startLevel
         jmp     @checkLeftPressed
 
 @rightPressedForHeightSelection:
-        lda     startHeight
-        cmp     #$05
-        beq     @checkLeftPressed
-        inc     startHeight
+        ; lda     startHeight
+        ; cmp     #$05
+        ; beq     @checkLeftPressed
+        ; inc     startHeight
 @checkLeftPressed:
         lda     newlyPressedButtons
         cmp     #$02
@@ -1041,9 +1053,9 @@ gameMode_levelMenu_handleLevelHeightNavigation:
         jmp     @checkDownPressed
 
 @leftPressedForHeightSelection:
-        lda     startHeight
-        beq     @checkDownPressed
-        dec     startHeight
+        ; lda     startHeight
+        ; beq     @checkDownPressed
+        ; dec     startHeight
 @checkDownPressed:
         lda     newlyPressedButtons
         cmp     #$04
@@ -1061,12 +1073,12 @@ gameMode_levelMenu_handleLevelHeightNavigation:
         jmp     @checkUpPressed
 
 @downPressedForHeightSelection:
-        lda     startHeight
-        cmp     #$03
-        bpl     @checkUpPressed
-        inc     startHeight
-        inc     startHeight
-        inc     startHeight
+        ; lda     startHeight
+        ; cmp     #$03
+        ; bpl     @checkUpPressed
+        ; inc     startHeight
+        ; inc     startHeight
+        ; inc     startHeight
 @checkUpPressed:
         lda     newlyPressedButtons
         cmp     #$08
@@ -1155,16 +1167,16 @@ gameMode_levelMenu_handleLevelHeightNavigation:
 
 levelToSpriteYOffset:
         .byte   $53,$53,$53,$53,$53,$63,$63,$63
-        .byte   $63,$63
+        .byte   $63,$63,$63
 levelToSpriteXOffset:
         .byte   $34,$44,$54,$64,$74,$34,$44,$54
-        .byte   $64,$74
+        .byte   $64,$74,$84
 heightToPpuHighAddr:
         .byte   $53,$53,$53,$63,$63,$63
 heightToPpuLowAddr:
         .byte   $9C,$AC,$BC,$9C,$AC,$BC
 musicSelectionTable:
-        .byte   $03,$04,$05,$FF,$06,$07,$08,$FF
+        ; .byte   $03,$04,$05,$FF,$06,$07,$08,$FF
 render_mode_menu_screens:
         lda     currentPpuCtrl
         and     #$FC

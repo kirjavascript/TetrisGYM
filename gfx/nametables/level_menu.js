@@ -2,7 +2,7 @@ const { readFileSync, writeFileSync } = require('fs');
 
 const buffer = readFileSync(__dirname + '/level_menu_nametable.bin');
 
-let lookup = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ-.\'>################qweadzxc###############/##!###########()############################################################################################################################################################### ';
+let lookup = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ-,\'>rtyfhvbn########qweadzxc############jkl/ui!###########()#############$@.############################################################################################################################################### ';
 
 lookup = [...lookup].map((d, i) => d === '#' ? String.fromCharCode(9472 + i) : d).join``
 
@@ -21,11 +21,11 @@ W#W###a                        d###
 W#W###a    #######             d###
 X0W###a    #LEVEL#             d###
 XWW###a    #######             d###
-X#W###a  ###########           d###
-X#W###a  #0#1#2#3#4#           d###
-X#W###a  ###########           d###
-X#W###a  #5#6#7#8#9#           d###
-X#W###a  ###########           d###
+X#W###a  rtutututututy         d###
+X#W###a  f0f1f2f3f4f@h         d###
+X#W###a  jbkbkbkbkbkbl         d###
+X#W###a  f5f6f7f8f9f$h         d###
+X#W###a  vbibibibibibn         d###
 X#W###a                        d###
 Y0W###a                        d###
 YWW###a ###################### d###
