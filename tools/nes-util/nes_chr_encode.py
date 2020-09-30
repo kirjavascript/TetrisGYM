@@ -46,7 +46,7 @@ def parse_arguments():
     if not os.path.isfile(args.input_file):
         sys.exit("Input file not found.")
     if os.path.exists(args.output_file):
-        sys.exit("Output file already exists.")
+        os.remove(args.output_file)
     if len(set(decode_color_code(c) for c in args.palette)) < 4:
         sys.exit("All colors in --palette must be distinct.")
 
