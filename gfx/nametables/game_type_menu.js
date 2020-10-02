@@ -23,8 +23,8 @@ X0W#a                            d#
 XWW#a                            d#
 X#W#a                            d#
 X#W#a   PLAY                     d#
-X#W#a   PARITY                   d#
 X#W#a   T-SPINS                  d#
+X#W#a   PARITY                   d#
 X#W#a   SETUPS                   d#
 X#W#a   FLOOR                    d#
 Y0W#a   (QUICK)TAP               d#
