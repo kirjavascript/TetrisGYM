@@ -44,6 +44,7 @@ Z#W################################
 Z◀W▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪
 Z◠W▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪
 `;
+
 const practise = Buffer.from(buffer);
 [...tiles.trim().split('\n').join('')].forEach((d, i) => {
     // TODO: patch logo
@@ -51,4 +52,6 @@ const practise = Buffer.from(buffer);
         practise[i] = lookup.indexOf(d);
     }
 });
+console.log([...buffer].slice(buffer.length - 71));
+console.log([...practise].slice(buffer.length - 71));
 writeFileSync(__dirname + '/game_type_menu_nametable_practise.bin', practise);
