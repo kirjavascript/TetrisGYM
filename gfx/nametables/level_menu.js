@@ -45,8 +45,6 @@ Z#W##########################    ##
 Z#W#000000##000000#########AAAAAAAA
 `;
 
-
-
 const practise = Buffer.from(buffer);
 [...tiles.trim().split('\n').join('')].forEach((d, i) => {
     // TODO: patch logo
