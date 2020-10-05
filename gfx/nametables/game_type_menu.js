@@ -2,22 +2,42 @@ const { readFileSync, writeFileSync } = require('fs');
 
 const buffer = readFileSync(__dirname + '/game_type_menu_nametable.bin');
 
-let lookup = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ-.\'>################qweadzxc###############/##!###########()############################################################################################################################################################### ';
+let lookup = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ-.\'>################qweadzxc###############/##!#########[]()############################################################################################################################################################### ';
 
-lookup = [...lookup].map((d, i) => d === '#' ? String.fromCharCode(9472 + i) : d).join``
+lookup = [...lookup].map((d, i) => d === '#' ? String.fromCharCode(/*9472+*/9726-i):d).join``
+
+console.log(lookup.match(/.{16}/g).join('\n'));
 
 const chars = [...buffer].map(value => lookup[value] || '__NOWAYNOWAY');
 
 console.log(chars.join('').match(/.{35}/g).join('\n'));
+`
+0123456789ABCDEF
+GHIJKLMNOPQRSTUV
+WXYZ-.'>◖◕◔◓◒◑◐●
+◎◍◌○◊◉◈◇qweadzxc
+▾▽▼▻►▹▸▷▶▵▴△▲▱▰/
+▮▭!▫▪▩▨▧▦▥▤▣▢□()
+▞▝▜▛▚▙▘▗▖▕▔▓▒░▐▏
+▎▍▌▋▊▉█▇▆▅▄▃▂▁▀╿
+╾╽╼╻╺╹╸╷╶╵╴╳╲╱╰╯
+╮╭╬╫╪╩╨╧╦╥╤╣╢╡╠╟
+╞╝╜╛╚╙╘╗╖╕╔╓╒║═╏
+╎╍╌╋╊╉╈╇╆╅╄╃╂╁╀┿
+┾┽┼┻┺┹┸┷┶┵┴┳┲┱┰┯
+┮┭┬┫┪┩┨┧┦┥┤┣┢┡┠┟
+┞┝├┛┚┙┘┗┖┕└┓┒┑┐┏
+┎┍┌┋┊┉┈┇┆┅┄┃│━─
+`
 
 const tiles = `
 W0W################################
-WWW####qwwwwwwwwwwwwwwwwwwwwwwe####
-W#W#qwwaTETRIS GYM (PROTOTYPE)dwwe#
-W#W#a  zxxxxxxxxxxxxxxxxxxxxxxc  d#
-W#W#a                            d#
-W#W#a                            d#
-W#W#a                            d#
+WWW#########qwwwwwwwwwwwwe#########
+W#W#qwwwwwww] ╎╍╌╋╊╉╈╇╆╅ [wwwwwwwe#
+W#W#a         ┾┽┼┻┺┹┸┷┶┵         d#
+W#W#a         ┮┭┬┫┪┩┨┧┦┥         d#
+W#W#a         ┞┝├┛┚┙┘┗┖┕         d#
+W#W#a         ┎┍┌┋┊┉┈┇┆┅         d#
 W#W#a                            d#
 X0W#a                            d#
 XWW#a                            d#
@@ -37,7 +57,7 @@ Y#W#a                            d#
 Y#W#a                            d#
 Z0W#a                            d#
 ZWW#a                            d#
-Z#W#a                     KIRJAVAd#
+Z#W#aV1                   KIRJAVAd#
 Z#W#zxxxxxxxxxxxxxxxxxxxxxxxxxxxxc#
 Z#W################################
 Z#W################################
@@ -51,10 +71,9 @@ const practise = Buffer.from(buffer);
     }
 });
 
-
 // palettes
 // DR - DL - UR - UL
-const palTiles = p => p.trim().match(/.+\n.+$/gm)
+const palettes = p => p.trim().match(/.+\n.+$/gm)
     .flatMap(line=>(
         [t,b]=line.split('\n'),
         t.trim().match(r=/../g).map((d,i)=>d+b.trim().match(r)[i])
@@ -62,17 +81,17 @@ const palTiles = p => p.trim().match(/.+\n.+$/gm)
     .map(d=>+('0b'+[...d].reverse().map(d=>(+d).toString(2).padStart(2,0)).join``));
 
 [
-    [1053, palTiles(`
+    [1053, palettes(`
         2222222222222222
-        2222222222222222
-        2222222222222222
-        2222222222222222
+        2222211111122222
+        2222211111122222
+        2222211111122222
         2222222222222222
         2222222222222222
         2222222222222222
         2222222222222222
     `)],
-    [1088, palTiles(`
+    [1088, palettes(`
         2222222222222222
         2222222222222222
         2222222222222222
