@@ -5606,7 +5606,7 @@ legal_screen_palette:
 menu_palette:
         .byte   $3F,$00,$14,$0F,$30,$38,$00,$0F
 .if PRACTISE_MODE
-        .byte   $30,$16,$00,$0F,$30,$12,$00,$0F
+        .byte   $17,$27,$37,$0F,$30,$12,$00,$0F
 .else
         .byte   $30,$16,$00,$0F,$30,$21,$00,$0F
 .endif
