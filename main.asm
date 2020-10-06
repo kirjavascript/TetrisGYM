@@ -7829,9 +7829,15 @@ advanceGameParity:
         txa
         and #1
         bne @foo
+
+        lda #$7B
+        sta $0400, x
         inc $620
         jmp @bar
 @foo:
+
+        lda #$7C
+        sta $0400, x
         inc $621
 @bar:
 
