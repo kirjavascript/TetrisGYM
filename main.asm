@@ -492,11 +492,8 @@ branchOnGameMode:
         .addr   gameMode_playAndEndingHighScore_jmp
         .addr   gameMode_startDemo
 gameModeState_updatePlayer1:
-.if PRACTISE_MODE
-        jsr     practiseAdvanceGamePatch
-.else
+        jsr     practiseAdvanceGame
         jsr     makePlayer1Active
-.endif
         jsr     branchOnPlayStatePlayer1
 .if PRACTISE_MODE
         jsr     practiseCurrentSpritePatch
@@ -7605,14 +7602,13 @@ practiseCurrentSpritePatch:
 @skip:
         rts
 
-practiseAdvanceGamePatch:
-        jsr     makePlayer1Active ; patched command
-
+practiseAdvanceGame:
+        ; TODO: replace with jump table
         lda     practiseType
-        cmp     #MODE_TAP
-        bne     @skipTap
-        jsr     advanceGameTap
-@skipTap:
+        cmp     #MODE_PARITY
+        bne     @skipParity
+        jsr     advanceGameParity
+@skipParity:
 
         lda     practiseType
         cmp     #MODE_TSPINS
@@ -7627,11 +7623,16 @@ practiseAdvanceGamePatch:
 @skipPresets:
 
         lda     practiseType
+        cmp     #MODE_TAP
+        bne     @skipTap
+        jsr     advanceGameTap
+@skipTap:
+
+        lda     practiseType
         cmp     #MODE_FLOOR
         bne     @skipFloor
         jsr     advanceGameFloor
 @skipFloor:
-
         rts
 
 clearPlayfield:
@@ -7810,6 +7811,50 @@ advanceGameTap:
         dex
         bne     @loop
 @skip:
+        rts
+
+advanceGameParity:
+        ; 7B / 7C
+
+        lda #0
+        sta $620
+        sta $621
+
+        ldx #$C8
+@loop:
+        lda $0400, x
+
+        cmp #$EF
+        beq @empty
+        txa
+        and #1
+        bne @foo
+        inc $620
+        jmp @bar
+@foo:
+        inc $621
+@bar:
+
+
+
+@empty:
+        dex
+        bne @loop
+
+        ; sty $610
+        rts
+
+tmp_delete:
+        ldx #$C8
+@loop:
+        lda $0400, x
+        ; cmp #$EF
+        ; beq @empty
+        ; lda #$7B
+        ; sta $0400, x
+; @empty:
+        dex
+        bne @loop
         rts
 
 .endif
