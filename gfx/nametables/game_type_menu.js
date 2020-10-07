@@ -39,7 +39,7 @@ Y#W#a                            d#
 Y#W#a                            d#
 Z0W#a                            d#
 ZWW#a                            d#
-Z#W#aV1                   KIRJAVAd#
+Z#W#aV0                   KIRJAVAd#
 Z#W#zxxxxxxxxxxxxxxxxxxxxxxxxxxxxc#
 Z#W################################
 Z#W################################
