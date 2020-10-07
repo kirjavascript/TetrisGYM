@@ -7941,11 +7941,6 @@ DEBUG_ORIGINAL_CURRENT_PIECE := tmp2
         and     #1
         bne     handleLevelEditor
 
-        ; handle piece
-        jsr     isPositionValid
-        bne     @restore_
-        jsr     savePlayer1State
-
         ; handle next piece
         lda     heldButtons_player1
         and     #BUTTON_B
@@ -7982,6 +7977,12 @@ DEBUG_ORIGINAL_CURRENT_PIECE := tmp2
         bpl     @notPressedA
         inc     currentPiece
 @notPressedA:
+
+        ; handle piece
+        jsr     isPositionValid
+        bne     @restore_
+        jsr     savePlayer1State
+
 @draw:
         jsr     stageSpriteForCurrentPiece ; patched command
         jsr     stageSpriteForNextPiece ; patched command
@@ -7994,7 +7995,7 @@ DEBUG_ORIGINAL_CURRENT_PIECE := tmp2
         sta     tetriminoY
         lda     DEBUG_ORIGINAL_CURRENT_PIECE
         sta     currentPiece
-        rts
+        jmp     @draw
 
 @changeNext:
         lda     debugNextCounter
