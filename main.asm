@@ -588,12 +588,14 @@ gameMode_legalScreen: ; boot
 
         ; region detection
 	ldx #0
+	ldy #0
 @vwait1:
 	bit $2002
 	bpl @vwait1
 @vwait2:
 	inx
 	bne @noincy
+        iny
 @noincy:
 	bit $2002
 	bpl @vwait2
