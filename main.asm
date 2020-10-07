@@ -586,6 +586,24 @@ gameMode_legalScreen: ; boot
         dex
         bpl     @loop
 
+        ; region detection
+	ldx #0
+@vwait1:
+	bit $2002
+	bpl @vwait1
+@vwait2:
+	inx
+	bne @noincy
+@noincy:
+	bit $2002
+	bpl @vwait2
+
+        cpx #$40 ;
+        bmi @ntsc
+        lda #1
+        sta palFlag
+@ntsc:
+
         ; fallthrough
 gameMode_titleScreen:
         inc     gameMode
@@ -1555,7 +1573,6 @@ framesPerDropTablePAL:
         .byte   $01,$01,$01,$01,$01,$01
 shift_tetrimino:
         ; region stuff
-        ; tmp1 / tmp2 not touched in isPositionValid
         lda     #$10
         sta     dasValueHigh
         lda     #$0A
