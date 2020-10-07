@@ -496,8 +496,8 @@ branchOnGameMode:
         .addr   gameMode_playAndEndingHighScore_jmp
         .addr   gameMode_startDemo
 gameModeState_updatePlayer1:
-        jsr     practiseAdvanceGame
         jsr     makePlayer1Active
+        jsr     practiseAdvanceGame
         jsr     branchOnPlayStatePlayer1
 .if PRACTISE_MODE
         jsr     practiseCurrentSpritePatch
