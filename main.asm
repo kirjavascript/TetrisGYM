@@ -1552,6 +1552,21 @@ framesPerDropTablePAL:
         .byte   $02,$02,$02,$01,$01,$01,$01,$01
         .byte   $01,$01,$01,$01,$01,$01
 shift_tetrimino:
+        ; region stuff
+        ; tmp1 / tmp2 not touched in isPositionValid
+        lda     #$10
+        sta     tmp1
+        lda     #$0A
+        sta     tmp2
+        ldy     palFlag
+        cpy     #0
+        beq     @shiftTetrimino
+        lda     #$0C
+        sta     tmp1
+        lda     #$08
+        sta     tmp2
+@shiftTetrimino:
+
         lda     tetriminoX
         sta     originalY
         lda     heldButtons
@@ -1565,9 +1580,9 @@ shift_tetrimino:
         beq     @ret
         inc     autorepeatX
         lda     autorepeatX
-        cmp     #$10
+        cmp     tmp1
         bmi     @ret
-        lda     #$0A
+        lda     tmp2
         sta     autorepeatX
         jmp     @buttonHeldDown
 
@@ -1599,7 +1614,7 @@ shift_tetrimino:
 @restoreX:
         lda     originalY
         sta     tetriminoX
-        lda     #$10
+        lda     tmp1
         sta     autorepeatX
 @ret:   rts
 
