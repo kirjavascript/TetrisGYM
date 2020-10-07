@@ -587,18 +587,18 @@ gameMode_legalScreen: ; boot
         bpl     @loop
 
         ; region detection
-	ldx #0
-	ldy #0
+        ldx #0
+        ldy #0
 @vwait1:
-	bit $2002
-	bpl @vwait1
+        bit $2002
+        bpl @vwait1
 @vwait2:
-	inx
-	bne @noincy
+        inx
+        bne @noincy
         iny
 @noincy:
-	bit $2002
-	bpl @vwait2
+        bit $2002
+        bpl @vwait2
 
         cpx #$40 ;
         bmi @ntsc
