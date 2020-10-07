@@ -31,9 +31,10 @@ MODE_FLOOR := 4
 MODE_TAP := 5
 MODE_DROUGHT := 6
 MODE_DEBUG := 7
+MODE_PAL := 8
 
-MODE_QUANTITY := 8
-MODE_CONFIG_QUANTITY := 5
+MODE_QUANTITY := 9
+MODE_CONFIG_QUANTITY := 6
 MODE_CONFIG_OFFSET := MODE_QUANTITY - MODE_CONFIG_QUANTITY
 
 ; RAM
@@ -53,6 +54,7 @@ floorModifier := menuVars+1
 tapModifier := menuVars+2
 droughtModifier := menuVars+3
 debugFlag := menuVars+4
+palFlag := menuVars+5
 ; $B00 - $BEF
 
 ; macros
@@ -581,9 +583,8 @@ gameMode_legalScreen: ; boot
         sta     menuVars, x
         dex
         bpl     @loop
-        inc     gameMode
-        rts
 
+        ; fallthrough
 gameMode_titleScreen:
         inc     gameMode
         rts
@@ -1524,7 +1525,11 @@ drop_tetrimino:
         ldx     levelNumber
         cpx     #$1D
         bcs     @noTableLookup
-        lda     framesPerDropTable,x
+        lda     framesPerDropTableNTSC,x
+        ldy     palFlag
+        cpy     #0
+        beq     @noTableLookup
+        lda     framesPerDropTablePAL,x
 @noTableLookup:
         sta     dropSpeed
         lda     fallTimer
@@ -1536,13 +1541,16 @@ drop_tetrimino:
         inc     autorepeatY
         jmp     @ret
 
-framesPerDropTable:
+framesPerDropTableNTSC:
         .byte   $30,$2B,$26,$21,$1C,$17,$12,$0D
         .byte   $08,$06,$05,$05,$05,$04,$04,$04
         .byte   $03,$03,$03,$02,$02,$02,$02,$02
         .byte   $02,$02,$02,$02,$02,$01
-unreferenced_framesPerDropTable:
-        .byte   $01,$01
+framesPerDropTablePAL:
+        .byte   $24,$20,$1d,$19,$16,$12,$0f,$0b
+        .byte   $07,$05,$04,$04,$04,$03,$03,$03
+        .byte   $02,$02,$02,$01,$01,$01,$01,$01
+        .byte   $01,$01,$01,$01,$01,$01
 shift_tetrimino:
         lda     tetriminoX
         sta     originalY
@@ -7483,7 +7491,7 @@ practiseMenuControlPatch:
         rts
 
 practiseMenuConfigSizeLookup:
-        .byte   $5, $C, $20, $12, $1
+        .byte   $5, $C, $20, $12, $1, $1
 
 practisePickTetriminoPatch:
         lda     practiseType

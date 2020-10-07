@@ -32,7 +32,7 @@ X#W#a   FLOOR                    d#
 Y0W#a   (QUICK)TAP               d#
 YWW#a   DROUGHT                  d#
 Y#W#a   DEBUG MODE               d#
-Y#W#a                            d#
+Y#W#a   PAL MODE                 d#
 Y#W#a                            d#
 Y#W#a                            d#
 Y#W#a                            d#
