@@ -47,6 +47,8 @@ spawnDelay := $600
 tspinX := $601
 tspinY := $602
 tspinType := $603
+dasValueHigh := $604
+dasValueLow := $605
 ; $760 - $7FF
 menuVars := $760
 presetModifier := menuVars+0
@@ -1555,16 +1557,16 @@ shift_tetrimino:
         ; region stuff
         ; tmp1 / tmp2 not touched in isPositionValid
         lda     #$10
-        sta     tmp1
+        sta     dasValueHigh
         lda     #$0A
-        sta     tmp2
+        sta     dasValueLow
         ldy     palFlag
         cpy     #0
         beq     @shiftTetrimino
         lda     #$0C
-        sta     tmp1
+        sta     dasValueHigh
         lda     #$08
-        sta     tmp2
+        sta     dasValueLow
 @shiftTetrimino:
 
         lda     tetriminoX
@@ -1580,9 +1582,9 @@ shift_tetrimino:
         beq     @ret
         inc     autorepeatX
         lda     autorepeatX
-        cmp     tmp1
+        cmp     dasValueHigh
         bmi     @ret
-        lda     tmp2
+        lda     dasValueLow
         sta     autorepeatX
         jmp     @buttonHeldDown
 
@@ -1614,7 +1616,7 @@ shift_tetrimino:
 @restoreX:
         lda     originalY
         sta     tetriminoX
-        lda     tmp1
+        lda     dasValueHigh
         sta     autorepeatX
 @ret:   rts
 
