@@ -39,16 +39,16 @@ MODE_CONFIG_OFFSET := MODE_QUANTITY - MODE_CONFIG_QUANTITY
 
 ; RAM
 
-practiseType := musicType
 debugLevelEdit := unused_0E
 debugNextCounter := nextPiece_2player
 ; $600 - $67F
-spawnDelay := $600
-tspinX := $601
-tspinY := $602
-tspinType := $603
-dasValueHigh := $604
-dasValueLow := $605
+practiseType := $600
+spawnDelay := $601
+dasValueHigh := $602
+dasValueLow := $603
+tspinX := $604
+tspinY := $605
+tspinType := $606
 ; $760 - $7FF
 menuVars := $760
 presetModifier := menuVars+0
@@ -650,7 +650,7 @@ gameMode_gameTypeMenu:
         jsr     updateAudioWaitForNmiAndResetOamStaging
         jsr     updateAudioWaitForNmiAndEnablePpuRendering
         jsr     updateAudioWaitForNmiAndResetOamStaging
-        ldx     musicType
+        ldx     practiseType
         lda     musicSelectionTable,x
         jsr     setMusicTrack
 L830B:  lda     #$FF
@@ -687,7 +687,7 @@ padNOP  10
         bne     @downNotPressed
         lda     #$01
         sta     soundEffectSlot1Init
-        lda     musicType
+        lda     practiseType
 
 .if PRACTISE_MODE ; menu item qty
         cmp     #MODE_QUANTITY-1
@@ -695,8 +695,8 @@ padNOP  10
         cmp     #$03
 .endif
         beq     @upNotPressed
-        inc     musicType
-        ldx     musicType
+        inc     practiseType
+        ldx     practiseType
         lda     musicSelectionTable,x
         jsr     setMusicTrack
 @downNotPressed:
@@ -705,10 +705,10 @@ padNOP  10
         bne     @upNotPressed
         lda     #$01
         sta     soundEffectSlot1Init
-        lda     musicType
+        lda     practiseType
         beq     @upNotPressed
-        dec     musicType
-        ldx     musicType
+        dec     practiseType
+        ldx     practiseType
         lda     musicSelectionTable,x
         jsr     setMusicTrack
 @upNotPressed:
@@ -761,7 +761,7 @@ padNOP  25
 @flickerCursorPair1:
         jsr     loadSpriteIntoOamStaging
 .endif
-        lda     musicType
+        lda     practiseType
         asl     a
         asl     a
         asl     a
