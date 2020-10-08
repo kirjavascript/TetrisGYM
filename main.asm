@@ -52,6 +52,7 @@ dasValueLow := $603
 tspinX := $604
 tspinY := $605
 tspinType := $606
+parityTargets := $610 ; sized
 ; $760 - $7FF
 menuVars := $760
 presetModifier := menuVars+0
@@ -698,9 +699,9 @@ L830B:  lda     #$FF
 .endif
         beq     @upNotPressed
         inc     practiseType
-        ldx     practiseType
-        lda     musicSelectionTable,x
-        jsr     setMusicTrack
+        ; ldx     practiseType
+        ; lda     musicSelectionTable,x
+        ; jsr     setMusicTrack
 @downNotPressed:
         lda     newlyPressedButtons_player1
         cmp     #$08
@@ -710,7 +711,7 @@ L830B:  lda     #$FF
         lda     practiseType
         beq     @upNotPressed
         dec     practiseType
-        ldx     practiseType
+        ; ldx     practiseType
         ; lda     musicSelectionTable,x
         ; jsr     setMusicTrack
 @upNotPressed:
@@ -772,7 +773,6 @@ L830B:  lda     #$FF
         asl     a
 
 .if PRACTISE_MODE ; adjust music menu sprites
-        nop
         clc
         adc     #$57
         sta     spriteYOffset
@@ -7861,6 +7861,18 @@ advanceGameTap:
 
 advanceGameParity:
         ; 7B / 7C
+        ; convert to decimal, check high byte
+
+        ; keep decresing index h by 20 until you're < 20
+
+        ; do it to the first N lines
+        ; linewise method
+        ; 1 red 1+ white
+        ; 1 gap inbetween make the others red
+        ; mutiple passes
+        ; store targets
+
+
 
         lda #0
         sta $620
@@ -7872,7 +7884,23 @@ advanceGameParity:
 
         cmp #$EF
         beq @empty
+
+
         txa
+
+
+
+@sub21loop:
+        cmp #20
+        bpl @under21
+        sbc #20
+        jmp @sub21loop
+@under21:
+        cmp #10
+        bmi @under10
+        eor 1
+@under10:
+
         and #1
         bne @foo
 
@@ -7894,19 +7922,6 @@ advanceGameParity:
         bne @loop
 
         ; sty $610
-        rts
-
-tmp_delete:
-        ldx #$C8
-@loop:
-        lda $0400, x
-        ; cmp #$EF
-        ; beq @empty
-        ; lda #$7B
-        ; sta $0400, x
-; @empty:
-        dex
-        bne @loop
         rts
 
 .endif
