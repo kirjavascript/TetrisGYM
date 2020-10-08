@@ -14,6 +14,6 @@ preset2:
 preset3:
          .byte $7e, $aa, $b3, $be, $c0, $c5, $c7, $ff
 preset4:
-         .byte $3f, $ab, $ae, $b0, $b3, $bf, $c2, $c4, $c7, $ff
+         .byte $3f, $88, $89, $9c, $9d, $b0, $b1, $c4, $c5, $ff
 preset5:
          .byte $0, $98, $a7, $ac, $b0, $ba, $be, $c0, $c2, $c5, $c6, $ff
