@@ -711,8 +711,8 @@ L830B:  lda     #$FF
         beq     @upNotPressed
         dec     practiseType
         ldx     practiseType
-        lda     musicSelectionTable,x
-        jsr     setMusicTrack
+        ; lda     musicSelectionTable,x
+        ; jsr     setMusicTrack
 @upNotPressed:
         lda     newlyPressedButtons_player1
         cmp     #$10
@@ -7510,6 +7510,8 @@ practiseMenuControlPatch:
         beq     @skipLeft
         ; dec value
         dec     menuVars, x
+        lda     #$01
+        sta     soundEffectSlot1Init
 @skipLeft:
 
         ; check if pressing right
@@ -7521,6 +7523,8 @@ practiseMenuControlPatch:
         cmp     practiseMenuConfigSizeLookup, x
         bpl     @skipRight
         inc     menuVars, x
+        lda     #$01
+        sta     soundEffectSlot1Init
 @skipRight:
 @skip:
         rts
