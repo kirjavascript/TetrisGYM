@@ -34,6 +34,7 @@ MODE_DEBUG := 7
 MODE_PAL := 8
 
 MODE_QUANTITY := 9
+MODE_GAME_QUANTITY := 7
 MODE_CONFIG_QUANTITY := 6
 MODE_CONFIG_OFFSET := MODE_QUANTITY - MODE_CONFIG_QUANTITY
 
@@ -664,7 +665,6 @@ L830B:  lda     #$FF
 .if PRACTISE_MODE ; skip mode menu
         jsr practiseMenuControlPatch
         jmp @leftNotPressed
-padNOP  10
 .else
         cmp     #$01
         bne     @rightNotPressed
@@ -717,6 +717,11 @@ padNOP  10
         lda     newlyPressedButtons_player1
         cmp     #$10
         bne     @startNotPressed
+        ; check it's a selectable option
+        lda     practiseType
+        cmp     #MODE_GAME_QUANTITY
+        bpl     @startNotPressed
+
         lda     #$02
         sta     soundEffectSlot1Init
         inc     gameMode
@@ -746,9 +751,7 @@ padNOP  10
         asl     a
         clc
 
-.if PRACTISE_MODE ; skip mode menu sprites
-padNOP  25
-.else
+.if !PRACTISE_MODE ; skip mode menu sprites
         adc     #$3F
         sta     spriteXOffset
         lda     #$3F
@@ -769,7 +772,6 @@ padNOP  25
         asl     a
 
 .if PRACTISE_MODE ; adjust music menu sprites
-padNOP  10
         nop
         clc
         adc     #$57
