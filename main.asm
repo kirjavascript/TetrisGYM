@@ -41,6 +41,8 @@ MODE_CONFIG_OFFSET := MODE_QUANTITY - MODE_CONFIG_QUANTITY
 
 debugLevelEdit := unused_0E
 debugNextCounter := nextPiece_2player
+presetRNG := tmp1
+presetBitmask := tmp2
 ; $600 - $67F
 practiseType := $600
 spawnDelay := $601
@@ -2988,15 +2990,10 @@ L992A:  cmp     #$07
         jmp     L992A
 
 L9934:  tax
-.if PRACTISE_MODE
-useNewSpawnID:
-        jmp     practisePickTetriminoPatch
-padNOP 2
-.else
         lda     spawnTable,x
 useNewSpawnID:
         sta     spawnID
-.endif
+        jsr     practisePickTetriminoPatch
         rts
 
 tetriminoTypeFromOrientation:
@@ -7542,20 +7539,12 @@ practisePickTetriminoPatch:
         cmp     #MODE_TAP
         beq     @tap
 
-        lda     spawnTable,x ; patched command
-        sta     spawnID ; patched command
+        lda     practiseType
+        cmp     #MODE_DROUGHT
+        beq     @drought
 
-        ; drought
-        cmp     #$12
-        bne     @finish
-        lda     spawnCount
-        and     #$F
-        adc     #1 ; always adds 1 so code continues as normal if droughtModifier is 0
-        cmp     droughtModifier
-        bmi     @pickRando
-        lda     spawnID ; patched command
-@finish:
         rts
+
 @pickRando:
         jmp     pickRandomTetrimino
 
@@ -7569,15 +7558,27 @@ practisePickTetriminoPatch:
         sta     spawnID
         rts
 
+@drought:
+        cmp     #$12
+        bne     @droughtDone
+        lda     spawnCount
+        and     #$F
+        adc     #1 ; always adds 1 so code continues as normal if droughtModifier is 0
+        cmp     droughtModifier
+        bmi     @pickRando
+        lda     spawnID ; patched command
+@droughtDone:
+        rts
+
 @presets:
         ; RNG in x
-        stx     tmp1
+        stx     presetRNG
         ; store piece bitmask
         ldy     presetModifier
         lda     presets, y ; offset of preset in A
         tay
         lda     presets, y
-        sta     tmp2
+        sta     presetBitmask
         ; create bit to compare with mask from RNG
         lda     #1
 @shiftBit:
@@ -7587,9 +7588,9 @@ practisePickTetriminoPatch:
         dex
         jmp     @shiftBit
 @doneShifting:
-        and     tmp2
+        and     presetBitmask
         bne     @pickRando
-        ldx     tmp1 ; restore RNG
+        ldx     presetRNG ; restore RNG
         lda     spawnTable,x
         sta     spawnID
         rts
