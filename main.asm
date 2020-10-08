@@ -7543,10 +7543,8 @@ practisePickTetriminoPatch:
         cmp     #MODE_DROUGHT
         beq     @drought
 
+        lda     spawnID ; restore A
         rts
-
-@pickRando:
-        jmp     pickRandomTetrimino
 
 @tspins:
         lda     #$2
@@ -7559,6 +7557,7 @@ practisePickTetriminoPatch:
         rts
 
 @drought:
+        lda     spawnID ; restore A
         cmp     #$12
         bne     @droughtDone
         lda     spawnCount
@@ -7566,9 +7565,11 @@ practisePickTetriminoPatch:
         adc     #1 ; always adds 1 so code continues as normal if droughtModifier is 0
         cmp     droughtModifier
         bmi     @pickRando
-        lda     spawnID ; patched command
+        lda     spawnID ; restore A
 @droughtDone:
         rts
+@pickRando:
+        jmp     pickRandomTetrimino
 
 @presets:
         ; RNG in x
