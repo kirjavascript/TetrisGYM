@@ -52,7 +52,6 @@ dasValueLow := $603
 tspinX := $604
 tspinY := $605
 tspinType := $606
-parityTargets := $610 ; sized
 ; $760 - $7FF
 menuVars := $760
 presetModifier := menuVars+0
@@ -7859,6 +7858,10 @@ advanceGameTap:
 @skip:
         rts
 
+parityTargets := $610 ; sized
+parityIndex := $620
+parityCount := $621
+
 advanceGameParity:
         ; 7B / 7C
         ; convert to decimal, check high byte
@@ -7867,29 +7870,85 @@ advanceGameParity:
 
         ; do it to the first N lines
         ; linewise method
+
         ; 1 red 1+ white
         ; 1 gap inbetween make the others red
+        ; gap between wall and stack
+
         ; mutiple passes
         ; store targets
 
+        ; change everything to 7B
+        ldx #$C8
+@loop:
+        lda playfield, x
 
+        cmp #$EF
+        beq @empty
+        lda #$7B
+        sta $0400, x
+@empty:
+        dex
+        bne @loop
+
+        ldx #190
+        stx parityIndex
+
+        ; reset stuff
+
+
+
+        ldx parityIndex
+        inx ; col 2-8
 
         lda #0
-        sta $620
-        sta $621
+        sta parityCount
+        ldy #$8
+
+@checkString:
+        lda playfield, x
+        cmp #$EF
+        beq @stringEmpty
+        inc parityCount
+        jmp @stringNext
+@stringEmpty:
+        lda parityCount
+        cmp #1
+        bne @resetCount
+        ; set prev tile
+        dex
+        lda #$7C
+        sta playfield, x
+        inx
+        jmp @stringNext
+@resetCount:
+        lda #0
+        sta parityCount
+        jmp @stringNext
+
+@stringNext:
+        inx
+        dey
+        bne @checkString
+
+        ; draw line
+
+        ; lda $
+
+
+        rts
+
+unused_checkerboard:
 
         ldx #$C8
 @loop:
-        lda $0400, x
+        lda playfield, x
 
         cmp #$EF
         beq @empty
 
 
         txa
-
-
-
 @sub21loop:
         cmp #20
         bpl @under21
@@ -7906,13 +7965,11 @@ advanceGameParity:
 
         lda #$7B
         sta $0400, x
-        inc $620
         jmp @bar
 @foo:
 
         lda #$7C
         sta $0400, x
-        inc $621
 @bar:
 
 
@@ -7921,7 +7978,6 @@ advanceGameParity:
         dex
         bne @loop
 
-        ; sty $610
         rts
 
 .endif

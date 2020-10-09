@@ -26,7 +26,7 @@ XWW#a                            d#
 X#W#a                            d#
 X#W#a   PLAY                     d#
 X#W#a   T-SPINS                  d#
-X#W#a   PARITY                   d#
+X#W#a   STACKING                 d#
 X#W#a   SETUPS                   d#
 X#W#a   FLOOR                    d#
 Y0W#a   (QUICK)TAP               d#
@@ -39,7 +39,7 @@ Y#W#a                            d#
 Y#W#a                            d#
 Z0W#a                            d#
 ZWW#a                            d#
-Z#W#aV0                   KIRJAVAd#
+Z#W#a    ╬╫╪╩╨╧╦╥╤╣╢╡╠╟╜╛╚╙╘╗  V0d#
 Z#W#zxxxxxxxxxxxxxxxxxxxxxxxxxxxxc#
 Z#W################################
 Z#W################################
