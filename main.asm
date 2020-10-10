@@ -7882,11 +7882,10 @@ advanceGameParity:
         ldx #$C8
 @loop:
         lda playfield, x
-
         cmp #$EF
         beq @empty
         lda #$7B
-        sta $0400, x
+        sta playfield, x
 @empty:
         dex
         bne @loop
@@ -7899,11 +7898,10 @@ advanceGameParity:
 
 
         ldx parityIndex
-        inx ; col 2-8
 
         lda #0
         sta parityCount
-        ldy #$8
+        ldy #10
 
 @checkString:
         lda playfield, x
@@ -7916,10 +7914,10 @@ advanceGameParity:
         cmp #1
         bne @resetCount
         ; set prev tile
-        dex
-        lda #$7C
-        sta playfield, x
-        inx
+        ; dex
+        ; lda #$7C
+        ; sta playfield, x
+        ; inx
         jmp @stringNext
 @resetCount:
         lda #0
