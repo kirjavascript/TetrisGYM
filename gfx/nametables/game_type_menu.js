@@ -13,7 +13,6 @@ const chars = [...buffer].map(value => lookup[value] || '__NOWAYNOWAY');
 console.log(chars.join('').match(/.{35}/g).join('\n'));
 
 
-
 const tiles = `
 W0W################################
 WWW#########qwwwwwwwwwwwwe#########
@@ -38,10 +37,10 @@ Y#W#a   PAL MODE                 d#
 Y#W#a                            d#
 Y#W#a                            d#
 Y#W#a                            d#
-Y#W#a                            d#
-Z0W#a                            d#
-ZWW#a                            d#
-Z#W#aV0  ╬╫╪╩╨╧╦╥╤╣╢╡╠╟╜╛╚╙╘╗╖╕╔╓d#
+Y#W#a                        ╤╣╢╡d#
+Z0W#a                        ╔╓╒║d#
+ZWW#a                     V0 ╄╃╂╁d#
+Z#W#a                        ┴┳┲┱d#
 Z#W#zxxxxxxxxxxxxxxxxxxxxxxxxxxxxc#
 Z#W################################
 Z#W################################
