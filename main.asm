@@ -323,7 +323,7 @@ nmi:    pha
         jsr     render
         dec     sleepCounter
         lda     sleepCounter
-        cmp     #$FF
+        ; cmp     #$FF
         bne     @jumpOverIncrement
         inc     sleepCounter
 @jumpOverIncrement:
