@@ -7912,11 +7912,7 @@ highlightGaps:
         ; draw in red
         lda #$7C
         sta playfield, x
-        inx
-        inx
-        sta playfield, x
-        dex
-        dex
+        sta playfield+2, x
 
 @groupNext:
         inx
