@@ -90,10 +90,10 @@ When enabled, press start to go into debug mode.
 
 You can use use the dpad to move around, and select to switch between piece editing and playfield editing.
 
-* Piece editing
-    A/B to change current piece, hold one and press the other to change next piece
-* Playfield editing
-    A to draw a block, B to delete a block
+* Piece editing  
+        A/B to change current piece, hold one and press the other to change next piece
+* Playfield editing  
+        A to draw a block, B to delete a block
 
 This is a config option only, and will enable debug mde globally.
 
