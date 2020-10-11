@@ -52,6 +52,8 @@ dasValueLow := $603
 tspinX := $604
 tspinY := $605
 tspinType := $606
+parityIndex := $607
+parityCount := $608
 ; $760 - $7FF
 menuVars := $760
 presetModifier := menuVars+0
@@ -1822,16 +1824,6 @@ orientationToSpriteTable:
         .byte   $00,$00,$06,$00,$00,$00,$00,$09
         .byte   $08,$00,$0B,$07,$00,$00,$0A,$00
         .byte   $00,$00,$0C
-; Same as orientationToSpriteTable except sprites have different offsets
-unreferenced_orientationToSpriteTable:
-        .byte   $00,$00,$0F,$00,$00,$00,$00,$12
-        .byte   $11,$00,$14,$10,$00,$00,$13,$00
-        .byte   $00,$00,$15
-unreferenced_data2:
-        .byte   $00,$FF,$FE,$FD,$FC,$FD,$FE,$FF
-        .byte   $00,$01,$02,$03,$04,$05,$06,$07
-        .byte   $08,$09,$0A,$0B,$0C,$0D,$0E,$0F
-        .byte   $10,$11,$12,$13
 loadSpriteIntoOamStaging:
         clc
         lda     spriteIndexInOamContentLookup
@@ -1898,11 +1890,7 @@ oamContentLookup:
         .addr   sprite13LPieceOffset
         .addr   sprite14OPieceOffset
         .addr   sprite15IPieceOffset
-.if DEBUG_MODE
-        .addr   spriteDebugLevelSelect
-.else
-        .addr   sprite16KidIcarus1
-.endif
+        .addr   spriteDebugLevelSelect ; DEBUG_MODE
         .addr   sprite17KidIcarus2
         .addr   sprite18Link1
         .addr   sprite19Link2
@@ -1981,7 +1969,6 @@ sprite01GameTypeCursor:
 ; Used as a sort of NOOP for cursors
 sprite02Blank:
         .byte   $00,$FF,$00,$00,$FF
-.if DEBUG_MODE
 sprite03PausePalette6:
         .byte   $00,$19,$00,$00,$00,$0A,$00,$08
         .byte   $00,$1E,$00,$10,$00,$1C,$00,$18
@@ -1990,16 +1977,6 @@ sprite05PausePalette4:
         .byte   $00,$0D,$00,$00,$00,$0E,$00,$08
         .byte   $00,$0B,$00,$10,$00,$1E,$00,$18
         .byte   $00,$10,$00,$20,$FF
-.else
-sprite03PausePalette6:
-        .byte   $00,$19,$02,$00,$00,$0A,$02,$08
-        .byte   $00,$1E,$02,$10,$00,$1C,$02,$18
-        .byte   $00,$0E,$02,$20,$FF
-sprite05PausePalette4:
-        .byte   $00,$19,$00,$00,$00,$0A,$00,$08
-        .byte   $00,$1E,$00,$10,$00,$1C,$00,$18
-        .byte   $00,$0E,$00,$20,$FF
-.endif
 sprite06TPiece:
         .byte   $00,$7B,$02,$FC,$00,$7B,$02,$04
         .byte   $00,$7B,$02,$0C,$08,$7B,$02,$04
@@ -2064,10 +2041,6 @@ sprite14OPieceOffset:
 sprite15IPieceOffset:
         .byte   $08,$7B,$02,$F8,$08,$7B,$02,$00
         .byte   $08,$7B,$02,$08,$08,$7B,$02,$10
-        .byte   $FF
-sprite16KidIcarus1:
-        .byte   $F0,$95,$01,$10,$F8,$A3,$01,$00
-        .byte   $F8,$A4,$01,$08,$F8,$A5,$01,$10
         .byte   $FF
 sprite17KidIcarus2:
         .byte   $F8,$83,$01,$00,$F8,$84,$01,$08
@@ -7857,10 +7830,6 @@ advanceGameTap:
         bne     @loop
 @skip:
         rts
-
-parityTargets := $610 ; sized
-parityIndex := $620
-parityCount := $621
 
 advanceGameParity:
         ; linewise stacking highlights
