@@ -7863,21 +7863,12 @@ parityIndex := $620
 parityCount := $621
 
 advanceGameParity:
-        ; 7B / 7C
-        ; convert to decimal, check high byte
-
-        ; keep decresing index h by 20 until you're < 20
-
-        ; do it to the first N lines
-        ; linewise method
+        ; linewise stacking highlights
 
         ; 1 red 1+ white
-        ;   maybe skip the first one
+        ;   skip the first one
         ; 1 gap inbetween make the others red
-        ; gap between wall and stack (left only?)
-
-        ; mutiple passes
-        ; store targets
+        ; gap between wall and stack (left only)
 
         ; change everything to 7B
         ldx #$C8
@@ -7891,38 +7882,79 @@ advanceGameParity:
         dex
         bne @loop
 
-
         ; mark things with 7C
 
-        lda #0
+        lda #190
         sta parityIndex
 @runLine:
         jsr highlightParity
         lda parityIndex
-        adc #10
+        sec
+        sbc #$A
         sta parityIndex
-        cmp #100
-        bmi @runLine
+        cmp #60
+        bpl @runLine
 
-        lda #100
+        ; have to do in two stages for some reason
+
+        lda #50
         sta parityIndex
-@runLine2:
         jsr highlightParity
-        lda parityIndex
-        adc #10
+        lda #40
         sta parityIndex
-        cmp #200
-        bmi @runLine2
-
-        ; ???
+        jsr highlightParity
 
         rts
 
 highlightParity:
         jsr highlightOrphans
+        jsr highlightGaps
         rts
 
-        ; highlight lone blocks
+highlightGaps:
+        ldx parityIndex
+
+        ; check first gap
+        lda playfield, x
+        cmp #$EF
+        bne @startGapEnd
+        lda playfield+1, x
+        cmp #$EF
+        beq @startGapEnd
+        lda #$7C
+        sta playfield+1, x
+@startGapEnd:
+
+        ; check other gaps
+
+        ldy #8 ; groups of 3
+@checkGroup:
+        lda playfield, x
+        cmp #$EF
+        beq @groupNext
+        lda playfield+1, x
+        cmp #$EF
+        bne @groupNext
+        lda playfield+2, x
+        cmp #$EF
+        beq @groupNext
+
+        ; draw in red
+        lda #$7C
+        sta playfield, x
+        inx
+        inx
+        sta playfield, x
+        dex
+        dex
+
+@groupNext:
+        inx
+        dey
+        bne @checkGroup
+
+
+        rts
 
 highlightOrphans:
         ldx parityIndex
@@ -7944,7 +7976,7 @@ highlightOrphans:
         ; dont highlight the first one
         cpy #9
         beq @resetCount
-        ; set prev tile
+        ; last is skipped anyway
         lda #$7C
         dex
         sta playfield, x
