@@ -76,7 +76,7 @@ A mode for practising tapping and quicktapping pieces over towers. 0-G will have
 
 ### Drought
 
-Create artificiallt inflated droughts. Increasing the value causes less I pieces.
+Create artificially inflated droughts. Increasing the value causes less I pieces.
 
 0 = normal gameplay I = no line pieces
 
