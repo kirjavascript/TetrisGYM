@@ -7838,6 +7838,7 @@ advanceGameParity:
         ;   skip the first one
         ; 1 gap inbetween make the others red
         ; gap between wall and stack (left only)
+        ; overhangs?
 
         ; change everything to 7B
         ldx #$C8
