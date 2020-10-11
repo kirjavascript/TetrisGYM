@@ -7893,36 +7893,33 @@ advanceGameParity:
 
 
         ; mark things with 7C
-        ; lda #190
-        ; sta parityIndex
 
-; @runLine:
-        ; jsr highlightOrphans
-        ; lda parityIndex
-        ; sbc #10
-        ; sta parityIndex
-        ; cmp #200
-        ; bmi @runLine
-
-        ; rts
-
-        lda #190
+        lda #0
         sta parityIndex
-        jsr highLightOrphans
-        ldx #180
-        stx parityIndex
-        jsr highLightOrphans
-        ldx #170
-        stx parityIndex
-        jsr highLightOrphans
+@runLine:
+        jsr highlightParity
+        lda parityIndex
+        adc #10
+        sta parityIndex
+        cmp #100
+        bmi @runLine
 
-        ldx #160
-        stx parityIndex
-        jsr highLightOrphans
+        lda #100
+        sta parityIndex
+@runLine2:
+        jsr highlightParity
+        lda parityIndex
+        adc #10
+        sta parityIndex
+        cmp #200
+        bmi @runLine2
 
-        ldx #150
-        stx parityIndex
-        jsr highLightOrphans
+        ; ???
+
+        rts
+
+highlightParity:
+        jsr highlightOrphans
         rts
 
         ; highlight lone blocks
@@ -7944,6 +7941,9 @@ highlightOrphans:
         lda parityCount
         cmp #1
         bne @resetCount
+        ; dont highlight the first one
+        cpy #9
+        beq @resetCount
         ; set prev tile
         lda #$7C
         dex
