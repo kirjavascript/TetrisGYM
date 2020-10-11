@@ -7944,9 +7944,7 @@ highlightOrphans:
         beq @resetCount
         ; last is skipped anyway
         lda #$7C
-        dex
-        sta playfield, x
-        inx
+        sta playfield-1, x
 
 @resetCount:
         lda #0
