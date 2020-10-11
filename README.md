@@ -95,7 +95,7 @@ You can use use the dpad to move around, and select to switch between piece edit
 * Playfield editing  
         A to draw a block, B to delete a block
 
-This is a config option only, and will enable debug mde globally.
+This is a config option only, and will enable debug mode globally.
 
 ### PAL Mode
 
