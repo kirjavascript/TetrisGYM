@@ -7872,8 +7872,9 @@ advanceGameParity:
         ; linewise method
 
         ; 1 red 1+ white
+        ;   maybe skip the first one
         ; 1 gap inbetween make the others red
-        ; gap between wall and stack
+        ; gap between wall and stack (left only?)
 
         ; mutiple passes
         ; store targets
@@ -7890,15 +7891,45 @@ advanceGameParity:
         dex
         bne @loop
 
-        ldx #190
+
+        ; mark things with 7C
+        ; lda #190
+        ; sta parityIndex
+
+; @runLine:
+        ; jsr highlightOrphans
+        ; lda parityIndex
+        ; sbc #10
+        ; sta parityIndex
+        ; cmp #200
+        ; bmi @runLine
+
+        ; rts
+
+        lda #190
+        sta parityIndex
+        jsr highLightOrphans
+        ldx #180
         stx parityIndex
+        jsr highLightOrphans
+        ldx #170
+        stx parityIndex
+        jsr highLightOrphans
 
-        ; reset stuff
+        ldx #160
+        stx parityIndex
+        jsr highLightOrphans
 
+        ldx #150
+        stx parityIndex
+        jsr highLightOrphans
+        rts
 
+        ; highlight lone blocks
 
+highlightOrphans:
         ldx parityIndex
-
+        ; reset stuff
         lda #0
         sta parityCount
         ldy #10
@@ -7914,11 +7945,11 @@ advanceGameParity:
         cmp #1
         bne @resetCount
         ; set prev tile
-        ; dex
-        ; lda #$7C
-        ; sta playfield, x
-        ; inx
-        jmp @stringNext
+        lda #$7C
+        dex
+        sta playfield, x
+        inx
+
 @resetCount:
         lda #0
         sta parityCount
@@ -7928,12 +7959,6 @@ advanceGameParity:
         inx
         dey
         bne @checkString
-
-        ; draw line
-
-        ; lda $
-
-
         rts
 
 unused_checkerboard:
