@@ -34,7 +34,21 @@ A link to the BPS can be found in the releases page. [TODO ADD LINK]
 
 ![Play](/screens/play.png)
 
-Same gameplay as Type-A, with some improvements. No score cap, rocket, curtain, better pause, extended level select. There are various other small changes
+Same gameplay as Type-A, with some improvements. No score cap, no rocket, no curtain, always next box, better pause, extended level select.
+
+There are various other small changes
+
+### T-Spins
+
+![T-Spins](/screens/tspins.png)
+
+Spawn T-Spins in random X and Y positions. Additional entry delay on successful T-Spin to prepare for the next state.
+
+### Stacking
+
+![Stackin](/screens/stacking.png)
+
+An experiment to highlight bad areas of the playfield in an attempt to improve stacking.
 
 ## Resources
 
