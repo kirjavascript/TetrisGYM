@@ -32,10 +32,9 @@ A link to the BPS can be found in the releases page. [TODO ADD LINK]
 
 ### Play
 
-![/screens/play.png]
+![/screens/play.png](Play)
 
 Same gameplay as Type-A, with some improvements. No score cap, rocket, curtain, better pause, extended level select. There are various other small changes
-{level select}
 
 ## Resources
 
