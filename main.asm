@@ -54,6 +54,7 @@ tspinY := $605
 tspinType := $606
 parityIndex := $607
 parityCount := $608
+parityColor := $609
 ; $760 - $7FF
 menuVars := $760
 presetModifier := menuVars+0
@@ -7832,6 +7833,7 @@ advanceGameTap:
         rts
 
 advanceGameParity:
+
         ; linewise stacking highlights
 
         ; 1 red 1+ white
@@ -7839,6 +7841,13 @@ advanceGameParity:
         ; 1 gap inbetween make the others red
         ; gap between wall and stack (left only)
         ; overhangs?
+        ldx #$7C
+        lda player1_levelNumber
+        cmp #19
+        bne @altColor
+        inx
+@altColor:
+        stx parityColor
 
         ; change everything to 7B
         ldx #$C8
@@ -7892,7 +7901,7 @@ highlistGapsLeft:
         lda playfield+1, x
         cmp #$EF
         beq @startGapEnd
-        lda #$7C
+        lda parityColor
         sta playfield+1, x
 @startGapEnd:
 
@@ -7908,7 +7917,7 @@ highlightGapsOverhang:
         beq @checkGroup
 
         ; draw in red
-        lda #$7C
+        lda parityColor
         sta playfield-10, x
 
 @checkGroup:
@@ -7926,7 +7935,7 @@ highlightGapsOverhang:
         beq @groupNext
 
         ; draw in red
-        lda #$7C
+        lda parityColor
         sta playfield, x
         sta playfield+2, x
 
@@ -7958,7 +7967,7 @@ highlightOrphans:
         cpy #9
         beq @resetCount
         ; last is skipped anyway
-        lda #$7C
+        lda parityColor
         sta playfield-1, x
 
 @resetCount:
