@@ -7842,11 +7842,11 @@ advanceGameParity:
 
         ; change everything to 7B
         ldx #$C8
-@loop:
-        lda playfield, x
-        cmp #$EF
-        beq @empty
         lda #$7B
+@loop:
+        ldy playfield, x
+        cpy #$EF
+        beq @empty
         sta playfield, x
 @empty:
         dex
@@ -7860,7 +7860,7 @@ advanceGameParity:
         jsr highlightParity
         lda parityIndex
         sec
-        sbc #$A
+        sbc #10
         sta parityIndex
         cmp #60
         bpl @runLine
@@ -7884,6 +7884,7 @@ highlightParity:
 highlightGaps:
         ldx parityIndex
 
+highlistGapsLeft:
         ; check first gap
         lda playfield, x
         cmp #$EF
@@ -7895,9 +7896,9 @@ highlightGaps:
         sta playfield+1, x
 @startGapEnd:
 
-        ; check other gaps
-
+highlightGapsHorizontal:
         ldy #8 ; groups of 3
+
 @checkGroup:
         lda playfield, x
         cmp #$EF
@@ -7918,7 +7919,6 @@ highlightGaps:
         inx
         dey
         bne @checkGroup
-
 
         rts
 

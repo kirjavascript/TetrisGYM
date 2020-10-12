@@ -10,23 +10,23 @@
 * [Getting Started](#guide)
 * [Modes](#modes)
     * [Play](#play)
-    * [T-Spins](#tspins)
+    * [T-Spins](#t-spins)
     * [Stacking](#stacking)
     * [Setups](#setups)
     * [Floor](#floor)
-    * [(Quick)Tap](#tap)
+    * [(Quick)Tap](#%28quick%29-tap)
     * [Drought](#drought)
-    * [Debug Mode](#debug)
-    * [PAL Mode](#pal)
+    * [Debug Mode](#debug-mode)
+    * [PAL Mode](#pal-mode)
 * [Resources](#resources)
 
 ## Getting Started
 
-TetrisGYM is a modification of the USA version of NES Tetris.
+TetrisGYM is a modification of NES Tetris.
 
-While it is originally based on the USA NTSC version, after patching it will detect your console region, and gameplay will either match the corresponding NTSC or PAL versions of the game.
+While it is originally based on the NTSC version, after patching it will detect your console region, and gameplay will either match the corresponding NTSC or PAL versions of the game.
 
-TetrisGYM is distributed in the form of an BPS patch and can be applied with [Rom PatcherJS](https://www.romhacking.net/patch/) or similar.
+TetrisGYM is distributed in the form of an BPS patch and can be applied to the USA version of the game with [Rom PatcherJS](https://www.romhacking.net/patch/) or similar.
 
 A link to the BPS can be found in the releases page. [TODO ADD LINK]
 
@@ -52,7 +52,7 @@ Spawn T-Spins in random X and Y positions. Additional entry delay on successful 
 
 ![Stacking](/screens/stacking.png)
 
-An experiment to highlight bad areas of the playfield in an attempt to improve stacking.
+An experiment in highlighting bad areas of the playfield in an attempt to improve stacking.
 
 ### Setups
 
