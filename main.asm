@@ -7879,36 +7879,6 @@ advanceGameParity:
 highlightParity:
         jsr highlightOrphans
         jsr highlightGaps
-        jsr highlightOverhang
-        rts
-
-
-highlightOverhang:
-        ldx parityIndex
-        ; skip top rows
-        ; cpx #60
-        ; bmi @groupEnd
-
-        ldy #9
-
-@checkGroup:
-        lda playfield, x
-        cmp #$EF
-        bne @groupNext
-        lda playfield-10, x
-        cmp #$EF
-        beq @groupNext
-
-        ; draw in red
-        lda #$7C
-        sta playfield-10, x
-
-@groupNext:
-        inx
-        dey
-        bne @checkGroup
-
-@groupEnd:
         rts
 
 highlightGaps:
@@ -7926,10 +7896,25 @@ highlistGapsLeft:
         sta playfield+1, x
 @startGapEnd:
 
-highlightGapsHorizontal:
-        ldy #8 ; groups of 3
+highlightGapsOverhang:
+        ldy #10
+
+@checkHang:
+        lda playfield, x
+        cmp #$EF
+        bne @checkGroup
+        lda playfield-10, x
+        cmp #$EF
+        beq @checkGroup
+
+        ; draw in red
+        lda #$7C
+        sta playfield-10, x
 
 @checkGroup:
+        cpy #3 ; you want the first 8
+        bmi @groupNext
+        ; horizontal
         lda playfield, x
         cmp #$EF
         beq @groupNext
@@ -7948,7 +7933,7 @@ highlightGapsHorizontal:
 @groupNext:
         inx
         dey
-        bne @checkGroup
+        bne @checkHang
 
         rts
 

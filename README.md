@@ -52,7 +52,7 @@ Spawn T-Spins in random X and Y positions. Additional entry delay on successful 
 
 ![Stacking](/screens/stacking.png)
 
-An experiment in highlighting bad areas of the playfield in an attempt to improve stacking.
+An experiment in highlighting bad areas of the playfield.
 
 ### Setups
 
