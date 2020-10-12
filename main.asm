@@ -7879,6 +7879,36 @@ advanceGameParity:
 highlightParity:
         jsr highlightOrphans
         jsr highlightGaps
+        jsr highlightOverhang
+        rts
+
+
+highlightOverhang:
+        ldx parityIndex
+        ; skip top rows
+        ; cpx #60
+        ; bmi @groupEnd
+
+        ldy #9
+
+@checkGroup:
+        lda playfield, x
+        cmp #$EF
+        bne @groupNext
+        lda playfield-10, x
+        cmp #$EF
+        beq @groupNext
+
+        ; draw in red
+        lda #$7C
+        sta playfield-10, x
+
+@groupNext:
+        inx
+        dey
+        bne @checkGroup
+
+@groupEnd:
         rts
 
 highlightGaps:
