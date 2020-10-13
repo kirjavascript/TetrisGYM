@@ -9,7 +9,7 @@
 
 * [Getting Started](#guide)
 * [Modes](#modes)
-    * [Play](#play)
+    * [Tetris](#tetris)
     * [T-Spins](#t-spins)
     * [Stacking](#stacking)
     * [Setups](#setups)
@@ -34,9 +34,9 @@ A link to the BPS can be found in the releases page. [TODO ADD LINK]
 
 Some modes have additional configuration values; use left and right to change them.
 
-### Play
+### Tetris
 
-![Play](/screens/play.png)
+![Tetris](/screens/tetris.png)
 
 Same gameplay as Type-A, with some improvements. No score cap, no rocket, no curtain, always next box, better pause, extended level select.
 

@@ -24,7 +24,7 @@ W#W#a                            d#
 X0W#a                            d#
 XWW#a                            d#
 X#W#a                            d#
-X#W#a   PLAY                     d#
+X#W#a   TETRIS                   d#
 X#W#a   T-SPINS                  d#
 X#W#a   STACKING                 d#
 X#W#a   SETUPS                   d#
