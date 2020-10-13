@@ -7833,14 +7833,14 @@ advanceGameTap:
         rts
 
 advanceGameParity:
-
-        ; linewise stacking highlights
+        ; stacking highlights
 
         ; 1 red 1+ white
         ;   skip the first one
         ; 1 gap inbetween make the others red
         ; gap between wall and stack (left only)
-        ; overhangs?
+        ; overhangs
+
         ldx #$7C
         lda player1_levelNumber
         cmp #19
@@ -7861,7 +7861,7 @@ advanceGameParity:
         dex
         bne @loop
 
-        ; mark things with 7C
+        ; mark things with parityColor
 
         lda #190
         sta parityIndex
