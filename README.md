@@ -36,7 +36,7 @@ Some modes have additional configuration values; use left and right to change th
 
 ### Tetris
 
-![Tetris](/screens/tetris.png)
+![Tetris](/screens/play.png)
 
 Same gameplay as Type-A, with some improvements. No score cap, no rocket, no curtain, always next box, better pause, extended level select.
 
