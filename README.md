@@ -8,7 +8,7 @@
 <br>
 
 * [Getting Started](#guide)
-* [Modes](#modes)
+* [Trainers](#modes)
     * [Tetris](#tetris)
     * [T-Spins](#t-spins)
     * [Stacking](#stacking)
@@ -36,7 +36,7 @@ Some modes have additional configuration values; use left and right to change th
 
 ### Tetris
 
-![Tetris](/screens/play.png)
+![Tetris](/screens/levelselect.png)
 
 Same gameplay as Type-A, with some improvements. No score cap, no rocket, no curtain, always next box, better pause, extended level select.
 
