@@ -1090,11 +1090,8 @@ render_mode_menu_screens:
         sta     ppuScrollX
         sta     PPUSCROLL
         sta     ppuScrollY
-.if PRACTISE_MODE
-        jsr     practiseMenuRenderPatch
-.else
         sta     PPUSCROLL
-.endif
+        jsr     practiseMenuRenderPatch
         rts
 
 gameModeState_initGameBackground:
@@ -4393,8 +4390,6 @@ gameModeState_startButtonHandling:
         bne     @startPressed
         jmp     @ret
 
-.if BETTER_PAUSE
-padNOP  $2
 @startPressed:
         lda     #$05
         sta     musicStagingNoiseHi
@@ -4425,35 +4420,6 @@ padNOP  $2
         jsr     stageSpriteForCurrentPiece
 .endif
 
-.else
-@startPressed:
-; Do nothing if curtain is being lowered
-        lda     player1_playState
-        cmp     #$0A
-        bne     @pause
-        jmp     @ret
-
-@pause: lda     #$05
-        sta     musicStagingNoiseHi
-        lda     #$00
-        sta     renderMode
-        jsr     updateAudioAndWaitForNmi
-        lda     #$16
-        sta     PPUMASK
-        lda     #$FF
-        ldx     #$02
-        ldy     #$02
-        jsr     memset_page
-@pauseLoop:
-
-        lda     #$70
-        sta     spriteXOffset
-        lda     #$77
-        sta     spriteYOffset
-        lda     #$05
-        sta     spriteIndexInOamContentLookup
-        jsr     loadSpriteIntoOamStaging
-.endif
         lda     newlyPressedButtons_player1
         cmp     #$10
         beq     @resume
@@ -7435,8 +7401,6 @@ developRts:
 .if PRACTISE_MODE
 
 practiseMenuRenderPatch:
-        sta     PPUSCROLL ; patched command
-
         lda     gameMode
         cmp     #2
         bne     @notGameType
