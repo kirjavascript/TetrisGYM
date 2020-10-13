@@ -30,17 +30,15 @@ TetrisGYM is distributed in the form of an BPS patch and can be applied to the U
 
 A link to the BPS can be found in the releases page. [TODO ADD LINK]
 
-## Modes
+## Trainers
 
-Some modes have additional configuration values; use left and right to change them.
+Some trainers have additional configuration values; use left and right to change them.
 
 ### Tetris
 
 ![Tetris](/screens/levelselect.png)
 
-Same gameplay as Type-A, with some improvements. No score cap, no rocket, no curtain, always next box, better pause, extended level select.
-
-There are various other small changes
+Same gameplay as Type-A, with some improvements: no score cap, no rocket, no curtain, always next box, better pause, extended level select.
 
 ### T-Spins
 
@@ -52,7 +50,7 @@ Spawn T-Spins in random X and Y positions. Additional entry delay on successful 
 
 ![Stacking](/screens/stacking.png)
 
-An experiment in highlighting bad areas of the playfield.
+An experiment in highlighting areas of the playfield.
 
 ### Setups
 
@@ -72,7 +70,7 @@ Setting the height to zero will result in a game mode with burns disabled.
 
 ![Tap](/screens/tap.png)
 
-A mode for practising tapping and quicktapping pieces over towers. 0-G will have a tower on the left of the screen and H-W will have a tower to the right.
+For practising tapping and quicktapping pieces over towers. 0-G will have a tower on the left of the screen and H-W will have a tower to the right.
 
 ### Drought
 

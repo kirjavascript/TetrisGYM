@@ -1,12 +1,7 @@
 const presets = [
     [[
-        `    X X`,
-        `     X`,
-        `     X`,
-        `  X X X X`,
-        `  X X X X`,
-    ], 'JL'],
-    [[
+        `       X`,
+        `      X`,
         ` XX    X`,
         `X     X`,
         ` X     X`,
@@ -31,6 +26,13 @@ const presets = [
         `      XX  `,
     ], 'I'],
     [[
+        `    X X`,
+        `     X`,
+        `     X`,
+        `  X X X X`,
+        `  X X X X`,
+    ], 'JL'],
+    [[
         `          `,
         `          `,
         `          `,
@@ -51,7 +53,7 @@ const presets = [
         `  X   X   `,
         `      X   `,
         `X X X  XX `,
-    ], 'ILSOZJT'],
+    ], 'ILJT'],
 ];
 const tab = '        ';
 let out = 'presets:\n';
