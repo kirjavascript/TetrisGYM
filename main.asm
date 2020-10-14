@@ -23,7 +23,7 @@ BUTTON_B := $40
 BUTTON_A := $80
 BUTTON_SELECT := $20
 
-MODE_NORMAL := 0
+MODE_TETRIS := 0
 MODE_TSPINS := 1
 MODE_PARITY := 2
 MODE_PRESETS := 3
@@ -3080,18 +3080,7 @@ playState_lockTetrimino:
 @ret:   rts
 
 playState_updateGameOverCurtain:
-        ; skip curtain
-
-@curtainFinished:
-        lda     numberOfPlayers
-        cmp     #$02
-        beq     @exitGame
-        lda     player1_score+2
-        cmp     #ROCKET_LIMIT
-        bcc     @checkForStartButton
-        lda     #$80
-        jsr     endingAnimation_maybe
-        jmp     @exitGame
+        ; skip curtain / rocket
 
 @checkForStartButton:
         lda     newlyPressedButtons_player1
@@ -7587,17 +7576,32 @@ practiseCurrentSpritePatch:
 
 practiseAdvanceGame:
         ; TODO: replace with jump table
-        lda     practiseType
-        cmp     #MODE_PARITY
-        bne     @skipParity
-        jsr     advanceGameParity
-@skipParity:
+
+        ; lda practiseType
+        ; cmp #6
+        ; bpl advanceGameSkip
+        ; jsr switch_s_plus_2a
+        ; .addr advanceGameSkip
+        ; .addr advanceGameTSpins
+        ; .addr advanceGameParity
+        ; .addr advanceGamePreset
+        ; .addr advanceGameFloor
+        ; .addr advanceGameTap
+
+; advanceGameSkip:
+        ; rts
 
         lda     practiseType
         cmp     #MODE_TSPINS
         bne     @skipTSpins
         jsr     advanceGameTSpins
 @skipTSpins:
+
+        lda     practiseType
+        cmp     #MODE_PARITY
+        bne     @skipParity
+        jsr     advanceGameParity
+@skipParity:
 
         lda     practiseType
         cmp     #MODE_PRESETS
@@ -7617,6 +7621,7 @@ practiseAdvanceGame:
         jsr     advanceGameFloor
 @skipFloor:
         rts
+
 
 clearPlayfield:
         lda #$EF
