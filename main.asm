@@ -665,28 +665,9 @@ L830B:  lda     #$FF
         jsr     memset_page
         lda     newlyPressedButtons_player1
 
-.if PRACTISE_MODE ; skip mode menu
-        jsr practiseMenuControlPatch
-        jmp @leftNotPressed
-.else
-        cmp     #$01
-        bne     @rightNotPressed
-        lda     #$01
-        sta     gameType
-        lda     #$01
-        sta     soundEffectSlot1Init
-        jmp     @leftNotPressed
-.endif
+        ; additional controls
+        jsr     practiseMenuControl
 
-@rightNotPressed:
-        lda     newlyPressedButtons_player1
-        cmp     #$02
-        bne     @leftNotPressed
-        lda     #$00
-        sta     gameType
-        lda     #$01
-        sta     soundEffectSlot1Init
-@leftNotPressed:
         lda     newlyPressedButtons_player1
         cmp     #$04
         bne     @downNotPressed
@@ -694,16 +675,9 @@ L830B:  lda     #$FF
         sta     soundEffectSlot1Init
         lda     practiseType
 
-.if PRACTISE_MODE ; menu item qty
         cmp     #MODE_QUANTITY-1
-.else
-        cmp     #$03
-.endif
         beq     @upNotPressed
         inc     practiseType
-        ; ldx     practiseType
-        ; lda     musicSelectionTable,x
-        ; jsr     setMusicTrack
 @downNotPressed:
         lda     newlyPressedButtons_player1
         cmp     #$08
@@ -713,9 +687,6 @@ L830B:  lda     #$FF
         lda     practiseType
         beq     @upNotPressed
         dec     practiseType
-        ; ldx     practiseType
-        ; lda     musicSelectionTable,x
-        ; jsr     setMusicTrack
 @upNotPressed:
         lda     newlyPressedButtons_player1
         cmp     #$10
@@ -731,17 +702,6 @@ L830B:  lda     #$FF
         rts
 
 @startNotPressed:
-        lda     newlyPressedButtons_player1
-        cmp     #$40
-        bne     @bNotPressed
-        lda     #$02
-        sta     soundEffectSlot1Init
-        lda     #$00
-        sta     frameCounter+1
-        dec     gameMode
-        rts
-
-@bNotPressed:
         ldy     #$00
         lda     gameType
         asl     a
@@ -7417,7 +7377,10 @@ practiseMenuRenderPatch:
 @notGameType:
         rts
 
-practiseMenuControlPatch:
+practiseMenuConfigSizeLookup:
+        .byte   $5, $C, $20, $12, $1, $1
+
+practiseMenuControl:
         ; load config type from offset
         lda     practiseType
         cmp     #MODE_CONFIG_OFFSET
@@ -7454,9 +7417,6 @@ practiseMenuControlPatch:
 @skipRight:
 @skip:
         rts
-
-practiseMenuConfigSizeLookup:
-        .byte   $5, $C, $20, $12, $1, $1
 
 practisePickTetriminoPatch:
         lda     practiseType

@@ -24,7 +24,7 @@
 
 TetrisGYM is a modification of NES Tetris.
 
-While it is originally based on the NTSC version, after patching it will detect your console region, and gameplay will either match the corresponding NTSC or PAL versions of the game.
+While originally based on the NTSC version of the game, the patched ROM supports PAL and NTSC gameplay types.
 
 TetrisGYM is distributed in the form of an BPS patch and can be applied to the USA version of the game with [Rom PatcherJS](https://www.romhacking.net/patch/) or similar.
 
