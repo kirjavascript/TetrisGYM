@@ -2,7 +2,7 @@ const { readFileSync, writeFileSync } = require('fs');
 
 const buffer = readFileSync(__dirname + '/game_type_menu_nametable.bin');
 
-let lookup = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ-.\'>################qweadzxc###############/##!#########[]()############################################################################################################################################################### ';
+let lookup = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ-,\'>################qweadzxc###############/##!#########[]()###############.############################################################################################################################################### ';
 
 lookup = [...lookup].map((d, i) => d === '#' ? String.fromCharCode(/*9472+*/9726-i):d).join``
 
@@ -13,36 +13,36 @@ const chars = [...buffer].map(value => lookup[value] || '__NOWAYNOWAY');
 console.log(chars.join('').match(/.{35}/g).join('\n'));
 
 const tiles = `
-W0W################################
-WWW#########qwwwwwwwwwwwwe#########
-W#W#qwwwwwww] ╎╍╌╋╊╉╈╇╆╅ [wwwwwwwe#
-W#W#a         ┾┽┼┻┺┹┸┷┶┵         d#
-W#W#a         ┮┭┬┫┪┩┨┧┦┥         d#
-W#W#a         ┞┝├┛┚┙┘┗┖┕         d#
-W#W#a         ┎┍┌┋┊┉┈┇┆┅         d#
-W#W#a                            d#
-X0W#a                            d#
-XWW#a                            d#
-X#W#a                            d#
-X#W#a   TETRIS                   d#
-X#W#a   T-SPINS                  d#
-X#W#a   STACKING                 d#
-X#W#a   SETUPS                   d#
-X#W#a   FLOOR                    d#
-Y0W#a   (QUICK)TAP               d#
-YWW#a   DROUGHT                  d#
-Y#W#a   DEBUG MODE               d#
-Y#W#a   PAL MODE                 d#
-Y#W#a                            d#
-Y#W#a                            d#
-Y#W#a                       ╤╣╢╡╠d#
-Y#W#a                       ╔╓╒║═d#
-Z0W#a                       ╄╃╂╁╀d#
-ZWW#a V1                    ┴┳┲┱┰d#
-Z#W#a                       ┤┣┢┡┠d#
-Z#W#zxxxxxxxxxxxxxxxxxxxxxxxxxxxxc#
-Z#W################################
-Z#W################################
+##W################################
+##W#########qwwwwwwwwwwwwe#########
+##W#qwwwwwww] ╎╍╌╋╊╉╈╇╆╅ [wwwwwwwe#
+##W#a         ┾┽┼┻┺┹┸┷┶┵         d#
+##W#a         ┮┭┬┫┪┩┨┧┦┥         d#
+##W#a         ┞┝├┛┚┙┘┗┖┕         d#
+##W#a         ┎┍┌┋┊┉┈┇┆┅         d#
+##W#a                            d#
+##W#a                            d#
+##W#a                            d#
+##W#a                            d#
+##W#a   TETRIS                   d#
+##W#a   T-SPINS                  d#
+##W#a   STACKING                 d#
+##W#a   SETUPS                   d#
+##W#a   FLOOR                    d#
+##W#a   (QUICK)TAP               d#
+##W#a   GARBAGE                  d#
+##W#a   DROUGHT                  d#
+##W#a   DEBUG MODE               d#
+##W#a   PAL MODE                 d#
+##W#a                            d#
+##W#a                       ╤╣╢╡╠d#
+##W#a                       ╔╓╒║═d#
+##W#a                       ╄╃╂╁╀d#
+##W#a V1.1                  ┴┳┲┱┰d#
+##W#a                       ┤┣┢┡┠d#
+##W#zxxxxxxxxxxxxxxxxxxxxxxxxxxxxc#
+##W################################
+##W################################
 `;
 
 // tiles

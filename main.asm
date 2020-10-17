@@ -29,13 +29,14 @@ MODE_PARITY := 2
 MODE_PRESETS := 3
 MODE_FLOOR := 4
 MODE_TAP := 5
-MODE_DROUGHT := 6
-MODE_DEBUG := 7
-MODE_PAL := 8
+MODE_GARBAGE := 6
+MODE_DROUGHT := 7
+MODE_DEBUG := 8
+MODE_PAL := 9
 
-MODE_QUANTITY := 9
-MODE_GAME_QUANTITY := 7
-MODE_CONFIG_QUANTITY := 6
+MODE_QUANTITY := 10
+MODE_GAME_QUANTITY := 8
+MODE_CONFIG_QUANTITY := 7
 MODE_CONFIG_OFFSET := MODE_QUANTITY - MODE_CONFIG_QUANTITY
 
 ; RAM
@@ -3155,9 +3156,9 @@ playState_checkForCompletedRows_return:
         rts
 
 playState_receiveGarbage:
-        lda     numberOfPlayers
-        cmp     #$01
-        beq     @ret
+        ; lda     numberOfPlayers
+        ; cmp     #$01
+        ; beq     @ret
         ldy     pendingGarbage
         beq     @ret
         lda     vramRow
@@ -7378,7 +7379,7 @@ practiseMenuRenderPatch:
         rts
 
 practiseMenuConfigSizeLookup:
-        .byte   $5, $C, $20, $12, $1, $1
+        .byte   $5, $C, $20, $0, $12, $1, $1
 
 practiseMenuControl:
         ; load config type from offset
@@ -7549,7 +7550,7 @@ practiseAdvanceGame:
         ; .addr advanceGameTap
 
 ; advanceGameSkip:
-        ; rts
+;         rts
 
         lda     practiseType
         cmp     #MODE_TSPINS
