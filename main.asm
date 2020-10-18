@@ -3183,7 +3183,7 @@ playState_receiveGarbage:
 @fillGarbage:
         cpx     garbageHole
         beq     @hole
-        lda     #$78
+        lda     #$8C
         jmp     @set
 @hole:
         lda     #$FF
@@ -7551,6 +7551,8 @@ practiseAdvanceGame:
 
 ; advanceGameSkip:
 ;         rts
+        ; lda     #$1
+        ; sta     pendingGarbage
 
         lda     practiseType
         cmp     #MODE_TSPINS
