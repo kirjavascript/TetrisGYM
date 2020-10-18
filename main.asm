@@ -61,9 +61,10 @@ menuVars := $760
 presetModifier := menuVars+0
 floorModifier := menuVars+1
 tapModifier := menuVars+2
-droughtModifier := menuVars+3
-debugFlag := menuVars+4
-palFlag := menuVars+5
+garbageModifier := menuVars+3
+droughtModifier := menuVars+4
+debugFlag := menuVars+5
+palFlag := menuVars+6
 ; $B00 - $BEF
 
 ; macros
@@ -737,7 +738,7 @@ L830B:  lda     #$FF
 
 .if PRACTISE_MODE ; adjust music menu sprites
         clc
-        adc     #$57
+        adc     #$4F
         sta     spriteYOffset
         lda     #$53
         sta     spriteIndexInOamContentLookup
@@ -7357,10 +7358,12 @@ practiseMenuRenderPatch:
 
         ldx     #MODE_CONFIG_QUANTITY-1
 @loop:
-        txa
-        ror
-        ror
-        adc     #$21
+        lda #$21
+        cpx #3
+        bmi @lower
+        lda #$22
+@lower:
+        ; 32 wide
         sta     PPUADDR
         txa
         asl
@@ -7368,7 +7371,7 @@ practiseMenuRenderPatch:
         asl
         asl
         asl
-        adc     #$DC
+        adc     #$BC
         sta     PPUADDR
         lda     menuVars, x
         sta     PPUDATA

@@ -23,7 +23,6 @@ const tiles = `
 ##W#a                            d#
 ##W#a                            d#
 ##W#a                            d#
-##W#a                            d#
 ##W#a   TETRIS                   d#
 ##W#a   T-SPINS                  d#
 ##W#a   STACKING                 d#
@@ -34,6 +33,7 @@ const tiles = `
 ##W#a   DROUGHT                  d#
 ##W#a   DEBUG MODE               d#
 ##W#a   PAL MODE                 d#
+##W#a                            d#
 ##W#a                            d#
 ##W#a                       ╤╣╢╡╠d#
 ##W#a                       ╔╓╒║═d#
