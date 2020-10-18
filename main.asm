@@ -3157,9 +3157,20 @@ playState_checkForCompletedRows_return:
         rts
 
 playState_receiveGarbage:
-        ; lda     numberOfPlayers
-        ; cmp     #$01
-        ; beq     @ret
+        ; lda     practiseType
+        ; cmp     #MODE_GARBAGE
+        ; bne     @ret
+
+; @pickRando:
+;         ldx     #$17
+;         ldy     #$02
+;         jsr     generateNextPseudorandomNumber
+;         lda     rng_seed
+;         and     #$0F
+;         cmp     #$0A
+;         bpl     @pickRando
+;         sta     garbageHole
+
         ldy     pendingGarbage
         beq     @ret
         lda     vramRow
@@ -3180,6 +3191,7 @@ playState_receiveGarbage:
         cmp     #$C8
         bne     @shiftPlayfieldUp
         iny
+
         ldx     #$00
 @fillGarbage:
         cpx     garbageHole
@@ -3187,7 +3199,7 @@ playState_receiveGarbage:
         lda     #$8C
         jmp     @set
 @hole:
-        lda     #$FF
+        lda     #$EF ; was $FF ?
 @set:
         sta     (playfieldAddr),y
         inx
@@ -7554,8 +7566,8 @@ practiseAdvanceGame:
 
 ; advanceGameSkip:
 ;         rts
-        ; lda     #$1
-        ; sta     pendingGarbage
+        lda     #$1
+        sta     pendingGarbage
 
         lda     practiseType
         cmp     #MODE_TSPINS
