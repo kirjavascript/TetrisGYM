@@ -3160,16 +3160,15 @@ playState_receiveGarbage:
         ; lda     practiseType
         ; cmp     #MODE_GARBAGE
         ; bne     @ret
-
 ; @pickRando:
-;         ldx     #$17
-;         ldy     #$02
-;         jsr     generateNextPseudorandomNumber
-;         lda     rng_seed
-;         and     #$0F
-;         cmp     #$0A
-;         bpl     @pickRando
-;         sta     garbageHole
+        ; ldx     #$17
+        ; ldy     #$02
+        ; jsr     generateNextPseudorandomNumber
+        ; lda     rng_seed
+        ; and     #$0F
+        ; cmp     #$0A
+        ; bpl     @pickRando
+        ; sta     garbageHole
 
         ldy     pendingGarbage
         beq     @ret
@@ -7551,24 +7550,7 @@ practiseCurrentSpritePatch:
         rts
 
 practiseAdvanceGame:
-        ; TODO: replace with jump table
-
-        ; lda practiseType
-        ; cmp #6
-        ; bpl advanceGameSkip
-        ; jsr switch_s_plus_2a
-        ; .addr advanceGameSkip
-        ; .addr advanceGameTSpins
-        ; .addr advanceGameParity
-        ; .addr advanceGamePreset
-        ; .addr advanceGameFloor
-        ; .addr advanceGameTap
-
-; advanceGameSkip:
-;         rts
-        lda     #$1
-        sta     pendingGarbage
-
+        ; TODO: use jump table?
         lda     practiseType
         cmp     #MODE_TSPINS
         bne     @skipTSpins
@@ -7588,16 +7570,22 @@ practiseAdvanceGame:
 @skipPresets:
 
         lda     practiseType
+        cmp     #MODE_FLOOR
+        bne     @skipFloor
+        jsr     advanceGameFloor
+@skipFloor:
+
+        lda     practiseType
         cmp     #MODE_TAP
         bne     @skipTap
         jsr     advanceGameTap
 @skipTap:
 
         lda     practiseType
-        cmp     #MODE_FLOOR
-        bne     @skipFloor
-        jsr     advanceGameFloor
-@skipFloor:
+        cmp     #MODE_GARBAGE
+        bne     @skipGarbage
+        jsr     advanceGameGarbage
+@skipGarbage:
         rts
 
 
@@ -7968,6 +7956,63 @@ unused_checkerboard:
         dex
         bne @loop
 
+        rts
+
+advanceGameGarbage:
+        ; TODO: use jump table
+
+        ; lda practiseType
+        ; cmp #6
+        ; bpl advanceGameSkip
+        ; jsr switch_s_plus_2a
+        ; .addr advanceGameSkip
+        ; .addr advanceGameTSpins
+        ; .addr advanceGameParity
+        ; .addr advanceGamePreset
+        ; .addr advanceGameFloor
+        ; .addr advanceGameTap
+
+        ; initPlayfieldIfTypeB
+
+        ; jump table
+        ; different types of garbage mode
+        ; type C
+        ; one random block per item
+
+        ; set hole to normal well
+
+garbageAlwaysTetrisReady:
+        lda #9
+        sta garbageHole
+
+        lda #0
+        sta tmp1 ; garbage to add
+
+        ldx #190
+        jsr checkTetrisReady
+        ldx #180
+        jsr checkTetrisReady
+        ldx #170
+        jsr checkTetrisReady
+        ldx #160
+        jsr checkTetrisReady
+
+        lda tmp1
+        sta pendingGarbage
+        rts
+
+checkTetrisReady:
+        ldy #9
+@loop:
+        lda playfield, x
+        cmp #$EF
+        bne @filled
+        inc tmp1 ; add garbage
+        ldy #1
+@filled:
+        inx
+        dey
+        bne @loop
         rts
 
 .endif
