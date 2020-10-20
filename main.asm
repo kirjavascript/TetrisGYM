@@ -67,6 +67,8 @@ debugFlag := menuVars+5
 palFlag := menuVars+6
 ; $B00 - $BEF
 
+.define MENUSIZES $5, $C, $20, $7F, $12, $1, $1
+
 ; macros
 
 .macro padNOP qty
@@ -863,23 +865,23 @@ gameMode_levelMenu_processPlayer1Navigation:
         rts
 
 @chooseRandomHole_player1:
-        ldx     #$17
-        ldy     #$02
-        jsr     generateNextPseudorandomNumber
-        lda     rng_seed
-        and     #$0F
-        cmp     #$0A
-        bpl     @chooseRandomHole_player1
-        sta     player1_garbageHole
+        ; ldx     #$17
+        ; ldy     #$02
+        ; jsr     generateNextPseudorandomNumber
+        ; lda     rng_seed
+        ; and     #$0F
+        ; cmp     #$0A
+        ; bpl     @chooseRandomHole_player1
+        ; sta     player1_garbageHole
 @chooseRandomHole_player2:
-        ldx     #$17
-        ldy     #$02
-        jsr     generateNextPseudorandomNumber
-        lda     rng_seed
-        and     #$0F
-        cmp     #$0A
-        bpl     @chooseRandomHole_player2
-        sta     player2_garbageHole
+        ; ldx     #$17
+        ; ldy     #$02
+        ; jsr     generateNextPseudorandomNumber
+        ; lda     rng_seed
+        ; and     #$0F
+        ; cmp     #$0A
+        ; bpl     @chooseRandomHole_player2
+        ; sta     player2_garbageHole
         jsr     updateAudioWaitForNmiAndResetOamStaging
         jmp     gameMode_levelMenu_processPlayer1Navigation
 
@@ -3157,19 +3159,6 @@ playState_checkForCompletedRows_return:
         rts
 
 playState_receiveGarbage:
-        ; lda     practiseType
-        ; cmp     #MODE_GARBAGE
-        ; bne     @ret
-; @pickRando:
-        ; ldx     #$17
-        ; ldy     #$02
-        ; jsr     generateNextPseudorandomNumber
-        ; lda     rng_seed
-        ; and     #$0F
-        ; cmp     #$0A
-        ; bpl     @pickRando
-        ; sta     garbageHole
-
         ldy     pendingGarbage
         beq     @ret
         lda     vramRow
@@ -7393,7 +7382,7 @@ practiseMenuRenderPatch:
         rts
 
 practiseMenuConfigSizeLookup:
-        .byte   $5, $C, $20, $0, $12, $1, $1
+        .byte   MENUSIZES
 
 practiseMenuControl:
         ; load config type from offset
@@ -7959,18 +7948,10 @@ unused_checkerboard:
         rts
 
 advanceGameGarbage:
-        ; TODO: use jump table
-
-        ; lda practiseType
-        ; cmp #6
-        ; bpl advanceGameSkip
-        ; jsr switch_s_plus_2a
-        ; .addr advanceGameSkip
-        ; .addr advanceGameTSpins
-        ; .addr advanceGameParity
-        ; .addr advanceGamePreset
-        ; .addr advanceGameFloor
-        ; .addr advanceGameTap
+        lda garbageModifier
+        jsr switch_s_plus_2a
+        .addr garbageAlwaysTetrisReady
+        .addr garbageHoles
 
         ; initPlayfieldIfTypeB
 
@@ -7978,10 +7959,27 @@ advanceGameGarbage:
         ; different types of garbage mode
         ; type C
         ; one random block per item
+        ; pixels that slowly fill in per frame / static garbage
 
-        ; set hole to normal well
+garbageHoles:
+        jsr garbageHole
+        lda #1
+        sta pendingGarbage
+        rts
+
+randomHole:
+        ldx     #$17
+        ldy     #$02
+        jsr     generateNextPseudorandomNumber
+        lda     rng_seed
+        and     #$0F
+        cmp     #$0A
+        bpl     randomHole
+        sta     garbageHole
+        rts
 
 garbageAlwaysTetrisReady:
+        ; right well
         lda #9
         sta garbageHole
 
