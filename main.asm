@@ -67,7 +67,7 @@ debugFlag := menuVars+5
 palFlag := menuVars+6
 ; $B00 - $BEF
 
-.define MENUSIZES $5, $C, $20, $7F, $12, $1, $1
+.define MENUSIZES $5, $C, $20, $3, $12, $1, $1
 
 ; macros
 
@@ -7905,53 +7905,12 @@ highlightOrphans:
         bne @checkString
         rts
 
-unused_checkerboard:
-
-        ldx #$C8
-@loop:
-        lda playfield, x
-
-        cmp #$EF
-        beq @empty
-
-
-        txa
-@sub21loop:
-        cmp #20
-        bpl @under21
-        sbc #20
-        jmp @sub21loop
-@under21:
-        cmp #10
-        bmi @under10
-        eor 1
-@under10:
-
-        and #1
-        bne @foo
-
-        lda #$7B
-        sta $0400, x
-        jmp @bar
-@foo:
-
-        lda #$7C
-        sta $0400, x
-@bar:
-
-
-
-@empty:
-        dex
-        bne @loop
-
-        rts
-
 advanceGameGarbage:
         lda garbageModifier
         jsr switch_s_plus_2a
         .addr garbageAlwaysTetrisReady
-        .addr garbageHoles
+        .addr garbagePieces
+        .addr garbageHard
 
         ; initPlayfieldIfTypeB
 
@@ -7961,21 +7920,51 @@ advanceGameGarbage:
         ; one random block per item
         ; pixels that slowly fill in per frame / static garbage
 
-garbageHoles:
-        jsr garbageHole
+garbagePieces:
+        ; smartHole
+        ; jsr initPlayfieldForTypeB
+
+        lda spawnCount
+        and #7
+        cmp #3
+        beq @nothing
+
+        jsr smartHole
+        lda #1
+        sta pendingGarbage
+@nothing:
+        rts
+
+garbageHard:
+        jsr randomHole
         lda #1
         sta pendingGarbage
         rts
 
+smartHole:
+        ldx #190
+@loop:
+        lda playfield, x
+        cmp #$EF
+        beq @done
+        inx
+        cpx #200
+        bmi @loop
+@done:
+        txa
+        sbc #190
+        sta garbageHole
+        rts
+
 randomHole:
-        ldx     #$17
-        ldy     #$02
-        jsr     generateNextPseudorandomNumber
-        lda     rng_seed
-        and     #$0F
-        cmp     #$0A
-        bpl     randomHole
-        sta     garbageHole
+        ldx #$17
+        ldy #$02
+        jsr generateNextPseudorandomNumber
+        lda rng_seed
+        and #$0F
+        cmp #$0A
+        bpl randomHole
+        sta garbageHole
         rts
 
 garbageAlwaysTetrisReady:
