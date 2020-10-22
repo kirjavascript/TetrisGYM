@@ -28,7 +28,7 @@ While originally based on the NTSC version of the game, the patched ROM supports
 
 TetrisGYM is distributed in the form of a BPS patch and can be applied to the USA version of the game with [Rom PatcherJS](https://www.romhacking.net/patch/) or similar.
 
-A link to the BPS can be found in the [releases page](https://github.com/kirjavascript/TetrisGYM/releases).
+A link to the BPS can be found on the [releases page](https://github.com/kirjavascript/TetrisGYM/releases).
 
 ## Trainers
 

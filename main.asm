@@ -14,6 +14,7 @@ NO_MUSIC := 1
 NO_NO_NEXT_BOX := 1
 PRACTISE_MODE := 1
 DEBUG_MODE := 1
+AUTO_WIN := 0
 
 BUTTON_RIGHT := $1
 BUTTON_LEFT := $2
@@ -38,6 +39,8 @@ MODE_QUANTITY := 10
 MODE_GAME_QUANTITY := 8
 MODE_CONFIG_QUANTITY := 7
 MODE_CONFIG_OFFSET := MODE_QUANTITY - MODE_CONFIG_QUANTITY
+
+.define MENUSIZES $5, $C, $20, $3, $12, $1, $1
 
 ; RAM
 
@@ -66,8 +69,6 @@ droughtModifier := menuVars+4
 debugFlag := menuVars+5
 palFlag := menuVars+6
 ; $B00 - $BEF
-
-.define MENUSIZES $5, $C, $20, $3, $12, $1, $1
 
 ; macros
 
@@ -2523,9 +2524,6 @@ render_mode_play_and_demo:
         and     #$FD
         sta     outOfDateRenderFlags
 @renderScore:
-        lda     numberOfPlayers
-        cmp     #$02
-        beq     @renderStats
         lda     outOfDateRenderFlags
         and     #$04
         beq     @renderStats
@@ -2533,19 +2531,38 @@ render_mode_play_and_demo:
         sta     PPUADDR
         lda     #$18
         sta     PPUADDR
-        lda     player1_score+2
+
+        lda     player1_score+2 ; patched
+
+        ; 7 digit score clamping
+        cmp #$A0
+        bcc @nomax
+        sbc #$A0
+@nomax:
+
         jsr     twoDigsToPPU
         lda     player1_score+1
         jsr     twoDigsToPPU
         lda     player1_score
         jsr     twoDigsToPPU
+
         lda     outOfDateRenderFlags
         and     #$FB
         sta     outOfDateRenderFlags
+
+        ; draw million digit
+        lda     player1_score+2
+        cmp     #$A0
+        bcc     @noExtraDigit
+        lda     #$21
+        sta     PPUADDR
+        lda     #$17
+        sta     PPUADDR
+        lda     #$1
+        sta     PPUDATA
+@noExtraDigit:
+
 @renderStats:
-        lda     numberOfPlayers
-        cmp     #$02
-        beq     @renderTetrisFlashAndSound
         lda     outOfDateRenderFlags
         and     #$40
         beq     @renderTetrisFlashAndSound
@@ -3083,15 +3100,18 @@ playState_checkForCompletedRows:
         ldx     #$0A
 
 @checkIfRowComplete:
-.if PRACTISE_MODE
+        ; this block
         jsr     practiseRowCompletePatch
+.if !AUTO_WIN
         nop
         beq     @rowNotComplete
-.else
-        lda     (playfieldAddr),y
-        cmp     #$EF
-        beq     @rowNotComplete
 .endif
+
+        ; replaces this one
+        ; lda     (playfieldAddr),y
+        ; cmp     #$EF
+        ; beq     @rowNotComplete
+
         iny
         dex
         bne     @checkIfRowComplete
