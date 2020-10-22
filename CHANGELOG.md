@@ -2,6 +2,7 @@
 
 ## [v1.1]
 - Garbage Trainer
+- 7th score digit added on maxout
 
 ## [v1]
 - Tetris Trainer
