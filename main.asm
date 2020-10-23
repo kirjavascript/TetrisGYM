@@ -2467,9 +2467,6 @@ render_mode_play_and_demo:
         lda     outOfDateRenderFlags
         and     #$01
         beq     @renderLevel
-        lda     numberOfPlayers
-        cmp     #$02
-        beq     @renderLinesTwoPlayers
         lda     #$20
         sta     PPUADDR
         lda     #$73
@@ -2481,34 +2478,10 @@ render_mode_play_and_demo:
         lda     outOfDateRenderFlags
         and     #$FE
         sta     outOfDateRenderFlags
-        jmp     @renderLevel
 
-@renderLinesTwoPlayers:
-        lda     #$20
-        sta     PPUADDR
-        lda     #$68
-        sta     PPUADDR
-        lda     player1_lines+1
-        sta     PPUDATA
-        lda     player1_lines
-        jsr     twoDigsToPPU
-        lda     #$20
-        sta     PPUADDR
-        lda     #$7A
-        sta     PPUADDR
-        lda     player2_lines+1
-        sta     PPUDATA
-        lda     player2_lines
-        jsr     twoDigsToPPU
-        lda     outOfDateRenderFlags
-        and     #$FE
-        sta     outOfDateRenderFlags
 @renderLevel:
         lda     outOfDateRenderFlags
         and     #$02
-        beq     @renderScore
-        lda     numberOfPlayers
-        cmp     #$02
         beq     @renderScore
         ldx     player1_levelNumber
         lda     levelDisplayTable,x
@@ -2546,10 +2519,6 @@ render_mode_play_and_demo:
         lda     player1_score
         jsr     twoDigsToPPU
 
-        lda     outOfDateRenderFlags
-        and     #$FB
-        sta     outOfDateRenderFlags
-
         ; draw million digit
         lda     player1_score+2
         cmp     #$A0
@@ -2561,6 +2530,10 @@ render_mode_play_and_demo:
         lda     #$1
         sta     PPUDATA
 @noExtraDigit:
+
+        lda     outOfDateRenderFlags
+        and     #$FB
+        sta     outOfDateRenderFlags
 
 @renderStats:
         lda     outOfDateRenderFlags

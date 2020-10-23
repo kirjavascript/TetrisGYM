@@ -2,7 +2,7 @@
 
 ## [v1.1]
 - Garbage Trainer
-- 7th score digit added on maxout
+- Overflow score - display an extra digit if you maxout
 
 ## [v1]
 - Tetris Trainer
