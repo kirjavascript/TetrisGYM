@@ -3,6 +3,7 @@
 ## [v1.1]
 - Garbage Trainer
 - Overflow score - display an extra digit if you maxout
+- Original game bug: Resetting during a tetris no longer creates an invalid state
 
 ## [v1]
 - Tetris Trainer

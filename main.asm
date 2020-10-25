@@ -13,7 +13,7 @@ NO_MUSIC := 1
 NO_NO_NEXT_BOX := 1
 PRACTISE_MODE := 1
 DEBUG_MODE := 1
-AUTO_WIN := 1
+AUTO_WIN := 0
 
 BUTTON_RIGHT := $1
 BUTTON_LEFT := $2
@@ -1171,6 +1171,7 @@ gameModeState_initGameState:
         sta     player1_tetriminoX
         sta     player2_tetriminoX
         lda     #$00
+        sta     player1_completedLines ; reset during tetris bugfix
         sta     player1_tetriminoY
         sta     player2_tetriminoY
         sta     player1_vramRow
