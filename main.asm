@@ -8,13 +8,12 @@
 ; constants
 
 ROCKET_LIMIT := $FF
-SCORE_LIMIT := $FF
 BETTER_PAUSE := 1
 NO_MUSIC := 1
 NO_NO_NEXT_BOX := 1
 PRACTISE_MODE := 1
 DEBUG_MODE := 1
-AUTO_WIN := 0
+AUTO_WIN := 1
 
 BUTTON_RIGHT := $1
 BUTTON_LEFT := $2
@@ -2508,9 +2507,9 @@ render_mode_play_and_demo:
         lda     player1_score+2 ; patched
 
         ; 7 digit score clamping
-        cmp #$A0
-        bcc @nomax
-        sbc #$A0
+        cmp     #$A0
+        bcc     @nomax
+        sbc     #$A0
 @nomax:
 
         jsr     twoDigsToPPU
@@ -3366,13 +3365,15 @@ L9C75:  lda     score+2
         clc
         adc     #$06
         sta     score+2
-L9C84:  lda     score+2
+L9C84: ; SCORE_LIMIT
+        lda     score+2
         and     #$F0
-        cmp     #SCORE_LIMIT
+        cmp     #$F0
         bcc     L9C94
-        lda     #$99
+        lda     #0
         sta     score
         sta     score+1
+        lda     #$F0
         sta     score+2
 L9C94:  dec     generalCounter
         bne     L9C37
