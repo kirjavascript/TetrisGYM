@@ -3152,6 +3152,7 @@ playState_checkForCompletedRows_return:
         rts
 
 playState_receiveGarbage:
+        jsr     practiseReceiveGarbage
         ldy     pendingGarbage
         beq     @ret
         lda     vramRow
@@ -7564,12 +7565,6 @@ practiseAdvanceGame:
         bne     @skipTap
         jsr     advanceGameTap
 @skipTap:
-
-        lda     practiseType
-        cmp     #MODE_GARBAGE
-        bne     @skipGarbage
-        jsr     advanceGameGarbage
-@skipGarbage:
         rts
 
 
@@ -7900,11 +7895,21 @@ highlightOrphans:
         bne @checkString
         rts
 
+
+practiseReceiveGarbage:
+        lda     practiseType
+        cmp     #MODE_GARBAGE
+        bne     @skip
+        jsr     advanceGameGarbage
+@skip:
+        rts
+
 advanceGameGarbage:
         lda garbageModifier
         jsr switch_s_plus_2a
         .addr garbageAlwaysTetrisReady
         .addr garbagePieces
+        .addr garbagePiecesMore
         .addr garbageHard
 
         ; initPlayfieldIfTypeB
@@ -7919,11 +7924,29 @@ garbagePieces:
         ; smartHole
         ; jsr initPlayfieldForTypeB
 
-        lda spawnCount
+        lda spawncount
         and #7
-        cmp #3
-        beq @nothing
+        bne @nothing
+; @loop:
+;         cmp #$A
+;         bmi @done
+;         sbc #$A
+;         jmp @loop
+; @done:
 
+;         cmp #0
+;         bne @nothing
+
+        jsr smartHole
+        lda #1
+        sta pendingGarbage
+@nothing:
+        rts
+
+garbagePiecesMore:
+        lda spawncount
+        and #1
+        bne @nothing
         jsr smartHole
         lda #1
         sta pendingGarbage

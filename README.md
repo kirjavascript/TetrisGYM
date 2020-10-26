@@ -44,7 +44,7 @@ Same gameplay as Type-A, with some improvements: no score cap, no rocket, no cur
 
 ![T-Spins](/screens/tspins.png)
 
-Spawn T-Spins in random X and Y positions. Additional entry delay on successful T-Spin to prepare for the next state.
+Spawn T-Spins in random positions. Additional entry delay on successful T-Spin to prepare for the next state.
 
 ### Stacking
 
