@@ -7,7 +7,6 @@
 
 ; constants
 
-ROCKET_LIMIT := $FF
 BETTER_PAUSE := 1
 NO_MUSIC := 1
 NO_NO_NEXT_BOX := 1
@@ -649,7 +648,7 @@ gameMode_gameTypeMenu:
         jsr     updateAudioWaitForNmiAndDisablePpuRendering
         jsr     disableNmi
         jsr     bulkCopyToPpu
-        .addr   menu_palette
+        .addr   title_palette
         jsr     bulkCopyToPpu
         .addr   game_type_menu_nametable
         lda     #$00
@@ -5513,30 +5512,21 @@ changePRGBank:
         sta     MMC1_PRG
         rts
 
+ending_palette: ; removed
 game_palette:
         .byte   $3F,$00,$20,$0F,$30,$12,$16,$0F
         .byte   $20,$12,$18,$0F,$2C,$16,$29,$0F
         .byte   $3C,$00,$30,$0F,$35,$15,$22,$0F
         .byte   $35,$29,$26,$0F,$2C,$16,$29,$0F
         .byte   $3C,$00,$30,$FF
-legal_screen_palette:
-        .byte   $3F,$00,$10,$0F,$27,$2A,$2B,$0F
-        .byte   $3C,$2A,$22,$0F,$27,$2C,$29,$0F
-        .byte   $30,$3A,$15,$FF
+title_palette:
+        .byte   $3F,$00,$14,$0F,$3C,$38,$00,$0F
+        .byte   $17,$27,$37,$0F,$30,$12,$00,$0F
+        .byte   $22,$2A,$28,$0F,$30,$29,$27,$FF
 menu_palette:
         .byte   $3F,$00,$14,$0F,$30,$38,$00,$0F
-.if PRACTISE_MODE
         .byte   $17,$27,$37,$0F,$30,$12,$00,$0F
-.else
-        .byte   $30,$16,$00,$0F,$30,$21,$00,$0F
-.endif
         .byte   $16,$2A,$28,$0F,$30,$29,$27,$FF
-ending_palette:
-        .byte   $3F,$00,$20,$12,$0F,$29,$37,$12
-        .byte   $0F,$30,$27,$12,$0F,$17,$27,$12
-        .byte   $0F,$15,$37,$12,$0F,$29,$37,$12
-        .byte   $0F,$30,$27,$12,$0F,$17,$27,$12
-        .byte   $0F,$15,$37,$FF
 
 
 .include "charmap.asm"
@@ -7908,23 +7898,27 @@ advanceGameGarbage:
         lda garbageModifier
         jsr switch_s_plus_2a
         .addr garbageAlwaysTetrisReady
+        .addr garbageTypeB
         .addr garbagePieces
         .addr garbagePiecesMore
         .addr garbageHard
 
         ; initPlayfieldIfTypeB
 
-        ; jump table
-        ; different types of garbage mode
         ; type C
         ; one random block per item
         ; pixels that slowly fill in per frame / static garbage
+        ; height based
+
+garbageTypeB:
+
+        rts
 
 garbagePieces:
         ; smartHole
         ; jsr initPlayfieldForTypeB
 
-        lda spawncount
+        lda spawnCount
         and #7
         bne @nothing
 ; @loop:
@@ -7944,7 +7938,7 @@ garbagePieces:
         rts
 
 garbagePiecesMore:
-        lda spawncount
+        lda spawnCount
         and #1
         bne @nothing
         jsr smartHole
