@@ -7911,46 +7911,66 @@ advanceGameGarbage:
         ; height based
 
 garbageTypeB:
+        ; get random location in playfield
 
+
+        ; run at other places in code with a on/off thing
+        ; lda $610
+        ; eor 1
+        ; sta $610
+
+        ; lda #$7B
+        ; cmp
+        ; sta playfield+90
+
+        ; ldx #180
+        ; jsr swapMino
+        ; ldx #190
+        ; jsr swapMino
+
+        jsr swap
+        ; jsr swap
+        ; jsr swap
+        ; jsr swap
+        ; jsr swap
+        rts
+
+swap:
+        ldx #$17
+        ldy #$02
+        jsr generateNextPseudorandomNumber
+        lda rng_seed
+        and #$07
+        tax
+        jsr swapMino
+
+
+        rts
+
+swapMino:
+        ldy #$ef
+        lda playfield+190, x
+        cmp #$ef
+        bne @full
+        ldy #$7B
+@full:
+        tya
+        sta playfield+190, x
         rts
 
 garbagePieces:
-        ; smartHole
-        ; jsr initPlayfieldForTypeB
-
-        lda spawnCount
-        and #7
-        bne @nothing
-; @loop:
-;         cmp #$A
-;         bmi @done
-;         sbc #$A
-;         jmp @loop
-; @done:
-
-;         cmp #0
-;         bne @nothing
-
-        jsr smartHole
-        lda #1
-        sta pendingGarbage
-@nothing:
-        rts
-
 garbagePiecesMore:
         lda spawnCount
         and #1
         bne @nothing
         jsr smartHole
-        lda #1
-        sta pendingGarbage
+        inc pendingGarbage
 @nothing:
         rts
 
 garbageHard:
         jsr randomHole
-        lda #1
-        sta pendingGarbage
+        inc pendingGarbage
         rts
 
 smartHole:
