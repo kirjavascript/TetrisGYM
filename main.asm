@@ -1075,8 +1075,6 @@ padNOP $13
         sta     PPUADDR
         lda     #$83
         sta     PPUADDR
-        lda     gameType
-        bne     @typeB
         lda     #$0A
         sta     PPUDATA
 .endif
@@ -1090,46 +1088,6 @@ padNOP $13
         jsr     twoDigsToPPU
         lda     highScoreScoresA+2
         jsr     twoDigsToPPU
-        jmp     gameModeState_initGameBackground_finish
-
-@typeB: lda     #$0B
-        sta     PPUDATA
-        lda     #$20
-        sta     PPUADDR
-        lda     #$B8
-        sta     PPUADDR
-        lda     highScoreScoresB
-        jsr     twoDigsToPPU
-        lda     highScoreScoresB+1
-        jsr     twoDigsToPPU
-        lda     highScoreScoresB+2
-        jsr     twoDigsToPPU
-        ldx     #$00
-@nextPpuAddress:
-        lda     game_typeb_nametable_patch,x
-        inx
-        sta     PPUADDR
-        lda     game_typeb_nametable_patch,x
-        inx
-        sta     PPUADDR
-@nextPpuData:
-        lda     game_typeb_nametable_patch,x
-        inx
-        cmp     #$FE
-        beq     @nextPpuAddress
-        cmp     #$FD
-        beq     @endOfPpuPatching
-        sta     PPUDATA
-        jmp     @nextPpuData
-
-@endOfPpuPatching:
-        lda     #$23
-        sta     PPUADDR
-        lda     #$3B
-        sta     PPUADDR
-        lda     startHeight
-        and     #$0F
-        sta     PPUDATA
         jmp     gameModeState_initGameBackground_finish
 
 gameModeState_initGameBackground_finish:
@@ -1147,13 +1105,6 @@ gameModeState_initGameBackground_finish:
         inc     gameModeState
         rts
 
-game_typeb_nametable_patch:
-        .byte   $22,$F7,$38,$39,$39,$39,$39,$39
-        .byte   $39,$3A,$FE,$23,$17,$3B,$11,$0E
-        .byte   $12,$10,$11,$1D,$3C,$FE,$23,$37
-        .byte   $3B,$FF,$FF,$FF,$FF,$FF,$FF,$3C
-        .byte   $FE,$23,$57,$3D,$3E,$3E,$3E,$3E
-        .byte   $3E,$3E,$3F,$FD
 gameModeState_initGameState:
         lda     #$EF
         ldx     #$04
@@ -2769,7 +2720,6 @@ playState_checkForCompletedRows:
         ; this block
         jsr     practiseRowCompletePatch
 .if !AUTO_WIN
-        nop
         beq     @rowNotComplete
 .endif
 
@@ -4256,7 +4206,6 @@ changePRGBank:
         sta     MMC1_PRG
         rts
 
-ending_palette: ; removed
 game_palette:
         .byte   $3F,$00,$20,$0F,$30,$12,$16,$0F
         .byte   $20,$12,$18,$0F,$2C,$16,$29,$0F
