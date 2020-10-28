@@ -1060,9 +1060,9 @@ render_mode_menu_screens:
 gameModeState_initGameBackground:
         jsr     updateAudioWaitForNmiAndDisablePpuRendering
         jsr     disableNmi
-        lda     #$03
+        lda     #$01
         jsr     changeCHRBank0
-        lda     #$03
+        lda     #$01
         jsr     changeCHRBank1
         jsr     bulkCopyToPpu
         .addr   game_palette
@@ -1341,9 +1341,9 @@ rngTable:
         .byte   $EF,$7B,$EF,$7C,$7D,$7D,$EF
         .byte   $EF
 gameModeState_updateCountersAndNonPlayerState:
-        lda     #$03
+        lda     #$01
         jsr     changeCHRBank0
-        lda     #$03
+        lda     #$01
         jsr     changeCHRBank1
         lda     #$00
         sta     oamStagingLength
