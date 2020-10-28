@@ -550,11 +550,11 @@ branchOnPlayStatePlayer1:
         .addr   playState_checkForCompletedRows
         .addr   playState_noop
         .addr   playState_updateLinesAndStatistics
-        .addr   playState_bTypeGoalCheck
+        .addr   playState_incrementPlayState ; used to be bTypeGoalCheck
         .addr   playState_receiveGarbage
         .addr   playState_spawnNextTetrimino
         .addr   playState_noop
-        .addr   playState_updateGameOverCurtain
+        .addr   playState_checkStartGameOver
         .addr   playState_incrementPlayState
 playState_playerControlsActiveTetrimino:
         jsr     shift_tetrimino
@@ -571,11 +571,11 @@ branchOnPlayStatePlayer2:
         .addr   playState_checkForCompletedRows
         .addr   playState_noop
         .addr   playState_updateLinesAndStatistics
-        .addr   playState_bTypeGoalCheck
+        .addr   playState_incrementPlayState
         .addr   playState_receiveGarbage
         .addr   playState_spawnNextTetrimino
         .addr   playState_noop
-        .addr   playState_updateGameOverCurtain
+        .addr   playState_checkStartGameOver
         .addr   playState_incrementPlayState
 playState_player2ControlsActiveTetrimino:
         jsr     shift_tetrimino
@@ -3032,7 +3032,7 @@ playState_lockTetrimino:
         inc     playState
 @ret:   rts
 
-playState_updateGameOverCurtain:
+playState_checkStartGameOver:
         ; skip curtain / rocket
 
 @checkForStartButton:
