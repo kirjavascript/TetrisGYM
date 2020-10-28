@@ -5558,7 +5558,6 @@ defaultHighScoresTable:
         .byte   $00 ;Game B 3rd Entry Level
         .byte   $00 ;unknown
         .byte   $FF
-.if PRACTISE_MODE
 game_type_menu_nametable:
         .incbin "gfx/nametables/game_type_menu_nametable_practise.bin"
 level_menu_nametable:
@@ -5567,16 +5566,6 @@ game_nametable:
         .incbin "gfx/nametables/game_nametable_practise.bin"
 enter_high_score_nametable:
         .incbin "gfx/nametables/enter_high_score_nametable_practise.bin"
-.else
-game_type_menu_nametable:
-        .incbin "gfx/nametables/game_type_menu_nametable.bin"
-level_menu_nametable:
-        .incbin "gfx/nametables/level_menu_nametable.bin"
-game_nametable:
-        .incbin "gfx/nametables/game_nametable.bin"
-enter_high_score_nametable:
-        .incbin "gfx/nametables/enter_high_score_nametable.bin"
-.endif
 high_scores_nametable:
         .incbin "gfx/nametables/high_scores_nametable.bin"
 type_b_lvl9_ending_nametable:
@@ -7900,7 +7889,6 @@ advanceGameGarbage:
         .addr garbageAlwaysTetrisReady
         .addr garbageTypeB
         .addr garbagePieces
-        .addr garbagePiecesMore
         .addr garbageHard
 
         ; initPlayfieldIfTypeB
@@ -7959,7 +7947,6 @@ swapMino:
         rts
 
 garbagePieces:
-garbagePiecesMore:
         lda spawnCount
         and #1
         bne @nothing

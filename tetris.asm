@@ -20,7 +20,7 @@ INES_SRAM   = 0 ; 1 = battery backed SRAM at $6000-7FFF
 
 
 .segment "CHR"
-.incbin "gfx/title_menu_tileset_practise.chr"
+.incbin "gfx/title_menu_tileset.chr"
 .incbin "gfx/typeB_ending_tileset.chr"
 .incbin "gfx/typeA_ending_tileset.chr"
 .incbin "gfx/game_tileset.chr"
