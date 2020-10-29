@@ -4230,12 +4230,61 @@ enter_high_score_nametable:
 high_scores_nametable:
         .incbin "gfx/nametables/high_scores_nametable.bin"
 
+
+saveStateRAM := $620
+
+checkSaveStateControls:
+        lda     heldButtons_player1
+        and     #BUTTON_SELECT
+        beq     @done
+        lda     newlyPressedButtons_player1
+        and     #BUTTON_A
+        beq     @done
+        jsr     saveState
+@done:
+        rts
+
+saveStateTetriminoX := SRAM
+saveStateTetriminoY := SRAM+1
+saveStateCurrentPiece := SRAM+2
+saveStateNextPiece := SRAM+3
+saveStatePlayfield := SRAM+4
+
+saveState:
+        lda tetriminoX
+        sta saveStateTetriminoX
+        lda tetriminoY
+        sta saveStateTetriminoY
+        lda currentPiece
+        sta saveStateCurrentPiece
+        lda nextPiece
+        sta saveStateNextPiece
+        ldx #$C8
+@copy:
+        lda playfield,x
+        sta saveStatePlayfield,x
+        dex
+        bne @copy
+        ; do the missing one
+        lda playfield
+        sta saveStatePlayfield
+        rts
+
+
+; make player 1 active
+
 .if DEBUG_MODE
 
 practisePausePatch:
 
 DEBUG_ORIGINAL_Y := tmp1
 DEBUG_ORIGINAL_CURRENT_PIECE := tmp2
+
+        ; savestate test
+        ; jsr     checkSaveStateControls
+        ; jsr     stageSpriteForCurrentPiece ; patched command
+        ; jsr     stageSpriteForNextPiece ; patched command
+        ; rts
 
         lda     tetriminoX
         sta     originalY

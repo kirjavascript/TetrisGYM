@@ -16,8 +16,8 @@
     * [Floor](#floor)
     * [(Quick)Tap](#%28quick%29-tap)
     * [Drought](#drought)
-    * [Debug Mode](#debug-mode)
-    * [PAL Mode](#pal-mode)
+* [Debug Mode](#debug-mode)
+* [PAL Mode](#pal-mode)
 * [Resources](#resources)
 
 ## Getting Started
@@ -78,7 +78,7 @@ Create artificially inflated droughts. Increasing the value causes less I pieces
 
 0 = normal gameplay I = no line pieces
 
-### Debug Mode
+## Debug Mode
 
 ![Tap](/screens/debug.png)
 
@@ -95,7 +95,7 @@ You can use use the dpad to move around, and select to switch between piece edit
 
 This is a config option only, and will enable debug mode globally.
 
-### PAL Mode
+## PAL Mode
 
 Dictate if the NTSC or PAL gameplay mechanics should be used. Should automatically detect region, but can be manually overwritten otherwise.
 
