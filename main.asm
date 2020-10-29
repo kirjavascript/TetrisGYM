@@ -68,6 +68,8 @@ debugFlag := menuVars+5
 palFlag := menuVars+6
 ; $B00 - $BEF
 
+SRAM := $6000 ; 8kb
+
 ; macros
 
 .macro padNOP qty
@@ -1796,13 +1798,13 @@ oamContentLookup:
         .addr   sprite0CIPiece
         .addr   sprite0EHighScoreNameCursor
         .addr   sprite0EHighScoreNameCursor
-        .addr   sprite0FTPieceOffset
-        .addr   sprite10SPieceOffset
-        .addr   sprite11ZPieceOffset
-        .addr   sprite12JPieceOffset
-        .addr   sprite13LPieceOffset
-        .addr   sprite14OPieceOffset
-        .addr   sprite15IPieceOffset
+        .addr   sprite02Blank
+        .addr   sprite02Blank
+        .addr   sprite02Blank
+        .addr   sprite02Blank
+        .addr   sprite02Blank
+        .addr   sprite02Blank
+        .addr   sprite02Blank
         .addr   spriteDebugLevelSelect ; DEBUG_MODE
         .addr   sprite02Blank
         .addr   sprite02Blank
@@ -1872,6 +1874,7 @@ oamContentLookup:
         .addr   isPositionValid
         .addr   isPositionValid
 ; Sprites are sets of 4 bytes in the OAM format, terminated by FF. byte0=y, byte1=tile, byte2=attrs, byte3=x
+; YY AA II XX
 sprite00LevelSelectCursor:
         .byte   $00,$FC,$20,$00,$00,$FC,$20,$08
         .byte   $08,$FC,$20,$00,$08,$FC,$20,$08
@@ -1920,48 +1923,13 @@ sprite0CIPiece:
         .byte   $FF
 sprite0EHighScoreNameCursor:
         .byte   $00,$FC,$21,$00,$FF
-; Unused, but referenced from unreferenced_orientationToSpriteTable
-sprite0FTPieceOffset:
-        .byte   $02,$7B,$02,$FC,$02,$7B,$02,$04
-        .byte   $02,$7B,$02,$0C,$0A,$7B,$02,$04
-        .byte   $FF
-; Unused, but referenced from unreferenced_orientationToSpriteTable
-sprite10SPieceOffset:
-        .byte   $00,$7D,$02,$06,$00,$7D,$02,$0E
-        .byte   $08,$7D,$02,$FE,$08,$7D,$02,$06
-        .byte   $FF
-; Unused, but referenced from unreferenced_orientationToSpriteTable
-sprite11ZPieceOffset:
-        .byte   $00,$7C,$02,$FA,$00,$7C,$02,$02
-        .byte   $08,$7C,$02,$02,$08,$7C,$02,$0A
-        .byte   $FF
-; Unused, but referenced from unreferenced_orientationToSpriteTable
-sprite12JPieceOffset:
-        .byte   $08,$7D,$02,$00,$08,$7D,$02,$08
-        .byte   $08,$7D,$02,$10,$10,$7D,$02,$10
-        .byte   $FF
-; Unused, but referenced from unreferenced_orientationToSpriteTable
-sprite13LPieceOffset:
-        .byte   $08,$7C,$02,$F8,$08,$7C,$02,$00
-        .byte   $08,$7C,$02,$08,$10,$7C,$02,$F8
-        .byte   $FF
-; Unused, but referenced from unreferenced_orientationToSpriteTable
-sprite14OPieceOffset:
-        .byte   $00,$7B,$02,$00,$00,$7B,$02,$08
-        .byte   $08,$7B,$02,$00,$08,$7B,$02,$08
-        .byte   $FF
-; Unused, but referenced from unreferenced_orientationToSpriteTable
-sprite15IPieceOffset:
-        .byte   $08,$7B,$02,$F8,$08,$7B,$02,$00
-        .byte   $08,$7B,$02,$08,$08,$7B,$02,$10
+spriteDebugLevelSelect:
+        .byte   $00,$21,$00,$00
         .byte   $FF
 sprite53MusicTypeCursor:
-.if PRACTISE_MODE
-        .byte   $00,$27,$00,$00,$00,$FF,$40,$4A
-.else
-        .byte   $00,$27,$00,$00,$00,$27,$40,$4A
-.endif
+        .byte   $00,$27,$00,$00
         .byte   $FF
+
 isPositionValid:
         lda     tetriminoY
         asl     a
@@ -4261,6 +4229,211 @@ enter_high_score_nametable:
         .incbin "gfx/nametables/enter_high_score_nametable_practise.bin"
 high_scores_nametable:
         .incbin "gfx/nametables/high_scores_nametable.bin"
+
+.if DEBUG_MODE
+
+practisePausePatch:
+
+DEBUG_ORIGINAL_Y := tmp1
+DEBUG_ORIGINAL_CURRENT_PIECE := tmp2
+
+        lda     tetriminoX
+        sta     originalY
+        lda     tetriminoY
+        sta     DEBUG_ORIGINAL_Y
+        lda     currentPiece
+        sta     DEBUG_ORIGINAL_CURRENT_PIECE
+
+.if PRACTISE_MODE
+        lda     debugFlag
+        cmp     #0
+        beq     @draw
+.endif
+
+        ; toggle mode
+        lda     newlyPressedButtons_player1
+        and     #BUTTON_SELECT
+        beq     @notPressedSelect
+        ; flip debug bit
+        lda     debugLevelEdit
+        eor     #1
+        sta     debugLevelEdit
+@notPressedSelect:
+
+        ; update position
+        lda     newlyPressedButtons_player1
+        and     #BUTTON_UP
+        beq     @notPressedUp
+        dec     tetriminoY
+
+@notPressedUp:
+
+        lda     newlyPressedButtons_player1
+        and     #BUTTON_DOWN
+        beq     @notPressedDown
+        inc     tetriminoY
+@notPressedDown:
+        lda     newlyPressedButtons_player1
+        and     #BUTTON_LEFT
+        beq     @notPressedLeft
+        dec     tetriminoX
+@notPressedLeft:
+        lda     newlyPressedButtons_player1
+        and     #BUTTON_RIGHT
+        beq     @notPressingRight
+        inc     tetriminoX
+@notPressingRight:
+
+        ; check mode
+        lda     debugLevelEdit
+        and     #1
+        bne     handleLevelEditor
+
+        ; handle next piece
+        lda     heldButtons_player1
+        and     #BUTTON_B
+        beq     @notPressedBothB
+        lda     newlyPressedButtons_player1
+        and     #BUTTON_A
+        beq     @notPressedBothB
+        jmp     @changeNext
+@notPressedBothB:
+        lda     heldButtons_player1
+        and     #BUTTON_A
+        beq     @notPressedBothA
+        lda     newlyPressedButtons_player1
+        and     #BUTTON_B
+        beq     @notPressedBothA
+        jmp     @changeNext
+@notPressedBothA:
+
+        ; change current piece
+        lda     newlyPressedButtons_player1
+        and     #BUTTON_B
+        beq     @notPressedB
+        lda     currentPiece
+        cmp     #$1
+        bmi     @notPressedB
+        dec     currentPiece
+@notPressedB:
+
+        lda     newlyPressedButtons_player1
+        and     #BUTTON_A
+        beq     @notPressedA
+        lda     currentPiece
+        cmp     #$12
+        bpl     @notPressedA
+        inc     currentPiece
+@notPressedA:
+
+        ; handle piece
+        jsr     isPositionValid
+        bne     @restore_
+        jsr     savePlayer1State
+
+@draw:
+        jsr     stageSpriteForCurrentPiece ; patched command
+        jsr     stageSpriteForNextPiece ; patched command
+        rts
+
+@restore_:
+        lda     originalY
+        sta     tetriminoX
+        lda     DEBUG_ORIGINAL_Y
+        sta     tetriminoY
+        lda     DEBUG_ORIGINAL_CURRENT_PIECE
+        sta     currentPiece
+        jmp     @draw
+
+@changeNext:
+        lda     debugNextCounter
+        and     #7
+        cmp     #7
+        bne     @notDupe
+        inc     debugNextCounter
+@notDupe:
+        tax
+        lda     spawnTable,x
+        sta     nextPiece
+
+        inc     debugNextCounter
+        jmp     @draw
+
+
+handleLevelEditor:
+
+        jsr     stageSpriteForNextPiece ; patched command
+
+        ; handle drawing
+
+        ; load X
+        lda     tetriminoX
+        asl
+        asl
+        asl
+        clc
+        adc     #$60
+        sta     spriteXOffset
+
+        ; load Y
+        lda     tetriminoY
+        asl
+        asl
+        asl
+        clc
+        adc     #$2F
+        sta     spriteYOffset
+
+        lda     #$16
+        sta     spriteIndexInOamContentLookup
+        jsr     loadSpriteIntoOamStaging
+
+        ; handle editing
+
+        lda     newlyPressedButtons_player1
+        and     #BUTTON_B
+        beq     @notPressedB
+        jsr     @getPos
+        ldx     tmp3
+        lda     #$EF
+        sta     $0400, x
+        jmp     @renderPlayfield
+
+@notPressedB:
+
+        lda     newlyPressedButtons_player1
+        and     #BUTTON_A
+        beq     @notPressedA
+        jsr     @getPos
+        ldx     tmp3
+        lda     #$7B
+        sta     $0400, x
+        jmp     @renderPlayfield
+
+@notPressedA:
+
+        jsr     savePlayer1State
+        rts
+
+@renderPlayfield:
+        lda     #$00
+        sta     player1_vramRow
+        lda     #$03
+        sta     renderMode
+        rts
+
+@getPos:
+        ; multiply by 10
+        ldx     tetriminoY
+        lda     multBy10Table,x
+
+        ; add X
+        adc     tetriminoX
+        sta     tmp3
+        dec     tmp3
+        rts
+
+.endif
 
 ; End of "PRG_chunk1" segment
 .code
@@ -6710,213 +6883,6 @@ checkTetrisReady:
 
 .endif
 
-.if DEBUG_MODE
-
-practisePausePatch:
-
-DEBUG_ORIGINAL_Y := tmp1
-DEBUG_ORIGINAL_CURRENT_PIECE := tmp2
-
-        lda     tetriminoX
-        sta     originalY
-        lda     tetriminoY
-        sta     DEBUG_ORIGINAL_Y
-        lda     currentPiece
-        sta     DEBUG_ORIGINAL_CURRENT_PIECE
-
-.if PRACTISE_MODE
-        lda     debugFlag
-        cmp     #0
-        beq     @draw
-.endif
-
-        ; toggle mode
-        lda     newlyPressedButtons_player1
-        and     #BUTTON_SELECT
-        beq     @notPressedSelect
-        ; flip debug bit
-        lda     debugLevelEdit
-        eor     #1
-        sta     debugLevelEdit
-@notPressedSelect:
-
-        ; update position
-        lda     newlyPressedButtons_player1
-        and     #BUTTON_UP
-        beq     @notPressedUp
-        dec     tetriminoY
-
-@notPressedUp:
-
-        lda     newlyPressedButtons_player1
-        and     #BUTTON_DOWN
-        beq     @notPressedDown
-        inc     tetriminoY
-@notPressedDown:
-        lda     newlyPressedButtons_player1
-        and     #BUTTON_LEFT
-        beq     @notPressedLeft
-        dec     tetriminoX
-@notPressedLeft:
-        lda     newlyPressedButtons_player1
-        and     #BUTTON_RIGHT
-        beq     @notPressingRight
-        inc     tetriminoX
-@notPressingRight:
-
-        ; check mode
-        lda     debugLevelEdit
-        and     #1
-        bne     handleLevelEditor
-
-        ; handle next piece
-        lda     heldButtons_player1
-        and     #BUTTON_B
-        beq     @notPressedBothB
-        lda     newlyPressedButtons_player1
-        and     #BUTTON_A
-        beq     @notPressedBothB
-        jmp     @changeNext
-@notPressedBothB:
-        lda     heldButtons_player1
-        and     #BUTTON_A
-        beq     @notPressedBothA
-        lda     newlyPressedButtons_player1
-        and     #BUTTON_B
-        beq     @notPressedBothA
-        jmp     @changeNext
-@notPressedBothA:
-
-        ; change current piece
-        lda     newlyPressedButtons_player1
-        and     #BUTTON_B
-        beq     @notPressedB
-        lda     currentPiece
-        cmp     #$1
-        bmi     @notPressedB
-        dec     currentPiece
-@notPressedB:
-
-        lda     newlyPressedButtons_player1
-        and     #BUTTON_A
-        beq     @notPressedA
-        lda     currentPiece
-        cmp     #$12
-        bpl     @notPressedA
-        inc     currentPiece
-@notPressedA:
-
-        ; handle piece
-        jsr     isPositionValid
-        bne     @restore_
-        jsr     savePlayer1State
-
-@draw:
-        jsr     stageSpriteForCurrentPiece ; patched command
-        jsr     stageSpriteForNextPiece ; patched command
-        rts
-
-@restore_:
-        lda     originalY
-        sta     tetriminoX
-        lda     DEBUG_ORIGINAL_Y
-        sta     tetriminoY
-        lda     DEBUG_ORIGINAL_CURRENT_PIECE
-        sta     currentPiece
-        jmp     @draw
-
-@changeNext:
-        lda     debugNextCounter
-        and     #7
-        cmp     #7
-        bne     @notDupe
-        inc     debugNextCounter
-@notDupe:
-        tax
-        lda     spawnTable,x
-        sta     nextPiece
-
-        inc     debugNextCounter
-        jmp     @draw
-
-
-handleLevelEditor:
-
-        jsr     stageSpriteForNextPiece ; patched command
-
-        ; handle drawing
-
-        ; load X
-        lda     tetriminoX
-        asl
-        asl
-        asl
-        clc
-        adc     #$60
-        sta     spriteXOffset
-
-        ; load Y
-        lda     tetriminoY
-        asl
-        asl
-        asl
-        clc
-        adc     #$2F
-        sta     spriteYOffset
-
-        lda     #$16
-        sta     spriteIndexInOamContentLookup
-        jsr     loadSpriteIntoOamStaging
-
-        ; handle editing
-
-        lda     newlyPressedButtons_player1
-        and     #BUTTON_B
-        beq     @notPressedB
-        jsr     @getPos
-        ldx     tmp3
-        lda     #$EF
-        sta     $0400, x
-        jmp     @renderPlayfield
-
-@notPressedB:
-
-        lda     newlyPressedButtons_player1
-        and     #BUTTON_A
-        beq     @notPressedA
-        jsr     @getPos
-        ldx     tmp3
-        lda     #$7B
-        sta     $0400, x
-        jmp     @renderPlayfield
-
-@notPressedA:
-
-        jsr     savePlayer1State
-        rts
-
-@renderPlayfield:
-        lda     #$00
-        sta     player1_vramRow
-        lda     #$03
-        sta     renderMode
-        rts
-
-@getPos:
-        ; multiply by 10
-        ldx     tetriminoY
-        lda     multBy10Table,x
-
-        ; add X
-        adc     tetriminoX
-        sta     tmp3
-        dec     tmp3
-        rts
-
-; YY AA II XX
-spriteDebugLevelSelect:
-        .byte   $00,$21,$00,$00,$FF
-.endif
 
 ; End of "unreferenced_data4" segment
 .code
