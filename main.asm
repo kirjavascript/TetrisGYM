@@ -1122,27 +1122,20 @@ gameModeState_initGameState:
         bne     @initStatsByType
         lda     #$05
         sta     player1_tetriminoX
-        sta     player2_tetriminoX
         lda     #$00
+        sta     spawnDelay
+        sta     saveStateDirty
         sta     player1_completedLines ; reset during tetris bugfix
         sta     player1_tetriminoY
-        sta     player2_tetriminoY
         sta     player1_vramRow
-        sta     player2_vramRow
         sta     player1_fallTimer
-        sta     player2_fallTimer
         sta     pendingGarbage
         sta     pendingGarbageInactivePlayer
         sta     player1_score
         sta     player1_score+1
         sta     player1_score+2
-        sta     player2_score
-        sta     player2_score+1
-        sta     player2_score+2
         sta     player1_lines
         sta     player1_lines+1
-        sta     player2_lines
-        sta     player2_lines+1
         sta     twoPlayerPieceDelayCounter
         sta     lineClearStatsByType
         sta     lineClearStatsByType+1
@@ -1160,23 +1153,14 @@ gameModeState_initGameState:
         sta     renderMode
         lda     #$A0
         sta     player1_autorepeatY
-        sta     player2_autorepeatY
         jsr     chooseNextTetrimino
         sta     player1_currentPiece
-        sta     player2_currentPiece
         jsr     incrementPieceStat
         ldx     #$17
         ldy     #$02
         jsr     generateNextPseudorandomNumber
         jsr     chooseNextTetrimino
         sta     nextPiece
-        sta     nextPiece_2player
-        lda     gameType
-        beq     @skipTypeBInit
-        lda     #$25
-        sta     player1_lines
-        sta     player2_lines
-@skipTypeBInit:
         lda     #$47
         sta     outOfDateRenderFlags
         jsr     updateAudioWaitForNmiAndResetOamStaging
@@ -2425,6 +2409,7 @@ playState_spawnNextTetrimino:
         lda     vramRow
         cmp     #$20
         bmi     @ret
+
 .if PRACTISE_MODE
         lda     spawnDelay
         beq     @notDelaying
@@ -2433,26 +2418,26 @@ playState_spawnNextTetrimino:
 .endif
 
 @notDelaying:
-        lda     #$00
-        sta     twoPlayerPieceDelayCounter
-        sta     fallTimer
-        sta     tetriminoY
         lda     #$01
         sta     playState
+
+        ; savestate patch
+        lda     saveStateDirty
+        beq     @noSaveState
+        lda     #0
+        sta     saveStateDirty
+        rts
+@noSaveState:
+
+        lda     #$00
+        sta     fallTimer
+        sta     tetriminoY
         lda     #$05
         sta     tetriminoX
         ldx     nextPiece
         lda     spawnOrientationFromOrientation,x
         sta     currentPiece
         jsr     incrementPieceStat
-        lda     numberOfPlayers
-        cmp     #$01
-        beq     @onePlayerPieceSelection
-        lda     nextPiece_2player
-        sta     nextPiece
-        jmp     @resetDownHold
-
-@onePlayerPieceSelection:
         jsr     chooseNextTetrimino
         sta     nextPiece
 @resetDownHold:
@@ -4209,6 +4194,13 @@ enter_high_score_nametable:
 high_scores_nametable:
         .incbin "gfx/nametables/high_scores_nametable.bin"
 
+saveStateDirty := $620
+saveStateTetriminoX := SRAM
+saveStateTetriminoY := SRAM+1
+saveStateCurrentPiece := SRAM+2
+saveStateNextPiece := SRAM+3
+saveStatePlayfield := SRAM+4
+
 checkSaveStateControls:
         lda heldButtons_player1
         and #BUTTON_SELECT
@@ -4227,13 +4219,6 @@ checkSaveStateControls:
         jsr saveState
 @done:
         rts
-
-saveStateDirty := $620
-saveStateTetriminoX := SRAM
-saveStateTetriminoY := SRAM+1
-saveStateCurrentPiece := SRAM+2
-saveStateNextPiece := SRAM+3
-saveStatePlayfield := SRAM+4
 
 saveState:
         lda tetriminoX
@@ -4274,15 +4259,16 @@ loadState:
         rts
 
 renderStateGameplay:
+        lda #$03
+        sta playState
+        lda #1
+        sta saveStateDirty ; cleared in game init
         lda #$20
         sta spawnDelay
-        lda     #$00
-        sta     tetriminoY
-        lda     #$01
-        sta     playState
-        lda     #$05
-        sta     tetriminoX
-        ; jsr playState_checkForCompletedRows
+        lda #$00
+        sta tetriminoY
+        lda #$05
+        sta tetriminoX
         rts
 
 renderStateDebug:
