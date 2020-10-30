@@ -4234,14 +4234,28 @@ high_scores_nametable:
 saveStateRAM := $620
 
 checkSaveStateControls:
-        lda     heldButtons_player1
-        and     #BUTTON_SELECT
-        beq     @done
-        lda     newlyPressedButtons_player1
-        and     #BUTTON_A
-        beq     @done
-        jsr     saveState
+        lda heldButtons_player1
+        and #BUTTON_SELECT
+        beq @done
+
+        lda newlyPressedButtons_player1
+        and #BUTTON_B
+        beq @notPressedB
+        jsr loadSaveState
+        jsr commitDebugSaveState
+        jmp @done
+@notPressedB:
+
+        lda newlyPressedButtons_player1
+        and #BUTTON_A
+        beq @done
+        jsr saveState
 @done:
+        rts
+
+commitDebugSaveState:
+        jsr savePlayer1State
+        jsr renderPlayfieldDebug
         rts
 
 saveStateTetriminoX := SRAM
@@ -4249,6 +4263,24 @@ saveStateTetriminoY := SRAM+1
 saveStateCurrentPiece := SRAM+2
 saveStateNextPiece := SRAM+3
 saveStatePlayfield := SRAM+4
+
+loadSaveState:
+        lda saveStateTetriminoX
+        sta tetriminoX
+        lda saveStateTetriminoY
+        sta tetriminoY
+        lda saveStateCurrentPiece
+        sta currentPiece
+        lda saveStateNextPiece
+        sta nextPiece
+        ldx #0
+@copy:
+        lda saveStatePlayfield,x
+        sta playfield,x
+        inx
+        cpx #$c8
+        bcc @copy
+        rts
 
 saveState:
         lda tetriminoX
@@ -4442,7 +4474,7 @@ handleLevelEditor:
         ldx     tmp3
         lda     #$EF
         sta     $0400, x
-        jmp     @renderPlayfield
+        jmp     renderPlayfieldDebug
 
 @notPressedB:
 
@@ -4453,18 +4485,11 @@ handleLevelEditor:
         ldx     tmp3
         lda     #$7B
         sta     $0400, x
-        jmp     @renderPlayfield
+        jmp     renderPlayfieldDebug
 
 @notPressedA:
 
         jsr     savePlayer1State
-        rts
-
-@renderPlayfield:
-        lda     #$00
-        sta     player1_vramRow
-        lda     #$03
-        sta     renderMode
         rts
 
 @getPos:
@@ -4476,6 +4501,13 @@ handleLevelEditor:
         adc     tetriminoX
         sta     tmp3
         dec     tmp3
+        rts
+
+renderPlayfieldDebug:
+        lda     #$00
+        sta     player1_vramRow
+        lda     #$03
+        sta     renderMode
         rts
 
 .endif
