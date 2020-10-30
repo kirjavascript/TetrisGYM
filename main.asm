@@ -4259,19 +4259,15 @@ saveState:
         sta saveStateCurrentPiece
         lda nextPiece
         sta saveStateNextPiece
-        ldx #$C8
+        ldx #0
 @copy:
         lda playfield,x
         sta saveStatePlayfield,x
-        dex
-        bne @copy
-        ; do the missing one
-        lda playfield
-        sta saveStatePlayfield
+        inx
+        cpx #$c8
+        bcc @copy
         rts
 
-
-; make player 1 active
 
 .if DEBUG_MODE
 
@@ -4281,10 +4277,10 @@ DEBUG_ORIGINAL_Y := tmp1
 DEBUG_ORIGINAL_CURRENT_PIECE := tmp2
 
         ; savestate test
-        ; jsr     checkSaveStateControls
-        ; jsr     stageSpriteForCurrentPiece ; patched command
-        ; jsr     stageSpriteForNextPiece ; patched command
-        ; rts
+        jsr     checkSaveStateControls
+        jsr     stageSpriteForCurrentPiece ; patched command
+        jsr     stageSpriteForNextPiece ; patched command
+        rts
 
         lda     tetriminoX
         sta     originalY
