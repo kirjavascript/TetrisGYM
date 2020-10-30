@@ -515,6 +515,7 @@ gameModeState_updatePlayer1:
 .else
         jsr     stageSpriteForCurrentPiece
 .endif
+        jsr     checkSaveStateControls
         jsr     savePlayer1State
         jsr     stageSpriteForNextPiece
         inc     gameModeState
@@ -2429,28 +2430,6 @@ playState_spawnNextTetrimino:
         beq     @notDelaying
         dec     spawnDelay
         jmp     @ret
-padNOP 27
-.else
-        lda     numberOfPlayers
-        cmp     #$01
-        beq     @notDelaying
-        lda     twoPlayerPieceDelayCounter
-        cmp     #$00
-        bne     @twoPlayerPieceDelay
-        inc     twoPlayerPieceDelayCounter
-        lda     activePlayer
-        sta     twoPlayerPieceDelayPlayer
-        jsr     chooseNextTetrimino
-        sta     nextPiece_2player
-        jmp     @ret
-
-@twoPlayerPieceDelay:
-        lda     twoPlayerPieceDelayPlayer
-        cmp     activePlayer
-        bne     @ret
-        lda     twoPlayerPieceDelayCounter
-        cmp     #$1C
-        bne     @ret
 .endif
 
 @notDelaying:
@@ -4230,9 +4209,6 @@ enter_high_score_nametable:
 high_scores_nametable:
         .incbin "gfx/nametables/high_scores_nametable.bin"
 
-
-saveStateRAM := $620
-
 checkSaveStateControls:
         lda heldButtons_player1
         and #BUTTON_SELECT
@@ -4241,8 +4217,7 @@ checkSaveStateControls:
         lda newlyPressedButtons_player1
         and #BUTTON_B
         beq @notPressedB
-        jsr loadSaveState
-        jsr commitDebugSaveState
+        jsr loadState
         jmp @done
 @notPressedB:
 
@@ -4253,34 +4228,12 @@ checkSaveStateControls:
 @done:
         rts
 
-commitDebugSaveState:
-        jsr savePlayer1State
-        jsr renderPlayfieldDebug
-        rts
-
+saveStateDirty := $620
 saveStateTetriminoX := SRAM
 saveStateTetriminoY := SRAM+1
 saveStateCurrentPiece := SRAM+2
 saveStateNextPiece := SRAM+3
 saveStatePlayfield := SRAM+4
-
-loadSaveState:
-        lda saveStateTetriminoX
-        sta tetriminoX
-        lda saveStateTetriminoY
-        sta tetriminoY
-        lda saveStateCurrentPiece
-        sta currentPiece
-        lda saveStateNextPiece
-        sta nextPiece
-        ldx #0
-@copy:
-        lda saveStatePlayfield,x
-        sta playfield,x
-        inx
-        cpx #$c8
-        bcc @copy
-        rts
 
 saveState:
         lda tetriminoX
@@ -4300,6 +4253,42 @@ saveState:
         bcc @copy
         rts
 
+loadState:
+        lda saveStateTetriminoX
+        sta tetriminoX
+        lda saveStateTetriminoY
+        sta tetriminoY
+        lda saveStateCurrentPiece
+        sta currentPiece
+        lda saveStateNextPiece
+        sta nextPiece
+        ldx #0
+@copy:
+        lda saveStatePlayfield,x
+        sta playfield,x
+        inx
+        cpx #$c8
+        bcc @copy
+
+        jsr renderStateGameplay
+        rts
+
+renderStateGameplay:
+        lda #$20
+        sta spawnDelay
+        lda     #$00
+        sta     tetriminoY
+        lda     #$01
+        sta     playState
+        lda     #$05
+        sta     tetriminoX
+        ; jsr playState_checkForCompletedRows
+        rts
+
+renderStateDebug:
+        jsr savePlayer1State
+        jsr renderPlayfieldDebug
+        rts
 
 .if DEBUG_MODE
 
