@@ -1126,6 +1126,7 @@ gameModeState_initGameState:
         sta     player1_tetriminoX
         lda     #$00
         sta     spawnDelay
+        sta     saveStateSpriteDelay
         sta     saveStateDirty
         sta     player1_completedLines ; reset during tetris bugfix
         sta     player1_tetriminoY
@@ -4385,6 +4386,11 @@ debugDrawPieces:
         jsr     loadSpriteIntoOamStaging
         rts
 
+pauseDrawPieces:
+        jsr     stageSpriteForNextPiece
+        jsr     stageSpriteForCurrentPiece
+        rts
+
 practisePausePatch:
 
 DEBUG_ORIGINAL_Y := tmp1
@@ -4392,7 +4398,7 @@ DEBUG_ORIGINAL_CURRENT_PIECE := tmp2
 
         lda     debugFlag
         cmp     #0
-        beq     debugDrawPieces
+        beq     pauseDrawPieces
 
         jmp     debugSelectMenuControls
 debugContinue:
