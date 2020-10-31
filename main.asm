@@ -7,12 +7,11 @@
 
 ; constants
 
-BETTER_PAUSE := 1
 NO_MUSIC := 1
 NO_NO_NEXT_BOX := 1
+AUTO_WIN := 0
 PRACTISE_MODE := 1
 DEBUG_MODE := 1
-AUTO_WIN := 0
 
 BUTTON_RIGHT := $1
 BUTTON_LEFT := $2
@@ -515,7 +514,7 @@ gameModeState_updatePlayer1:
 .else
         jsr     stageSpriteForCurrentPiece
 .endif
-        jsr     checkSaveStateControls
+        jsr     checkSaveStateControlsGameplay
         jsr     savePlayer1State
         jsr     stageSpriteForNextPiece
         inc     gameModeState
@@ -4201,25 +4200,6 @@ saveStateCurrentPiece := SRAM+2
 saveStateNextPiece := SRAM+3
 saveStatePlayfield := SRAM+4
 
-checkSaveStateControls:
-        lda heldButtons_player1
-        and #BUTTON_SELECT
-        beq @done
-
-        lda newlyPressedButtons_player1
-        and #BUTTON_B
-        beq @notPressedB
-        jsr loadState
-        jmp @done
-@notPressedB:
-
-        lda newlyPressedButtons_player1
-        and #BUTTON_A
-        beq @done
-        jsr saveState
-@done:
-        rts
-
 saveState:
         lda tetriminoX
         sta saveStateTetriminoX
@@ -4238,6 +4218,7 @@ saveState:
         bcc @copy
         rts
 
+
 loadState:
         lda saveStateTetriminoX
         sta tetriminoX
@@ -4254,9 +4235,14 @@ loadState:
         inx
         cpx #$c8
         bcc @copy
-
-        jsr renderStateGameplay
         rts
+
+
+renderState:
+        lda renderMode
+        cmp #3
+        beq renderStateGameplay
+        jmp renderStateDebug
 
 renderStateGameplay:
         lda #$03
@@ -4276,41 +4262,114 @@ renderStateDebug:
         jsr renderPlayfieldDebug
         rts
 
+checkSaveStateControlsGameplay:
+        lda debugFlag
+        cmp #0
+        beq @done
+
+        lda heldButtons_player1
+        and #BUTTON_SELECT
+        beq @done
+
+        lda newlyPressedButtons_player1
+        and #BUTTON_B
+        beq @done
+        jsr loadState
+        jsr renderStateGameplay
+        jmp @done
+@done:
+        rts
+
+checkSaveStateControlsDebug:
+        ; lda heldButtons_player1
+        ; and #BUTTON_SELECT
+        ; beq @done
+
+        lda newlyPressedButtons_player1
+        and #BUTTON_B
+        beq @notPressedB
+        jsr loadState
+        jsr renderState
+        jmp @done
+@notPressedB:
+
+        lda newlyPressedButtons_player1
+        and #BUTTON_A
+        beq @done
+        jsr saveState
+@done:
+        rts
+
+
 .if DEBUG_MODE
+
+debugSelectMenuControls:
+        lda     heldButtons_player1
+        and     #BUTTON_SELECT
+        beq     debugContinue
+
+        lda     newlyPressedButtons_player1
+        and     #BUTTON_LEFT+BUTTON_RIGHT
+        beq     @skipDebugType
+        ; toggle mode
+        lda     debugLevelEdit
+        eor     #1
+        sta     debugLevelEdit
+@skipDebugType:
+
+
+        ; fallthrough
+
+debugDrawPieces:
+        jsr     stageSpriteForNextPiece
+
+        lda     debugLevelEdit
+        and     #1
+        bne     @handleX
+        jsr     stageSpriteForCurrentPiece
+        rts
+@handleX:
+
+        ; load X
+        lda     tetriminoX
+        asl
+        asl
+        asl
+        clc
+        adc     #$60
+        sta     spriteXOffset
+
+        ; load Y
+        lda     tetriminoY
+        asl
+        asl
+        asl
+        clc
+        adc     #$2F
+        sta     spriteYOffset
+
+        lda     #$16
+        sta     spriteIndexInOamContentLookup
+        jsr     loadSpriteIntoOamStaging
+        rts
 
 practisePausePatch:
 
 DEBUG_ORIGINAL_Y := tmp1
 DEBUG_ORIGINAL_CURRENT_PIECE := tmp2
 
-        ; savestate test
-        jsr     checkSaveStateControls
-        jsr     stageSpriteForCurrentPiece ; patched command
-        jsr     stageSpriteForNextPiece ; patched command
-        rts
+        lda     debugFlag
+        cmp     #0
+        beq     debugDrawPieces
 
+        jmp     debugSelectMenuControls
+debugContinue:
         lda     tetriminoX
         sta     originalY
         lda     tetriminoY
         sta     DEBUG_ORIGINAL_Y
         lda     currentPiece
         sta     DEBUG_ORIGINAL_CURRENT_PIECE
-
-.if PRACTISE_MODE
-        lda     debugFlag
-        cmp     #0
-        beq     @draw
-.endif
-
-        ; toggle mode
-        lda     newlyPressedButtons_player1
-        and     #BUTTON_SELECT
-        beq     @notPressedSelect
-        ; flip debug bit
-        lda     debugLevelEdit
-        eor     #1
-        sta     debugLevelEdit
-@notPressedSelect:
 
         ; update position
         lda     newlyPressedButtons_player1
@@ -4382,11 +4441,7 @@ DEBUG_ORIGINAL_CURRENT_PIECE := tmp2
         jsr     isPositionValid
         bne     @restore_
         jsr     savePlayer1State
-
-@draw:
-        jsr     stageSpriteForCurrentPiece ; patched command
-        jsr     stageSpriteForNextPiece ; patched command
-        rts
+        jmp     debugDrawPieces
 
 @restore_:
         lda     originalY
@@ -4395,7 +4450,7 @@ DEBUG_ORIGINAL_CURRENT_PIECE := tmp2
         sta     tetriminoY
         lda     DEBUG_ORIGINAL_CURRENT_PIECE
         sta     currentPiece
-        jmp     @draw
+        jmp     debugDrawPieces
 
 @changeNext:
         lda     debugNextCounter
@@ -4409,36 +4464,11 @@ DEBUG_ORIGINAL_CURRENT_PIECE := tmp2
         sta     nextPiece
 
         inc     debugNextCounter
-        jmp     @draw
+        jmp     debugDrawPieces
 
 
 handleLevelEditor:
-
-        jsr     stageSpriteForNextPiece ; patched command
-
-        ; handle drawing
-
-        ; load X
-        lda     tetriminoX
-        asl
-        asl
-        asl
-        clc
-        adc     #$60
-        sta     spriteXOffset
-
-        ; load Y
-        lda     tetriminoY
-        asl
-        asl
-        asl
-        clc
-        adc     #$2F
-        sta     spriteYOffset
-
-        lda     #$16
-        sta     spriteIndexInOamContentLookup
-        jsr     loadSpriteIntoOamStaging
+        jsr debugDrawPieces
 
         ; handle editing
 
