@@ -517,7 +517,7 @@ gameModeState_updatePlayer1:
 .else
         jsr     stageSpriteForCurrentPiece
 .endif
-        jsr     checkSaveStateControlsGameplay
+        jsr     checkSaveStateGameplay
         jsr     savePlayer1State
         jsr     stageSpriteForNextPiece
         inc     gameModeState
@@ -4276,11 +4276,15 @@ renderStateDebug:
         jsr renderPlayfieldDebug
         rts
 
-checkSaveStateControlsGameplay:
+checkSaveStateGameplay:
         lda debugFlag
         cmp #0
         beq @done
 
+        ; sprite
+        jsr renderSaveStateSprites
+
+        ; controls
         lda heldButtons_player1
         and #BUTTON_SELECT
         beq @done

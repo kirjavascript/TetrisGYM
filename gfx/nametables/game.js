@@ -13,7 +13,7 @@ W0W################################
 WWW################################
 W#W###########qwwwwwwwwwweqwwwwwwe#
 W#W##qwwwwwwe#a LINES-   da      d#
-W#W##aSLOT 0d#zxxxxxxxxxxcaTOP   d#
+W#W##aSLOT-0d#zxxxxxxxxxxcaTOP   d#
 W#W##a      d#############a000000d#
 W#W##zxxxxxxc##          #a      d#
 W#W############          #aSCORE d#
