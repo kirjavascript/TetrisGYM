@@ -1772,8 +1772,8 @@ oamContentLookup:
         .addr   sprite01GameTypeCursor
         .addr   sprite02Blank
         .addr   sprite03PausePalette6
-        .addr   sprite05PausePalette4
-        .addr   sprite05PausePalette4
+        .addr   sprite05DebugPalette4
+        .addr   sprite05DebugPalette4
         .addr   sprite06TPiece
         .addr   sprite07SPiece
         .addr   sprite08ZPiece
@@ -1790,8 +1790,8 @@ oamContentLookup:
         .addr   sprite02Blank
         .addr   sprite02Blank
         .addr   sprite02Blank
-        .addr   spriteDebugLevelSelect ; DEBUG_MODE
-        .addr   sprite02Blank
+        .addr   spriteDebugLevelEdit ; DEBUG_MODE
+        .addr   spriteStateLoad
         .addr   sprite02Blank
         .addr   sprite02Blank
         .addr   sprite02Blank
@@ -1874,7 +1874,7 @@ sprite03PausePalette6:
         .byte   $00,$19,$00,$00,$00,$0A,$00,$08
         .byte   $00,$1E,$00,$10,$00,$1C,$00,$18
         .byte   $00,$0E,$00,$20,$FF
-sprite05PausePalette4:
+sprite05DebugPalette4:
         .byte   $00,$0D,$00,$00,$00,$0E,$00,$08
         .byte   $00,$0B,$00,$10,$00,$1E,$00,$18
         .byte   $00,$10,$00,$20,$FF
@@ -1908,8 +1908,13 @@ sprite0CIPiece:
         .byte   $FF
 sprite0EHighScoreNameCursor:
         .byte   $00,$FC,$21,$00,$FF
-spriteDebugLevelSelect:
+spriteDebugLevelEdit:
         .byte   $00,$21,$00,$00
+        .byte   $FF
+spriteStateLoad:
+        .byte   $00,$15,$03,$00,$00,$18,$03,$08
+        .byte   $00,$0A,$03,$10,$00,$0D,$03,$18
+        .byte   $00,$0E,$03,$20,$00,$0D,$03,$28
         .byte   $FF
 sprite53MusicTypeCursor:
         .byte   $00,$27,$00,$00
@@ -4285,7 +4290,7 @@ checkSaveStateControlsDebug:
         and #BUTTON_B
         beq @notPressedB
         jsr loadState
-        jsr renderState
+        jsr renderStateDebug
         jmp @done
 @notPressedB:
 
@@ -4318,6 +4323,19 @@ debugSelectMenuControls:
         ; fallthrough
 
 debugDrawPieces:
+        ; handle savestates
+
+        lda     #$60
+        sta     spriteXOffset
+        lda     #$30
+        sta     spriteYOffset
+        lda     #$17
+        sta     spriteIndexInOamContentLookup
+        jsr     loadSpriteIntoOamStaging
+
+
+        ; handle pieces / X
+
         jsr     stageSpriteForNextPiece
 
         lda     debugLevelEdit
@@ -4325,8 +4343,8 @@ debugDrawPieces:
         bne     @handleX
         jsr     stageSpriteForCurrentPiece
         rts
-@handleX:
 
+@handleX:
         ; load X
         lda     tetriminoX
         asl
