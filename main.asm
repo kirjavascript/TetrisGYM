@@ -57,6 +57,8 @@ parityIndex := $607
 parityCount := $608
 parityColor := $609
 saveStateDirty := $60A
+saveStateSpriteType := $60B
+saveStateSpriteDelay := $60C
 ; $760 - $7FF
 menuVars := $760
 presetModifier := menuVars+0
@@ -1791,8 +1793,8 @@ oamContentLookup:
         .addr   sprite02Blank
         .addr   sprite02Blank
         .addr   spriteDebugLevelEdit ; DEBUG_MODE
+        .addr   spriteStateSave
         .addr   spriteStateLoad
-        .addr   sprite02Blank
         .addr   sprite02Blank
         .addr   sprite02Blank
         .addr   sprite02Blank
@@ -1915,6 +1917,11 @@ spriteStateLoad:
         .byte   $00,$15,$03,$00,$00,$18,$03,$08
         .byte   $00,$0A,$03,$10,$00,$0D,$03,$18
         .byte   $00,$0E,$03,$20,$00,$0D,$03,$28
+        .byte   $FF
+spriteStateSave:
+        .byte   $00,$1c,$03,$00,$00,$0a,$03,$08
+        .byte   $00,$1f,$03,$10,$00,$0e,$03,$18
+        .byte   $00,$0d,$03,$20
         .byte   $FF
 sprite53MusicTypeCursor:
         .byte   $00,$27,$00,$00
@@ -4221,8 +4228,12 @@ saveState:
         inx
         cpx #$c8
         bcc @copy
-        rts
 
+        lda #$17
+        sta saveStateSpriteType
+        lda #$20
+        sta saveStateSpriteDelay
+        rts
 
 loadState:
         lda saveStateTetriminoX
@@ -4240,6 +4251,11 @@ loadState:
         inx
         cpx #$c8
         bcc @copy
+
+        lda #$18
+        sta saveStateSpriteType
+        lda #$20
+        sta saveStateSpriteDelay
         rts
 
 renderStateGameplay:
@@ -4294,6 +4310,20 @@ checkSaveStateControlsDebug:
 @done:
         rts
 
+renderSaveStateSprites:
+        lda saveStateSpriteDelay
+        beq @noSprite
+        dec saveStateSpriteDelay
+        lda #$18
+        sta spriteXOffset
+        lda #$28
+        sta spriteYOffset
+        lda saveStateSpriteType
+        sta spriteIndexInOamContentLookup
+        jsr loadSpriteIntoOamStaging
+@noSprite:
+        rts
+
 
 .if DEBUG_MODE
 
@@ -4316,19 +4346,9 @@ debugSelectMenuControls:
         ; fallthrough
 
 debugDrawPieces:
-        ; handle savestates
-
-        lda     #$60
-        sta     spriteXOffset
-        lda     #$30
-        sta     spriteYOffset
-        lda     #$17
-        sta     spriteIndexInOamContentLookup
-        jsr     loadSpriteIntoOamStaging
-
+        jsr     renderSaveStateSprites
 
         ; handle pieces / X
-
         jsr     stageSpriteForNextPiece
 
         lda     debugLevelEdit
