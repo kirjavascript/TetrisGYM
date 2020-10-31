@@ -4242,13 +4242,6 @@ loadState:
         bcc @copy
         rts
 
-
-renderState:
-        lda renderMode
-        cmp #3
-        beq renderStateGameplay
-        jmp renderStateDebug
-
 renderStateGameplay:
         lda #$03
         sta playState
