@@ -56,6 +56,7 @@ tspinType := $606
 parityIndex := $607
 parityCount := $608
 parityColor := $609
+saveStateDirty := $60A
 ; $760 - $7FF
 menuVars := $760
 presetModifier := menuVars+0
@@ -4193,7 +4194,6 @@ enter_high_score_nametable:
 high_scores_nametable:
         .incbin "gfx/nametables/high_scores_nametable.bin"
 
-saveStateDirty := $620
 saveStateTetriminoX := SRAM
 saveStateTetriminoY := SRAM+1
 saveStateCurrentPiece := SRAM+2
@@ -4281,10 +4281,6 @@ checkSaveStateControlsGameplay:
         rts
 
 checkSaveStateControlsDebug:
-        ; lda heldButtons_player1
-        ; and #BUTTON_SELECT
-        ; beq @done
-
         lda newlyPressedButtons_player1
         and #BUTTON_B
         beq @notPressedB
@@ -4317,6 +4313,7 @@ debugSelectMenuControls:
         sta     debugLevelEdit
 @skipDebugType:
 
+        jsr checkSaveStateControlsDebug
 
         ; fallthrough
 
