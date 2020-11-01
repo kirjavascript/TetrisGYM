@@ -1,9 +1,11 @@
 # Changelog
 
 ## [v1.1]
+- Savestates
 - Garbage Trainer
+- Wraparound on main menu cursor
 - Overflow score - display an extra digit if you maxout
-- Original game bug: Resetting during a tetris no longer creates an invalid state
+- Resetting during a tetris no longer creates an invalid state
 
 ## [v1]
 - Tetris Trainer

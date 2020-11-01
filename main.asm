@@ -7,19 +7,28 @@
 
 ; constants
 
+PRACTISE_MODE := 1
+DEBUG_MODE := 1
 NO_MUSIC := 1
 NO_NO_NEXT_BOX := 1
 AUTO_WIN := 0
-PRACTISE_MODE := 1
-DEBUG_MODE := 1
+SWAPUD := 0
+
+.if SWAPUD
+    BUTTON_UP := $4
+    BUTTON_DOWN := $8
+.else
+    BUTTON_DOWN := $4
+    BUTTON_UP := $8
+.endif
 
 BUTTON_RIGHT := $1
 BUTTON_LEFT := $2
-BUTTON_DOWN := $4
-BUTTON_UP := $8
 BUTTON_B := $40
 BUTTON_A := $80
 BUTTON_SELECT := $20
+
+BLOCK_TILES := $7B
 
 MODE_TETRIS := 0
 MODE_TSPINS := 1
@@ -676,26 +685,35 @@ L830B:  lda     #$FF
         ; additional controls
         jsr     practiseMenuControl
 
+        ; down
         lda     newlyPressedButtons_player1
         cmp     #$04
-        bne     @downNotPressed
+        bne     @downEnd
         lda     #$01
         sta     soundEffectSlot1Init
-        lda     practiseType
 
-        cmp     #MODE_QUANTITY-1
-        beq     @upNotPressed
         inc     practiseType
-@downNotPressed:
+        lda     practiseType
+        cmp     #MODE_QUANTITY
+        bne     @downEnd
+        lda     #0
+        sta     practiseType
+@downEnd:
+
+        ; up
         lda     newlyPressedButtons_player1
         cmp     #$08
-        bne     @upNotPressed
+        bne     @upEnd
         lda     #$01
         sta     soundEffectSlot1Init
         lda     practiseType
-        beq     @upNotPressed
+        bne     @noUpWrap
+        lda     #MODE_QUANTITY
+        sta     practiseType
+@noUpWrap:
         dec     practiseType
-@upNotPressed:
+@upEnd:
+
         lda     newlyPressedButtons_player1
         cmp     #$10
         bne     @startNotPressed
@@ -2766,7 +2784,7 @@ playState_receiveGarbage:
 @fillGarbage:
         cpx     garbageHole
         beq     @hole
-        lda     #$8C
+        lda     #BLOCK_TILES + 3
         jmp     @set
 @hole:
         lda     #$EF ; was $FF ?
