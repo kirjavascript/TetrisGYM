@@ -77,8 +77,9 @@ parityIndex := $607
 parityCount := $608
 parityColor := $609
 saveStateDirty := $60A
-saveStateSpriteType := $60B
-saveStateSpriteDelay := $60C
+saveStateSlot := $60B
+saveStateSpriteType := $60C
+saveStateSpriteDelay := $60D
 ; $760 - $7FF
 menuVars := $760
 presetModifier := menuVars+0
@@ -762,31 +763,14 @@ L830B:  lda     #$FF
         asl     a
         asl     a
         asl     a
-
-.if PRACTISE_MODE ; adjust music menu sprites
         clc
         adc     #$4F
+        ; cursor sprite
         sta     spriteYOffset
-        lda     #$53
-        sta     spriteIndexInOamContentLookup
         lda     #$17
         sta     spriteXOffset
-.else
-        asl     a
-        clc
-        adc     #$8F
-        sta     spriteYOffset
         lda     #$53
         sta     spriteIndexInOamContentLookup
-        lda     #$67
-        sta     spriteXOffset
-        lda     frameCounter
-        and     #$03
-        bne     @flickerCursorPair2
-        lda     #$02
-        sta     spriteIndexInOamContentLookup
-.endif
-@flickerCursorPair2:
         jsr     loadSpriteIntoOamStaging
         jsr     updateAudioWaitForNmiAndResetOamStaging
         jmp     L830B
@@ -1165,7 +1149,7 @@ saveStateUI:
 
 savestate_nametable_patch:
         .byte   $22,$F7,$38,$39,$39,$39,$39,$39,$39,$3A,$FE
-        .byte   $23,$17,$3B,$1C,$15,$18,$1D,$FF,$00,$3C,$FE
+        .byte   $23,$17,$3B,$1C,$15,$18,$1D,$FF,$FF,$3C,$FE
         .byte   $23,$37,$3B,$FF,$FF,$FF,$FF,$FF,$FF,$3C,$FE
         .byte   $23,$57,$3D,$3E,$3E,$3E,$3E,$3E,$3E,$3F,$FD
 
@@ -1867,7 +1851,7 @@ oamContentLookup:
         .addr   sprite02Blank
         .addr   sprite02Blank
         .addr   sprite02Blank
-        .addr   spriteDebugLevelEdit ; DEBUG_MODE
+        .addr   spriteDebugLevelEdit
         .addr   spriteStateSave
         .addr   spriteStateLoad
         .addr   sprite02Blank
@@ -2093,7 +2077,7 @@ render_mode_play_and_demo:
         sta     player1_playState
         lda     #$00
         sta     player1_vramRow
-        jmp     @renderPlayer2Playfield
+        jmp     @renderLines
 
 @playStateNotDisplayLineClearingAnimation:
         lda     player1_vramRow
@@ -2106,47 +2090,6 @@ render_mode_play_and_demo:
         jsr     copyPlayfieldRowToVRAM
         lda     vramRow
         sta     player1_vramRow
-@renderPlayer2Playfield:
-        lda     numberOfPlayers
-        cmp     #$02
-        bne     @renderLines
-        lda     player2_playState
-        cmp     #$04
-        bne     @player2PlayStateNotDisplayLineClearingAnimation
-        lda     #$05
-        sta     playfieldAddr+1
-        lda     player2_rowY
-        sta     rowY
-        lda     player2_completedRow
-        sta     completedRow
-        lda     player2_completedRow+1
-        sta     completedRow+1
-        lda     player2_completedRow+2
-        sta     completedRow+2
-        lda     player2_completedRow+3
-        sta     completedRow+3
-        lda     player2_playState
-        sta     playState
-        jsr     updateLineClearingAnimation
-        lda     rowY
-        sta     player2_rowY
-        lda     playState
-        sta     player2_playState
-        lda     #$00
-        sta     player2_vramRow
-        jmp     @renderLines
-
-@player2PlayStateNotDisplayLineClearingAnimation:
-        lda     player2_vramRow
-        sta     vramRow
-        lda     #$05
-        sta     playfieldAddr+1
-        jsr     copyPlayfieldRowToVRAM
-        jsr     copyPlayfieldRowToVRAM
-        jsr     copyPlayfieldRowToVRAM
-        jsr     copyPlayfieldRowToVRAM
-        lda     vramRow
-        sta     player2_vramRow
 @renderLines:
         lda     outOfDateRenderFlags
         and     #$01
@@ -4401,6 +4344,26 @@ renderSaveStateSprites:
         sta spriteIndexInOamContentLookup
         jsr loadSpriteIntoOamStaging
 @noSprite:
+
+        ; draw slot #
+
+        ldx oamStagingLength
+        lda #$BF
+        sta oamStaging, x
+        inx
+        lda saveStateSlot
+        sta oamStaging, x
+        inx
+        lda #$03
+        sta oamStaging, x
+        inx
+        lda #$E8
+        sta oamStaging, x
+        inx
+        lda #$04
+        clc
+        adc oamStagingLength
+        sta oamStagingLength
         rts
 
 
@@ -4420,7 +4383,7 @@ debugSelectMenuControls:
         sta     debugLevelEdit
 @skipDebugType:
 
-        jsr checkSaveStateControlsDebug
+        jsr     checkSaveStateControlsDebug
 
         ; fallthrough
 
@@ -4580,7 +4543,7 @@ debugContinue:
 
 
 handleLevelEditor:
-        jsr debugDrawPieces
+        jsr     debugDrawPieces
 
         ; handle editing
 

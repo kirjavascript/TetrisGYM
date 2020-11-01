@@ -1,7 +1,7 @@
 # Changelog
 
 ## [v1.1]
-- Savestates
+- Savestates added to Debug Mode
 - Garbage Trainer
 - Wraparound on main menu cursor
 - Display current mode in gameplay
@@ -15,5 +15,5 @@
 - Floor Trainer
 - (Quick)Tap Trainer
 - Drought Trainer
-- Debug Mode Trainer
+- Debug Mode
 - PAL Mode

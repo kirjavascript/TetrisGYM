@@ -15,7 +15,7 @@ const print = bytes => bytes.map(line => '        .byte   ' + line.map(d => '$' 
 
 console.log(print(convert(`
 qwwwwwwe
-aSLOT 0d
+aSLOT  d
 a      d
 zxxxxxxc
 `, 0x22F7)));
