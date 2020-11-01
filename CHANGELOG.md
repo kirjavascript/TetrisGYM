@@ -4,7 +4,7 @@
 - Savestates
 - Garbage Trainer
 - Wraparound on main menu cursor
-- Overflow score - display an extra digit if you maxout
+- Display current mode in gameplay
 - Resetting during a tetris no longer creates an invalid state
 
 ## [v1]

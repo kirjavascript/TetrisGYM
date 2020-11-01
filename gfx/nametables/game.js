@@ -2,7 +2,7 @@ const { readFileSync, writeFileSync } = require('fs');
 
 const buffer = readFileSync(__dirname + '/game_nametable.bin');
 
-const lookup = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ-.\'>!^##############qweadzxc############################################################################################################################################################################################### ';
+const lookup = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ-.\'>!^()############qweadzxc############################################################################################################################################################################################### ';
 
 const chars = [...buffer].map(value => lookup[value] || '__NOWAYNOWAY');
 
@@ -13,9 +13,9 @@ W0W################################
 WWW################################
 W#W###########qwwwwwwwwwweqwwwwwwe#
 W#W##qwwwwwwe#a LINES-   da      d#
-W#W##aSLOT-0d#zxxxxxxxxxxcaTOP   d#
-W#W##a      d#############a000000d#
-W#W##zxxxxxxc##          #a      d#
+W#W##a      d#zxxxxxxxxxxcaTOP   d#
+W#W##zxxxxxxc#############a000000d#
+W#W############          #a      d#
 W#W############          #aSCORE d#
 X0W#qwwwwwwwwe#          #a000000d#
 XWW#a########d#          #a      d#

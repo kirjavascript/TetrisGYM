@@ -48,6 +48,17 @@ MODE_CONFIG_OFFSET := MODE_QUANTITY - MODE_CONFIG_QUANTITY
 
 .define MENUSIZES $5, $C, $20, $3, $12, $1, $1
 
+.macro MODENAMES
+    .byte   $1D,$0E,$1D,$1B,$12,$1C
+    .byte   $1D,$1C,$19,$12,$17,$1C
+    .byte   $1C,$1D,$0A,$0C,$14,$17
+    .byte   $1C,$0E,$1D,$1E,$19,$1C
+    .byte   $0F,$15,$18,$18,$1B,$FF
+    .byte   $2A,$1A,$2B,$1D,$0A,$19
+    .byte   $10,$0A,$1B,$0B,$10,$0E
+    .byte   $0D,$1B,$10,$11,$1D,$FF
+.endmacro
+
 ; RAM
 
 debugLevelEdit := unused_0E
@@ -1091,16 +1102,6 @@ gameModeState_initGameBackground:
         .addr   game_palette
         jsr     bulkCopyToPpu
         .addr   game_nametable
-.if PRACTISE_MODE ; hide A-TYPE
-padNOP $13
-.else
-        lda     #$20
-        sta     PPUADDR
-        lda     #$83
-        sta     PPUADDR
-        lda     #$0A
-        sta     PPUDATA
-.endif
         lda     #$20
         sta     PPUADDR
         lda     #$B8
@@ -1111,7 +1112,69 @@ padNOP $13
         jsr     twoDigsToPPU
         lda     highScoreScoresA+2
         jsr     twoDigsToPPU
+        jsr     displayModeText
+        jsr     saveStateUI
         jmp     gameModeState_initGameBackground_finish
+
+
+displayModeText:
+        ldx     practiseType
+        lda     #0
+@loopAddr:
+        cpx     #0
+        beq     @addr
+        clc
+        adc     #6
+        dex
+        jmp     @loopAddr
+@addr:
+        ; offset in X
+        tax
+
+        lda     #$20
+        sta     PPUADDR
+        lda     #$83
+        sta     PPUADDR
+
+        ldy     #6
+@writeChar:
+        lda     modeText, x
+        sta     PPUDATA
+        inx
+        dey
+        bne     @writeChar
+        rts
+
+modeText:
+MODENAMES
+
+saveStateUI:
+        ldx     #$00
+@nextPpuAddress:
+        lda     savestate_nametable_patch,x
+        inx
+        sta     PPUADDR
+        lda     savestate_nametable_patch,x
+        inx
+        sta     PPUADDR
+@nextPpuData:
+        lda     savestate_nametable_patch,x
+        inx
+        cmp     #$FE
+        beq     @nextPpuAddress
+        cmp     #$FD
+        beq     @endOfPpuPatching
+        sta     PPUDATA
+        jmp     @nextPpuData
+@endOfPpuPatching:
+        rts
+
+
+savestate_nametable_patch:
+        .byte   $22,$F7,$38,$39,$39,$39,$39,$39,$39,$3A,$FE
+        .byte   $23,$17,$3B,$1C,$15,$18,$1D,$FF,$00,$3C,$FE
+        .byte   $23,$37,$3B,$FF,$FF,$FF,$FF,$FF,$FF,$3C,$FE
+        .byte   $23,$57,$3D,$3E,$3E,$3E,$3E,$3E,$3E,$3F,$FD
 
 gameModeState_initGameBackground_finish:
         jsr     waitForVBlankAndEnableNmi
@@ -2136,10 +2199,10 @@ render_mode_play_and_demo:
         lda     player1_score+2 ; patched
 
         ; 7 digit score clamping
-        cmp     #$A0
-        bcc     @nomax
-        sbc     #$A0
-@nomax:
+        ; cmp     #$A0
+        ; bcc     @nomax
+        ; sbc     #$A0
+; @nomax:
 
         jsr     twoDigsToPPU
         lda     player1_score+1
@@ -2148,16 +2211,16 @@ render_mode_play_and_demo:
         jsr     twoDigsToPPU
 
         ; draw million digit
-        lda     player1_score+2
-        cmp     #$A0
-        bcc     @noExtraDigit
-        lda     #$21
-        sta     PPUADDR
-        lda     #$17
-        sta     PPUADDR
-        lda     #$1
-        sta     PPUDATA
-@noExtraDigit:
+        ; lda     player1_score+2
+        ; cmp     #$A0
+        ; bcc     @noExtraDigit
+        ; lda     #$21
+        ; sta     PPUADDR
+        ; lda     #$17
+        ; sta     PPUADDR
+        ; lda     #$1
+        ; sta     PPUDATA
+; @noExtraDigit:
 
         lda     outOfDateRenderFlags
         and     #$FB
@@ -2976,7 +3039,7 @@ L9C75:  lda     score+2
 L9C84: ; SCORE_LIMIT
         lda     score+2
         and     #$F0
-        cmp     #$F0
+        cmp     #$FF
         bcc     L9C94
         lda     #0
         sta     score
