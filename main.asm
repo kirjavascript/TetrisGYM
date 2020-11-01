@@ -711,10 +711,10 @@ L830B:  lda     #$FF
         lda     #$01
         sta     soundEffectSlot1Init
         lda     practiseType
-        bne     @noUpWrap
+        bne     @noWrap
         lda     #MODE_QUANTITY
         sta     practiseType
-@noUpWrap:
+@noWrap:
         dec     practiseType
 @upEnd:
 
@@ -744,21 +744,6 @@ L830B:  lda     #$FF
         asl     a
         clc
 
-.if !PRACTISE_MODE ; skip mode menu sprites
-        adc     #$3F
-        sta     spriteXOffset
-        lda     #$3F
-        sta     spriteYOffset
-        lda     #$01
-        sta     spriteIndexInOamContentLookup
-        lda     frameCounter
-        and     #$03
-        bne     @flickerCursorPair1
-        lda     #$02
-        sta     spriteIndexInOamContentLookup
-@flickerCursorPair1:
-        jsr     loadSpriteIntoOamStaging
-.endif
         lda     practiseType
         asl     a
         asl     a
@@ -4322,14 +4307,32 @@ checkSaveStateControlsDebug:
         beq @notPressedB
         jsr loadState
         jsr renderStateDebug
-        jmp @done
 @notPressedB:
-
         lda newlyPressedButtons_player1
         and #BUTTON_A
-        beq @done
+        beq @notPressedA
         jsr saveState
-@done:
+@notPressedA:
+        lda newlyPressedButtons_player1
+        and #BUTTON_UP
+        beq @notPressedUp
+        inc saveStateSlot
+        lda saveStateSlot
+        cmp #$A
+        bne @notPressedUp
+        lda #0
+        sta saveStateSlot
+@notPressedUp:
+        lda newlyPressedButtons_player1
+        and #BUTTON_DOWN
+        beq @notPressedDown
+        lda saveStateSlot
+        bne @noWrap
+        lda #$A
+        sta saveStateSlot
+@noWrap:
+        dec saveStateSlot
+@notPressedDown:
         rts
 
 renderSaveStateSprites:
@@ -4365,7 +4368,6 @@ renderSaveStateSprites:
         adc oamStagingLength
         sta oamStagingLength
         rts
-
 
 .if DEBUG_MODE
 
