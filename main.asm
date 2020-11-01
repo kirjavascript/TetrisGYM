@@ -92,14 +92,6 @@ palFlag := menuVars+6
 
 SRAM := $6000 ; 8kb
 
-; macros
-
-.macro padNOP qty
-    .repeat qty
-        nop
-    .endrep
-.endmacro
-
         .setcpu "6502"
 
 tmp1            := $0000
@@ -1149,6 +1141,8 @@ modeText:
 MODENAMES
 
 saveStateUI:
+        lda     debugFlag
+        beq     @endOfPpuPatching
         ldx     #$00
 @nextPpuAddress:
         lda     savestate_nametable_patch,x
@@ -1168,7 +1162,6 @@ saveStateUI:
         jmp     @nextPpuData
 @endOfPpuPatching:
         rts
-
 
 savestate_nametable_patch:
         .byte   $22,$F7,$38,$39,$39,$39,$39,$39,$39,$3A,$FE
@@ -4400,9 +4393,9 @@ renderSaveStateSprites:
         lda saveStateSpriteDelay
         beq @noSprite
         dec saveStateSpriteDelay
-        lda #$18
+        lda #$C0
         sta spriteXOffset
-        lda #$28
+        lda #$C8
         sta spriteYOffset
         lda saveStateSpriteType
         sta spriteIndexInOamContentLookup
