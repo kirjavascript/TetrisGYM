@@ -4104,8 +4104,6 @@ switch_s_plus_2a:
         jsr     setMMC1Control
         rts
 
-        rts
-
 setMMC1Control:
         sta     MMC1_Control
         lsr     a
@@ -4229,6 +4227,7 @@ saveStatePlayfield := SRAM+4
 ; loadSpriteIntoOamStaging
 
 saveState:
+        ; save all of player RAM
         lda tetriminoX
         sta saveStateTetriminoX
         lda tetriminoY
@@ -4237,12 +4236,13 @@ saveState:
         sta saveStateCurrentPiece
         lda nextPiece
         sta saveStateNextPiece
-        ldx #0
+
+        ldy #0
 @copy:
-        lda playfield,x
-        sta saveStatePlayfield,x
-        inx
-        cpx #$c8
+        lda playfield,y
+        sta saveStatePlayfield,y
+        iny
+        cpy #$c8
         bcc @copy
 
         lda #$17
@@ -4250,6 +4250,28 @@ saveState:
         lda #$20
         sta saveStateSpriteDelay
         rts
+
+SLOT_SIZE := $100
+
+slots:
+        .addr slot0
+        .addr slot1
+slot0:
+        lda saveStatePlayfield,y
+        rts
+slot1:
+        lda saveStatePlayfield+$500,y
+        rts
+
+loadSlot:
+        lda saveStateSlot
+        asl
+        tax
+        lda slots,x
+        sta tmp1
+        lda slots+1,x
+        sta tmp1+1
+        jmp (tmp1)
 
 loadState:
         lda saveStateTetriminoX
@@ -4260,12 +4282,14 @@ loadState:
         sta currentPiece
         lda saveStateNextPiece
         sta nextPiece
-        ldx #0
+
+        ldy #0
 @copy:
-        lda saveStatePlayfield,x
-        sta playfield,x
-        inx
-        cpx #$c8
+        ; lda saveStatePlayfield,y
+        jsr loadSlot
+        sta playfield,y
+        iny
+        cpy #$c8
         bcc @copy
 
         lda #$18
