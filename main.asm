@@ -4206,44 +4206,82 @@ enter_high_score_nametable:
 high_scores_nametable:
         .incbin "gfx/nametables/high_scores_nametable.bin"
 
-saveStateTetriminoX := SRAM
-saveStateTetriminoY := SRAM+1
-saveStateCurrentPiece := SRAM+2
-saveStateNextPiece := SRAM+3
-saveStatePlayfield := SRAM+4
+SLOT_SIZE := $100
 
-; saveSize := $100
-; saveSlots:
-;         .addr SRAM
-;         .addr SRAM + (saveSize * 1)
-;         .addr SRAM + (saveSize * 2)
-;         .addr SRAM + (saveSize * 3)
-;         .addr SRAM + (saveSize * 4)
-;         .addr SRAM + (saveSize * 5)
-;         .addr SRAM + (saveSize * 6)
-;         .addr SRAM + (saveSize * 7)
-;         .addr SRAM + (saveSize * 8)
-;         .addr SRAM + (saveSize * 9)
-; loadSpriteIntoOamStaging
+saveslots:
+        .addr saveslot0
+        .addr saveslot1
+        .addr saveslot2
+        .addr saveslot3
+        .addr saveslot4
+        .addr saveslot5
+        .addr saveslot6
+        .addr saveslot7
+        .addr saveslot8
+        .addr saveslot9
+saveslot0:
+        sta SRAM,y
+        rts
+saveslot1:
+        sta SRAM+SLOT_SIZE,y
+        rts
+saveslot2:
+        sta SRAM+(SLOT_SIZE*2),y
+        rts
+saveslot3:
+        sta SRAM+(SLOT_SIZE*3),y
+        rts
+saveslot4:
+        sta SRAM+(SLOT_SIZE*4),y
+        rts
+saveslot5:
+        sta SRAM+(SLOT_SIZE*5),y
+        rts
+saveslot6:
+        sta SRAM+(SLOT_SIZE*6),y
+        rts
+saveslot7:
+        sta SRAM+(SLOT_SIZE*7),y
+        rts
+saveslot8:
+        sta SRAM+(SLOT_SIZE*8),y
+        rts
+saveslot9:
+        sta SRAM+(SLOT_SIZE*9),y
+        rts
+
+saveSlot:
+        sta tmp3 ; save a copy of A
+        lda saveStateSlot
+        asl
+        tax
+        lda saveslots,x
+        sta tmp1
+        lda saveslots+1,x
+        sta tmp1+1
+        lda tmp3 ; restore it
+        jmp (tmp1)
 
 saveState:
-        ; save all of player RAM
-        lda tetriminoX
-        sta saveStateTetriminoX
-        lda tetriminoY
-        sta saveStateTetriminoY
-        lda currentPiece
-        sta saveStateCurrentPiece
-        lda nextPiece
-        sta saveStateNextPiece
-
         ldy #0
 @copy:
         lda playfield,y
-        sta saveStatePlayfield,y
+        jsr saveSlot
         iny
         cpy #$c8
         bcc @copy
+
+        lda tetriminoX
+        jsr saveSlot
+        iny
+        lda tetriminoY
+        jsr saveSlot
+        iny
+        lda currentPiece
+        jsr saveSlot
+        lda nextPiece
+        iny
+        jsr saveSlot
 
         lda #$17
         sta saveStateSpriteType
@@ -4251,46 +4289,78 @@ saveState:
         sta saveStateSpriteDelay
         rts
 
-SLOT_SIZE := $100
-
-slots:
-        .addr slot0
-        .addr slot1
-slot0:
-        lda saveStatePlayfield,y
+loadslots:
+        .addr loadslot0
+        .addr loadslot1
+        .addr loadslot2
+        .addr loadslot3
+        .addr loadslot4
+        .addr loadslot5
+        .addr loadslot6
+        .addr loadslot7
+        .addr loadslot8
+        .addr loadslot9
+loadslot0:
+        lda SRAM,y
         rts
-slot1:
-        lda saveStatePlayfield+$500,y
+loadslot1:
+        lda SRAM+SLOT_SIZE,y
+        rts
+loadslot2:
+        lda SRAM+(SLOT_SIZE*2),y
+        rts
+loadslot3:
+        lda SRAM+(SLOT_SIZE*3),y
+        rts
+loadslot4:
+        lda SRAM+(SLOT_SIZE*4),y
+        rts
+loadslot5:
+        lda SRAM+(SLOT_SIZE*5),y
+        rts
+loadslot6:
+        lda SRAM+(SLOT_SIZE*6),y
+        rts
+loadslot7:
+        lda SRAM+(SLOT_SIZE*7),y
+        rts
+loadslot8:
+        lda SRAM+(SLOT_SIZE*8),y
+        rts
+loadslot9:
+        lda SRAM+(SLOT_SIZE*9),y
         rts
 
 loadSlot:
         lda saveStateSlot
         asl
         tax
-        lda slots,x
+        lda loadslots,x
         sta tmp1
-        lda slots+1,x
+        lda loadslots+1,x
         sta tmp1+1
         jmp (tmp1)
 
 loadState:
-        lda saveStateTetriminoX
-        sta tetriminoX
-        lda saveStateTetriminoY
-        sta tetriminoY
-        lda saveStateCurrentPiece
-        sta currentPiece
-        lda saveStateNextPiece
-        sta nextPiece
-
         ldy #0
 @copy:
-        ; lda saveStatePlayfield,y
         jsr loadSlot
         sta playfield,y
         iny
         cpy #$c8
         bcc @copy
+
+        jsr loadSlot
+        sta tetriminoX
+        iny
+        jsr loadSlot
+        sta tetriminoY
+        iny
+        jsr loadSlot
+        sta currentPiece
+        iny
+        jsr loadSlot
+        sta nextPiece
 
         lda #$18
         sta saveStateSpriteType
