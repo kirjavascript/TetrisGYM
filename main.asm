@@ -5,6 +5,8 @@
 ; @disassembly CelestialAmber/TetrisNESDisasm
 ; @information ejona86/taus
 
+.include "charmap.asm"
+
 ; constants
 
 PRACTISE_MODE := 1
@@ -49,14 +51,14 @@ MODE_CONFIG_OFFSET := MODE_QUANTITY - MODE_CONFIG_QUANTITY
 .define MENUSIZES $5, $C, $20, $3, $12, $1, $1
 
 .macro MODENAMES
-    .byte   $1D,$0E,$1D,$1B,$12,$1C
-    .byte   $1D,$1C,$19,$12,$17,$1C
-    .byte   $1C,$1D,$0A,$0C,$14,$17
-    .byte   $1C,$0E,$1D,$1E,$19,$1C
-    .byte   $0F,$15,$18,$18,$1B,$FF
-    .byte   $2A,$1A,$2B,$1D,$0A,$19
-    .byte   $10,$0A,$1B,$0B,$10,$0E
-    .byte   $0D,$1B,$1E,$10,$11,$1D
+    .byte   "TETRIS"
+    .byte   "TSPINS"
+    .byte   "STACKN"
+    .byte   "SETUPS"
+    .byte   "FLOOR "
+    .byte   "(Q)TAP"
+    .byte   "GARBGE"
+    .byte   "DRUGHT"
 .endmacro
 
 ; RAM
@@ -4167,8 +4169,6 @@ menu_palette:
         .byte   $17,$27,$37,$0F,$30,$12,$00,$0F
         .byte   $16,$2A,$28,$0F,$30,$29,$27,$FF
 
-
-; .include "charmap.asm"
 defaultHighScoresTable:
         ; used to use charmap.asm
         .byte  $2B,$2B,$2B,$2B,$2B,$2B ; HOWARD

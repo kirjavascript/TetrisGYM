@@ -23,11 +23,6 @@ zxxxxxxc
 
 // mode names
 
-const modeNames = `
-TETRIS
-TSPINS
-`.trim().split('\n').map(line => Array.from({ length: 6 }, (_, i) => (
-    lookup.indexOf(line[i] || ' ')
-)))
-
-console.log(print(modeNames))
+// [...lookup].forEach((d, i) => {
+//     d=='#'||console.log(`.charmap '${d}', $${i.toString(16).padStart(2, '0')}`)
+// });
