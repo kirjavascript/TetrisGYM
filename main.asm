@@ -4366,6 +4366,7 @@ loadState:
         sta saveStateSpriteType
         lda #$20
         sta saveStateSpriteDelay
+@done:
         rts
 
 renderStateGameplay:
@@ -4402,6 +4403,9 @@ checkSaveStateGameplay:
         lda newlyPressedButtons_player1
         and #BUTTON_B
         beq @done
+        ldy #0
+        jsr loadSlot ; check slot is empty
+        beq @done
         jsr loadState
         jsr renderStateGameplay
         jmp @done
@@ -4412,6 +4416,9 @@ checkSaveStateControlsDebug:
         ; load / save
         lda newlyPressedButtons_player1
         and #BUTTON_B
+        beq @notPressedB
+        ldy #0
+        jsr loadSlot ; check slot is empty
         beq @notPressedB
         jsr loadState
         jsr renderStateDebug
