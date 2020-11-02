@@ -1,6 +1,5 @@
 const lookup = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ-.\'>!^()############qweadzxc############################################################################################################################################################################################### ';
 
-
 const convert = (patch, pos) => {
     const lines = patch.trim().split('\n');
     return lines.map((line, i) => {
@@ -13,6 +12,8 @@ const convert = (patch, pos) => {
 
 const print = bytes => bytes.map(line => '        .byte   ' + line.map(d => '$' + d.toString(16).padStart(2,'0').toUpperCase()).join`,`).join`\n`;
 
+// nametable patches
+
 console.log(print(convert(`
 qwwwwwwe
 aSLOT  d
@@ -20,15 +21,11 @@ a      d
 zxxxxxxc
 `, 0x22F7)));
 
+// mode names
+
 const modeNames = `
 TETRIS
 TSPINS
-STACKN
-SETUPS
-FLOOR
-(Q)TAP
-GARBGE
-DRGHT
 `.trim().split('\n').map(line => Array.from({ length: 6 }, (_, i) => (
     lookup.indexOf(line[i] || ' ')
 )))

@@ -1,10 +1,10 @@
 # Changelog
 
 ## [v1.1]
-- Savestates added to Debug Mode
 - Garbage Trainer
+- Savestates added to Debug Mode
 - Wraparound on main menu cursor
-- Display current mode in gameplay
+- Display current mode during gameplay
 - Resetting during a tetris no longer creates an invalid state
 
 ## [v1]

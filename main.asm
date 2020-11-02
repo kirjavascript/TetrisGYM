@@ -2,8 +2,8 @@
 ;
 ; @author Kirjava
 ; @github kirjavascript/TetrisGYM
-; @upstream CelestialAmber/TetrisNESDisasm
-; @disassembly ejona86/taus
+; @disassembly CelestialAmber/TetrisNESDisasm
+; @information ejona86/taus
 
 ; constants
 
@@ -56,7 +56,7 @@ MODE_CONFIG_OFFSET := MODE_QUANTITY - MODE_CONFIG_QUANTITY
     .byte   $0F,$15,$18,$18,$1B,$FF
     .byte   $2A,$1A,$2B,$1D,$0A,$19
     .byte   $10,$0A,$1B,$0B,$10,$0E
-    .byte   $0D,$1B,$10,$11,$1D,$FF
+    .byte   $0D,$1B,$1E,$10,$11,$1D
 .endmacro
 
 ; RAM
@@ -4168,16 +4168,16 @@ menu_palette:
         .byte   $16,$2A,$28,$0F,$30,$29,$27,$FF
 
 
-.include "charmap.asm"
-        ;are the following zeros unused entries for each high score table?
+; .include "charmap.asm"
 defaultHighScoresTable:
-        .byte  "      " ; HOWARD
-        .byte  "      " ; OTASAN
-        .byte  "      " ; LANCE
+        ; used to use charmap.asm
+        .byte  $2B,$2B,$2B,$2B,$2B,$2B ; HOWARD
+        .byte  $2B,$2B,$2B,$2B,$2B,$2B ; OTASAN
+        .byte  $2B,$2B,$2B,$2B,$2B,$2B ; LANCE
         .byte  $00,$00,$00,$00,$00,$00 ;unknown
-        .byte  "ALEX  " ;$01,$0C,$05,$18,$2B,$2B
-        .byte  "TONY  " ;$14,$0F,$0E,$19,$2B,$2B
-        .byte  "NINTEN" ;$0E,$09,$0E,$14,$05,$0E
+        .byte  $2B,$2B,$2B,$2B,$2B,$2B ; ALEX
+        .byte  $2B,$2B,$2B,$2B,$2B,$2B ; TONY
+        .byte  $2B,$2B,$2B,$2B,$2B,$2B ; NINTEN
         .byte   $00,$00,$00,$00,$00,$00 ;unknown
         ;High Scores are stored in BCD
         .byte   $00,$00,$00
@@ -4226,6 +4226,7 @@ saveStatePlayfield := SRAM+4
 ;         .addr SRAM + (saveSize * 7)
 ;         .addr SRAM + (saveSize * 8)
 ;         .addr SRAM + (saveSize * 9)
+; loadSpriteIntoOamStaging
 
 saveState:
         lda tetriminoX
