@@ -778,7 +778,6 @@ gameMode_levelMenu:
         jsr     bulkCopyToPpu
         .addr   level_menu_nametable
         ; type-a patching used to happen here
-@skipTypeBHeightDisplay:
         jsr     showHighScores
         jsr     waitForVBlankAndEnableNmi
         jsr     updateAudioWaitForNmiAndResetOamStaging
@@ -4215,6 +4214,19 @@ saveStateCurrentPiece := SRAM+2
 saveStateNextPiece := SRAM+3
 saveStatePlayfield := SRAM+4
 
+; saveSize := $100
+; saveSlots:
+;         .addr SRAM
+;         .addr SRAM + (saveSize * 1)
+;         .addr SRAM + (saveSize * 2)
+;         .addr SRAM + (saveSize * 3)
+;         .addr SRAM + (saveSize * 4)
+;         .addr SRAM + (saveSize * 5)
+;         .addr SRAM + (saveSize * 6)
+;         .addr SRAM + (saveSize * 7)
+;         .addr SRAM + (saveSize * 8)
+;         .addr SRAM + (saveSize * 9)
+
 saveState:
         lda tetriminoX
         sta saveStateTetriminoX
@@ -4302,6 +4314,7 @@ checkSaveStateGameplay:
         rts
 
 checkSaveStateControlsDebug:
+        ; load / save
         lda newlyPressedButtons_player1
         and #BUTTON_B
         beq @notPressedB
@@ -4313,6 +4326,7 @@ checkSaveStateControlsDebug:
         beq @notPressedA
         jsr saveState
 @notPressedA:
+        ; save slot
         lda newlyPressedButtons_player1
         and #BUTTON_UP
         beq @notPressedUp
