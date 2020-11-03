@@ -2,7 +2,7 @@
 
 ## [v1.1]
 - Garbage Trainer
-- Savestates added to Debug Mode
+- Savestates feature added to Debug Mode
 - Wraparound on main menu cursor
 - Display current mode during gameplay
 - Resetting during a tetris no longer creates an invalid state

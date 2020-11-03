@@ -65,7 +65,6 @@ MODE_CONFIG_OFFSET := MODE_QUANTITY - MODE_CONFIG_QUANTITY
 
 debugLevelEdit := unused_0E
 debugNextCounter := nextPiece_2player
-presetRNG := tmp1
 presetBitmask := tmp2
 ; $600 - $67F
 practiseType := $600
@@ -82,6 +81,7 @@ saveStateDirty := $60A
 saveStateSlot := $60B
 saveStateSpriteType := $60C
 saveStateSpriteDelay := $60D
+presetIndex := $60E
 ; $760 - $7FF
 menuVars := $760
 presetModifier := menuVars+0
@@ -1643,6 +1643,7 @@ L8A4B:  lda     orientationTable,x
         iny
         inx
         lda     orientationTable,x
+        ; BLOCK_TILES
         sta     oamStaging,y
         inc     oamStagingLength
         iny
@@ -2614,6 +2615,7 @@ playState_lockTetrimino:
         adc     selectingLevelOrHeight
         tay
         lda     generalCounter5
+        ; BLOCK_TILES
         sta     (playfieldAddr),y
         inx
         dec     generalCounter3
@@ -4206,7 +4208,10 @@ enter_high_score_nametable:
 high_scores_nametable:
         .incbin "gfx/nametables/high_scores_nametable.bin"
 
-SLOT_SIZE := $100
+SLOT_SIZE := $100 ; $CC used, the rest free
+
+; some repeated code here, dynamic 16 bit addressing is hard
+; could replace it with code executed / modified in RAM
 
 saveslots:
         .addr saveslot0
@@ -6578,8 +6583,13 @@ practisePickTetriminoPatch:
         jmp     pickRandomTetrimino
 
 @presets:
-        ; RNG in x
-        stx     presetRNG
+        inc     presetIndex
+        lda     presetIndex
+        and     #$07
+        cmp     #$07
+        beq     @presets
+        sta     presetIndex
+        tax     ; RNG in x
         ; store piece bitmask
         ldy     presetModifier
         lda     presets, y ; offset of preset in A
@@ -6596,8 +6606,8 @@ practisePickTetriminoPatch:
         jmp     @shiftBit
 @doneShifting:
         and     presetBitmask
-        bne     @pickRando
-        ldx     presetRNG ; restore RNG
+        bne     @presets
+        ldx     presetIndex ; restore RNG
         lda     spawnTable,x
         sta     spawnID
         rts
