@@ -2,7 +2,7 @@ const { readFileSync, writeFileSync } = require('fs');
 
 const buffer = readFileSync(__dirname + '/level_menu_nametable.bin');
 
-let lookup = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ-,\'>rtyfhvbn########qweadzxc############jkl/ui!###########()#############$@.############################################################################################################################################### ';
+let lookup = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ-,\'>rtyfhvbn########qweadzxc############jkl/ui!###########()############@$#.############################################################################################################################################### ';
 
 lookup = [...lookup].map((d, i) => d === '#' ? String.fromCharCode(9472 + i) : d).join``
 
@@ -15,9 +15,9 @@ W0W################################
 WWW################################
 W#W###qwwwwwwwwwwwwwwwwwwwwwwwwe###
 W#W###a                        d###
-W#W###a                        d###
-W#W###a                        d###
-W#W###a                        d###
+W#W###a               qwwwwwwe d###
+W#W###a               a      d d###
+W#W###a               zxxxxxxc d###
 W#W###a     ╄╅╅╅╅╅╆            d###
 X0W###a     ╇LEVEL╈            d###
 XWW###a     ╉╊╊╊╊╊╋            d###
@@ -47,9 +47,41 @@ Z#W#000000##000000#########AAAAAAAA
 
 const practise = Buffer.from(buffer);
 [...tiles.trim().split('\n').join('')].forEach((d, i) => {
-    // TODO: patch logo
     if (d !== '#') {
         practise[i] = lookup.indexOf(d);
     }
 });
+
+// palettes
+// DR - DL - UR - UL
+const palettes = p => p.trim().match(/.+\n.+$/gm)
+    .flatMap(line=>(
+        [t,b]=line.split('\n'),
+        t.trim().match(r=/../g).map((d,i)=>d+b.trim().match(r)[i])
+    ))
+    .map(d=>+('0b'+[...d].reverse().map(d=>(+d).toString(2).padStart(2,0)).join``));
+
+[
+    [1053, palettes(`
+        2222222222222222
+        2222222222222222
+        2222222222222222
+        2222222222222222
+        2222222222222222
+        2223333333222222
+        2223333333222222
+        2223333333222222
+    `)],
+    [1088, palettes(`
+        2222222222222222
+        2222222222222222
+        2222222222222222
+        2222222222222222
+        2222222222222222
+        2222222222222222
+        2222222222222222
+        2222222222222222
+    `)],
+].forEach(([index, attributes]) => attributes.forEach((byte, i) => { practise[i+index] = byte; }));
+
 writeFileSync(__dirname + '/level_menu_nametable_practise.bin', practise);

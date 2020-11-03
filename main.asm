@@ -779,7 +779,11 @@ gameMode_levelMenu:
         .addr   menu_palette
         jsr     bulkCopyToPpu
         .addr   level_menu_nametable
-        ; type-a patching used to happen here
+        lda     #$20
+        sta     tmp1
+        lda     #$B4 ; $6D is OEM position
+        sta     tmp2
+        jsr     displayModeText
         jsr     showHighScores
         jsr     waitForVBlankAndEnableNmi
         jsr     updateAudioWaitForNmiAndResetOamStaging
@@ -1074,6 +1078,10 @@ gameModeState_initGameBackground:
         jsr     twoDigsToPPU
         lda     highScoreScoresA+2
         jsr     twoDigsToPPU
+        lda     #$20
+        sta     tmp1
+        lda     #$83
+        sta     tmp2
         jsr     displayModeText
         jsr     saveStateUI
         jmp     gameModeState_initGameBackground_finish
@@ -1093,9 +1101,9 @@ displayModeText:
         ; offset in X
         tax
 
-        lda     #$20
+        lda     tmp1
         sta     PPUADDR
-        lda     #$83
+        lda     tmp2
         sta     PPUADDR
 
         ldy     #6
@@ -4165,7 +4173,7 @@ title_palette:
         .byte   $17,$27,$37,$0F,$30,$12,$00,$0F
         .byte   $22,$2A,$28,$0F,$30,$29,$27,$FF
 menu_palette:
-        .byte   $3F,$00,$14,$0F,$30,$38,$00,$0F
+        .byte   $3F,$00,$14,$0F,$30,$38,$06,$0F
         .byte   $17,$27,$37,$0F,$30,$12,$00,$0F
         .byte   $16,$2A,$28,$0F,$30,$29,$27,$FF
 

@@ -4,7 +4,8 @@
 - Garbage Trainer
 - Savestates feature added to Debug Mode
 - Wraparound on main menu cursor
-- Display current mode during gameplay
+- Display current mode during gameplay / level select
+- Piece distribution in Setups Trainer is now even
 - Resetting during a tetris no longer creates an invalid state
 
 ## [v1]
