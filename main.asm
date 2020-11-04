@@ -56,7 +56,7 @@ MODE_CONFIG_OFFSET := MODE_QUANTITY - MODE_CONFIG_QUANTITY
     .byte   "STACKN"
     .byte   "SETUPS"
     .byte   "FLOOR "
-    .byte   "(Q)TAP"
+    .byte   "QCKTAP"
     .byte   "GARBGE"
     .byte   "DRUGHT"
 .endmacro
