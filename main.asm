@@ -4509,10 +4509,10 @@ renderDebugHUD:
         lda #$D8
         sta oamStaging, x
         inx
-        tya
+        lda #BLOCK_TILES
         sta oamStaging, x
         inx
-        lda #$03
+        lda #$01
         sta oamStaging, x
         inx
         tya
