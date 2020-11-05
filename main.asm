@@ -29,6 +29,7 @@ BUTTON_LEFT := $2
 BUTTON_B := $40
 BUTTON_A := $80
 BUTTON_SELECT := $20
+BUTTON_START := $10
 
 BLOCK_TILES := $7B
 
@@ -4406,7 +4407,7 @@ checkSaveStateGameplay:
         beq @done
 
         ; sprite
-        jsr renderSaveStateSprites
+        jsr renderDebugHUD
 
         ; controls
         lda heldButtons_player1
@@ -4464,7 +4465,8 @@ checkSaveStateControlsDebug:
 @notPressedDown:
         rts
 
-renderSaveStateSprites:
+renderDebugHUD:
+        ; savestates
         lda saveStateSpriteDelay
         beq @noSprite
         dec saveStateSpriteDelay
@@ -4476,9 +4478,7 @@ renderSaveStateSprites:
         sta spriteIndexInOamContentLookup
         jsr loadSpriteIntoOamStaging
 @noSprite:
-
-        ; draw slot #
-
+        ; slot #
         ldx oamStagingLength
         lda #$BF
         sta oamStaging, x
@@ -4496,6 +4496,42 @@ renderSaveStateSprites:
         clc
         adc oamStagingLength
         sta oamStagingLength
+
+        ; controller input
+        lda heldButtons_player1
+        sta tmp1
+        ldy #8
+@inputLoop:
+        lda tmp1
+        and #1
+        beq @inputContinue
+        ldx oamStagingLength
+        lda #$D8
+        sta oamStaging, x
+        inx
+        tya
+        sta oamStaging, x
+        inx
+        lda #$03
+        sta oamStaging, x
+        inx
+        tya
+        asl
+        asl
+        asl
+        adc #$8
+        sta oamStaging, x
+        inx
+        lda #$04
+        clc
+        adc oamStagingLength
+        sta oamStagingLength
+@inputContinue:
+        lda tmp1
+        ror
+        sta tmp1
+        dey
+        bne @inputLoop
         rts
 
 .if DEBUG_MODE
@@ -4519,7 +4555,7 @@ debugSelectMenuControls:
         ; fallthrough
 
 debugDrawPieces:
-        jsr     renderSaveStateSprites
+        jsr     renderDebugHUD
 
         ; handle pieces / X
         jsr     stageSpriteForNextPiece
