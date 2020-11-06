@@ -571,7 +571,7 @@ branchOnPlayStatePlayer1:
         .addr   playState_checkForCompletedRows
         .addr   playState_noop
         .addr   playState_updateLinesAndStatistics
-        .addr   playState_incrementPlayState ; used to be bTypeGoalCheck
+        .addr   playState_prepareNext ; used to be bTypeGoalCheck
         .addr   playState_receiveGarbage
         .addr   playState_spawnNextTetrimino
         .addr   playState_noop
@@ -592,7 +592,7 @@ branchOnPlayStatePlayer2:
         .addr   playState_checkForCompletedRows
         .addr   playState_noop
         .addr   playState_updateLinesAndStatistics
-        .addr   playState_incrementPlayState
+        .addr   playState_prepareNext
         .addr   playState_receiveGarbage
         .addr   playState_spawnNextTetrimino
         .addr   playState_noop
@@ -2751,6 +2751,11 @@ playState_completeRowContinue:
         lda     #$07
         sta     soundEffectSlot1Init
 playState_checkForCompletedRows_return:
+        rts
+
+playState_prepareNext:
+        jsr     practisePrepareNext
+        inc     playState
         rts
 
 playState_receiveGarbage:
@@ -6702,6 +6707,15 @@ practiseCurrentSpritePatch:
 @skip:
         rts
 
+practisePrepareNext:
+        lda     practiseType
+        cmp     #MODE_PARITY
+        bne     @skipParity
+        jsr     advanceGameParity
+@skipParity:
+
+        rts
+
 practiseAdvanceGame:
         ; TODO: use jump table?
         lda     practiseType
@@ -6709,12 +6723,6 @@ practiseAdvanceGame:
         bne     @skipTSpins
         jsr     advanceGameTSpins
 @skipTSpins:
-
-        lda     practiseType
-        cmp     #MODE_PARITY
-        bne     @skipParity
-        jsr     advanceGameParity
-@skipParity:
 
         lda     practiseType
         cmp     #MODE_PRESETS
@@ -6957,6 +6965,7 @@ advanceGameParity:
         bpl @runLine
 
         ; have to do in two stages for some reason
+        ; TODO: un/signed comparison fixes
 
         lda #50
         sta parityIndex
