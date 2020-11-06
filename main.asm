@@ -2755,11 +2755,11 @@ playState_checkForCompletedRows_return:
 
 playState_prepareNext:
         jsr     practisePrepareNext
+        jsr     practiseReceiveGarbage
         inc     playState
         rts
 
 playState_receiveGarbage:
-        jsr     practiseReceiveGarbage
         ldy     pendingGarbage
         beq     @ret
         lda     vramRow
@@ -6713,11 +6713,9 @@ practisePrepareNext:
         bne     @skipParity
         jsr     advanceGameParity
 @skipParity:
-
         rts
 
 practiseAdvanceGame:
-        ; TODO: use jump table?
         lda     practiseType
         cmp     #MODE_TSPINS
         bne     @skipTSpins
@@ -6961,19 +6959,8 @@ advanceGameParity:
         sec
         sbc #10
         sta parityIndex
-        cmp #60
-        bpl @runLine
-
-        ; have to do in two stages for some reason
-        ; TODO: un/signed comparison fixes
-
-        lda #50
-        sta parityIndex
-        jsr highlightParity
-        lda #40
-        sta parityIndex
-        jsr highlightParity
-
+        cmp #30
+        bcs @runLine
         rts
 
 highlightParity:
