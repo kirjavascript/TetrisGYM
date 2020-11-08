@@ -385,7 +385,7 @@ render: lda     renderMode
         .addr   render_mode_menu_screens
         .addr   render_mode_congratulations_screen
         .addr   render_mode_play_and_demo
-        .addr   render_mode_ending_animation
+        .addr   render_mode_pause
 initRamContinued:
         ldy     #$06
         sty     tmp2
@@ -640,6 +640,14 @@ gameMode_legalScreen: ; boot
 gameMode_titleScreen:
         inc     gameMode
         rts
+
+render_mode_pause:
+        ; lda     #$20
+        ; sta     PPUADDR
+        ; lda     #$83
+        ; sta     PPUADDR
+        ; lda     rng_seed
+        ; sta     PPUDATA
 
 render_mode_legal_and_title_screens:
         lda     currentPpuCtrl
@@ -3254,9 +3262,6 @@ playState_incrementPlayState:
 playState_noop:
         rts
 
-render_mode_ending_animation:
-        rts
-
 showHighScores:
         lda     numberOfPlayers
         cmp     #$01
@@ -3738,7 +3743,7 @@ gameModeState_startButtonHandling:
 @startPressed:
         lda     #$05
         sta     musicStagingNoiseHi
-        lda     #$00
+        lda     #$04 ; render_mode_pause
         sta     renderMode
         jsr     updateAudioAndWaitForNmi
         lda     #$1E
@@ -4184,14 +4189,13 @@ menu_palette:
         .byte   $16,$2A,$28,$0F,$30,$29,$27,$FF
 
 defaultHighScoresTable:
-        ; used to use charmap.asm
-        .byte  $2B,$2B,$2B,$2B,$2B,$2B ; HOWARD
-        .byte  $2B,$2B,$2B,$2B,$2B,$2B ; OTASAN
-        .byte  $2B,$2B,$2B,$2B,$2B,$2B ; LANCE
-        .byte  $00,$00,$00,$00,$00,$00 ;unknown
-        .byte  $2B,$2B,$2B,$2B,$2B,$2B ; ALEX
-        .byte  $2B,$2B,$2B,$2B,$2B,$2B ; TONY
-        .byte  $2B,$2B,$2B,$2B,$2B,$2B ; NINTEN
+        .byte   $2B,$2B,$2B,$2B,$2B,$2B ; HOWARD
+        .byte   $2B,$2B,$2B,$2B,$2B,$2B ; OTASAN
+        .byte   $2B,$2B,$2B,$2B,$2B,$2B ; LANCE
+        .byte   $00,$00,$00,$00,$00,$00 ;unknown
+        .byte   $2B,$2B,$2B,$2B,$2B,$2B ; ALEX
+        .byte   $2B,$2B,$2B,$2B,$2B,$2B ; TONY
+        .byte   $2B,$2B,$2B,$2B,$2B,$2B ; NINTEN
         .byte   $00,$00,$00,$00,$00,$00 ;unknown
         ;High Scores are stored in BCD
         .byte   $00,$00,$00
@@ -4507,12 +4511,12 @@ renderDebugHUD:
         sta tmp1
         ldy #0
 @inputLoop:
-        lda tmp1
-        and #1
-        beq @inputContinue
+        ; lda tmp1
+        ; and #1
+        ; beq @inputContinue
         ldx oamStagingLength
         lda controllerInputY, y
-        adc #$D8
+        adc #$32
         sta oamStaging, x
         inx
         lda controllerInputTiles, y
@@ -4522,7 +4526,7 @@ renderDebugHUD:
         sta oamStaging, x
         inx
         lda controllerInputX, y
-        adc #$10
+        adc #$18
         sta oamStaging, x
         inx
         ; increase OAM index
@@ -4540,12 +4544,14 @@ renderDebugHUD:
         rts
 
 controllerInputTiles:
-        .byte "RLDUSSBA"
+        ; .byte "RLDUSSBA"
+        .byte $90, $91, $92, $93
+        .byte $94, $94, $95, $95
 controllerInputX:
-        .byte $10, $0, $8, $8
-        .byte $18, $10, $20, $28
+        .byte $9, $0, $5, $4
+        .byte $1A, $12, $22, $2A
 controllerInputY:
-        .byte $0, $0, $8, $F8
+        .byte $0, $0, $5, $FB
         .byte $0, $0, $0, $0
 
 .if DEBUG_MODE
