@@ -4505,28 +4505,27 @@ renderDebugHUD:
         ; controller input
         lda heldButtons_player1
         sta tmp1
-        ldy #8
+        ldy #0
 @inputLoop:
         lda tmp1
         and #1
         beq @inputContinue
         ldx oamStagingLength
-        lda #$D8
+        lda controllerInputY, y
+        adc #$D8
         sta oamStaging, x
         inx
-        lda #BLOCK_TILES
+        lda controllerInputTiles, y
         sta oamStaging, x
         inx
-        lda #$01
+        lda #$03
         sta oamStaging, x
         inx
-        tya
-        asl
-        asl
-        asl
-        adc #$8
+        lda controllerInputX, y
+        adc #$10
         sta oamStaging, x
         inx
+        ; increase OAM index
         lda #$04
         clc
         adc oamStagingLength
@@ -4535,9 +4534,19 @@ renderDebugHUD:
         lda tmp1
         ror
         sta tmp1
-        dey
-        bne @inputLoop
+        iny
+        cpy #8
+        bmi @inputLoop
         rts
+
+controllerInputTiles:
+        .byte "RLDUSSBA"
+controllerInputX:
+        .byte $10, $0, $8, $8
+        .byte $18, $10, $20, $28
+controllerInputY:
+        .byte $0, $0, $8, $F8
+        .byte $0, $0, $0, $0
 
 .if DEBUG_MODE
 
