@@ -687,7 +687,7 @@ L830B:  lda #$FF
 
         ; down
         lda newlyPressedButtons_player1
-        cmp #$04
+        cmp #BUTTON_DOWN
         bne @downEnd
         lda #$01
         sta soundEffectSlot1Init
@@ -702,7 +702,7 @@ L830B:  lda #$FF
 
         ; up
         lda newlyPressedButtons_player1
-        cmp #$08
+        cmp #BUTTON_UP
         bne @upEnd
         lda #$01
         sta soundEffectSlot1Init
@@ -1077,8 +1077,7 @@ gameModeState_initGameBackground:
         lda #$83
         sta tmp2
         jsr displayModeText
-        jsr saveStateUI
-        jsr hideStatisticsText
+        jsr debugNametableUI
         jmp gameModeState_initGameBackground_finish
 
 
@@ -1113,9 +1112,15 @@ displayModeText:
 modeText:
 MODENAMES
 
-saveStateUI:
+debugNametableUI:
         lda debugFlag
-        beq @endOfPpuPatching
+        beq @notDebug
+        jsr saveStateNametableUI
+        jsr statisticsNametablePatch
+@notDebug:
+        rts
+
+saveStateNametableUI:
         ldx #$00
 @nextPpuAddress:
         lda savestate_nametable_patch,x
@@ -1136,13 +1141,13 @@ saveStateUI:
 @endOfPpuPatching:
         rts
 
-hideStatisticsText:
+statisticsNametablePatch:
         lda #$21
         sta PPUADDR
         lda #$22
         sta PPUADDR
         ldx #8
-        ldy #$34
+        ldy #$68
 @loop:
         ; ldy
         sty PPUDATA

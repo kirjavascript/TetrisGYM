@@ -48,4 +48,10 @@ const game = Buffer.from(buffer);
         game[i] = lookup.indexOf(d);
     }
 });
+
+// patch movement of statistics tiles
+for (let i = 320; i < 327; i++) {
+    game[i] = game[i] - 1;
+}
+game[327] = 0x6F;
 writeFileSync(__dirname + '/game_nametable_practise.bin', game);
