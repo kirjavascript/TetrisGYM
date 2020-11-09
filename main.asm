@@ -64,8 +64,6 @@ MODE_CONFIG_OFFSET := MODE_QUANTITY - MODE_CONFIG_QUANTITY
 
 ; RAM
 
-debugLevelEdit := unused_0E
-debugNextCounter := nextPiece_2player
 presetBitmask := tmp2
 ; $600 - $67F
 practiseType := $600
@@ -83,6 +81,9 @@ saveStateSlot := $60B
 saveStateSpriteType := $60C
 saveStateSpriteDelay := $60D
 presetIndex := $60E
+debugLevelEdit := unused_0E
+debugNextCounter := nextPiece_2player
+debugShowController := $60F
 ; $760 - $7FF
 menuVars := $760
 presetModifier := menuVars+0
@@ -1149,7 +1150,7 @@ statisticsNametablePatch:
         ldx #8
         ldy #$68
 @loop:
-        ; ldy
+        ldy #$FF
         sty PPUDATA
         iny
         dex
@@ -4513,6 +4514,8 @@ renderDebugHUD:
         sta oamStagingLength
 
         ; controller input
+        lda debugShowController
+        beq @noInput
         lda heldButtons_player1
         sta tmp1
         ldy #0
@@ -4547,6 +4550,7 @@ renderDebugHUD:
         iny
         cpy #8
         bmi @inputLoop
+@noInput:
         rts
 
 controllerInputTiles:
@@ -4568,13 +4572,22 @@ debugSelectMenuControls:
         beq debugContinue
 
         lda newlyPressedButtons_player1
-        and #BUTTON_LEFT+BUTTON_RIGHT
+        and #BUTTON_LEFT
         beq @skipDebugType
         ; toggle mode
         lda debugLevelEdit
         eor #1
         sta debugLevelEdit
 @skipDebugType:
+
+        lda newlyPressedButtons_player1
+        and #BUTTON_RIGHT
+        beq @skipDebugController
+        ; toggle controller
+        lda debugShowController
+        eor #1
+        sta debugShowController
+@skipDebugController:
 
         jsr checkSaveStateControlsDebug
 
