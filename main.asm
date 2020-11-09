@@ -1137,16 +1137,18 @@ saveStateUI:
         rts
 
 hideStatisticsText:
-        lda #$21
-        sta PPUADDR
-        lda #$22
-        sta PPUADDR
-        ldx #6
-        lda #$FF
+        lda     #$21
+        sta     PPUADDR
+        lda     #$22
+        sta     PPUADDR
+        ldx     #8
+        ldy     #$34
 @loop:
-        sta PPUDATA
+        ; ldy
+        sty     PPUDATA
+        iny
         dex
-        bne @loop
+        bne     @loop
         rts
 
 savestate_nametable_patch:
