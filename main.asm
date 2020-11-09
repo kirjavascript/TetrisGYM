@@ -642,13 +642,6 @@ gameMode_titleScreen:
         rts
 
 render_mode_pause:
-        ; lda     #$20
-        ; sta     PPUADDR
-        ; lda     #$83
-        ; sta     PPUADDR
-        ; lda     rng_seed
-        ; sta     PPUDATA
-
 render_mode_legal_and_title_screens:
         lda     currentPpuCtrl
         and     #$FC
@@ -658,14 +651,6 @@ render_mode_legal_and_title_screens:
         sta     PPUSCROLL
         sta     ppuScrollY
         sta     PPUSCROLL
-        rts
-
-        lda     #$00
-        sta     player1_levelNumber
-        lda     #$00
-        sta     gameType
-        lda     #$04
-        lda     gameMode
         rts
 
 gameMode_gameTypeMenu:
@@ -1093,6 +1078,7 @@ gameModeState_initGameBackground:
         sta     tmp2
         jsr     displayModeText
         jsr     saveStateUI
+        jsr     hideStatisticsText
         jmp     gameModeState_initGameBackground_finish
 
 
@@ -1148,6 +1134,19 @@ saveStateUI:
         sta     PPUDATA
         jmp     @nextPpuData
 @endOfPpuPatching:
+        rts
+
+hideStatisticsText:
+        lda #$21
+        sta PPUADDR
+        lda #$22
+        sta PPUADDR
+        ldx #6
+        lda #$FF
+@loop:
+        sta PPUDATA
+        dex
+        bne @loop
         rts
 
 savestate_nametable_patch:
@@ -4511,12 +4510,12 @@ renderDebugHUD:
         sta tmp1
         ldy #0
 @inputLoop:
-        ; lda tmp1
-        ; and #1
-        ; beq @inputContinue
+        lda tmp1
+        and #1
+        beq @inputContinue
         ldx oamStagingLength
         lda controllerInputY, y
-        adc #$32
+        adc #$4C
         sta oamStaging, x
         inx
         lda controllerInputTiles, y
@@ -4526,7 +4525,7 @@ renderDebugHUD:
         sta oamStaging, x
         inx
         lda controllerInputX, y
-        adc #$18
+        adc #$17
         sta oamStaging, x
         inx
         ; increase OAM index

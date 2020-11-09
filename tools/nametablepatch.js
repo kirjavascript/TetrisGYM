@@ -21,8 +21,6 @@ a      d
 zxxxxxxc
 `, 0x22F7)));
 
-// mode names
-
-// [...lookup].forEach((d, i) => {
-//     d=='#'||console.log(`.charmap '${d}', $${i.toString(16).padStart(2, '0')}`)
-// });
+console.log(print(convert(`
+a      d
+`, 0x20A2)));
