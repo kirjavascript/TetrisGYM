@@ -4184,14 +4184,14 @@ game_palette:
         .byte   $3F,$00,$20,$0F,$30,$12,$16,$0F
         .byte   $20,$12,$18,$0F,$2C,$16,$29,$0F
         .byte   $3C,$00,$30,$0F,$35,$15,$22,$0F
-        .byte   $35,$29,$26,$0F,$2C,$16,$29,$0F
+        .byte   $10,$16,$2D,$0F,$2C,$16,$29,$0F
         .byte   $3C,$00,$30,$FF
 title_palette:
         .byte   $3F,$00,$14,$0F,$3C,$38,$00,$0F
         .byte   $17,$27,$37,$0F,$30,$12,$00,$0F
         .byte   $22,$2A,$28,$0F,$30,$29,$27,$FF
 menu_palette:
-        .byte   $3F,$00,$14,$0F,$30,$38,$06,$0F
+        .byte   $3F,$00,$14,$0F,$30,$38,$26,$0F
         .byte   $17,$27,$37,$0F,$30,$12,$00,$0F
         .byte   $16,$2A,$28,$0F,$30,$29,$27,$FF
 
@@ -4520,9 +4520,9 @@ renderDebugHUD:
         sta tmp1
         ldy #0
 @inputLoop:
-        lda tmp1
-        and #1
-        beq @inputContinue
+        ; lda tmp1
+        ; and #1
+        ; beq @inputContinue
         ldx oamStagingLength
         lda controllerInputY, y
         adc #$4C
@@ -4531,7 +4531,7 @@ renderDebugHUD:
         lda controllerInputTiles, y
         sta oamStaging, x
         inx
-        lda #$03
+        lda #$01
         sta oamStaging, x
         inx
         lda controllerInputX, y
