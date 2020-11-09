@@ -5,6 +5,7 @@ presets:
          .byte preset3-presets
          .byte preset4-presets
          .byte preset5-presets
+         .byte preset6-presets
 preset0:
          .byte $7b, $9d, $a6, $ab, $ac, $b1, $b4, $ba, $bf, $c5, $ff
 preset1:
@@ -17,3 +18,5 @@ preset4:
          .byte $5d, $9a, $9c, $a5, $af, $b6, $b8, $ba, $bc, $c0, $c2, $c4, $c6, $ff
 preset5:
          .byte $1c, $98, $a7, $ac, $b0, $ba, $be, $c0, $c2, $c5, $c6, $ff
+preset6:
+         .byte $5d, $aa, $ab, $b2, $b3, $be, $bf, $c6, $c7, $ff
