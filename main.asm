@@ -84,6 +84,7 @@ presetIndex := $60E
 debugLevelEdit := unused_0E
 debugNextCounter := nextPiece_2player
 debugShowController := $60F
+pausedOutOfDateRenderFlags := $610
 ; $760 - $7FF
 menuVars := $760
 presetModifier := menuVars+0
@@ -643,6 +644,14 @@ gameMode_titleScreen:
         rts
 
 render_mode_pause:
+        lda pausedOutOfDateRenderFlags
+        and #$01
+        beq @skipStatisticsPatch
+        jsr statisticsNametablePatch
+@skipStatisticsPatch:
+        lda #0
+        sta pausedOutOfDateRenderFlags
+
 render_mode_legal_and_title_screens:
         lda currentPpuCtrl
         and #$FC
@@ -1150,7 +1159,10 @@ statisticsNametablePatch:
         ldx #8
         ldy #$68
 @loop:
+        lda debugShowController
+        beq @show
         ldy #$FF
+@show:
         sty PPUDATA
         iny
         dex
@@ -4587,6 +4599,9 @@ debugSelectMenuControls:
         lda debugShowController
         eor #1
         sta debugShowController
+        lda pausedOutOfDateRenderFlags
+        ora #$1
+        sta pausedOutOfDateRenderFlags
 @skipDebugController:
 
         jsr checkSaveStateControlsDebug
