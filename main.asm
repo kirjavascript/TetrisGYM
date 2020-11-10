@@ -535,7 +535,7 @@ gameModeState_updatePlayer1:
 .else
         jsr stageSpriteForCurrentPiece
 .endif
-        jsr checkSaveStateGameplay
+        jsr checkDebugGameplay
         jsr savePlayer1State
         jsr stageSpriteForNextPiece
         inc gameModeState
@@ -4444,7 +4444,7 @@ renderStateDebug:
         jsr renderDebugPlayfield
         rts
 
-checkSaveStateGameplay:
+checkDebugGameplay:
         lda debugFlag
         cmp #0
         beq @done
@@ -4489,6 +4489,7 @@ checkSaveStateControlsDebug:
         lda newlyPressedButtons_player1
         and #BUTTON_UP
         beq @notPressedUp
+        jsr renderDebugSaveSlot
         inc saveStateSlot
         lda saveStateSlot
         cmp #$A
@@ -4505,7 +4506,14 @@ checkSaveStateControlsDebug:
         sta saveStateSlot
 @noWrap:
         dec saveStateSlot
+        jsr renderDebugSaveSlot
 @notPressedDown:
+        rts
+
+renderDebugSaveSlot:
+        lda pausedOutOfDateRenderFlags
+        ora #$2
+        sta pausedOutOfDateRenderFlags
         rts
 
 renderDebugHUD:
@@ -4521,24 +4529,6 @@ renderDebugHUD:
         sta spriteIndexInOamContentLookup
         jsr loadSpriteIntoOamStaging
 @noSprite:
-        ; slot #
-        ldx oamStagingLength
-        lda #$BF
-        sta oamStaging, x
-        inx
-        lda saveStateSlot
-        sta oamStaging, x
-        inx
-        lda #$02
-        sta oamStaging, x
-        inx
-        lda #$E0
-        sta oamStaging, x
-        inx
-        lda #$04
-        clc
-        adc oamStagingLength
-        sta oamStagingLength
 
         ; controller input
         lda debugShowController
