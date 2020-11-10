@@ -4537,9 +4537,9 @@ renderDebugHUD:
         sta tmp1
         ldy #0
 @inputLoop:
-        lda tmp1
-        and #1
-        beq @inputContinue
+        ; lda tmp1
+        ; and #1
+        ; beq @inputContinue
         ldx oamStagingLength
         lda controllerInputY, y
         adc #$4C
@@ -4552,7 +4552,7 @@ renderDebugHUD:
         sta oamStaging, x
         inx
         lda controllerInputX, y
-        adc #$15
+        adc #$13
         sta oamStaging, x
         inx
         ; increase OAM index
@@ -4580,11 +4580,11 @@ controllerInputTiles:
         .byte $90, $91, $92, $93
         .byte $94, $94, $95, $95
 controllerInputX:
-        .byte $9, $0, $5, $4
-        .byte $1D, $14, $27, $2F
+        .byte $8, $0, $5, $4
+        .byte $1D, $14, $27, $30
 controllerInputY:
-        .byte $0, $0, $5, $FB
-        .byte $0, $0, $0, $0
+        .byte $FF, $0, $5, $FB
+        .byte $0, $0, $FF, $FF
 
 .if DEBUG_MODE
 
