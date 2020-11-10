@@ -4537,9 +4537,9 @@ renderDebugHUD:
         sta tmp1
         ldy #0
 @inputLoop:
-        ; lda tmp1
-        ; and #1
-        ; beq @inputContinue
+        lda tmp1
+        and #1
+        beq @inputContinue
         ldx oamStagingLength
         lda controllerInputY, y
         adc #$4C
