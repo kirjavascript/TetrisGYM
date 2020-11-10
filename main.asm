@@ -4260,7 +4260,7 @@ enter_high_score_nametable:
 high_scores_nametable:
         .incbin "gfx/nametables/high_scores_nametable.bin"
 
-SLOT_SIZE := $100 ; $CC used, the rest free
+SLOT_SIZE := $100 ; ~$CC used, the rest free
 
 ; some repeated code here, dynamic 16 bit addressing is hard
 ; could replace it with code executed / modified in RAM
@@ -4570,11 +4570,6 @@ renderDebugHUD:
 @noInput:
         rts
 
-renderDebugPlayfield:
-        lda #$00
-        sta player1_vramRow
-        rts
-
 controllerInputTiles:
         ; .byte "RLDUSSBA"
         .byte $90, $91, $92, $93
@@ -4585,6 +4580,11 @@ controllerInputX:
 controllerInputY:
         .byte $FF, $0, $5, $FB
         .byte $0, $0, $FF, $FF
+
+renderDebugPlayfield:
+        lda #$00
+        sta player1_vramRow
+        rts
 
 .if DEBUG_MODE
 
