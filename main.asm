@@ -84,7 +84,7 @@ presetIndex := $60E
 debugLevelEdit := unused_0E
 debugNextCounter := nextPiece_2player
 debugShowController := $60F
-pausedOutOfDateRenderFlags := $610
+pausedOutOfDateRenderFlags := $610 ; 1 - statistics
 ; $760 - $7FF
 menuVars := $760
 presetModifier := menuVars+0
@@ -643,15 +643,6 @@ gameMode_titleScreen:
         inc gameMode
         rts
 
-render_mode_pause:
-        lda pausedOutOfDateRenderFlags
-        and #$01
-        beq @skipStatisticsPatch
-        jsr statisticsNametablePatch
-@skipStatisticsPatch:
-        lda #0
-        sta pausedOutOfDateRenderFlags
-
 render_mode_legal_and_title_screens:
         lda currentPpuCtrl
         and #$FC
@@ -1127,7 +1118,17 @@ debugNametableUI:
         beq @notDebug
         jsr saveStateNametableUI
         jsr statisticsNametablePatch
+        jsr saveSlotNametablePatch
 @notDebug:
+        rts
+
+saveSlotNametablePatch:
+        lda #$23
+        sta PPUADDR
+        lda #$1D
+        sta PPUADDR
+        lda saveStateSlot
+        sta PPUDATA
         rts
 
 saveStateNametableUI:
@@ -2074,6 +2075,20 @@ isPositionValid:
         lda #$FF
         sta generalCounter
         rts
+
+render_mode_pause:
+        lda pausedOutOfDateRenderFlags
+        and #$01
+        beq @skipStatisticsPatch
+        jsr statisticsNametablePatch
+@skipStatisticsPatch:
+        lda pausedOutOfDateRenderFlags
+        and #$02
+        beq @skipSaveSlotPatch
+        jsr saveSlotNametablePatch
+@skipSaveSlotPatch:
+        lda #0
+        sta pausedOutOfDateRenderFlags
 
 render_mode_play_and_demo:
         lda player1_playState
@@ -4426,7 +4441,7 @@ renderStateGameplay:
 
 renderStateDebug:
         jsr savePlayer1State
-        jsr renderPlayfieldDebug
+        jsr renderDebugPlayfield
         rts
 
 checkSaveStateGameplay:
@@ -4514,10 +4529,10 @@ renderDebugHUD:
         lda saveStateSlot
         sta oamStaging, x
         inx
-        lda #$03
+        lda #$02
         sta oamStaging, x
         inx
-        lda #$E8
+        lda #$E0
         sta oamStaging, x
         inx
         lda #$04
@@ -4563,6 +4578,11 @@ renderDebugHUD:
         cpy #8
         bmi @inputLoop
 @noInput:
+        rts
+
+renderDebugPlayfield:
+        lda #$00
+        sta player1_vramRow
         rts
 
 controllerInputTiles:
@@ -4774,8 +4794,8 @@ handleLevelEditor:
         jsr @getPos
         ldx tmp3
         lda #$EF
-        sta $0400, x
-        jmp renderPlayfieldDebug
+        sta playfield, x
+        jmp renderDebugPlayfield
 
 @notPressedB:
 
@@ -4785,8 +4805,8 @@ handleLevelEditor:
         jsr @getPos
         ldx tmp3
         lda #$7B
-        sta $0400, x
-        jmp renderPlayfieldDebug
+        sta playfield, x
+        jmp renderDebugPlayfield
 
 @notPressedA:
 
@@ -4802,13 +4822,6 @@ handleLevelEditor:
         adc tetriminoX
         sta tmp3
         dec tmp3
-        rts
-
-renderPlayfieldDebug:
-        lda #$00
-        sta player1_vramRow
-        lda #$03
-        sta renderMode
         rts
 
 .endif
