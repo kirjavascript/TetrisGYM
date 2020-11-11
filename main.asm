@@ -2090,6 +2090,8 @@ render_mode_pause:
         lda #0
         sta pausedOutOfDateRenderFlags
 
+        ; fallthrough
+
 render_mode_play_and_demo:
         lda player1_playState
         cmp #$04
@@ -2489,6 +2491,7 @@ playState_spawnNextTetrimino:
         lda #$01
         sta playState
 
+.if PRACTISE_MODE
         ; savestate patch
         lda saveStateDirty
         beq @noSaveState
@@ -2496,6 +2499,7 @@ playState_spawnNextTetrimino:
         sta saveStateDirty
         rts
 @noSaveState:
+.endif
 
         lda #$00
         sta fallTimer
@@ -4221,7 +4225,6 @@ menu_palette:
         .byte   $3F,$00,$14,$0F,$30,$38,$26,$0F
         .byte   $17,$27,$37,$0F,$30,$12,$00,$0F
         .byte   $16,$2A,$28,$0F,$30,$29,$27,$FF
-
 defaultHighScoresTable:
         .byte   $2B,$2B,$2B,$2B,$2B,$2B ; HOWARD
         .byte   $2B,$2B,$2B,$2B,$2B,$2B ; OTASAN

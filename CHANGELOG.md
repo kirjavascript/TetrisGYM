@@ -1,6 +1,6 @@
 # Changelog
 
-## [v1.1]
+## [v2]
 - Garbage Trainer
 - Savestates added to Debug Mode
 - Controller input added to Debug Mode
