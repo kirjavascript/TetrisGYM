@@ -3587,16 +3587,6 @@ highScoreEntryScreen:
         .addr   menu_palette
         jsr bulkCopyToPpu
         .addr   enter_high_score_nametable
-.if !PRACTISE_MODE ; hide A-type
-        lda #$20
-        sta PPUADDR
-        lda #$6D
-        sta PPUADDR
-        lda #$0A
-        clc
-        adc gameType
-        sta PPUDATA
-.endif
         jsr showHighScores
         lda #$02
         sta renderMode
@@ -4231,9 +4221,10 @@ title_palette:
         .byte   $17,$27,$37,$0F,$30,$12,$00,$0F
         .byte   $22,$2A,$28,$0F,$30,$29,$27,$FF
 menu_palette:
-        .byte   $3F,$00,$14,$0F,$30,$38,$26,$0F
+        .byte   $3F,$00,$18,$0F,$30,$38,$26,$0F
         .byte   $17,$27,$37,$0F,$30,$12,$00,$0F
-        .byte   $16,$2A,$28,$0F,$30,$29,$27,$FF
+        .byte   $16,$2A,$28,$0F,$30,$29,$27,$0F
+        .byte   $26,$26,$26,$FF
 defaultHighScoresTable:
         .byte   $2B,$2B,$2B,$2B,$2B,$2B ; HOWARD
         .byte   $2B,$2B,$2B,$2B,$2B,$2B ; OTASAN
