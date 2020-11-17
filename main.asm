@@ -2090,7 +2090,25 @@ render_mode_pause:
         lda #0
         sta pausedOutOfDateRenderFlags
 
-        ; fallthrough
+        lda player1_playState
+        cmp #$04
+        beq @done
+        jsr render_playfield
+@done:
+        rts
+
+render_playfield:
+        lda player1_vramRow
+        sta vramRow
+        lda #$04
+        sta playfieldAddr+1
+        jsr copyPlayfieldRowToVRAM
+        jsr copyPlayfieldRowToVRAM
+        jsr copyPlayfieldRowToVRAM
+        jsr copyPlayfieldRowToVRAM
+        lda vramRow
+        sta player1_vramRow
+        rts
 
 render_mode_play_and_demo:
         lda player1_playState
@@ -2120,16 +2138,7 @@ render_mode_play_and_demo:
         jmp @renderLines
 
 @playStateNotDisplayLineClearingAnimation:
-        lda player1_vramRow
-        sta vramRow
-        lda #$04
-        sta playfieldAddr+1
-        jsr copyPlayfieldRowToVRAM
-        jsr copyPlayfieldRowToVRAM
-        jsr copyPlayfieldRowToVRAM
-        jsr copyPlayfieldRowToVRAM
-        lda vramRow
-        sta player1_vramRow
+        jsr render_playfield
 @renderLines:
         lda outOfDateRenderFlags
         and #$01
