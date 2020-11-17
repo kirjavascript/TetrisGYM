@@ -1992,7 +1992,7 @@ sprite0CIPiece:
         .byte   $04,$7B,$02,$08,$04,$7B,$02,$10
         .byte   $FF
 sprite0EHighScoreNameCursor:
-        .byte   $00,$FC,$21,$00,$FF
+        .byte   $00,$FD,$20,$00,$FF
 spriteDebugLevelEdit:
         .byte   $00,$21,$00,$00
         .byte   $FF
@@ -4221,10 +4221,9 @@ title_palette:
         .byte   $17,$27,$37,$0F,$30,$12,$00,$0F
         .byte   $22,$2A,$28,$0F,$30,$29,$27,$FF
 menu_palette:
-        .byte   $3F,$00,$18,$0F,$30,$38,$26,$0F
+        .byte   $3F,$00,$14,$0F,$30,$38,$26,$0F
         .byte   $17,$27,$37,$0F,$30,$12,$00,$0F
-        .byte   $16,$2A,$28,$0F,$30,$29,$27,$0F
-        .byte   $26,$26,$26,$FF
+        .byte   $16,$2A,$28,$0F,$30,$26,$27,$FF
 defaultHighScoresTable:
         .byte   $2B,$2B,$2B,$2B,$2B,$2B ; HOWARD
         .byte   $2B,$2B,$2B,$2B,$2B,$2B ; OTASAN
