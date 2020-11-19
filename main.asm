@@ -4343,21 +4343,21 @@ saveState:
         jsr saveSlot
 
         ; level/lines/score
-        iny
-        lda levelNumber
-        jsr saveSlot
-        iny
-        lda lines
-        jsr saveSlot
-        iny
-        lda score
-        jsr saveSlot
-        iny
-        lda score+1
-        jsr saveSlot
-        iny
-        lda score+2
-        jsr saveSlot
+        ; iny
+        ; lda levelNumber
+        ; jsr saveSlot
+        ; iny
+        ; lda lines
+        ; jsr saveSlot
+        ; iny
+        ; lda score
+        ; jsr saveSlot
+        ; iny
+        ; lda score+1
+        ; jsr saveSlot
+        ; iny
+        ; lda score+2
+        ; jsr saveSlot
 
 
         lda #$17
@@ -4440,24 +4440,24 @@ loadState:
         sta nextPiece
 
         ; level/lines/score
-        iny
-        jsr loadSlot
-        sta levelNumber
-        iny
-        jsr loadSlot
-        sta lines
-        iny
-        jsr loadSlot
-        sta score
-        iny
-        jsr loadSlot
-        sta score+1
-        iny
-        jsr loadSlot
-        sta score+2
-        ; mark for update
-        lda #7
-        sta outOfDateRenderFlags
+        ; iny
+        ; jsr loadSlot
+        ; sta levelNumber
+        ; iny
+        ; jsr loadSlot
+        ; sta lines
+        ; iny
+        ; jsr loadSlot
+        ; sta score
+        ; iny
+        ; jsr loadSlot
+        ; sta score+1
+        ; iny
+        ; jsr loadSlot
+        ; sta score+2
+        ; ; mark for update
+        ; lda #7
+        ; sta outOfDateRenderFlags
 
         lda #$18
         sta saveStateSpriteType
