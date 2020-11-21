@@ -1183,11 +1183,8 @@ gameModeState_initGameBackground_finish:
         jsr updateAudioWaitForNmiAndResetOamStaging
         lda #$01
         sta player1_playState
-        sta player2_playState
         lda player1_startLevel
         sta player1_levelNumber
-        lda player2_startLevel
-        sta player2_levelNumber
         inc gameModeState
         rts
 
@@ -3299,9 +3296,6 @@ gameModeState_vblankThenRunState2:
 playState_unassignOrientationId:
         lda #$13
         sta currentPiece
-        rts
-
-        inc gameModeState
         rts
 
 playState_incrementPlayState:
