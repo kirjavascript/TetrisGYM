@@ -188,7 +188,7 @@ frameCounter    := $00B1
 oamStagingLength:= $00B3
 newlyPressedButtons:= $00B5                 ; Active player's buttons
 heldButtons := $00B6                        ; Active player's buttons
-activePlayer    := $00B7                    ; Which player is being processed (data in $40)
+; activePlayer    := $00B7                    ; Which player is being processed (data in $40)
 playfieldAddr   := $00B8                    ; HI byte is leftPlayfield in canon. Current playfield being processed: $0400 (left; 1st player) or $0500 (right; 2nd player)
 allegro     := $00BA
 pendingGarbage  := $00BB                    ; Garbage waiting to be delivered to the current player. This is exchanged with pendingGarbageInactivePlayer when swapping players.
@@ -535,7 +535,7 @@ gameModeState_updatePlayer1:
         inc gameModeState
         rts
 
-gameModeState_updatePlayer2:
+gameModeState_next:
         inc gameModeState
         rts
 
@@ -547,7 +547,7 @@ gameMode_playAndEndingHighScore:
         .addr   gameModeState_updateCountersAndNonPlayerState
         .addr   gameModeState_handleGameOver
         .addr   gameModeState_updatePlayer1
-        .addr   gameModeState_updatePlayer2
+        .addr   gameModeState_next ; previously updatePlayer2
         .addr   gameModeState_checkForResetKeyCombo
         .addr   gameModeState_startButtonHandling
         .addr   gameModeState_vblankThenRunState2
@@ -774,8 +774,6 @@ gameMode_levelMenu:
         jmp @forceStartLevelToRange
 
 gameMode_levelMenu_processPlayer1Navigation:
-        lda #$00
-        sta activePlayer
         lda originalY
         sta selectingLevelOrHeight
         lda newlyPressedButtons_player1
@@ -935,14 +933,6 @@ gameMode_levelMenu_handleLevelHeightNavigation:
         ldx startLevel
         lda levelToSpriteXOffset,x
         sta spriteXOffset
-        lda activePlayer
-        cmp #$01
-        bne @stageLevelSelectCursor
-        clc
-        lda spriteYOffset
-        adc #$50
-        sta spriteYOffset
-@stageLevelSelectCursor:
         jsr loadSpriteIntoOamStaging
 @skipShowingSelectionLevel:
         lda gameType
@@ -961,14 +951,6 @@ gameMode_levelMenu_handleLevelHeightNavigation:
         ldx startHeight
         lda heightToPpuLowAddr,x
         sta spriteXOffset
-        lda activePlayer
-        cmp #$01
-        bne @stageHeightSelectCursor
-        clc
-        lda spriteYOffset
-        adc #$50
-        sta spriteYOffset
-@stageHeightSelectCursor:
         jsr loadSpriteIntoOamStaging
 @ret:   rts
 
@@ -1197,8 +1179,6 @@ gameModeState_initGameState:
         rts
 
 makePlayer1Active:
-        lda #$01
-        sta activePlayer
         lda #$04
         sta playfieldAddr+1
         lda newlyPressedButtons_player1
