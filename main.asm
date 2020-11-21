@@ -94,7 +94,6 @@ garbageModifier := menuVars+3
 droughtModifier := menuVars+4
 debugFlag := menuVars+5
 palFlag := menuVars+6
-; $B00 - $BEF
 
 SRAM := $6000 ; 8kb
 
@@ -195,7 +194,7 @@ allegro     := $00BA
 pendingGarbage  := $00BB                    ; Garbage waiting to be delivered to the current player. This is exchanged with pendingGarbageInactivePlayer when swapping players.
 pendingGarbageInactivePlayer := $00BC       ; canon is totalGarbage
 renderMode  := $00BD
-numberOfPlayers := $00BE
+; numberOfPlayers := $00BE
 nextPiece   := $00BF                        ; Stored by its orientation ID
 gameMode    := $00C0                        ; 0=legal, 1=title, 2=type menu, 3=level menu, 4=play and ending and high score, 5=demo, 6=start demo
 gameType    := $00C1                        ; A=0, B=1
@@ -485,8 +484,6 @@ initRamContinued:
         lda #$00
         sta gameModeState
         sta gameMode
-        lda #$01
-        sta numberOfPlayers
         lda #$00
         sta frameCounter+1
 @mainLoop:
@@ -1501,20 +1498,7 @@ stageSpriteForCurrentPiece:
         asl a
         adc #$60
         sta generalCounter3
-        lda numberOfPlayers
-        cmp #$01
-        beq L8A2C
-        lda generalCounter3
-        sec
-        sbc #$40
-        sta generalCounter3
-        lda activePlayer
-        cmp #$01
-        beq L8A2C
-        lda generalCounter3
-        adc #$6F
-        sta generalCounter3
-L8A2C:  clc
+        clc
         lda tetriminoY
         rol a
         rol a
@@ -2151,26 +2135,7 @@ copyPlayfieldRowToVRAM:
         lda vramPlayfieldRows,x
         sta PPUADDR
         dex
-        lda numberOfPlayers
-        cmp #$01
-        beq @onePlayer
-        lda playfieldAddr+1
-        cmp #$05
-        beq @playerTwo
-        lda vramPlayfieldRows,x
-        sec
-        sbc #$02
-        sta PPUADDR
-        jmp @copyRow
 
-@playerTwo:
-        lda vramPlayfieldRows,x
-        clc
-        adc #$0C
-        sta PPUADDR
-        jmp @copyRow
-
-@onePlayer:
         lda vramPlayfieldRows,x
         clc
         adc #$06
@@ -2205,22 +2170,9 @@ updateLineClearingAnimation:
         tay
         lda vramPlayfieldRows,y
         sta generalCounter
-        lda numberOfPlayers
-        cmp #$01
-        bne @twoPlayers
         lda generalCounter
         clc
         adc #$06
-        sta generalCounter
-        jmp @updateVRAM
-
-@twoPlayers:
-        lda playfieldAddr+1
-        cmp #$04
-        bne @player2
-        lda generalCounter
-        sec
-        sbc #$02
         sta generalCounter
         jmp @updateVRAM
 
@@ -2902,22 +2854,11 @@ gameModeState_handleGameOver:
         lda playState
         cmp #$00
         beq @gameOver
-        lda numberOfPlayers
-        cmp #$01
-        beq @ret
-        lda #$04
-        sta generalCounter2
-        lda #$0
-        cmp #$00
-        bne @ret
+        jmp @ret
 @gameOver:
         lda #$03
         sta renderMode
-        lda numberOfPlayers
-        cmp #$01
-        bne @resetGameState
         jsr handleHighScoreIfNecessary
-@resetGameState:
         lda #$01
         sta playState
         lda #$EF
@@ -3127,12 +3068,6 @@ playState_noop:
         rts
 
 showHighScores:
-        lda numberOfPlayers
-        cmp #$01
-        beq showHighScores_real
-        jmp showHighScores_ret
-
-showHighScores_real:
         jsr bulkCopyToPpu      ;not using @-label due to MMC1_Control in PAL
 MMC1_Control    := * + 1
         .addr   high_scores_nametable
