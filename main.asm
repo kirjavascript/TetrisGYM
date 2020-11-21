@@ -109,7 +109,7 @@ rng_seed    := $0017
 spawnID     := $0019
 spawnCount  := $001A
 verticalBlankingInterval:= $0033
-unused_0E   := $0034                              ; Always $0E
+; unused_0E   := $0034                              ; Always $0E
 tetriminoX  := $0040                        ; Player data is $20 in size. It is copied here from $60 or $80, processed, then copied back
 tetriminoY  := $0041
 currentPiece    := $0042                    ; Current piece as an orientation ID
@@ -149,32 +149,32 @@ garbageHole := $005A                        ; Position of hole in received garba
 ; player1_curtainRow:= $0078
 ; player1_startHeight:= $0079
 ; player1_garbageHole:= $007A
-player2_tetriminoX:= $0080
-player2_tetriminoY:= $0081
-player2_currentPiece:= $0082
-player2_levelNumber:= $0084
-player2_fallTimer:= $0085
-player2_autorepeatX:= $0086
-player2_startLevel:= $0087
-player2_playState:= $0088
-player2_vramRow := $0089
-player2_completedRow:= $008A
-player2_autorepeatY:= $008E
-player2_holdDownPoints:= $008F
-player2_lines   := $0090
-player2_rowY    := $0092
-player2_score   := $0093
-player2_completedLines:= $0096
-player2_curtainRow:= $0098
-player2_startHeight:= $0099
-player2_garbageHole:= $009A
+; player2_tetriminoX:= $0080
+; player2_tetriminoY:= $0081
+; player2_currentPiece:= $0082
+; player2_levelNumber:= $0084
+; player2_fallTimer:= $0085
+; player2_autorepeatX:= $0086
+; player2_startLevel:= $0087
+; player2_playState:= $0088
+; player2_vramRow := $0089
+; player2_completedRow:= $008A
+; player2_autorepeatY:= $008E
+; player2_holdDownPoints:= $008F
+; player2_lines   := $0090
+; player2_rowY    := $0092
+; player2_score   := $0093
+; player2_completedLines:= $0096
+; player2_curtainRow:= $0098
+; player2_startHeight:= $0099
+; player2_garbageHole:= $009A
 spriteXOffset   := $00A0
 spriteYOffset   := $00A1
 spriteIndexInOamContentLookup:= $00A2
 outOfDateRenderFlags:= $00A3                ; Bit 0-lines 1-level 2-score 6-stats 7-high score entry letter
 ; twoPlayerPieceDelayCounter:= $00A4          ; 0 is not delaying
 ; twoPlayerPieceDelayPlayer:= $00A5
-nextPiece_2player:= $00A6                   ; Somehow used for two players, but seems broken
+; nextPiece_2player:= $00A6                   ; Somehow used for two players, but seems broken
 gameModeState   := $00A7                    ; For values, see playState_checkForCompletedRows
 generalCounter  := $00A8                    ; canon is legalScreenCounter2
 generalCounter2 := $00A9
@@ -240,7 +240,7 @@ stack       := $0100
 oamStaging  := $0200                        ; format: https://wiki.nesdev.com/w/index.php/PPU_programmer_reference#OAM
 statsByType := $03F0
 playfield   := $0400
-playfieldForSecondPlayer:= $0500
+; playfieldForSecondPlayer:= $0500
 musicStagingSq1Lo:= $0680
 musicStagingSq1Hi:= $0681
 audioInitialized:= $0682
@@ -1226,7 +1226,6 @@ L87E7:  lda generalCounter
         sta generalCounter2
         lda #$00
         sta vramRow
-        sta player2_vramRow
         lda #$09
         sta generalCounter3
 L87FC:  ldx #$17
@@ -1267,11 +1266,7 @@ L8824:  ldx #$17
         jsr updateAudioWaitForNmiAndResetOamStaging
         dec generalCounter
         bne L87E7
-L884A:  ldx #$C8
-L884C:  lda playfield,x
-        sta playfieldForSecondPlayer,x
-        dex
-        bne L884C
+L884A:
         ldx startHeight
         lda typeBBlankInitCountByHeightTable,x
         tay
@@ -1280,14 +1275,6 @@ L885D:  sta playfield,y
         dey
         cpy #$FF
         bne L885D
-        ldx player2_startHeight
-        lda typeBBlankInitCountByHeightTable,x
-        tay
-        lda #$EF
-L886D:  sta playfieldForSecondPlayer,y
-        dey
-        cpy #$FF
-        bne L886D
 L8875:  rts
 
 typeBBlankInitCountByHeightTable:
@@ -2328,21 +2315,6 @@ colorTable:
 noop_disabledVramRowIncr:
         rts
 
-        inc vramRow
-        lda vramRow
-        cmp #$14
-        bmi @player2
-        lda #$20
-        sta vramRow
-@player2:
-        inc player2_vramRow
-        lda player2_vramRow
-        cmp #$14
-        bmi @ret
-        lda #$20
-        sta player2_vramRow
-@ret:   rts
-
 playState_spawnNextTetrimino:
         lda vramRow
         cmp #$20
@@ -2948,7 +2920,6 @@ gameModeState_handleGameOver:
 @resetGameState:
         lda #$01
         sta playState
-        sta player2_playState
         lda #$EF
         ldx #$04
         ldy #$05
