@@ -2854,6 +2854,7 @@ gameModeState_handleGameOver:
         lda playState
         cmp #$00
         beq @gameOver
+        lda #$1 ; deleting this line causes the next piece to flash (?)
         jmp @ret
 @gameOver:
         lda #$03
