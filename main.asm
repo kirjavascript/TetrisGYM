@@ -12,7 +12,7 @@
 PRACTISE_MODE := 1
 DEBUG_MODE := 1
 NO_MUSIC := 1
-NO_NO_NEXT_BOX := 1
+ALWAYS_NEXT_BOX := 1
 AUTO_WIN := 0
 SWAPUD := 0
 
@@ -126,7 +126,7 @@ rowY        := $0052
 score       := $0053
 completedLines  := $0056
 lineIndex   := $0057                        ; Iteration count of playState_checkForCompletedRows
-curtainRow  := $0058
+; curtainRow  := $0058
 startHeight := $0059
 garbageHole := $005A                        ; Position of hole in received garbage
 ; player1_tetriminoX:= $0060
@@ -1619,7 +1619,7 @@ L8B9D:  lda orientationTable,y
         rts
 
 stageSpriteForNextPiece:
-.if !NO_NO_NEXT_BOX
+.if !ALWAYS_NEXT_BOX
         lda displayNextPiece
         bne @ret
 .endif
@@ -2154,14 +2154,7 @@ updateLineClearingAnimation:
         clc
         adc #$06
         sta generalCounter
-        jmp @updateVRAM
 
-@player2:
-        lda generalCounter
-        clc
-        adc #$0C
-        sta generalCounter
-@updateVRAM:
         iny
         lda vramPlayfieldRows,y
         sta generalCounter2
@@ -2322,7 +2315,7 @@ pickRandomTetrimino:
         cmp spawnID
         bne useNewSpawnID
 @invalidIndex:
-        ldx #$17
+        ldx #rng_seed
         ldy #$02
         jsr generateNextPseudorandomNumber
         lda rng_seed
@@ -2392,8 +2385,6 @@ playState_lockTetrimino:
         sta soundEffectSlot0Init
         lda #$0A
         sta playState
-        lda #$F0
-        sta curtainRow
         jsr updateAudio2
         rts
 
@@ -3017,17 +3008,13 @@ setMusicTrack:
 ; A+B+Select+Start
 gameModeState_checkForResetKeyCombo:
         lda heldButtons_player1
-        cmp #$F0
+        cmp #BUTTON_A+BUTTON_B+BUTTON_START+BUTTON_SELECT
         beq @reset
         inc gameModeState
         rts
 
 @reset: jsr updateAudio2
-.if PRACTISE_MODE
-        lda #$02
-.else
-        lda #$00
-.endif
+        lda #$02 ; straight to menu screen
         sta gameMode
         rts
 
