@@ -8,7 +8,10 @@
 - Added new setup (#6)
 - Wraparound on main menu cursor
 - Display current trainer during gameplay / level select
-- Resetting during a tetris no longer creates an invalid state
+- Fixed some NES Tetris bugs;
+    - Resetting during a tetris no longer creates an invalid state
+    - Game no longer crashes after a certain number of levels
+    - Tetrimino colours are correct past level 138
 
 ## [v1]
 - Tetris Trainer

@@ -13,7 +13,7 @@ PRACTISE_MODE := 1
 DEBUG_MODE := 1
 NO_MUSIC := 1
 ALWAYS_NEXT_BOX := 1
-AUTO_WIN := 1
+AUTO_WIN := 0
 SWAPUD := 0
 
 .if SWAPUD
@@ -2122,7 +2122,7 @@ rightColumns:
 updatePaletteForLevel:
         lda levelNumber
 @mod10: cmp #$0A
-        bmi @copyPalettes
+        bcc @copyPalettes
         sec
         sbc #$0A
         jmp @mod10
