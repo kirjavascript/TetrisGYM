@@ -6246,9 +6246,6 @@ music_endings_noiseScript:
 
 .segment    "unreferenced_data4": absolute
 
-developRts:
-    rts
-
 .if PRACTISE_MODE
 
 practiseMenuRenderPatch:
