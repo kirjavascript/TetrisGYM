@@ -101,6 +101,6 @@ Dictate if the NTSC or PAL gameplay mechanics should be used. Should automatical
 
 ## Resources
 
-upstream repo: [https://github.com/CelestialAmber/TetrisNESDisasm](https://github.com/CelestialAmber/TetrisNESDisasm)  
+base disassembly: [https://github.com/CelestialAmber/TetrisNESDisasm](https://github.com/CelestialAmber/TetrisNESDisasm)  
 disassembly information: [https://github.com/ejona86/taus](https://github.com/ejona86/taus)
 

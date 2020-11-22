@@ -13,7 +13,7 @@ PRACTISE_MODE := 1
 DEBUG_MODE := 1
 NO_MUSIC := 1
 ALWAYS_NEXT_BOX := 1
-AUTO_WIN := 0
+AUTO_WIN := 1
 SWAPUD := 0
 
 .if SWAPUD
@@ -1171,7 +1171,6 @@ gameModeState_initGameState:
         lda #$47
         sta outOfDateRenderFlags
         jsr updateAudioWaitForNmiAndResetOamStaging
-        jsr initPlayfieldIfTypeB
         ldx musicType
         lda musicSelectionTable,x
         jsr setMusicTrack
@@ -1187,78 +1186,6 @@ makePlayer1Active:
         sta heldButtons
         rts
 
-initPlayfieldIfTypeB:
-        lda gameType
-        bne initPlayfieldForTypeB
-        jmp L8875
-
-initPlayfieldForTypeB:
-        lda #$0C
-        sta generalCounter
-L87E7:  lda generalCounter
-        beq L884A
-        lda #$14
-        sec
-        sbc generalCounter
-        sta generalCounter2
-        lda #$00
-        sta vramRow
-        lda #$09
-        sta generalCounter3
-L87FC:  ldx #$17
-        ldy #$02
-        jsr generateNextPseudorandomNumber
-        lda rng_seed
-        and #$07
-        tay
-        lda rngTable,y
-        sta generalCounter4
-        ldx generalCounter2
-        lda multBy10Table,x
-        clc
-        adc generalCounter3
-        tay
-        lda generalCounter4
-        sta playfield,y
-        lda generalCounter3
-        beq L8824
-        dec generalCounter3
-        jmp L87FC
-
-L8824:  ldx #$17
-        ldy #$02
-        jsr generateNextPseudorandomNumber
-        lda rng_seed
-        and #$0F
-        cmp #$0A
-        bpl L8824
-        sta generalCounter5
-        ldx generalCounter2
-        lda multBy10Table,x
-        clc
-        adc generalCounter5
-        tay
-        lda #$EF
-        sta playfield,y
-        jsr updateAudioWaitForNmiAndResetOamStaging
-        dec generalCounter
-        bne L87E7
-L884A:
-        ldx startHeight
-        lda typeBBlankInitCountByHeightTable,x
-        tay
-        lda #$EF
-L885D:  sta playfield,y
-        dey
-        cpy #$FF
-        bne L885D
-L8875:  rts
-
-typeBBlankInitCountByHeightTable:
-        .byte   $C8,$AA,$96,$78,$64,$50
-rngTable:
-        .byte   $EF,$7B,$EF,$7C,$7D,$7D,$EF
-        .byte   $EF
 gameModeState_updateCountersAndNonPlayerState:
         lda #$01
         jsr changeCHRBank0
@@ -6885,8 +6812,6 @@ advanceGameGarbage:
         .addr garbagePieces
         .addr garbageHard
 
-        ; initPlayfieldIfTypeB
-
         ; type C
         ; one random block per item
         ; pixels that slowly fill in per frame / static garbage
@@ -6910,7 +6835,7 @@ garbageTypeB:
         ; ldx #190
         ; jsr swapMino
 
-        jsr swap
+        ; jsr swap
         ; jsr swap
         ; jsr swap
         ; jsr swap
