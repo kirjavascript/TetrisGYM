@@ -2004,7 +2004,6 @@ render_mode_play_and_demo:
 pieceToPpuStatAddr:
         .dbyt   $2186,$21C6,$2206,$2246
         .dbyt   $2286,$22C6,$2306
-; levelDisplayTable used to live here
 multBy10Table:
         .byte   $00,$0A,$14,$1E,$28,$32,$3C,$46
         .byte   $50,$5A,$64,$6E,$78,$82,$8C,$96
@@ -2628,6 +2627,11 @@ L9BD0:  lda lines+1
         lda levelNumber
         cmp generalCounter
         bpl L9BFB
+
+        ; clamp levelNumber
+        cmp #$EF
+        beq L9BFB
+
         inc levelNumber
         lda #$06
         sta soundEffectSlot1Init
@@ -3055,6 +3059,7 @@ byteToBcdTable:
         .byte   $32,$33,$34,$35,$36,$37,$38,$39
         .byte   $40,$41,$42,$43,$44,$45,$46,$47
         .byte   $48,$49
+
 ; Adjusts high score table and handles data entry, if necessary
 handleHighScoreIfNecessary:
         lda #$00

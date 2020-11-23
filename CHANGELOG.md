@@ -10,8 +10,8 @@
 - Display current trainer during gameplay / level select
 - Fixed some NES Tetris bugs;
     - Resetting during a tetris no longer creates an invalid state
-    - Game no longer crashes after a certain number of levels
     - Tetrimino colours are correct past level 138
+    - Game no longer crashes after 1550 lines
 
 ## [v1]
 - Tetris Trainer
