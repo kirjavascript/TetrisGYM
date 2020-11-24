@@ -1,6 +1,6 @@
 const paletteLine = 3;
-const tileOffset = 0;
-const text = [...'height'.toUpperCase()];
+const tileOffset = 14 * 16;
+const text = [...'A22858'.toUpperCase()];
 const byte = num => '$' + num.toString(16).padStart(2,0);
 const char = ch => ch.charCodeAt(0) + tileOffset - 55;
 const chunk = (n,o) => 0 in(n=[...n])?[n.splice(0,o),...chunk(n,o)]:n;

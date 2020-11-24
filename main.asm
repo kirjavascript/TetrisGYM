@@ -3865,7 +3865,7 @@ changePRGBank:
 game_palette:
         .byte   $3F,$00,$20,$0F,$30,$12,$16,$0F
         .byte   $20,$12,$18,$0F,$2C,$16,$29,$0F
-        .byte   $3C,$00,$30,$0F,$35,$15,$22,$0F
+        .byte   $3C,$00,$30,$0F,$16,$2A,$22,$0F
         .byte   $10,$16,$2D,$0F,$2C,$16,$29,$0F
         .byte   $3C,$00,$30,$FF
 title_palette:
@@ -6877,8 +6877,12 @@ garbagePieces:
         rts
 
 garbageHard:
+        lda spawnCount
+        and #1
+        bne @nothing
         jsr randomHole
         inc pendingGarbage
+@nothing:
         rts
 
 smartHole:
