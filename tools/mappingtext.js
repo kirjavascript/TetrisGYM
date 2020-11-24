@@ -1,10 +1,26 @@
-const paletteLine = 3;
-const tileOffset = 14 * 16;
-const text = [...'A22858'.toUpperCase()];
-const byte = num => '$' + num.toString(16).padStart(2,0);
-const char = ch => ch.charCodeAt(0) + tileOffset - 55;
-const chunk = (n,o) => 0 in(n=[...n])?[n.splice(0,o),...chunk(n,o)]:n;
-const result = text.map((ch, i) => [0, char(ch), paletteLine, (i*8)].map(byte));
+{
+    // const paletteLine = 3;
+    // const tileOffset = 0;
+    // const text = [...'height'.toUpperCase()];
+    // const byte = num => '$' + num.toString(16).padStart(2,0);
+    // const char = ch => ch.charCodeAt(0) + tileOffset - 55;
+    // const chunk = (n,o) => 0 in(n=[...n])?[n.splice(0,o),...chunk(n,o)]:n;
+    // const result = text.map((ch, i) => [0, char(ch), paletteLine, (i*8)].map(byte));
 
-console.log(chunk(result, 2).map(d => '        .byte   ' + d.join`,`).join`\n`);
-console.log('        .byte   $FF')
+    // console.log(chunk(result, 2).map(d => '        .byte   ' + d.join`,`).join`\n`);
+    // console.log('        .byte   $FF')
+}
+
+{
+    const paletteLine = 0;
+    const tileOffset = 14 * 16;
+    const text = [...'022858'.toUpperCase()];
+    const byte = num => '$' + num.toString(16).padStart(2,0);
+    // const char = ch => ch.charCodeAt(0) + tileOffset - 55;
+    const char = ch => ch.charCodeAt(0) + tileOffset-48;
+    const chunk = (n,o) => 0 in(n=[...n])?[n.splice(0,o),...chunk(n,o)]:n;
+    const result = text.map((ch, i) => [0, char(ch), paletteLine, (i*8)].map(byte));
+
+    console.log(chunk(result, 2).map(d => '        .byte   ' + d.join`,`).join`\n`);
+    console.log('        .byte   $FF')
+}
