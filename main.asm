@@ -64,7 +64,6 @@ MODE_CONFIG_OFFSET := MODE_QUANTITY - MODE_CONFIG_QUANTITY
 
 ; RAM
 
-presetBitmask := tmp2
 ; $600 - $67F
 practiseType := $600
 spawnDelay := $601
@@ -6324,6 +6323,8 @@ practiseMenuControl:
 @skip:
         rts
 
+presetBitmask := tmp2
+
 practisePickTetriminoPatch:
         lda practiseType
         cmp #MODE_PRESETS
@@ -6810,61 +6811,67 @@ advanceGameGarbage:
         lda garbageModifier
         jsr switch_s_plus_2a
         .addr garbageAlwaysTetrisReady
-        .addr garbageTypeB
+        .addr garbageTypeC
         .addr garbagePieces
         .addr garbageHard
 
-        ; type C
         ; one random block per item
-        ; pixels that slowly fill in per frame / static garbage
-        ; height based
+        ; goodgarbage + findTop
+        ; goodgarbage + spawnCount
 
-garbageTypeB:
-        ; get random location in playfield
+    ; merge blocks/tiles into garbage
+    ; flat shapes / hearts
+    ;  big blocks
+    ; falling blocks
+    ; vertical garbage
+    ; mean bean machine stuff
 
+garbageTypeC:
+        ; lda spawnCount
+        ; and #1
+        ; beq @nope
+        ; rts
+; @nope:
 
-        ; run at other places in code with a on/off thing
-        ; lda $610
-        ; eor 1
-        ; sta $610
+        jsr findTop
+        txa
+        adc #$28 ; offset from starting position
 
-        ; lda #$7B
-        ; cmp
-        ; sta playfield+90
+@loop:
+        sta tmp3
 
-        ; ldx #180
-        ; jsr swapMino
-        ; ldx #190
-        ; jsr swapMino
-
-        ; jsr swap
-        ; jsr swap
-        ; jsr swap
-        ; jsr swap
-        ; jsr swap
-        rts
-
-swap:
-        ldx #$17
-        ldy #$02
-        jsr generateNextPseudorandomNumber
-        lda rng_seed
-        and #$07
+        jsr random10
+        adc tmp3
         tax
         jsr swapMino
 
+        lda tmp3
+        adc #$A
+        cmp #$c0
+        bcc @loop
+        rts
 
+findTop:
+        ldx #$0
+@loop:
+        lda playfield, x
+        cmp #$EF
+        bne @done
+        inx
+        cpx #$b8
+        bcc @loop
+@done:
         rts
 
 swapMino:
         ldy #$ef
-        lda playfield+190, x
+        lda playfield, x
         cmp #$ef
         bne @full
-        ldy #$7B
+        ldy #BLOCK_TILES+3
 @full:
         tya
-        sta playfield+190, x
+        sta playfield, x
         rts
 
 garbagePieces:
@@ -6901,14 +6908,18 @@ smartHole:
         rts
 
 randomHole:
+        jsr random10
+        sta garbageHole
+        rts
+
+random10:
         ldx #$17
         ldy #$02
         jsr generateNextPseudorandomNumber
         lda rng_seed
         and #$0F
         cmp #$0A
-        bpl randomHole
-        sta garbageHole
+        bpl random10
         rts
 
 garbageAlwaysTetrisReady:
