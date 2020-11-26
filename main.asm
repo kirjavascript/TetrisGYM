@@ -64,7 +64,7 @@ MODE_CONFIG_OFFSET := MODE_QUANTITY - MODE_CONFIG_QUANTITY
 
 ; RAM
 
-; $600 - $67F
+; $500 - $67F
 practiseType := $600
 spawnDelay := $601
 dasValueHigh := $602
@@ -474,7 +474,7 @@ initRamContinued:
         jsr LAA82
         lda #$EF
         ldx #$04
-        ldy #$05
+        ldy #$04 ; used to be 5, but we dont need to clear 2p playfield
         jsr memset_page
         jsr waitForVBlankAndEnableNmi
         jsr updateAudioWaitForNmiAndResetOamStaging
@@ -2765,7 +2765,7 @@ gameModeState_handleGameOver:
         sta playState
         lda #$EF
         ldx #$04
-        ldy #$05
+        ldy #$04 ; used to be 5, but we dont need to clear 2p playfield
         jsr memset_page
         lda #$00
         sta vramRow
@@ -6812,8 +6812,12 @@ advanceGameGarbage:
         jsr switch_s_plus_2a
         .addr garbageAlwaysTetrisReady
         .addr garbageTypeC ; infinite dig
-        .addr garbagePieces
+        .addr garbageNormal
         .addr garbageHard
+
+        ; good garbage
+        ; random chance
+        ; hole that changes
 
         ; one random block per item
         ; goodgarbage + findTop
@@ -6884,13 +6888,13 @@ swapMino:
         sta playfield, x
         rts
 
-garbagePieces:
-        lda spawnCount
-        and #1
-        bne @nothing
-        jsr smartHole
-        inc pendingGarbage
-@nothing:
+garbageNormal:
+        ; lda spawnCount
+        ; and #1
+        ; bne @nothing
+        ; jsr smartHole
+        ; inc pendingGarbage
+; @nothing:
         rts
 
 garbageHard:
@@ -6902,20 +6906,20 @@ garbageHard:
 @nothing:
         rts
 
-smartHole:
-        ldx #190
-@loop:
-        lda playfield, x
-        cmp #$EF
-        beq @done
-        inx
-        cpx #200
-        bmi @loop
-@done:
-        txa
-        sbc #190
-        sta garbageHole
-        rts
+; smartHole:
+;         ldx #190
+; @loop:
+;         lda playfield, x
+;         cmp #$EF
+;         beq @done
+;         inx
+;         cpx #200
+;         bmi @loop
+; @done:
+;         txa
+;         sbc #190
+;         sta garbageHole
+;         rts
 
 randomHole:
         jsr random10
