@@ -6811,7 +6811,7 @@ advanceGameGarbage:
         lda garbageModifier
         jsr switch_s_plus_2a
         .addr garbageAlwaysTetrisReady
-        .addr garbageTypeC
+        .addr garbageTypeC ; infinite dig
         .addr garbagePieces
         .addr garbageHard
 
@@ -6827,15 +6827,9 @@ advanceGameGarbage:
     ; mean bean machine stuff
 
 garbageTypeC:
-        ; lda spawnCount
-        ; and #1
-        ; beq @nope
-        ; rts
-; @nope:
-
-        jsr findTop
+        jsr findTopBulky
         txa
-        ; adc #$28 ; offset from starting position
+        adc #$20 ; offset from starting position
 @loop:
         sta tmp3
 
@@ -6843,50 +6837,38 @@ garbageTypeC:
         adc tmp3
         tax
         jsr swapMino
+        txa
 
-        lda tmp3
-        adc #$A
+        sta tmp3
         cmp #$c0
         bcc @loop
         rts
 
 findTopBulky:
-        ; lda #$0
-; @loop:
-        ; sta tmp3 ; line
-
-        ; tax
-        ; lda #0
-        ; sta tmp2 ; line block qty
-        ; ldy #9
-; @loopLine:
-        ; lda playfield, x
-        ; cmp #$EF
-        ; beq @noBlock
-        ; inc tmp2
-; @noBlock:
-        ; inx
-        ; dey
-        ; bne @loopLine
-        ; lda tmp2
-        ; cmp #5
-        ; bpl @done
-
-        ; lda tmp3
-        ; adc #$A
-        ; cmp #$b8
-        ; bcc @loop
-; @done:
-        ; rts
-
-findTop:
-        ldx #$0
+        lda #$0
 @loop:
+        sta tmp3 ; line
+
+        tax
+        lda #0
+        sta tmp2 ; line block qty
+        ldy #9
+@loopLine:
         lda playfield, x
         cmp #$EF
-        bne @done
+        beq @noBlock
+        inc tmp2
+@noBlock:
         inx
-        cpx #$b8
+        dey
+        bne @loopLine
+        lda tmp2
+        cmp #4 ; requirement
+        bpl @done
+
+        lda tmp3
+        adc #$A
+        cmp #$b8
         bcc @loop
 @done:
         rts
@@ -6983,6 +6965,18 @@ checkTetrisReady:
         inx
         dey
         bne @loop
+        rts
+
+unused_findTop:
+        ldx #$0
+@loop:
+        lda playfield, x
+        cmp #$EF
+        bne @done
+        inx
+        cpx #$b8
+        bcc @loop
+@done:
         rts
 
 .endif
