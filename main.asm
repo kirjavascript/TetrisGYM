@@ -6835,8 +6835,7 @@ garbageTypeC:
 
         jsr findTop
         txa
-        adc #$28 ; offset from starting position
-
+        ; adc #$28 ; offset from starting position
 @loop:
         sta tmp3
 
@@ -6850,6 +6849,35 @@ garbageTypeC:
         cmp #$c0
         bcc @loop
         rts
+
+findTopBulky:
+        ; lda #$0
+; @loop:
+        ; sta tmp3 ; line
+
+        ; tax
+        ; lda #0
+        ; sta tmp2 ; line block qty
+        ; ldy #9
+; @loopLine:
+        ; lda playfield, x
+        ; cmp #$EF
+        ; beq @noBlock
+        ; inc tmp2
+; @noBlock:
+        ; inx
+        ; dey
+        ; bne @loopLine
+        ; lda tmp2
+        ; cmp #5
+        ; bpl @done
+
+        ; lda tmp3
+        ; adc #$A
+        ; cmp #$b8
+        ; bcc @loop
+; @done:
+        ; rts
 
 findTop:
         ldx #$0
