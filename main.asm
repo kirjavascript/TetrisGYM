@@ -49,7 +49,7 @@ MODE_GAME_QUANTITY := 8
 MODE_CONFIG_QUANTITY := 7
 MODE_CONFIG_OFFSET := MODE_QUANTITY - MODE_CONFIG_QUANTITY
 
-.define MENUSIZES $6, $C, $20, $3, $12, $1, $1
+.define MENUSIZES $6, $C, $20, $1, $12, $1, $1
 
 .macro MODENAMES
     .byte   "TETRIS"
@@ -6832,7 +6832,6 @@ advanceGameGarbage:
 
 garbageTypeC:
         jsr findTopBulky
-        txa
         adc #$20 ; offset from starting position
 @loop:
         sta tmp3
@@ -6875,6 +6874,7 @@ findTopBulky:
         cmp #$b8
         bcc @loop
 @done:
+        txa
         rts
 
 swapMino:
@@ -6889,10 +6889,32 @@ swapMino:
         rts
 
 garbageNormal:
+        jsr smartHole
+
+        jsr findTopBulky
+        ; flip nybble
+        asl a
+        adc #$80
+        rol a
+        asl a
+        adc #$80
+        rol a
+        and #$F
+
+        sbc #$7
+        cmp #0
+        bmi @nogarbo
+
+        inc pendingGarbage
+@nogarbo:
+        ; lda #5
+        ; sbc
+
+
+
         ; lda spawnCount
         ; and #1
         ; bne @nothing
-        ; jsr smartHole
         ; inc pendingGarbage
 ; @nothing:
         rts
@@ -6906,20 +6928,20 @@ garbageHard:
 @nothing:
         rts
 
-; smartHole:
-;         ldx #190
-; @loop:
-;         lda playfield, x
-;         cmp #$EF
-;         beq @done
-;         inx
-;         cpx #200
-;         bmi @loop
-; @done:
-;         txa
-;         sbc #190
-;         sta garbageHole
-;         rts
+smartHole:
+        ldx #190
+@loop:
+        lda playfield, x
+        cmp #$EF
+        beq @done
+        inx
+        cpx #200
+        bmi @loop
+@done:
+        txa
+        sbc #190
+        sta garbageHole
+        rts
 
 randomHole:
         jsr random10
