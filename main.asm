@@ -49,7 +49,7 @@ MODE_GAME_QUANTITY := 8
 MODE_CONFIG_QUANTITY := 7
 MODE_CONFIG_OFFSET := MODE_QUANTITY - MODE_CONFIG_QUANTITY
 
-.define MENUSIZES $6, $C, $20, $1, $12, $1, $1
+.define MENUSIZES $6, $C, $20, $3, $12, $1, $1
 
 .macro MODENAMES
     .byte   "TETRIS"
@@ -125,9 +125,9 @@ rowY        := $0052
 score       := $0053
 completedLines  := $0056
 lineIndex   := $0057                        ; Iteration count of playState_checkForCompletedRows
-; curtainRow  := $0058
-startHeight := $0059
-garbageHole := $005A                        ; Position of hole in received garbage
+startHeight := $0058
+garbageHole := $0059                        ; Position of hole in received garbage
+garbageDelay  := $005A
 ; player1_tetriminoX:= $0060
 ; player1_tetriminoY:= $0061
 ; player1_currentPiece:= $0062
@@ -2528,6 +2528,7 @@ playState_receiveGarbage:
         inx
         cpx #$0A
         bne @inc
+        ; jsr garbageChooseHole
         ldx #$00
 @inc:   iny
         cpy #$C8
@@ -2537,6 +2538,23 @@ playState_receiveGarbage:
         sta vramRow
 @ret:  inc playState
 @delay:  rts
+
+garbageChooseHole:
+        lda garbageModifier
+        cmp #2
+        bne @done
+        lda garbageDelay
+        cmp #0
+        bne @nextLine
+        ; bne @nextLine
+        jsr random10
+        sta garbageHole
+        jsr random10
+        sta garbageDelay
+@nextLine:
+        dec garbageDelay
+@done:
+        rts
 
 garbageLines:
         .byte   $00,$00,$01,$02,$04
