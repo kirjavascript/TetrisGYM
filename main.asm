@@ -107,7 +107,7 @@ rng_seed    := $0017
 spawnID     := $0019
 spawnCount  := $001A
 verticalBlankingInterval:= $0033
-; unused_0E   := $0034                              ; Always $0E
+; $0034 - $003F
 tetriminoX  := $0040                        ; Player data is $20 in size. It is copied here from $60 or $80, processed, then copied back
 tetriminoY  := $0041
 currentPiece    := $0042                    ; Current piece as an orientation ID
@@ -2528,7 +2528,6 @@ playState_receiveGarbage:
         inx
         cpx #$0A
         bne @inc
-        ; jsr garbageChooseHole
         ldx #$00
 @inc:   iny
         cpy #$C8
@@ -2539,22 +2538,6 @@ playState_receiveGarbage:
 @ret:  inc playState
 @delay:  rts
 
-garbageChooseHole:
-        lda garbageModifier
-        cmp #2
-        bne @done
-        lda garbageDelay
-        cmp #0
-        bne @nextLine
-        ; bne @nextLine
-        jsr random10
-        sta garbageHole
-        jsr random10
-        sta garbageDelay
-@nextLine:
-        dec garbageDelay
-@done:
-        rts
 
 garbageLines:
         .byte   $00,$00,$01,$02,$04
@@ -6841,6 +6824,9 @@ advanceGameGarbage:
         ; goodgarbage + findTop
         ; goodgarbage + spawnCount
 
+        ; jsr garbageChooseHole
+        ; a few levels of garbage
+
     ; merge blocks/tiles into garbage
     ; flat shapes / hearts
     ;  big blocks
@@ -6907,7 +6893,27 @@ swapMino:
         rts
 
 garbageNormal:
-        jsr smartHole
+
+        ; lda garbageModifier
+        ; cmp #2
+        ; bne @done
+        ; lda garbageDelay
+        ; cmp #0
+        ; bne @nextLine
+        ; bne @nextLine
+        ; jsr random10
+        ; sta garbageHole
+        ; jsr random10
+        ; and #$7
+        ; ; lda #3
+        ; sta garbageDelay
+        ; rts
+; @nextLine:
+        ; dec garbageDelay
+; @done:
+
+        jsr randomHole
+
 
         jsr findTopBulky
         ; flip nybble
@@ -6919,11 +6925,17 @@ garbageNormal:
         rol a
         and #$F
 
-        sbc #$7
-        cmp #0
-        bmi @nogarbo
+        sbc #3
+        sta pendingGarbage
+        ; sta tmp1
+        ; lda #$C
+        ; sbc tmp1
 
-        inc pendingGarbage
+        ; sta garbageDelay
+        ; ; cmp #0
+        ; ; bmi @nogarbo
+
+        ; inc pendingGarbage
 @nogarbo:
         ; lda #5
         ; sbc

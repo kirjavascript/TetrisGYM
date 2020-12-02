@@ -1,9 +1,9 @@
 # Changelog
 
 ## [v2]
-- Garbage Trainer
 - Savestates added to Debug Mode
 - Controller input added to Debug Mode
+- Garbage Trainer
 - Piece distribution in Setups Trainer is now even
 - Added new setup (#6)
 - Wraparound on main menu cursor
@@ -11,7 +11,7 @@
 - Fixed some NES Tetris bugs;
     - Resetting during a tetris no longer creates an invalid state
     - Tetrimino colours are correct past level 138
-    - Game no longer crashes after 1550 lines
+    - Game no longer crashes after ~1550 lines
 
 ## [v1]
 - Tetris Trainer
