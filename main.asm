@@ -740,6 +740,39 @@ gameTypeLoop:
         asl a
         clc
 
+        ; draw
+
+        ; YTAX
+        ldy #0
+@loop:
+        ldx oamStagingLength
+
+        tya
+        asl
+        asl
+        asl
+        adc #$67
+        sta oamStaging, x
+        inx
+        lda menuVars, y
+        sta oamStaging, x
+        inx
+        lda #$03
+        sta oamStaging, x
+        inx
+        lda #$E0
+        sta oamStaging, x
+        inx
+        ; increase OAM index
+        lda #$04
+        clc
+        adc oamStagingLength
+        sta oamStagingLength
+        iny
+        cpy #MODE_CONFIG_QUANTITY
+        bne @loop
+
+
         ; cursor sprite
         lda practiseType
         asl a
@@ -1012,7 +1045,6 @@ render_mode_menu_screens:
         sta PPUSCROLL
         sta ppuScrollY
         sta PPUSCROLL
-        jsr practiseMenuRenderPatch
         rts
 
 gameModeState_initGameBackground:
@@ -6290,36 +6322,6 @@ music_endings_noiseScript:
 
 .if PRACTISE_MODE
 
-practiseMenuRenderPatch:
-        lda gameMode
-        cmp #2
-        bne @notGameType
-
-        ldx #MODE_CONFIG_QUANTITY-1
-@loop:
-        lda #$21
-        cpx #3
-        bmi @lower
-        lda #$22
-@lower:
-        ; 32 wide
-        sta PPUADDR
-        txa
-        asl
-        asl
-        asl
-        asl
-        asl
-        adc #$BC
-        sta PPUADDR
-        lda menuVars, x
-        sta PPUDATA
-        dex
-        bpl @loop
-
-@notGameType:
-        rts
-
 presetBitmask := tmp2
 
 practisePickTetriminoPatch:
@@ -6895,7 +6897,7 @@ findTop:
 
 randomGarbage:
         jsr findTop
-        cpx #80
+        cpx #130
         bcc @done
 
         lda garbageDelay
@@ -6904,6 +6906,10 @@ randomGarbage:
 
         jsr random10
         and #3
+        cmp #0
+        bne @notzero
+        lda #1
+@notzero:
         sta pendingGarbage
         jsr random10
         and #$7
@@ -6915,6 +6921,10 @@ randomGarbage:
         rts
 
 garbageHard:
+        jsr findTop
+        cpx #100
+        bcc @nothing
+
         lda spawnCount
         and #1
         bne @nothing
