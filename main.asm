@@ -6814,16 +6814,8 @@ advanceGameGarbage:
         .addr garbageAlwaysTetrisReady
         .addr garbageNormal
         .addr garbageSmart
-        .addr garbageTypeC ; infinite dig
         .addr garbageHard
-
-        ; one random block per item
-
-    ; flat shapes / hearts
-    ;  big blocks
-    ; falling blocks
-    ; vertical garbage
-    ; mean bean machine stuff
+        .addr garbageTypeC ; infinite dig
 
 garbageTypeC:
         jsr findTopBulky

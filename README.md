@@ -15,8 +15,12 @@
     * [Setups](#setups)
     * [Floor](#floor)
     * [(Quick)Tap](#%28quick%29-tap)
+    * [Garbage](#garbage)
     * [Drought](#drought)
 * [Debug Mode](#debug-mode)
+    * [Level Editor](#level-editor)
+    * [Savestates](#savestates)
+    * [Controller Input Display](#controller-input-display)
 * [PAL Mode](#pal-mode)
 * [Resources](#resources)
 
@@ -58,6 +62,14 @@ An experiment in highlighting areas of the playfield.
 
 Several preset playfields for practising different types of tucks and spins.
 
+0. Z
+1. T / S
+2. T
+3. I
+4. Buco
+5. Various
+6. L / J Double
+
 ### Floor
 
 ![Floor](/screens/floor.png)
@@ -72,6 +84,18 @@ Setting the height to zero will result in a game mode with burns disabled.
 
 For practising tapping and quicktapping pieces over towers. 0-G will have a tower on the left of the screen and H-W will have a tower to the right.
 
+### Garbage
+
+![Garbage](/screens/garbage.png)
+
+Different styles of garbage to dig through.
+
+0. Always Tetris Ready - Pushes blocks to force tetris readiness
+1. Normal Garbage - Random amounts of garbage
+2. Smart Garbage - Follows your well
+3. Hard Garbage - Brutal random garbage
+4. Infinite Dig Generator - Scrambles the bottom of your stack
+
 ### Drought
 
 Create artificially inflated droughts. Increasing the value causes less I pieces.
@@ -80,20 +104,63 @@ Create artificially inflated droughts. Increasing the value causes less I pieces
 
 ## Debug Mode
 
-![Tap](/screens/debug.png)
+![Controller](/screens/debug.png)
 
-Allows full control of editing the playfield and current / next pieces.
+Allow more fine control over aspects of gameplay.
+
+This is a config option only, and will enable debug mode globally. 
 
 When enabled, press start to go into debug mode.
 
-You can use use the dpad to move around, and select to switch between piece editing and playfield editing.
+### Level Editor
 
-* Piece editing  
-        A/B to change current piece, hold one and press the other to change next piece
-* Playfield editing  
-        A to draw a block, B to delete a block
+* DPad
+        Move around  
+* Select + Left  
+        Switch between piece and playfield editors
 
-This is a config option only, and will enable debug mode globally.
+In piece mode
+
+* A / B  
+    Change the current piece
+* A + B  
+    Change the next piece
+
+In playfield mode
+
+* A  
+    Draw block at cursor
+* B  
+*   Delete block at cursor
+
+### Savestates
+
+When paused
+
+* Select + Up  
+        Increment save slot
+* Select + Up  
+        Decrement save slot
+* Select + A  
+        Save state
+* Select + B  
+        Load state
+
+During gameplay
+
+* Select + B  
+        Load state
+
+Savestates require SRAM to work, but are tested and working on Everdrive / Emulator / MiSTerFPGA.
+
+Combined with the level editor, savestates are effective for practising specific scenarios.
+
+### Controller input display
+
+![Controller](/screens/controller.png)
+
+* Select + Right  
+        Toggle controller input display
 
 ## PAL Mode
 

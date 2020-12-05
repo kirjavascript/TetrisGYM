@@ -4,8 +4,13 @@
 - Savestates added to Debug Mode
 - Controller input added to Debug Mode
 - Garbage Trainer
+    - Always Tetris Ready
+    - Normal Garbage
+    - Smart Garbage 
+    - Hard Garbage
+    - Infinite Digging
 - Piece distribution in Setups Trainer is now even
-- Added new setup (#6)
+- Added new setup (L/J doubletuck)
 - Wraparound on main menu cursor
 - Display current trainer during gameplay / level select
 - Fixed some NES Tetris bugs;
