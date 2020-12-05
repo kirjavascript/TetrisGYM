@@ -151,7 +151,9 @@ During gameplay
 * Select + B  
         Load state
 
-Savestates require SRAM to work, but are tested and working on Everdrive / Emulator / MiSTerFPGA.
+Savestates allow you to save and reload playfields as many times as you want. These configurations are stored on your cart, and will persist after poweroff.
+
+Savestates require SRAM to work. Tested and working on Everdrive / Emulator / MiSTerFPGA.
 
 Combined with the level editor, savestates are effective for practising specific scenarios.
 
