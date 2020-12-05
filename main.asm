@@ -49,7 +49,7 @@ MODE_GAME_QUANTITY := 8
 MODE_CONFIG_QUANTITY := 7
 MODE_CONFIG_OFFSET := MODE_QUANTITY - MODE_CONFIG_QUANTITY
 
-.define MENUSIZES $6, $C, $20, $3, $12, $1, $1
+.define MENUSIZES $6, $C, $20, $4, $12, $1, $1
 
 .macro MODENAMES
     .byte   "TETRIS"
@@ -6812,22 +6812,13 @@ advanceGameGarbage:
         lda garbageModifier
         jsr switch_s_plus_2a
         .addr garbageAlwaysTetrisReady
-        .addr garbageTypeC ; infinite dig
         .addr garbageNormal
+        .addr garbageSmart
+        .addr garbageTypeC ; infinite dig
         .addr garbageHard
 
-        ; good garbage
-        ; random chance
-        ; hole that changes
-
         ; one random block per item
-        ; goodgarbage + findTop
-        ; goodgarbage + spawnCount
 
-        ; jsr garbageChooseHole
-        ; a few levels of garbage
-
-    ; merge blocks/tiles into garbage
     ; flat shapes / hearts
     ;  big blocks
     ; falling blocks
@@ -6893,11 +6884,20 @@ swapMino:
         rts
 
 garbageNormal:
+        jsr randomHole
+        jsr randomGarbage
+        rts
+
+garbageSmart:
+        jsr smartHole
+        jsr randomGarbage
+        rts
+
+randomGarbage:
         lda garbageDelay
         cmp #0
         bne @delay
 
-        jsr randomHole
         jsr random10
         and #3
         sta pendingGarbage
@@ -6919,14 +6919,14 @@ garbageHard:
         rts
 
 smartHole:
-        ldx #190
+        ldx #199
 @loop:
         lda playfield, x
         cmp #$EF
         beq @done
-        inx
-        cpx #200
-        bmi @loop
+        dex
+        cpx #190
+        bcs @loop
 @done:
         txa
         sbc #190
