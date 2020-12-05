@@ -6893,60 +6893,20 @@ swapMino:
         rts
 
 garbageNormal:
-
-        ; lda garbageModifier
-        ; cmp #2
-        ; bne @done
-        ; lda garbageDelay
-        ; cmp #0
-        ; bne @nextLine
-        ; bne @nextLine
-        ; jsr random10
-        ; sta garbageHole
-        ; jsr random10
-        ; and #$7
-        ; ; lda #3
-        ; sta garbageDelay
-        ; rts
-; @nextLine:
-        ; dec garbageDelay
-; @done:
+        lda garbageDelay
+        cmp #0
+        bne @delay
 
         jsr randomHole
-
-
-        jsr findTopBulky
-        ; flip nybble
-        asl a
-        adc #$80
-        rol a
-        asl a
-        adc #$80
-        rol a
-        and #$F
-
-        sbc #3
+        jsr random10
+        and #3
         sta pendingGarbage
-        ; sta tmp1
-        ; lda #$C
-        ; sbc tmp1
-
-        ; sta garbageDelay
-        ; ; cmp #0
-        ; ; bmi @nogarbo
-
-        ; inc pendingGarbage
-@nogarbo:
-        ; lda #5
-        ; sbc
-
-
-
-        ; lda spawnCount
-        ; and #1
-        ; bne @nothing
-        ; inc pendingGarbage
-; @nothing:
+        jsr random10
+        and #$7
+        adc #$2+1
+        sta garbageDelay
+@delay:
+        dec garbageDelay
         rts
 
 garbageHard:
