@@ -642,14 +642,48 @@ gameMode_gameTypeMenu:
         ldx practiseType
         lda musicSelectionTable,x
         jsr setMusicTrack
-L830B:  lda #$FF
+
+gameTypeLoop:
+        lda #$FF
         ldx #$02
         ldy #$02
         jsr memset_page
-        lda newlyPressedButtons_player1
 
-        ; additional controls
-        jsr practiseMenuControl
+        ; load config type from offset
+        lda practiseType
+        cmp #MODE_CONFIG_OFFSET
+        bmi @skip
+        lda practiseType
+        sbc #MODE_CONFIG_OFFSET
+        tax
+
+        ; check if pressing left
+        lda newlyPressedButtons_player1
+        cmp #BUTTON_LEFT
+        bne @skipLeft
+        ; check if zero
+        lda menuVars, x
+        cmp #0
+        beq @skipLeft
+        ; dec value
+        dec menuVars, x
+        lda #$01
+        sta soundEffectSlot1Init
+@skipLeft:
+
+        ; check if pressing right
+        lda newlyPressedButtons_player1
+        cmp #BUTTON_RIGHT
+        bne @skipRight
+        ; check if within the offset
+        lda menuVars, x
+        cmp menuConfigSizeLookup, x
+        bpl @skipRight
+        inc menuVars, x
+        lda #$01
+        sta soundEffectSlot1Init
+@skipRight:
+@skip:
 
         ; down
         lda newlyPressedButtons_player1
@@ -706,13 +740,13 @@ L830B:  lda #$FF
         asl a
         clc
 
+        ; cursor sprite
         lda practiseType
         asl a
         asl a
         asl a
         clc
         adc #$4F
-        ; cursor sprite
         sta spriteYOffset
         lda #$17
         sta spriteXOffset
@@ -720,7 +754,10 @@ L830B:  lda #$FF
         sta spriteIndexInOamContentLookup
         jsr loadSpriteIntoOamStaging
         jsr updateAudioWaitForNmiAndResetOamStaging
-        jmp L830B
+        jmp gameTypeLoop
+
+menuConfigSizeLookup:
+        .byte   MENUSIZES
 
 gameMode_levelMenu:
         inc initRam
@@ -6283,47 +6320,6 @@ practiseMenuRenderPatch:
 @notGameType:
         rts
 
-practiseMenuConfigSizeLookup:
-        .byte   MENUSIZES
-
-practiseMenuControl:
-        ; load config type from offset
-        lda practiseType
-        cmp #MODE_CONFIG_OFFSET
-        bmi @skip
-        lda practiseType
-        sbc #MODE_CONFIG_OFFSET
-        tax
-
-        ; check if pressing left
-        lda newlyPressedButtons_player1
-        cmp #BUTTON_LEFT
-        bne @skipLeft
-        ; check if zero
-        lda menuVars, x
-        cmp #0
-        beq @skipLeft
-        ; dec value
-        dec menuVars, x
-        lda #$01
-        sta soundEffectSlot1Init
-@skipLeft:
-
-        ; check if pressing right
-        lda newlyPressedButtons_player1
-        cmp #BUTTON_RIGHT
-        bne @skipRight
-        ; check if within the offset
-        lda menuVars, x
-        cmp practiseMenuConfigSizeLookup, x
-        bpl @skipRight
-        inc menuVars, x
-        lda #$01
-        sta soundEffectSlot1Init
-@skipRight:
-@skip:
-        rts
-
 presetBitmask := tmp2
 
 practisePickTetriminoPatch:
@@ -6885,7 +6881,23 @@ garbageSmart:
         jsr randomGarbage
         rts
 
+findTop:
+        ldx #$0
+@loop:
+        lda playfield, x
+        cmp #$EF
+        bne @done
+        inx
+        cpx #$b8
+        bcc @loop
+@done:
+        rts
+
 randomGarbage:
+        jsr findTop
+        cpx #80
+        bcc @done
+
         lda garbageDelay
         cmp #0
         bne @delay
@@ -6899,6 +6911,7 @@ randomGarbage:
         sta garbageDelay
 @delay:
         dec garbageDelay
+@done:
         rts
 
 garbageHard:
@@ -6975,17 +6988,6 @@ checkTetrisReady:
         bne @loop
         rts
 
-unused_findTop:
-        ldx #$0
-@loop:
-        lda playfield, x
-        cmp #$EF
-        bne @done
-        inx
-        cpx #$b8
-        bcc @loop
-@done:
-        rts
 
 .endif
 

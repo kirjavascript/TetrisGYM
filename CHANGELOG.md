@@ -1,5 +1,7 @@
 # Changelog
 
+## [v3]
+
 ## [v2]
 - Savestates added to Debug Mode
 - Controller input added to Debug Mode
