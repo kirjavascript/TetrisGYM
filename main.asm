@@ -728,52 +728,9 @@ gameTypeLoop:
         rts
 
 @startNotPressed:
-        ldy #$00
-        lda gameType
-        asl a
-        sta generalCounter
-        asl a
-        adc generalCounter
-        asl a
-        asl a
-        asl a
-        asl a
-        clc
+        jsr renderMenuVars
 
-        ; draw
-
-        ; YTAX
-        ldy #0
-@loop:
-        ldx oamStagingLength
-
-        tya
-        asl
-        asl
-        asl
-        adc #$67
-        sta oamStaging, x
-        inx
-        lda menuVars, y
-        sta oamStaging, x
-        inx
-        lda #$03
-        sta oamStaging, x
-        inx
-        lda #$E0
-        sta oamStaging, x
-        inx
-        ; increase OAM index
-        lda #$04
-        clc
-        adc oamStagingLength
-        sta oamStagingLength
-        iny
-        cpy #MODE_CONFIG_QUANTITY
-        bne @loop
-
-
-        ; cursor sprite
+        ; cursor
         lda practiseType
         asl a
         asl a
@@ -788,6 +745,70 @@ gameTypeLoop:
         jsr loadSpriteIntoOamStaging
         jsr updateAudioWaitForNmiAndResetOamStaging
         jmp gameTypeLoop
+
+renderMenuVars:
+
+menuCounter := tmp1
+menuYTmp := tmp2
+
+        ; YTAX
+        lda #0
+        sta menuCounter
+@loop:
+        lda menuCounter
+        asl
+        asl
+        asl
+        adc #$67
+        sta menuYTmp
+
+        ; handle boolean
+        lda menuCounter
+        tay
+        lda menuConfigSizeLookup, y
+        cmp #1
+        bne @notBool
+        jsr @renderBool
+        jmp @loopNext
+@notBool:
+
+        ldx oamStagingLength
+        lda menuYTmp
+        sta oamStaging, x
+        inx
+        lda menuVars, y
+        sta oamStaging, x
+        inx
+        lda #$00
+        sta oamStaging, x
+        inx
+        lda #$E0
+        sta oamStaging, x
+        inx
+        ; increase OAM index
+        lda #$04
+        clc
+        adc oamStagingLength
+        sta oamStagingLength
+
+@loopNext:
+        inc menuCounter
+        lda menuCounter
+        cmp #MODE_CONFIG_QUANTITY
+        bne @loop
+        rts
+
+@renderBool:
+
+        lda menuYTmp
+        sta spriteYOffset
+        lda #$D0
+        sta spriteXOffset
+        lda menuVars, y
+        adc #$18
+        sta spriteIndexInOamContentLookup
+        jsr loadSpriteIntoOamStaging
+        rts
 
 menuConfigSizeLookup:
         .byte   MENUSIZES
@@ -1703,8 +1724,8 @@ oamContentLookup:
         .addr   spriteDebugLevelEdit
         .addr   spriteStateSave
         .addr   spriteStateLoad
-        .addr   sprite02Blank
-        .addr   sprite02Blank
+        .addr   spriteOff
+        .addr   spriteOn
         .addr   sprite02Blank
         .addr   sprite02Blank
         .addr   sprite02Blank
@@ -1830,6 +1851,13 @@ spriteStateSave:
         .byte   $00,$1c,$03,$00,$00,$0a,$03,$08
         .byte   $00,$1f,$03,$10,$00,$0e,$03,$18
         .byte   $00,$0d,$03,$20
+        .byte   $FF
+spriteOff:
+        .byte   $00,$18,$00,$00,$00,$0f,$00,$08
+        .byte   $00,$0f,$00,$10
+        .byte   $FF
+spriteOn:
+        .byte   $00,$18,$00,$08,$00,$17,$00,$10
         .byte   $FF
 sprite53MusicTypeCursor:
         .byte   $00,$27,$00,$00
