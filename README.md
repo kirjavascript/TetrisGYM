@@ -114,7 +114,7 @@ When enabled, press start to go into debug mode.
 
 ### Level Editor
 
-* DPad
+* DPad  
         Move around  
 * Select + Left  
         Switch between piece and playfield editors
@@ -122,16 +122,16 @@ When enabled, press start to go into debug mode.
 In piece mode
 
 * A / B  
-    Change the current piece
+        Change the current piece
 * A + B  
-    Change the next piece
+        Change the next piece
 
 In playfield mode
 
 * A  
-    Draw block at cursor
+        Draw block at cursor
 * B  
-*   Delete block at cursor
+        Delete block at cursor
 
 ### Savestates
 
