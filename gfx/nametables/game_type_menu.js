@@ -22,10 +22,11 @@ const tiles = `
 ##W#a         ┎┍┌┋┊┉┈┇┆┅         d#
 ##W#a                            d#
 ##W#a                            d#
-##W#a                            d#
 ##W#a   TETRIS                   d#
 ##W#a   T-SPINS                  d#
+##W#a   SEED                     d#
 ##W#a   STACKING                 d#
+##W#a   PACE                     d#
 ##W#a   SETUPS                   d#
 ##W#a   FLOOR                    d#
 ##W#a   (QUICK)TAP               d#
@@ -34,11 +35,10 @@ const tiles = `
 ##W#a   DEBUG MODE               d#
 ##W#a   PAL MODE                 d#
 ##W#a                            d#
-##W#a                            d#
 ##W#a                       ╤╣╢╡╠d#
 ##W#a                       ╔╓╒║═d#
 ##W#a                       ╄╃╂╁╀d#
-##W#a V2                    ┴┳┲┱┰d#
+##W#a V3                    ┴┳┲┱┰d#
 ##W#a                       ┤┣┢┡┠d#
 ##W#zxxxxxxxxxxxxxxxxxxxxxxxxxxxxc#
 ##W################################

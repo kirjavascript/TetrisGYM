@@ -35,26 +35,30 @@ BLOCK_TILES := $7B
 
 MODE_TETRIS := 0
 MODE_TSPINS := 1
-MODE_PARITY := 2
-MODE_PRESETS := 3
-MODE_FLOOR := 4
-MODE_TAP := 5
-MODE_GARBAGE := 6
-MODE_DROUGHT := 7
-MODE_DEBUG := 8
-MODE_PAL := 9
+MODE_SEED := 2
+MODE_PARITY := 3
+MODE_PACE := 4
+MODE_PRESETS := 5
+MODE_FLOOR := 6
+MODE_TAP := 7
+MODE_GARBAGE := 8
+MODE_DROUGHT := 9
+MODE_DEBUG := 10
+MODE_PAL := 11
 
-MODE_QUANTITY := 10
-MODE_GAME_QUANTITY := 8
-MODE_CONFIG_QUANTITY := 7
+MODE_QUANTITY := 12
+MODE_GAME_QUANTITY := 9
+MODE_CONFIG_QUANTITY := 8
 MODE_CONFIG_OFFSET := MODE_QUANTITY - MODE_CONFIG_QUANTITY
 
-.define MENUSIZES $6, $C, $20, $4, $12, $1, $1
+.define MENUSIZES $F, $6, $C, $20, $4, $12, $1, $1
 
 .macro MODENAMES
     .byte   "TETRIS"
     .byte   "TSPINS"
+    .byte   " SEED "
     .byte   "STACKN"
+    .byte   " PACE "
     .byte   "SETUPS"
     .byte   "FLOOR "
     .byte   "QCKTAP"
@@ -86,13 +90,14 @@ debugNextCounter := $611
 debugShowController := $612
 ; $760 - $7FF
 menuVars := $760
-presetModifier := menuVars+0
-floorModifier := menuVars+1
-tapModifier := menuVars+2
-garbageModifier := menuVars+3
-droughtModifier := menuVars+4
-debugFlag := menuVars+5
-palFlag := menuVars+6
+paceModifier := menuVars+0
+presetModifier := menuVars+1
+floorModifier := menuVars+2
+tapModifier := menuVars+3
+garbageModifier := menuVars+4
+droughtModifier := menuVars+5
+debugFlag := menuVars+6
+palFlag := menuVars+7
 
 SRAM := $6000 ; 8kb
 
@@ -107,7 +112,8 @@ rng_seed    := $0017
 spawnID     := $0019
 spawnCount  := $001A
 verticalBlankingInterval:= $0033
-; $0034 - $003F
+set_seed    := $0034
+; $0036 - $003F
 tetriminoX  := $0040                        ; Player data is $20 in size. It is copied here from $60 or $80, processed, then copied back
 tetriminoY  := $0041
 currentPiece    := $0042                    ; Current piece as an orientation ID
@@ -736,7 +742,7 @@ gameTypeLoop:
         asl a
         asl a
         clc
-        adc #$4F
+        adc #$47
         sta spriteYOffset
         lda #$17
         sta spriteXOffset
@@ -6934,10 +6940,6 @@ randomGarbage:
 
         jsr random10
         and #3
-        cmp #0
-        bne @notzero
-        lda #1
-@notzero:
         sta pendingGarbage
         jsr random10
         and #$7
