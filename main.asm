@@ -2311,20 +2311,7 @@ playState_spawnNextTetrimino:
 @ret:   rts
 
 chooseNextTetrimino:
-        lda gameMode
-        cmp #$05
-        bne pickRandomTetrimino
-        ldx demoIndex
-        inc demoIndex
-        lda demoTetriminoTypeTable,x
-        lsr a
-        lsr a
-        lsr a
-        lsr a
-        and #$07
-        tax
-        lda spawnTable,x
-        rts
+        jmp pickTetriminoPre
 
 pickRandomTetrimino:
         jsr @realStart
@@ -2360,8 +2347,86 @@ L9934:  tax
         lda spawnTable,x
 useNewSpawnID:
         sta spawnID
-        jsr practisePickTetriminoPatch
+        jsr pickTetriminoPost
         rts
+
+pickTetriminoPre:
+        lda practiseType
+        cmp #MODE_TSPINS
+        beq pickTetriminoTSpin
+        lda practiseType
+        cmp #MODE_TAP
+        beq pickTetriminoTap
+        lda practiseType
+        cmp #MODE_PRESETS
+        beq pickTetriminoPreset
+        jmp pickRandomTetrimino
+
+pickTetriminoPost:
+        lda practiseType
+        cmp #MODE_DROUGHT
+        beq pickTetriminoDrought
+
+        lda spawnID ; restore A
+        rts
+
+
+pickTetriminoTSpin:
+        lda #$2
+        sta spawnID
+        rts
+
+pickTetriminoTap:
+        lda #$12
+        sta spawnID
+        rts
+
+pickTetriminoPreset:
+presetBitmask := tmp2
+@start:
+        inc presetIndex
+        lda presetIndex
+        and #$07
+        cmp #$07
+        beq pickTetriminoPreset
+        sta presetIndex
+        tax ; RNG in x
+        ; store piece bitmask
+        ldy presetModifier
+        lda presets, y ; offset of preset in A
+        tay
+        lda presets, y
+        sta presetBitmask
+        ; create bit to compare with mask from RNG
+        lda #1
+@shiftBit:
+        cpx #0
+        beq @doneShifting
+        asl
+        dex
+        jmp @shiftBit
+@doneShifting:
+        and presetBitmask
+        bne @start
+        ldx presetIndex ; restore RNG
+        lda spawnTable,x
+        sta spawnID
+        rts
+
+pickTetriminoDrought:
+        lda spawnID ; restore A
+        cmp #$12
+        bne @droughtDone
+        lda spawnCount
+        and #$F
+        adc #1 ; always adds 1 so code continues as normal if droughtModifier is 0
+        cmp droughtModifier
+        bmi @pickRando
+        lda spawnID ; restore A
+@droughtDone:
+        rts
+@pickRando:
+        jmp pickRandomTetrimino
 
 tetriminoTypeFromOrientation:
         .byte   $00,$00,$00,$00,$01,$01,$01,$01
@@ -6356,82 +6421,6 @@ music_endings_noiseScript:
 
 .if PRACTISE_MODE
 
-presetBitmask := tmp2
-
-practisePickTetriminoPatch:
-        lda practiseType
-        cmp #MODE_PRESETS
-        beq @presets
-
-        lda practiseType
-        cmp #MODE_TSPINS
-        beq @tspins
-
-        lda practiseType
-        cmp #MODE_TAP
-        beq @tap
-
-        lda practiseType
-        cmp #MODE_DROUGHT
-        beq @drought
-
-        lda spawnID ; restore A
-        rts
-
-@tspins:
-        lda #$2
-        sta spawnID
-        rts
-
-@tap:
-        lda #$12
-        sta spawnID
-        rts
-
-@drought:
-        lda spawnID ; restore A
-        cmp #$12
-        bne @droughtDone
-        lda spawnCount
-        and #$F
-        adc #1 ; always adds 1 so code continues as normal if droughtModifier is 0
-        cmp droughtModifier
-        bmi @pickRando
-        lda spawnID ; restore A
-@droughtDone:
-        rts
-@pickRando:
-        jmp pickRandomTetrimino
-
-@presets:
-        inc presetIndex
-        lda presetIndex
-        and #$07
-        cmp #$07
-        beq @presets
-        sta presetIndex
-        tax ; RNG in x
-        ; store piece bitmask
-        ldy presetModifier
-        lda presets, y ; offset of preset in A
-        tay
-        lda presets, y
-        sta presetBitmask
-        ; create bit to compare with mask from RNG
-        lda #1
-@shiftBit:
-        cpx #0
-        beq @doneShifting
-        asl
-        dex
-        jmp @shiftBit
-@doneShifting:
-        and presetBitmask
-        bne @presets
-        ldx presetIndex ; restore RNG
-        lda spawnTable,x
-        sta spawnID
-        rts
 
 practiseRowCompletePatch:
         lda practiseType
