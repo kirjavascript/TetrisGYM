@@ -47,7 +47,7 @@ MODE_DEBUG := 10
 MODE_PAL := 11
 
 MODE_QUANTITY := 12
-MODE_GAME_QUANTITY := 9
+MODE_GAME_QUANTITY := 10
 MODE_CONFIG_QUANTITY := 8
 MODE_CONFIG_OFFSET := MODE_QUANTITY - MODE_CONFIG_QUANTITY
 
@@ -367,7 +367,7 @@ nmi:    pha
         lda #$00
         adc frameCounter+1
         sta frameCounter+1
-        ldx #$17
+        ldx #rng_seed
         ldy #$02
         jsr generateNextPseudorandomNumber
         lda #$00
@@ -752,10 +752,74 @@ gameTypeLoop:
         jsr updateAudioWaitForNmiAndResetOamStaging
         jmp gameTypeLoop
 
+menuConfigSizeLookup:
+        .byte   MENUSIZES
+
 renderMenuVars:
 
+renderSeedRAM := rng_seed
 menuCounter := tmp1
 menuYTmp := tmp2
+menuXTmp := tmp2
+
+        ; render seed
+
+        ldy #0
+@seedMenuLoop:
+        tya
+        asl
+        asl
+        asl
+        asl
+        adc #$b8
+        sta menuXTmp
+
+        ldx oamStagingLength
+        lda #$57
+        sta oamStaging, x
+        inx
+        lda renderSeedRAM, y
+        and #$F0
+        lsr a
+        lsr a
+        lsr a
+        lsr a
+        sta oamStaging, x
+        inx
+        lda #$00
+        sta oamStaging, x
+        inx
+        lda menuXTmp
+        sta oamStaging, x
+        inx
+
+        lda #$57
+        sta oamStaging, x
+        inx
+        lda renderSeedRAM, y
+        and #$F
+        sta oamStaging, x
+        inx
+        lda #$00
+        sta oamStaging, x
+        inx
+        lda menuXTmp
+        adc #$8
+        sta oamStaging, x
+        inx
+
+        ; increase OAM index
+        lda #$08
+        clc
+        adc oamStagingLength
+        sta oamStagingLength
+
+        iny
+        cpy #3
+        bne @seedMenuLoop
+
+
+        ; render config vars
 
         ; YTAX
         lda #0
@@ -815,9 +879,6 @@ menuYTmp := tmp2
         sta spriteIndexInOamContentLookup
         jsr loadSpriteIntoOamStaging
         rts
-
-menuConfigSizeLookup:
-        .byte   MENUSIZES
 
 gameMode_levelMenu:
         inc initRam
@@ -1258,7 +1319,7 @@ gameModeState_initGameState:
         jsr chooseNextTetrimino
         sta currentPiece
         jsr incrementPieceStat
-        ldx #$17
+        ldx #rng_seed
         ldy #$02
         jsr generateNextPseudorandomNumber
         jsr chooseNextTetrimino
@@ -2314,10 +2375,6 @@ chooseNextTetrimino:
         jmp pickTetriminoPre
 
 pickRandomTetrimino:
-        jsr @realStart
-        rts
-
-@realStart:
         inc spawnCount
         lda rng_seed
         clc
@@ -2379,6 +2436,14 @@ pickTetriminoTSpin:
 pickTetriminoTap:
         lda #$12
         sta spawnID
+        rts
+
+pickTetriminoSeed:
+        ; use alternative spawn count, then same
+        ; strip some letters from ui
+        ; 3 digits? spawnCount, set_seed
+        ; press right to change char
+        ; autoinc
         rts
 
 pickTetriminoPreset:
@@ -6580,7 +6645,7 @@ advanceGameTSpins:
         bne renderTSpin
 
 generateNewTSpin:
-        ldx #$17
+        ldx #rng_seed
         ldy #$2
         jsr generateNextPseudorandomNumber
         lda rng_seed
@@ -6973,7 +7038,7 @@ randomHole:
         rts
 
 random10:
-        ldx #$17
+        ldx #rng_seed
         ldy #$02
         jsr generateNextPseudorandomNumber
         lda rng_seed
