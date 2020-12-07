@@ -88,6 +88,7 @@ pausedOutOfDateRenderFlags := $60F ; 0 - statistics 1 - saveslot
 debugLevelEdit := $610
 debugNextCounter := $611
 debugShowController := $612
+menuSeedCursorIndex := $613
 ; $760 - $7FF
 menuVars := $760
 paceModifier := menuVars+0
@@ -655,10 +656,52 @@ gameTypeLoop:
         ldy #$02
         jsr memset_page
 
+        ; seed mode controls
+
+        lda practiseType
+        cmp #MODE_SEED
+        bne @skipSeedControl
+
+        lda newlyPressedButtons_player1
+        cmp #BUTTON_LEFT
+        bne @skipSeedLeft
+        lda #$01
+        sta soundEffectSlot1Init
+        lda menuSeedCursorIndex
+        bne @noSeedLeftWrap
+        lda #7
+        sta menuSeedCursorIndex
+@noSeedLeftWrap:
+        dec menuSeedCursorIndex
+@skipSeedLeft:
+
+        lda newlyPressedButtons_player1
+        cmp #BUTTON_RIGHT
+        bne @skipSeedRight
+        lda #$01
+        sta soundEffectSlot1Init
+        inc menuSeedCursorIndex
+        lda menuSeedCursorIndex
+        cmp #7
+        bne @downEnd
+        lda #0
+        sta menuSeedCursorIndex
+@skipSeedRight:
+
+        lda menuSeedCursorIndex
+        bne @startNotPressed
+
+        ; inc set_seed
+
+
+@skipSeedControl:
+
+        ; menu config controls
+
         ; load config type from offset
         lda practiseType
         cmp #MODE_CONFIG_OFFSET
-        bmi @skip
+        bmi @skipConfig
         lda practiseType
         sbc #MODE_CONFIG_OFFSET
         tax
@@ -666,30 +709,32 @@ gameTypeLoop:
         ; check if pressing left
         lda newlyPressedButtons_player1
         cmp #BUTTON_LEFT
-        bne @skipLeft
+        bne @skipLeftConfig
         ; check if zero
         lda menuVars, x
         cmp #0
-        beq @skipLeft
+        beq @skipLeftConfig
         ; dec value
         dec menuVars, x
         lda #$01
         sta soundEffectSlot1Init
-@skipLeft:
+@skipLeftConfig:
 
         ; check if pressing right
         lda newlyPressedButtons_player1
         cmp #BUTTON_RIGHT
-        bne @skipRight
+        bne @skipRightConfig
         ; check if within the offset
         lda menuVars, x
         cmp menuConfigSizeLookup, x
-        bpl @skipRight
+        bpl @skipRightConfig
         inc menuVars, x
         lda #$01
         sta soundEffectSlot1Init
-@skipRight:
-@skip:
+@skipRightConfig:
+@skipConfig:
+
+        ; practiseType controls
 
         ; down
         lda newlyPressedButtons_player1
@@ -735,8 +780,19 @@ gameTypeLoop:
 
 @startNotPressed:
         jsr renderMenuVars
+        jsr updateAudioWaitForNmiAndResetOamStaging
+        jmp gameTypeLoop
 
-        ; cursor
+menuConfigSizeLookup:
+        .byte   MENUSIZES
+
+renderMenuVars:
+
+        ; playType / seed cursors
+
+        lda menuSeedCursorIndex
+        bne @seedCursor
+
         lda practiseType
         asl a
         asl a
@@ -749,15 +805,24 @@ gameTypeLoop:
         lda #$53
         sta spriteIndexInOamContentLookup
         jsr loadSpriteIntoOamStaging
-        jsr updateAudioWaitForNmiAndResetOamStaging
-        jmp gameTypeLoop
+        jmp @cursorFinished
 
-menuConfigSizeLookup:
-        .byte   MENUSIZES
+@seedCursor:
+        lda #$4E
+        sta spriteYOffset
+        lda menuSeedCursorIndex
+        asl a
+        asl a
+        asl a
+        adc #$B1
+        sta spriteXOffset
+        lda #$1B
+        sta spriteIndexInOamContentLookup
+        jsr loadSpriteIntoOamStaging
 
-renderMenuVars:
+@cursorFinished:
 
-renderSeedRAM := rng_seed
+renderSeedRAM := set_seed
 menuCounter := tmp1
 menuYTmp := tmp2
 menuXTmp := tmp2
@@ -1793,7 +1858,7 @@ oamContentLookup:
         .addr   spriteStateLoad
         .addr   spriteOff
         .addr   spriteOn
-        .addr   sprite02Blank
+        .addr   spriteSeedCursor
         .addr   sprite02Blank
         .addr   sprite02Blank
         .addr   sprite02Blank
@@ -1925,6 +1990,9 @@ spriteOff:
         .byte   $FF
 spriteOn:
         .byte   $00,$18,$00,$08,$00,$17,$00,$10
+        .byte   $FF
+spriteSeedCursor:
+        .byte   $00,$6B,$00,$00
         .byte   $FF
 sprite53MusicTypeCursor:
         .byte   $00,$27,$00,$00
@@ -2412,6 +2480,9 @@ pickTetriminoPre:
         cmp #MODE_TSPINS
         beq pickTetriminoTSpin
         lda practiseType
+        cmp #MODE_SEED
+        beq pickTetriminoSeed
+        lda practiseType
         cmp #MODE_TAP
         beq pickTetriminoTap
         lda practiseType
@@ -2440,7 +2511,7 @@ pickTetriminoTap:
 
 pickTetriminoSeed:
         ; use alternative spawn count, then same
-        ; strip some letters from ui
+        ; strip some letters from ui (below 8 on certain chars?
         ; 3 digits? spawnCount, set_seed
         ; press right to change char
         ; autoinc
