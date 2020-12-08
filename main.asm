@@ -68,6 +68,8 @@ MODE_CONFIG_OFFSET := MODE_QUANTITY - MODE_CONFIG_QUANTITY
 
 ; RAM
 
+setSeedOffset := set_seed
+
 ; $500 - $67F
 practiseType := $600
 spawnDelay := $601
@@ -646,18 +648,39 @@ gameMode_gameTypeMenu:
         jsr updateAudioWaitForNmiAndResetOamStaging
         jsr updateAudioWaitForNmiAndEnablePpuRendering
         jsr updateAudioWaitForNmiAndResetOamStaging
-        ldx practiseType
-        lda musicSelectionTable,x
-        jsr setMusicTrack
 
 gameTypeLoop:
         lda #$FF
         ldx #$02
         ldy #$02
         jsr memset_page
+        jmp seedControls
 
-        ; seed mode controls
+gameTypeLoopContinue:
+        jsr menuConfigControls
+        jsr practiseTypeMenuControls
 
+        ; handle start
+
+        lda newlyPressedButtons_player1
+        cmp #BUTTON_START
+        bne gameTypeLoopNext
+        ; check it's a selectable option
+        lda practiseType
+        cmp #MODE_GAME_QUANTITY
+        bpl gameTypeLoopNext
+
+        lda #$02
+        sta soundEffectSlot1Init
+        inc gameMode
+        rts
+
+gameTypeLoopNext:
+        jsr renderMenuVars
+        jsr updateAudioWaitForNmiAndResetOamStaging
+        jmp gameTypeLoop
+
+seedControls:
         lda practiseType
         cmp #MODE_SEED
         bne @skipSeedControl
@@ -689,31 +712,15 @@ gameTypeLoop:
 @skipSeedRight:
 
         lda menuSeedCursorIndex
-        bne nextGameTypeLoop
+        beq @skipSeedControl
+
+        ; handle changing seed vals
+
+        inc set_seed
+
+        jmp gameTypeLoopNext
 @skipSeedControl:
-
-        jsr menuConfigControls
-        jsr practiseTypeMenuControls
-
-        ; handle start
-
-        lda newlyPressedButtons_player1
-        cmp #BUTTON_START
-        bne nextGameTypeLoop
-        ; check it's a selectable option
-        lda practiseType
-        cmp #MODE_GAME_QUANTITY
-        bpl nextGameTypeLoop
-
-        lda #$02
-        sta soundEffectSlot1Init
-        inc gameMode
-        rts
-
-nextGameTypeLoop:
-        jsr renderMenuVars
-        jsr updateAudioWaitForNmiAndResetOamStaging
-        jmp gameTypeLoop
+        jmp gameTypeLoopContinue
 
 menuConfigControls:
         ; load config type from offset
@@ -823,7 +830,6 @@ renderMenuVars:
 
 @cursorFinished:
 
-renderSeedRAM := set_seed
 menuCounter := tmp1
 menuYTmp := tmp2
 menuXTmp := tmp2
@@ -844,7 +850,7 @@ menuXTmp := tmp2
         lda #$57
         sta oamStaging, x
         inx
-        lda renderSeedRAM, y
+        lda setSeedOffset, y
         and #$F0
         lsr a
         lsr a
@@ -862,7 +868,7 @@ menuXTmp := tmp2
         lda #$57
         sta oamStaging, x
         inx
-        lda renderSeedRAM, y
+        lda setSeedOffset, y
         and #$F
         sta oamStaging, x
         inx
@@ -1506,7 +1512,7 @@ drop_tetrimino:
         lda autorepeatY
         cmp #$03
         bcc @lookupDropSpeed
-        lda #$02
+        lda #$01
         sta autorepeatY
         inc holdDownPoints
 @drop:  lda #$00
