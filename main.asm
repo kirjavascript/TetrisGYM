@@ -683,21 +683,39 @@ gameTypeLoop:
         inc menuSeedCursorIndex
         lda menuSeedCursorIndex
         cmp #7
-        bne @downEnd
+        bne @skipSeedRight
         lda #0
         sta menuSeedCursorIndex
 @skipSeedRight:
 
         lda menuSeedCursorIndex
-        bne @startNotPressed
-
-        ; inc set_seed
-
-
+        bne nextGameTypeLoop
 @skipSeedControl:
 
-        ; menu config controls
+        jsr menuConfigControls
+        jsr practiseTypeMenuControls
 
+        ; handle start
+
+        lda newlyPressedButtons_player1
+        cmp #BUTTON_START
+        bne nextGameTypeLoop
+        ; check it's a selectable option
+        lda practiseType
+        cmp #MODE_GAME_QUANTITY
+        bpl nextGameTypeLoop
+
+        lda #$02
+        sta soundEffectSlot1Init
+        inc gameMode
+        rts
+
+nextGameTypeLoop:
+        jsr renderMenuVars
+        jsr updateAudioWaitForNmiAndResetOamStaging
+        jmp gameTypeLoop
+
+menuConfigControls:
         ; load config type from offset
         lda practiseType
         cmp #MODE_CONFIG_OFFSET
@@ -733,9 +751,9 @@ gameTypeLoop:
         sta soundEffectSlot1Init
 @skipRightConfig:
 @skipConfig:
+        rts
 
-        ; practiseType controls
-
+practiseTypeMenuControls:
         ; down
         lda newlyPressedButtons_player1
         cmp #BUTTON_DOWN
@@ -764,24 +782,7 @@ gameTypeLoop:
 @noWrap:
         dec practiseType
 @upEnd:
-
-        lda newlyPressedButtons_player1
-        cmp #$10
-        bne @startNotPressed
-        ; check it's a selectable option
-        lda practiseType
-        cmp #MODE_GAME_QUANTITY
-        bpl @startNotPressed
-
-        lda #$02
-        sta soundEffectSlot1Init
-        inc gameMode
         rts
-
-@startNotPressed:
-        jsr renderMenuVars
-        jsr updateAudioWaitForNmiAndResetOamStaging
-        jmp gameTypeLoop
 
 menuConfigSizeLookup:
         .byte   MENUSIZES
@@ -1505,7 +1506,7 @@ drop_tetrimino:
         lda autorepeatY
         cmp #$03
         bcc @lookupDropSpeed
-        lda #$01
+        lda #$02
         sta autorepeatY
         inc holdDownPoints
 @drop:  lda #$00
@@ -1522,6 +1523,10 @@ drop_tetrimino:
         jsr updatePlayfield
 @ret:   rts
 
+@incrementAutorepeatY:
+        inc autorepeatY
+        jmp @ret
+
 @lookupDropSpeed:
         lda #$01
         ldx levelNumber
@@ -1537,10 +1542,6 @@ drop_tetrimino:
         lda fallTimer
         cmp dropSpeed
         bpl @drop
-        jmp @ret
-
-@incrementAutorepeatY:
-        inc autorepeatY
         jmp @ret
 
 framesPerDropTableNTSC:
