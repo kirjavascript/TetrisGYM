@@ -68,8 +68,6 @@ MODE_CONFIG_OFFSET := MODE_QUANTITY - MODE_CONFIG_QUANTITY
 
 ; RAM
 
-setSeedOffset := set_seed_input
-
 ; $500 - $67F
 practiseType := $600
 spawnDelay := $601
@@ -585,7 +583,7 @@ gameMode_legalScreen: ; boot
         ; set start level to 18
         lda #$08
         sta startLevel
-        ; zero out config memory
+        ; zero out config memory (possibly unnecessary)
         lda #0
         ldx #MODE_CONFIG_QUANTITY
 @loop:
@@ -686,6 +684,18 @@ seedControls:
         bne gameTypeLoopContinue
 
         lda newlyPressedButtons_player1
+        cmp #BUTTON_SELECT
+        bne @skipSeedSelect
+        lda rng_seed
+        sta set_seed_input
+        lda rng_seed+1
+        sta set_seed_input+1
+        lda rng_seed+1
+        eor #$77
+        sta set_seed_input+2
+@skipSeedSelect:
+
+        lda newlyPressedButtons_player1
         cmp #BUTTON_LEFT
         bne @skipSeedLeft
         lda #$01
@@ -730,14 +740,14 @@ seedControls:
         and #1
         beq @lowNybbleUp
 
-        lda setSeedOffset, x
+        lda set_seed_input, x
         clc
         adc #$10
-        sta setSeedOffset, x
+        sta set_seed_input, x
 
         jmp @skipSeedUp
 @lowNybbleUp:
-        lda setSeedOffset, x
+        lda set_seed_input, x
         clc
         tay
         and #$F
@@ -745,12 +755,12 @@ seedControls:
         bne @noWrapUp
         tya
         and #$F0
-        sta setSeedOffset, x
+        sta set_seed_input, x
         jmp @skipSeedUp
 @noWrapUp:
         tya
         adc #1
-        sta setSeedOffset, x
+        sta set_seed_input, x
 @skipSeedUp:
 
         lda newlyPressedButtons_player1
@@ -762,14 +772,14 @@ seedControls:
         and #1
         beq @lowNybbleDown
 
-        lda setSeedOffset, x
+        lda set_seed_input, x
         sbc #$10
         clc
-        sta setSeedOffset, x
+        sta set_seed_input, x
 
         jmp @skipSeedDown
 @lowNybbleDown:
-        lda setSeedOffset, x
+        lda set_seed_input, x
         clc
         tay
         and #$F
@@ -779,12 +789,12 @@ seedControls:
         and #$F0
         clc
         adc #$F
-        sta setSeedOffset, x
+        sta set_seed_input, x
         jmp @skipSeedDown
 @noWrapDown:
         tya
         sbc #1
-        sta setSeedOffset, x
+        sta set_seed_input, x
 @skipSeedDown:
 
         jmp gameTypeLoopCheckStart
@@ -919,7 +929,7 @@ menuXTmp := tmp2
         lda #$57
         sta oamStaging, x
         inx
-        lda setSeedOffset, y
+        lda set_seed_input, y
         and #$F0
         lsr a
         lsr a
@@ -937,7 +947,7 @@ menuXTmp := tmp2
         lda #$57
         sta oamStaging, x
         inx
-        lda setSeedOffset, y
+        lda set_seed_input, y
         and #$F
         sta oamStaging, x
         inx
@@ -2591,13 +2601,6 @@ pickTetriminoTap:
         rts
 
 pickTetriminoSeed:
-        ; autoinc
-        ; show ui on level select page
-        ; generate random on boot
-
-        ; copy
-        ;
-
         ldx #set_seed
         ldy #$02
         jsr generateNextPseudorandomNumber
