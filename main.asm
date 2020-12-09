@@ -68,7 +68,7 @@ MODE_CONFIG_OFFSET := MODE_QUANTITY - MODE_CONFIG_QUANTITY
 
 ; RAM
 
-setSeedOffset := set_seed
+setSeedOffset := set_seed_input
 
 ; $500 - $67F
 practiseType := $600
@@ -115,8 +115,9 @@ rng_seed    := $0017
 spawnID     := $0019
 spawnCount  := $001A
 verticalBlankingInterval:= $0033
-set_seed    := $0034
-; $0036 - $003F
+set_seed    := $0034 ; 3 bytes - rng_seed, rng_seed+1, spawnCount
+set_seed_input := $0037 ; copied to set_seed during gameModeState_initGameState
+; $003A - $003F
 tetriminoX  := $0040                        ; Player data is $20 in size. It is copied here from $60 or $80, processed, then copied back
 tetriminoY  := $0041
 currentPiece    := $0042                    ; Current piece as an orientation ID
@@ -786,7 +787,6 @@ seedControls:
         sta setSeedOffset, x
 @skipSeedDown:
 
-
         jmp gameTypeLoopCheckStart
 @skipSeedControl:
         jmp gameTypeLoopContinue
@@ -885,7 +885,7 @@ renderMenuVars:
         jmp @cursorFinished
 
 @seedCursor:
-        lda #$4E
+        lda #$4D
         sta spriteYOffset
         lda menuSeedCursorIndex
         asl a
@@ -1424,6 +1424,12 @@ gameModeState_initGameState:
         sta $03EF,x
         dex
         bne @initStatsByType
+        lda set_seed_input
+        sta set_seed
+        lda set_seed_input+1
+        sta set_seed+1
+        lda set_seed_input+2
+        sta set_seed+2
         lda #$05
         sta tetriminoX
         lda #$00
@@ -2570,7 +2576,6 @@ pickTetriminoPost:
         lda practiseType
         cmp #MODE_DROUGHT
         beq pickTetriminoDrought
-
         lda spawnID ; restore A
         rts
 
@@ -2586,11 +2591,48 @@ pickTetriminoTap:
         rts
 
 pickTetriminoSeed:
-        ; use alternative spawn count, then same
-        ; strip some letters from ui (below 8 on certain chars?
-        ; 3 digits? spawnCount, set_seed
-        ; press right to change char
         ; autoinc
+        ; show ui on level select page
+        ; generate random on boot
+
+        ; copy
+        ;
+
+        ldx #set_seed
+        ldy #$02
+        jsr generateNextPseudorandomNumber
+
+        inc set_seed+2 ; 'spawnCount'
+        lda set_seed
+        clc
+        adc set_seed+2
+        and #$07
+        cmp #$07
+        beq @invalidIndex
+        tax
+        lda spawnTable,x
+        cmp spawnID
+        bne @useNewSpawnID
+@invalidIndex:
+        ldx #set_seed
+        ldy #$02
+        jsr generateNextPseudorandomNumber
+        lda set_seed
+        and #$07
+        clc
+        adc spawnID
+@L992A:
+        cmp #$07
+        bcc @L9934
+        sec
+        sbc #$07
+        jmp @L992A
+
+@L9934:
+        tax
+        lda spawnTable,x
+@useNewSpawnID:
+        sta spawnID
         rts
 
 pickTetriminoPreset:
