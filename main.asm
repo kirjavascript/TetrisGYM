@@ -660,8 +660,7 @@ gameTypeLoopContinue:
         jsr menuConfigControls
         jsr practiseTypeMenuControls
 
-        ; handle start
-
+gameTypeLoopCheckStart:
         lda newlyPressedButtons_player1
         cmp #BUTTON_START
         bne gameTypeLoopNext
@@ -683,7 +682,7 @@ gameTypeLoopNext:
 seedControls:
         lda practiseType
         cmp #MODE_SEED
-        bne @skipSeedControl
+        bne gameTypeLoopContinue
 
         lda newlyPressedButtons_player1
         cmp #BUTTON_LEFT
@@ -714,11 +713,81 @@ seedControls:
         lda menuSeedCursorIndex
         beq @skipSeedControl
 
+        lda menuSeedCursorIndex
+        sbc #1
+        lsr
+        tax ; save seed offset
+
         ; handle changing seed vals
 
-        inc set_seed
+        lda newlyPressedButtons_player1
+        cmp #BUTTON_UP
+        bne @skipSeedUp
+        lda #$01
+        sta soundEffectSlot1Init
+        lda menuSeedCursorIndex
+        and #1
+        beq @lowNybbleUp
 
-        jmp gameTypeLoopNext
+        lda setSeedOffset, x
+        clc
+        adc #$10
+        sta setSeedOffset, x
+
+        jmp @skipSeedUp
+@lowNybbleUp:
+        lda setSeedOffset, x
+        clc
+        tay
+        and #$F
+        cmp #$F
+        bne @noWrapUp
+        tya
+        and #$F0
+        sta setSeedOffset, x
+        jmp @skipSeedUp
+@noWrapUp:
+        tya
+        adc #1
+        sta setSeedOffset, x
+@skipSeedUp:
+
+        lda newlyPressedButtons_player1
+        cmp #BUTTON_DOWN
+        bne @skipSeedDown
+        lda #$01
+        sta soundEffectSlot1Init
+        lda menuSeedCursorIndex
+        and #1
+        beq @lowNybbleDown
+
+        lda setSeedOffset, x
+        sbc #$10
+        clc
+        sta setSeedOffset, x
+
+        jmp @skipSeedDown
+@lowNybbleDown:
+        lda setSeedOffset, x
+        clc
+        tay
+        and #$F
+        cmp #$0
+        bne @noWrapDown
+        tya
+        and #$F0
+        clc
+        adc #$F
+        sta setSeedOffset, x
+        jmp @skipSeedDown
+@noWrapDown:
+        tya
+        sbc #1
+        sta setSeedOffset, x
+@skipSeedDown:
+
+
+        jmp gameTypeLoopCheckStart
 @skipSeedControl:
         jmp gameTypeLoopContinue
 
