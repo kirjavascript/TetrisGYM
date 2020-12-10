@@ -8,8 +8,9 @@ spawnID:	.res 1	; $0019
 spawnCount:	.res 1	; $001A
 .res 24
 verticalBlankingInterval:	.res 1	; $0033
-unused_0E: .res 1 ; $0034
-.res 11
+set_seed: .res 3
+set_seed_input: .res 3
+.res 6
 tetriminoX:	.res 1	; $0040
 tetriminoY:	.res 1	; $0041
 currentPiece:	.res 1	; $0042
@@ -28,9 +29,9 @@ rowY:	.res 1	; $0052
 score:	.res 3	; $0053
 completedLines:	.res 1	; $0056
 lineIndex:	.res 1	; $0057
-curtainRow:	.res 1	; $0058
-startHeight:	.res 1	; $0059
-garbageHole:	.res 1	; $005A
+startHeight:	.res 1	; $0058
+garbageHole:	.res 1	; $0059
+garbageDelay:	.res 1	; $005A
 .res 5
 player1_tetriminoX:	.res 1	; $0060
 player1_tetriminoY:	.res 1	; $0061

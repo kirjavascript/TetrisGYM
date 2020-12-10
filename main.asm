@@ -692,6 +692,7 @@ seedControls:
         sta set_seed_input+1
         lda rng_seed+1
         eor #$77
+        ror
         sta set_seed_input+2
 @skipSeedSelect:
 
@@ -2914,7 +2915,6 @@ playState_checkForCompletedRows_return:
 
 playState_prepareNext:
         jsr practisePrepareNext
-        jsr practiseReceiveGarbage
         inc playState
         rts
 
@@ -3139,17 +3139,9 @@ L9C75:  lda score+2
         clc
         adc #$06
         sta score+2
-L9C84: ; SCORE_LIMIT
-        lda score+2
-        and #$F0
-        cmp #$FF
-        bcc L9C94
-        lda #0
-        sta score
-        sta score+1
-        lda #$F0
-        sta score+2
-L9C94:  dec generalCounter
+L9C84:
+        ; score limit used to live here
+        dec generalCounter
         bne L9C37
         lda outOfDateRenderFlags
         ora #$04
@@ -6727,6 +6719,16 @@ practiseCurrentSpritePatch:
 
 practisePrepareNext:
         lda practiseType
+        cmp #MODE_PACE
+        bne @skipPace
+        jsr advanceGamePace
+@skipPace:
+        lda practiseType
+        cmp #MODE_GARBAGE
+        bne @skipGarbo
+        jsr advanceGameGarbage
+@skipGarbo:
+        lda practiseType
         cmp #MODE_PARITY
         bne @skipParity
         jsr advanceGameParity
@@ -7078,14 +7080,6 @@ highlightOrphans:
         rts
 
 
-practiseReceiveGarbage:
-        lda practiseType
-        cmp #MODE_GARBAGE
-        bne @skip
-        jsr advanceGameGarbage
-@skip:
-        rts
-
 advanceGameGarbage:
         lda garbageModifier
         jsr switch_s_plus_2a
@@ -7274,6 +7268,66 @@ checkTetrisReady:
         bne @loop
         rts
 
+
+paceRAM := $620
+paceLineCounterA := paceRAM
+paceLineCounterB := paceRAM+1
+paceLineCounterC := paceRAM+2
+paceTarget := paceRAM+3 ; 3 bytes
+paceTemp := paceRAM+6
+paceRemainer := paceRAM+7
+
+; pace = score - ((target / 230) * lines)
+; numbers are in BCD (but hex for the highest digit)
+
+; game does BCD but the other way around
+targetTable:
+        .byte $4843
+
+advanceGamePace:
+        ; lda paceModifier
+        lda #$0
+        asl a
+        tax
+        ; load correct pace
+        lda targetTable, x
+        sta paceTarget
+        lda targetTable+2, x
+        sta paceTarget+1
+        lda #0
+        sta paceTarget+2
+
+        ; leave x free
+
+        ; 8434 backwards
+
+        lda paceTarget
+        and #$f
+        sta paceTemp
+        lda targetTable
+        and #$f
+        adc paceTemp
+
+
+        ; try adding 9999 and 9999
+
+        ; if bigger than A, subtract A
+        ; keep remainder for next digit
+
+        lda lines+1
+        sta paceLineCounterC
+        lda lines
+        and #$F0
+        lsr
+        lsr
+        lsr
+        lsr
+        sta paceLineCounterB
+        lda lines
+        and #$F
+        sta paceLineCounterA
+
+        rts
 
 .endif
 
