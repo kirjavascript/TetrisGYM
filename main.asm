@@ -13,7 +13,7 @@ PRACTISE_MODE := 1
 DEBUG_MODE := 1
 NO_MUSIC := 1
 ALWAYS_NEXT_BOX := 1
-AUTO_WIN := 0
+AUTO_WIN := 1
 SWAPUD := 0
 
 .if SWAPUD
@@ -66,43 +66,10 @@ MODE_CONFIG_OFFSET := MODE_QUANTITY - MODE_CONFIG_QUANTITY
     .byte   "DRUGHT"
 .endmacro
 
-; RAM
-
-; $500 - $67F
-practiseType := $600
-spawnDelay := $601
-dasValueHigh := $602
-dasValueLow := $603
-tspinX := $604
-tspinY := $605
-tspinType := $606
-parityIndex := $607
-parityCount := $608
-parityColor := $609
-saveStateDirty := $60A
-saveStateSlot := $60B
-saveStateSpriteType := $60C
-saveStateSpriteDelay := $60D
-presetIndex := $60E
-pausedOutOfDateRenderFlags := $60F ; 0 - statistics 1 - saveslot
-debugLevelEdit := $610
-debugNextCounter := $611
-debugShowController := $612
-menuSeedCursorIndex := $613
-; $760 - $7FF
-menuVars := $760
-paceModifier := menuVars+0
-presetModifier := menuVars+1
-floorModifier := menuVars+2
-tapModifier := menuVars+3
-garbageModifier := menuVars+4
-droughtModifier := menuVars+5
-debugFlag := menuVars+6
-palFlag := menuVars+7
-
-SRAM := $6000 ; 8kb
 
         .setcpu "6502"
+
+SRAM        := $6000 ; 8 delicious kilobytes
 
 tmp1        := $0000
 tmp2        := $0001
@@ -115,7 +82,8 @@ spawnCount  := $001A
 verticalBlankingInterval:= $0033
 set_seed    := $0034 ; 3 bytes - rng_seed, rng_seed+1, spawnCount
 set_seed_input := $0037 ; copied to set_seed during gameModeState_initGameState
-; $003A - $003F
+
+; ... $003F
 tetriminoX  := $0040                        ; Player data is $20 in size. It is copied here from $60 or $80, processed, then copied back
 tetriminoY  := $0041
 currentPiece    := $0042                    ; Current piece as an orientation ID
@@ -136,51 +104,14 @@ lineIndex   := $0057                        ; Iteration count of playState_check
 startHeight := $0058
 garbageHole := $0059                        ; Position of hole in received garbage
 garbageDelay  := $005A
-; player1_tetriminoX:= $0060
-; player1_tetriminoY:= $0061
-; player1_currentPiece:= $0062
-; player1_levelNumber:= $0064
-; player1_fallTimer:= $0065
-; player1_autorepeatX:= $0066
-; player1_startLevel:= $0067
-; player1_playState:= $0068
-; player1_vramRow := $0069
-; player1_completedRow:= $006A
-; player1_autorepeatY:= $006E
-; player1_holdDownPoints:= $006F
-; player1_lines   := $0070
-; player1_rowY    := $0072
-; player1_score   := $0073
-; player1_completedLines:= $0076
-; player1_curtainRow:= $0078
-; player1_startHeight:= $0079
-; player1_garbageHole:= $007A
-; player2_tetriminoX:= $0080
-; player2_tetriminoY:= $0081
-; player2_currentPiece:= $0082
-; player2_levelNumber:= $0084
-; player2_fallTimer:= $0085
-; player2_autorepeatX:= $0086
-; player2_startLevel:= $0087
-; player2_playState:= $0088
-; player2_vramRow := $0089
-; player2_completedRow:= $008A
-; player2_autorepeatY:= $008E
-; player2_holdDownPoints:= $008F
-; player2_lines   := $0090
-; player2_rowY    := $0092
-; player2_score   := $0093
-; player2_completedLines:= $0096
-; player2_curtainRow:= $0098
-; player2_startHeight:= $0099
-; player2_garbageHole:= $009A
+
+; ... $009A
 spriteXOffset   := $00A0
 spriteYOffset   := $00A1
 spriteIndexInOamContentLookup:= $00A2
 outOfDateRenderFlags:= $00A3                ; Bit 0-lines 1-level 2-score 6-stats 7-high score entry letter
-; twoPlayerPieceDelayCounter:= $00A4          ; 0 is not delaying
-; twoPlayerPieceDelayPlayer:= $00A5
-; nextPiece_2player:= $00A6                   ; Somehow used for two players, but seems broken
+
+; ... $00A6                   ; Somehow used for two players, but seems broken
 gameModeState   := $00A7                    ; For values, see playState_checkForCompletedRows
 generalCounter  := $00A8                    ; canon is legalScreenCounter2
 generalCounter2 := $00A9
@@ -207,10 +138,8 @@ gameMode    := $00C0                        ; 0=legal, 1=title, 2=type menu, 3=l
 gameType    := $00C1                        ; A=0, B=1
 musicType   := $00C2                        ; 0-3; 3 is off
 sleepCounter    := $00C3                    ; canon is legalScreenCounter1
-; ending      := $00C4
-; ending_customVars:= $00C5                   ; Different usages depending on Type A and B and Type B concert
-; ending_currentSprite:= $00CC
-; ending_typeBCathedralFrameDelayCounter:= $00CD
+
+; ... $00CD
 demo_heldButtons:= $00CE
 demo_repeats    := $00CF
 demoButtonsAddr := $00D1                    ; Current address within demoButtonsTable
@@ -246,7 +175,30 @@ stack       := $0100
 oamStaging  := $0200                        ; format: https://wiki.nesdev.com/w/index.php/PPU_programmer_reference#OAM
 statsByType := $03F0
 playfield   := $0400
-; playfieldForSecondPlayer:= $0500
+; $500 ...
+
+practiseType := $600
+spawnDelay := $601
+dasValueHigh := $602
+dasValueLow := $603
+tspinX := $604
+tspinY := $605
+tspinType := $606
+parityIndex := $607
+parityCount := $608
+parityColor := $609
+saveStateDirty := $60A
+saveStateSlot := $60B
+saveStateSpriteType := $60C
+saveStateSpriteDelay := $60D
+presetIndex := $60E
+pausedOutOfDateRenderFlags := $60F ; 0 - statistics 1 - saveslot
+debugLevelEdit := $610
+debugNextCounter := $611
+debugShowController := $612
+menuSeedCursorIndex := $613
+
+; ... $67F
 musicStagingSq1Lo:= $0680
 musicStagingSq1Hi:= $0681
 audioInitialized:= $0682
@@ -307,6 +259,18 @@ highScoreScoresA:= $0730
 highScoreScoresB:= $073C
 highScoreLevels := $0748
 initMagic   := $0750                        ; Initialized to a hard-coded number. When resetting, if not correct number then it knows this is a cold boot
+
+menuVars := $760
+paceModifier := menuVars+0
+presetModifier := menuVars+1
+floorModifier := menuVars+2
+tapModifier := menuVars+3
+garbageModifier := menuVars+4
+droughtModifier := menuVars+5
+debugFlag := menuVars+6
+palFlag := menuVars+7
+
+; ... $7FF
 PPUCTRL     := $2000
 PPUMASK     := $2001
 PPUSTATUS   := $2002
@@ -7269,65 +7233,218 @@ checkTetrisReady:
         rts
 
 
-paceRAM := $620
-paceLineCounterA := paceRAM
-paceLineCounterB := paceRAM+1
-paceLineCounterC := paceRAM+2
-paceTarget := paceRAM+3 ; 3 bytes
-paceTemp := paceRAM+6
-paceRemainer := paceRAM+7
+paceRAM := $60
+
+binary32 := paceRAM+$0
+bcd32 := paceRAM+$4
+exp := paceRAM+$8
+product24 := paceRAM+$9
+factorA24 := paceRAM+$C
+factorB24 := paceRAM+$F
 
 ; pace = score - ((target / 230) * lines)
-; numbers are in BCD (but hex for the highest digit)
 
-; game does BCD but the other way around
 targetTable:
-        .byte $4843
+        .byte $FC,$10
 
 advanceGamePace:
-        ; lda paceModifier
-        lda #$0
-        asl a
-        tax
-        ; load correct pace
-        lda targetTable, x
-        sta paceTarget
-        lda targetTable+2, x
-        sta paceTarget+1
-        lda #0
-        sta paceTarget+2
-
-        ; leave x free
-
-        ; 8434 backwards
-
-        lda paceTarget
-        and #$f
-        sta paceTemp
-        lda targetTable
-        and #$f
-        adc paceTemp
-
-
-        ; try adding 9999 and 9999
-
-        ; if bigger than A, subtract A
-        ; keep remainder for next digit
-
+        ; lines BCD -> binary
+        ; TODO: use target counter instead for better perf
+        lda lines
+        sta bcd32
         lda lines+1
-        sta paceLineCounterC
-        lda lines
-        and #$F0
-        lsr
-        lsr
-        lsr
-        lsr
-        sta paceLineCounterB
-        lda lines
-        and #$F
-        sta paceLineCounterA
+        sta bcd32+1
+        lda #0
+        sta bcd32+2
+        sta bcd32+3
+        jsr BCD_BIN
+
+        ; use lines as first factor
+
+        lda binary32
+        sta factorA24
+        lda #0
+        sta factorA24+1
+        sta factorA24+2
+
+        ; use target multiplier as other factor
+
+        lda paceModifier
+        lda #0
+        asl
+        tax
+        lda targetTable, x
+        sta factorB24
+        lda targetTable+1, x
+        sta factorB24+1
+        lda #0
+        sta factorB24+2
+
+        ; get actual score target in product24
+
+        jsr unsigned_mul24
+
+        ; convert score to binary
+
+        lda score
+        sta bcd32
+        lda score+1
+        sta bcd32+1
+        lda score+2
+        sta bcd32+2
+        lda #0
+        sta bcd32+3
+
+        ; normalise score base to BCD
+        lda bcd32+2
+        cmp #$A0
+        bcc @noverflow
+        sbc #$A0
+        sta bcd32+2
+        lda #$1
+        sta bcd32+3
+@noverflow:
+        jsr BCD_BIN
+
+        ; score in binary32, target in product24
+
+
 
         rts
+
+;This routine converts a packed 8 digit BCD value in memory loactions
+;binary32 to binary32+3 to a binary value with the dp value in location
+;EXP and stores it in locations bcd32 to bcd32+3. It Then packs the dp value
+;in the MSBY high nibble location bcd32+3.
+; source: http://www.6502.org/source/integers/32bcdbin.htm
+BCD_BIN:
+        lda #0
+        sta exp
+        sta binary32
+        sta binary32+1
+        sta binary32+2
+        sta binary32+3 ;Reset MSBY
+        jsr NXT_BCD  ;Get next BCD value
+        sta binary32   ;Store in LSBY
+        ldx #$07
+GET_NXT:
+        jsr NXT_BCD  ;Get next BCD value
+        jsr MPY10
+        dex
+        bne GET_NXT
+        asl exp      ;Move dp nibble left
+        asl exp
+        asl exp
+        asl exp
+        lda binary32+3 ;Get MSBY and filter it
+        and #$0f
+        ora exp      ;Pack dp
+        sta binary32+3
+        rts
+NXT_BCD:
+        ldy #$04
+        lda #$00
+MV_BITS:
+        asl bcd32
+        rol bcd32+1
+        rol bcd32+2
+        rol bcd32+3
+        rol a
+        dey
+        bne MV_BITS
+        rts
+
+;Conversion subroutine for BCD_BIN
+MPY10:
+        sta tmp2    ;Save digit just entered
+        lda binary32+3 ;Save partial result on
+        pha          ;stack
+        lda binary32+2
+        pha
+        lda binary32+1
+        pha
+        lda binary32
+        pha
+        asl binary32   ;Multiply partial
+        rol binary32+1 ;result by 2
+        rol binary32+2
+        rol binary32+3
+        asl binary32   ;Multiply by 2 again
+        rol binary32+1
+        rol binary32+2
+        rol binary32+3
+        pla          ;Add original result
+        adc binary32
+        sta binary32
+        pla
+        adc binary32+1
+        sta binary32+1
+        pla
+        adc binary32+2
+        sta binary32+2
+        pla
+        adc binary32+3
+        sta binary32+3
+        asl binary32   ;Multiply result by 2
+        rol binary32+1
+        rol binary32+2
+        rol binary32+3
+        lda tmp2    ;Add digit just entered
+        adc binary32
+        sta binary32
+        lda #$00
+        adc binary32+1
+        sta binary32+1
+        lda #$00
+        adc binary32+2
+        sta binary32+2
+        lda #$00
+        adc binary32+3
+        sta binary32+3
+        rts
+
+; source: https://codebase64.org/doku.php?id=base:24bit_multiplication_24bit_product
+unsigned_mul24:
+	lda #$00			; set product to zero
+	sta product24
+	sta product24+1
+	sta product24+2
+
+@loop:
+	lda factorB24                   ; while factorB24 !=0
+	bne @nz
+	lda factorB24+1
+	bne @nz
+	lda factorB24+2
+	bne @nz
+	rts
+@nz:
+	lda factorB24; if factorB24 isodd
+	and #$01
+	beq @skip
+
+	lda factorA24			; product24 += factorA24
+	clc
+	adc product24
+	sta product24
+
+	lda factorA24+1
+	adc product24+1
+	sta product24+1
+
+	lda factorA24+2
+	adc product24+2
+	sta product24+2			; end if
+
+@skip:
+	asl factorA24			; << factorA24
+	rol factorA24+1
+	rol factorA24+2
+	lsr factorB24+2			; >> factorB24
+	ror factorB24+1
+	ror factorB24
+
+	jmp @loop			; end while
 
 .endif
 

@@ -1,6 +1,7 @@
 # Changelog
 
 ## [v3]
+- Set Seed Trainer
 
 ## [v2]
 - Savestates added to Debug Mode
