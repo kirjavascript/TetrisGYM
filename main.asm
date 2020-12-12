@@ -503,12 +503,14 @@ gameModeState_updatePlayer1:
         jsr makePlayer1Active
         jsr practiseAdvanceGame
         jsr branchOnPlayStatePlayer1
-.if PRACTISE_MODE
-        jsr practiseCurrentSpritePatch
-.else
+
+        ; practiseCurrentSpritePatch
+        lda tetriminoX
+        cmp #$EF ; set in tspin code
+        beq @skip
         jsr stageSpriteForCurrentPiece
-.endif
-        jsr checkDebugGameplay
+@skip:
+
         jsr stageSpriteForNextPiece
         inc gameModeState
         rts
@@ -4895,6 +4897,8 @@ handleLevelEditor:
 
 .endif
 
+; math routines for pace mode
+
 ;This routine converts a packed 8 digit BCD value in memory loactions
 ;binary32 to binary32+3 to a binary value with the dp value in location
 ;EXP and stores it in locations bcd32 to bcd32+3. It Then packs the dp value
@@ -5072,20 +5076,51 @@ SUBTBL:
         .byte $64,$00,$00,$00
         .byte $0a,$00,$00,$00
 
+; source: https://codebase64.org/doku.php?id=base:24bit_multiplication_24bit_product
+unsigned_mul24:
+	lda #$00			; set product to zero
+	sta product24
+	sta product24+1
+	sta product24+2
+
+@loop:
+	lda factorB24                   ; while factorB24 !=0
+	bne @nz
+	lda factorB24+1
+	bne @nz
+	lda factorB24+2
+	bne @nz
+	rts
+@nz:
+	lda factorB24; if factorB24 isodd
+	and #$01
+	beq @skip
+
+	lda factorA24			; product24 += factorA24
+	clc
+	adc product24
+	sta product24
+
+	lda factorA24+1
+	adc product24+1
+	sta product24+1
+
+	lda factorA24+2
+	adc product24+2
+	sta product24+2			; end if
+
+@skip:
+	asl factorA24			; << factorA24
+	rol factorA24+1
+	rol factorA24+2
+	lsr factorB24+2			; >> factorB24
+	ror factorB24+1
+	ror factorB24
+
+	jmp @loop			; end while
+
 ; End of "PRG_chunk1" segment
 .code
-
-
-.segment    "unreferenced_data1": absolute
-
-unreferenced_data1:
-        .incbin "data/unreferenced_data1.bin"
-
-
-
-; End of "unreferenced_data1" segment
-.code
-
 
 .segment    "PRG_chunk2": absolute
 
@@ -6814,12 +6849,6 @@ music_endings_noiseScript:
         .addr   music_endings_noiseScript
 .include "audio/music/music_endings.asm"
 
-; End of "PRG_chunk2" segment
-.code
-
-
-.segment    "unreferenced_data4": absolute
-
 .if PRACTISE_MODE
 
 
@@ -6861,33 +6890,27 @@ practiseRowCompletePatch:
         cmp #$EF
         rts
 
-practiseCurrentSpritePatch:
-        lda tetriminoX
-        cmp #$EF ; set in tspin code
-        beq @skip
-        jsr stageSpriteForCurrentPiece ; patched
-@skip:
-        rts
-
 practisePrepareNext:
         lda practiseType
         cmp #MODE_PACE
         bne @skipPace
-        jsr advanceGamePace
+        jsr prepareNextPace
 @skipPace:
         lda practiseType
         cmp #MODE_GARBAGE
         bne @skipGarbo
-        jsr advanceGameGarbage
+        jsr prepareNextGarbage
 @skipGarbo:
         lda practiseType
         cmp #MODE_PARITY
         bne @skipParity
-        jsr advanceGameParity
+        jsr prepareNextParity
 @skipParity:
         rts
 
 practiseAdvanceGame:
+        jsr checkDebugGameplay
+
         lda practiseType
         cmp #MODE_TSPINS
         bne @skipTSpins
@@ -6911,6 +6934,12 @@ practiseAdvanceGame:
         bne @skipTap
         jsr advanceGameTap
 @skipTap:
+
+        lda practiseType
+        cmp #MODE_SEED
+        bne @skipPace
+        jsr advanceGamePace
+@skipPace:
         rts
 
 
@@ -7090,7 +7119,7 @@ advanceGameTap:
 @skip:
         rts
 
-advanceGameParity:
+prepareNextParity:
         ; stacking highlights
 
         ; 1 red 1+ white
@@ -7230,7 +7259,7 @@ highlightOrphans:
         rts
 
 
-advanceGameGarbage:
+prepareNextGarbage:
         lda garbageModifier
         jsr switch_s_plus_2a
         .addr garbageAlwaysTetrisReady
@@ -7420,15 +7449,27 @@ checkTetrisReady:
 
 ; pace = score - ((target / 230) * lines)
 
+; I'm using pace = score - ((target / 230) * lines)
+
+; so, for a maxout it'd expect a score of A00000 at 230 lines, 695680 at 160 lines, 565240 at 130 lines, and 130440 at 30 lines
+
+; but this doesnt take tetris score ratio into account - I think I have to factor levelnumber in too somehow, any ideas?
+
 ; TODO
-; clear at start
+; clear at start of game
 ; targetTable
     ; after 230 lines hide ui
+; if first number is 0, show sign
+
+; set paceModifier to A
+
+; compensate for scoring potential
+; alternative target under 100 ?
 
 targetTable:
         .byte $FC,$10
 
-advanceGamePace:
+prepareNextPace:
         ; lines BCD -> binary
         ; TODO: use target counter instead for better perf
         lda lines
@@ -7538,54 +7579,15 @@ advanceGamePace:
 
         rts
 
-; source: https://codebase64.org/doku.php?id=base:24bit_multiplication_24bit_product
-unsigned_mul24:
-	lda #$00			; set product to zero
-	sta product24
-	sta product24+1
-	sta product24+2
+advanceGamePace:
+        rts
 
-@loop:
-	lda factorB24                   ; while factorB24 !=0
-	bne @nz
-	lda factorB24+1
-	bne @nz
-	lda factorB24+2
-	bne @nz
-	rts
-@nz:
-	lda factorB24; if factorB24 isodd
-	and #$01
-	beq @skip
-
-	lda factorA24			; product24 += factorA24
-	clc
-	adc product24
-	sta product24
-
-	lda factorA24+1
-	adc product24+1
-	sta product24+1
-
-	lda factorA24+2
-	adc product24+2
-	sta product24+2			; end if
-
-@skip:
-	asl factorA24			; << factorA24
-	rol factorA24+1
-	rol factorA24+2
-	lsr factorB24+2			; >> factorB24
-	ror factorB24+1
-	ror factorB24
-
-	jmp @loop			; end while
 
 
 .endif
 
 
-; End of "unreferenced_data4" segment
+; End of "PRG_chunk2" segment
 .code
 
 
