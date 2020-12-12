@@ -7,13 +7,11 @@
 
 .include "charmap.asm"
 
-; constants
-
 PRACTISE_MODE := 1
 DEBUG_MODE := 1
 NO_MUSIC := 1
 ALWAYS_NEXT_BOX := 1
-AUTO_WIN := 1
+AUTO_WIN := 0
 SWAPUD := 0
 
 .if SWAPUD
@@ -66,7 +64,6 @@ MODE_CONFIG_OFFSET := MODE_QUANTITY - MODE_CONFIG_QUANTITY
     .byte   "DRUGHT"
 .endmacro
 
-
         .setcpu "6502"
 
 SRAM        := $6000 ; 8 delicious kilobytes
@@ -104,6 +101,16 @@ lineIndex   := $0057                        ; Iteration count of playState_check
 startHeight := $0058
 garbageHole := $0059                        ; Position of hole in received garbage
 garbageDelay  := $005A
+
+paceRAM := $60 ; $12 bytes
+binary32 := paceRAM+$0
+bcd32 := paceRAM+$4
+exp := paceRAM+$8
+product24 := paceRAM+$9
+factorA24 := paceRAM+$C
+factorB24 := paceRAM+$F
+binaryTemp := paceRAM+$C
+sign := paceRAM+$F
 
 ; ... $009A
 spriteXOffset   := $00A0
@@ -4295,6 +4302,8 @@ enter_high_score_nametable:
 high_scores_nametable:
         .incbin "gfx/nametables/high_scores_nametable.bin"
 
+.include "presets/presets.asm"
+
 SLOT_SIZE := $100 ; ~$CC used, the rest free
 
 ; some repeated code here, dynamic 16 bit addressing is hard
@@ -4886,6 +4895,183 @@ handleLevelEditor:
 
 .endif
 
+;This routine converts a packed 8 digit BCD value in memory loactions
+;binary32 to binary32+3 to a binary value with the dp value in location
+;EXP and stores it in locations bcd32 to bcd32+3. It Then packs the dp value
+;in the MSBY high nibble location bcd32+3.
+; source: http://www.6502.org/source/integers/32bcdbin.htm
+BCD_BIN:
+        lda #0
+        sta exp
+        sta binary32
+        sta binary32+1
+        sta binary32+2
+        sta binary32+3 ;Reset MSBY
+        jsr NXT_BCD  ;Get next BCD value
+        sta binary32   ;Store in LSBY
+        ldx #$07
+GET_NXT:
+        jsr NXT_BCD  ;Get next BCD value
+        jsr MPY10
+        dex
+        bne GET_NXT
+        asl exp      ;Move dp nibble left
+        asl exp
+        asl exp
+        asl exp
+        lda binary32+3 ;Get MSBY and filter it
+        and #$0f
+        ora exp      ;Pack dp
+        sta binary32+3
+        rts
+NXT_BCD:
+        ldy #$04
+        lda #$00
+MV_BITS:
+        asl bcd32
+        rol bcd32+1
+        rol bcd32+2
+        rol bcd32+3
+        rol a
+        dey
+        bne MV_BITS
+        rts
+
+;Conversion subroutine for BCD_BIN
+MPY10:
+        sta tmp2    ;Save digit just entered
+        lda binary32+3 ;Save partial result on
+        pha          ;stack
+        lda binary32+2
+        pha
+        lda binary32+1
+        pha
+        lda binary32
+        pha
+        asl binary32   ;Multiply partial
+        rol binary32+1 ;result by 2
+        rol binary32+2
+        rol binary32+3
+        asl binary32   ;Multiply by 2 again
+        rol binary32+1
+        rol binary32+2
+        rol binary32+3
+        pla          ;Add original result
+        adc binary32
+        sta binary32
+        pla
+        adc binary32+1
+        sta binary32+1
+        pla
+        adc binary32+2
+        sta binary32+2
+        pla
+        adc binary32+3
+        sta binary32+3
+        asl binary32   ;Multiply result by 2
+        rol binary32+1
+        rol binary32+2
+        rol binary32+3
+        lda tmp2    ;Add digit just entered
+        adc binary32
+        sta binary32
+        lda #$00
+        adc binary32+1
+        sta binary32+1
+        lda #$00
+        adc binary32+2
+        sta binary32+2
+        lda #$00
+        adc binary32+3
+        sta binary32+3
+        rts
+
+BIN_BCD:
+        lda binary32+3 ;Get MSBY
+        and #$f0     ;Filter out low nibble
+        lsr a        ;Move hi nibble right (dp)
+        lsr a
+        lsr a
+        lsr a
+        sta exp      ;store dp
+        lda binary32+3
+        and #$0f     ;Filter out high nibble
+        sta binary32+3
+BCD_DP:
+        ldy #$00     ;Clear table pointer
+NXTDIG:
+        ldx #$00     ;Clear digit count
+SUB_MEM:
+        lda binary32   ;Get LSBY of binary value
+        sec
+        sbc SUBTBL,y ;Subtract LSBY + y of table value
+        sta binary32   ;Return result
+        lda binary32+1 ;Get next byte of binary value
+        iny
+        sbc SUBTBL,y ;Subtract next byte of table value
+        sta binary32+1
+        lda binary32+2 ;Get next byte
+        iny
+        sbc SUBTBL,y ;Subtract next byte of table
+        sta binary32+2
+        lda binary32+3 ;Get MSBY of binary value
+        iny
+        sbc SUBTBL,y ;Subtract MSBY of table
+        bcc ADBACK   ;If result is neg go add back
+        sta binary32+3 ;Store MSBY then point back to LSBY of table
+        dey
+        dey
+        dey
+        inx
+        jmp SUB_MEM  ;Go subtract again
+ADBACK:
+        dey          ;Point back to LSBY of table
+        dey
+        dey
+        lda binary32   ;Get LSBY of binary value and add LSBY
+        adc SUBTBL,y ;of table value
+        sta binary32
+        lda binary32+1 ;Get next byte
+        iny
+        adc SUBTBL,y ;Add next byte of table
+        sta binary32+1
+        lda binary32+2 ;Next byte
+        iny
+        adc SUBTBL,y ;Add next byte of table
+        sta binary32+2
+        txa          ;Put dec count in acc
+        jsr BCDREG   ;Put in BCD reg
+        iny
+        iny
+        cpy #$20     ;End of table?
+        bcc NXTDIG   ;No? go back with next dec weight
+        lda binary32   ;Yes? put remainder in acc and put in BCD reg
+BCDREG:
+        asl a
+        asl a
+        asl a
+        asl a
+        ldx #$04
+SHFT_L:
+        asl a
+        rol bcd32
+        rol bcd32+1
+        rol bcd32+2
+        rol bcd32+3
+        dex
+        bne SHFT_L
+        rts
+
+SUBTBL:
+        .byte $00,$e1,$f5,$05
+        .byte $80,$96,$98,$00
+        .byte $40,$42,$0f,$00
+        .byte $a0,$86,$01,$00
+        .byte $10,$27,$00,$00
+        .byte $e8,$03,$00,$00
+        .byte $64,$00,$00,$00
+        .byte $0a,$00,$00,$00
+
 ; End of "PRG_chunk1" segment
 .code
 
@@ -4894,6 +5080,8 @@ handleLevelEditor:
 
 unreferenced_data1:
         .incbin "data/unreferenced_data1.bin"
+
+
 
 ; End of "unreferenced_data1" segment
 .code
@@ -6735,8 +6923,6 @@ clearPlayfield:
         bne @loop
         rts
 
-.include "presets/presets.asm"
-
 advanceGamePreset:
         jsr clearPlayfield
         ; render layout
@@ -7232,17 +7418,12 @@ checkTetrisReady:
         bne @loop
         rts
 
-
-paceRAM := $60
-
-binary32 := paceRAM+$0
-bcd32 := paceRAM+$4
-exp := paceRAM+$8
-product24 := paceRAM+$9
-factorA24 := paceRAM+$C
-factorB24 := paceRAM+$F
-
 ; pace = score - ((target / 230) * lines)
+
+; TODO
+; clear at start
+; targetTable
+    ; after 230 lines hide ui
 
 targetTable:
         .byte $FC,$10
@@ -7308,99 +7489,53 @@ advanceGamePace:
 
         ; score in binary32, target in product24
 
+        ; do subtraction
 
-
-        rts
-
-;This routine converts a packed 8 digit BCD value in memory loactions
-;binary32 to binary32+3 to a binary value with the dp value in location
-;EXP and stores it in locations bcd32 to bcd32+3. It Then packs the dp value
-;in the MSBY high nibble location bcd32+3.
-; source: http://www.6502.org/source/integers/32bcdbin.htm
-BCD_BIN:
-        lda #0
-        sta exp
-        sta binary32
-        sta binary32+1
-        sta binary32+2
-        sta binary32+3 ;Reset MSBY
-        jsr NXT_BCD  ;Get next BCD value
-        sta binary32   ;Store in LSBY
-        ldx #$07
-GET_NXT:
-        jsr NXT_BCD  ;Get next BCD value
-        jsr MPY10
-        dex
-        bne GET_NXT
-        asl exp      ;Move dp nibble left
-        asl exp
-        asl exp
-        asl exp
-        lda binary32+3 ;Get MSBY and filter it
-        and #$0f
-        ora exp      ;Pack dp
-        sta binary32+3
-        rts
-NXT_BCD:
-        ldy #$04
-        lda #$00
-MV_BITS:
-        asl bcd32
-        rol bcd32+1
-        rol bcd32+2
-        rol bcd32+3
-        rol a
-        dey
-        bne MV_BITS
-        rts
-
-;Conversion subroutine for BCD_BIN
-MPY10:
-        sta tmp2    ;Save digit just entered
-        lda binary32+3 ;Save partial result on
-        pha          ;stack
-        lda binary32+2
-        pha
-        lda binary32+1
-        pha
+        sec
         lda binary32
-        pha
-        asl binary32   ;Multiply partial
-        rol binary32+1 ;result by 2
-        rol binary32+2
-        rol binary32+3
-        asl binary32   ;Multiply by 2 again
-        rol binary32+1
-        rol binary32+2
-        rol binary32+3
-        pla          ;Add original result
-        adc binary32
+        sbc product24
+        sta binaryTemp
+        lda binary32+1
+        sbc product24+1
+        sta binaryTemp+1
+        lda binary32+2
+        sbc product24+2
+        sta binaryTemp+2
+
+        ; convert to unsigned, extract sign
+
+        lda #0
+        sta sign
+        lda binaryTemp+2
+        and #$80
+        beq @positive
+        lda #1
+        sta sign
+        lda binaryTemp
+        eor #$FF
+        adc #1
+        sta binaryTemp
+        lda binaryTemp+1
+        eor #$FF
+        sta binaryTemp+1
+        lda binaryTemp+2
+        eor #$FF
+        sta binaryTemp+2
+@positive:
+
+        lda binaryTemp
         sta binary32
-        pla
-        adc binary32+1
+        lda binaryTemp+1
         sta binary32+1
-        pla
-        adc binary32+2
+        lda binaryTemp+2
         sta binary32+2
-        pla
-        adc binary32+3
+        lda #0
         sta binary32+3
-        asl binary32   ;Multiply result by 2
-        rol binary32+1
-        rol binary32+2
-        rol binary32+3
-        lda tmp2    ;Add digit just entered
-        adc binary32
-        sta binary32
-        lda #$00
-        adc binary32+1
-        sta binary32+1
-        lda #$00
-        adc binary32+2
-        sta binary32+2
-        lda #$00
-        adc binary32+3
-        sta binary32+3
+
+        ; back to BCD
+
+        jsr BIN_BCD
+
         rts
 
 ; source: https://codebase64.org/doku.php?id=base:24bit_multiplication_24bit_product
@@ -7445,6 +7580,7 @@ unsigned_mul24:
 	ror factorB24
 
 	jmp @loop			; end while
+
 
 .endif
 
