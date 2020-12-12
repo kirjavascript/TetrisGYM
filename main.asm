@@ -500,11 +500,17 @@ branchOnGameMode:
         .addr   gameMode_playAndEndingHighScore_jmp
         .addr   gameMode_startDemo
 gameModeState_updatePlayer1:
-        jsr makePlayer1Active
+        lda #$04
+        sta playfieldAddr+1
+        ; copy controller from mirror
+        lda newlyPressedButtons_player1
+        sta newlyPressedButtons
+        lda heldButtons_player1
+        sta heldButtons
+
         jsr practiseAdvanceGame
         jsr branchOnPlayStatePlayer1
 
-        ; practiseCurrentSpritePatch
         lda tetriminoX
         cmp #$EF ; set in tspin code
         beq @skip
@@ -515,7 +521,7 @@ gameModeState_updatePlayer1:
         inc gameModeState
         rts
 
-gameModeState_next:
+gameModeState_next: ; previously updatePlayer2
         inc gameModeState
         rts
 
@@ -527,7 +533,7 @@ gameMode_playAndEndingHighScore:
         .addr   gameModeState_updateCountersAndNonPlayerState
         .addr   gameModeState_handleGameOver
         .addr   gameModeState_updatePlayer1
-        .addr   gameModeState_next ; previously updatePlayer2
+        .addr   gameModeState_next
         .addr   gameModeState_checkForResetKeyCombo
         .addr   gameModeState_startButtonHandling
         .addr   gameModeState_vblankThenRunState2
@@ -1462,15 +1468,6 @@ gameModeState_initGameState:
         lda musicSelectionTable,x
         jsr setMusicTrack
         inc gameModeState
-        rts
-
-makePlayer1Active:
-        lda #$04
-        sta playfieldAddr+1
-        lda newlyPressedButtons_player1
-        sta newlyPressedButtons
-        lda heldButtons_player1
-        sta heldButtons
         rts
 
 gameModeState_updateCountersAndNonPlayerState:
@@ -7008,7 +7005,7 @@ advanceGameTSpins:
 
         lda #$20
         sta spawnDelay
-        lda #$EF ; magic number in practiseCurrentSpritePatch
+        lda #$EF ; magic number in stageSpriteForCurrentPiece
         sta tetriminoX
 
 @notFinished:
