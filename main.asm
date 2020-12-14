@@ -1480,6 +1480,7 @@ gameModeState_initGameState:
         lda #$B0
         sta paceRAM
         lda #$00
+        sta sign
         sta paceRAM+1
         sta paceRAM+2
 
