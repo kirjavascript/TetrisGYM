@@ -117,7 +117,7 @@ byteSpriteRAM := $73
 byteSpriteXOffset := byteSpriteRAM
 byteSpriteYOffset := byteSpriteRAM+1
 byteSpriteAddr := byteSpriteRAM+2
-byteSpriteTile := byteSpriteRAM+3
+byteSpriteTile := byteSpriteRAM+4
 
 ; ... $009A
 spriteXOffset   := $00A0
@@ -976,7 +976,7 @@ menuYTmp := tmp2
 byteSprite:
 menuXTmp := tmp2
 
-        lda #1
+        lda #0
         sta byteSpriteTile
 
 byteSprite_base:
@@ -1000,6 +1000,7 @@ byteSprite_base:
         lsr a
         lsr a
         lsr a
+        adc byteSpriteTile
         sta oamStaging, x
         inx
         lda #$00
@@ -1014,6 +1015,7 @@ byteSprite_base:
         inx
         lda (byteSpriteAddr), y
         and #$F
+        adc byteSpriteTile
         sta oamStaging, x
         inx
         lda #$00
@@ -1463,19 +1465,31 @@ gameModeState_initGameState:
         sta $03EF,x
         dex
         bne @initStatsByType
+        lda #$05
+        sta tetriminoX
+
+        ; set seed init
         lda set_seed_input
         sta set_seed
         lda set_seed_input+1
         sta set_seed+1
         lda set_seed_input+2
         sta set_seed+2
-        lda #$05
-        sta tetriminoX
+
+        ; paceRAM init
+        lda #$B0
+        sta paceRAM
         lda #$00
+        sta paceRAM+1
+        sta paceRAM+2
+
+        ; misc
         sta spawnDelay
         sta saveStateSpriteDelay
         sta saveStateDirty
         sta completedLines ; reset during tetris bugfix
+
+        ; OEM continues
         sta tetriminoY
         sta vramRow
         sta fallTimer
@@ -7501,22 +7515,16 @@ checkTetrisReady:
 
 ; I'm using pace = score - ((target / 230) * lines)
 
-; so, for a maxout it'd expect a score of A00000 at 230 lines, 695680 at 160 lines, 565240 at 130 lines, and 130440 at 30 lines
-
-; but this doesnt take tetris score ratio into account - I think I have to factor levelnumber in too somehow, any ideas?
 
 ; TODO
-; clear at start of game
 ; targetTable
     ; after 230 lines hide ui
-; if first number is 0, show sign (change to A/B)
-;
-
-; set paceModifier to A
 
 ; compensate for scoring potential
 ; alternative target under 100 ?
-; show during pause - gameHUD
+
+; set paceModifier to A
+
 
 targetTable:
         .byte $FC,$10
@@ -7629,19 +7637,48 @@ prepareNextPace:
 
         jsr BIN_BCD
 
+        ; reorder data
+
+        lda bcd32
+        sta paceRAM+2
+        lda bcd32+1
+        sta paceRAM+1
+        lda bcd32+2
+        sta paceRAM
+
+        ; check if highest nybble is empty and use it for a sign
+        ldx #$B0
+        lda sign
+        beq @negative
+        ldx #$A0
+@negative:
+        stx tmp3
+
+        lda paceRAM
+        and #$F0
+        bne @noSign
+        lda paceRAM
+        adc tmp3
+        sta paceRAM
+@noSign:
+
         rts
 
 gameHUDPace:
-
         lda #$C0
         sta byteSpriteXOffset
         lda #$27
         sta byteSpriteYOffset
-        lda #bcd32
+        lda #paceRAM
         sta byteSpriteAddr
-        ; lda #$1
-        ; sta byteSpriteTile
-        jsr byteSprite
+
+        ldx #$E0
+        lda sign
+        beq @positive
+        ldx #$F0
+@positive:
+        stx byteSpriteTile
+        jsr byteSprite_base
         rts
 
 .endif
