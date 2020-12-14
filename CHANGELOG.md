@@ -2,6 +2,7 @@
 
 ## [v3]
 - Set Seed Trainer
+- Controller input can be enabled outside of debug mode
 
 ## [v2]
 - Savestates added to Debug Mode

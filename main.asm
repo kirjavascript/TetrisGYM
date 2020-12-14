@@ -511,6 +511,7 @@ gameModeState_updatePlayer1:
 
         jsr checkDebugGameplay
         jsr practiseAdvanceGame
+        jsr practiseGameHUD
         jsr branchOnPlayStatePlayer1
 
         lda tetriminoX
@@ -3865,6 +3866,8 @@ gameModeState_startButtonHandling:
         adc #3
         sta spriteIndexInOamContentLookup
         jsr loadSpriteIntoOamStaging
+
+        jsr practiseGameHUD
 .if DEBUG_MODE
         jsr practisePausePatch
 .else
@@ -6873,7 +6876,6 @@ practiseRowCompletePatch:
         cmp #$EF
         rts
 
-
 practisePrepareNext:
         lda practiseType
         cmp #MODE_PACE
@@ -6893,8 +6895,6 @@ practisePrepareNext:
         rts
 
 practiseAdvanceGame:
-        jsr controllerInputDisplay
-
         lda practiseType
         cmp #MODE_TSPINS
         bne @skipTSpins
@@ -6918,11 +6918,15 @@ practiseAdvanceGame:
         bne @skipTap
         jsr advanceGameTap
 @skipTap:
+        rts
+
+practiseGameHUD:
+        jsr controllerInputDisplay
 
         lda practiseType
         cmp #MODE_PACE
         bne @skipPace
-        jsr advanceGamePace
+        jsr gameHUDPace
 @skipPace:
         rts
 
@@ -7605,7 +7609,7 @@ prepareNextPace:
 
         rts
 
-advanceGamePace:
+gameHUDPace:
 
         ; TODO: create bytesprites
         ; TODO: replace 'top'
