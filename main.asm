@@ -113,10 +113,11 @@ factorB24 := paceRAM+$F
 binaryTemp := paceRAM+$C
 sign := paceRAM+$F
 
-byteSpriteRAM := $63
+byteSpriteRAM := $73
 byteSpriteXOffset := byteSpriteRAM
 byteSpriteYOffset := byteSpriteRAM+1
 byteSpriteAddr := byteSpriteRAM+2
+byteSpriteTile := byteSpriteRAM+3
 
 ; ... $009A
 spriteXOffset   := $00A0
@@ -908,7 +909,6 @@ menuYTmp := tmp2
         sta byteSpriteYOffset
         lda #set_seed_input
         sta byteSpriteAddr
-
         jsr byteSprite
 
         ; render config vars
@@ -976,8 +976,12 @@ menuYTmp := tmp2
 byteSprite:
 menuXTmp := tmp2
 
+        lda #1
+        sta byteSpriteTile
+
+byteSprite_base:
         ldy #0
-@seedMenuLoop:
+@loop:
         tya
         asl
         asl
@@ -1008,7 +1012,7 @@ menuXTmp := tmp2
         lda byteSpriteYOffset
         sta oamStaging, x
         inx
-        lda set_seed_input, y
+        lda (byteSpriteAddr), y
         and #$F
         sta oamStaging, x
         inx
@@ -1028,7 +1032,7 @@ menuXTmp := tmp2
 
         iny
         cpy #3
-        bne @seedMenuLoop
+        bne @loop
 
         rts
 
@@ -7629,66 +7633,16 @@ prepareNextPace:
 
 gameHUDPace:
 
-        ; TODO: create bytesprites
-        ; TODO: replace 'top'
-
-        ldy #0
-@loop:
-        tya
-        asl
-        asl
-        asl
-        asl
-        adc #$C0
-        sta tmp2
-
-        ldx oamStagingLength
+        lda #$C0
+        sta byteSpriteXOffset
         lda #$27
-        sta oamStaging, x
-        inx
-        lda bcd32, y
-        sta tmp3
-        and #$F0
-        lsr a
-        lsr a
-        lsr a
-        lsr a
-        sta oamStaging, x
-        inx
-        lda #$00
-        sta oamStaging, x
-        inx
-        lda tmp2
-        sta oamStaging, x
-        inx
-
-        lda #$27
-        sta oamStaging, x
-        inx
-        lda tmp3
-        and #$F
-        sta oamStaging, x
-        inx
-        lda #$00
-        sta oamStaging, x
-        inx
-        lda tmp2
-        adc #$8
-        sta oamStaging, x
-        inx
-
-        ; increase OAM index
-        lda #$08
-        clc
-        adc oamStagingLength
-        sta oamStagingLength
-
-        iny
-        cpy #3
-        bne @loop
+        sta byteSpriteYOffset
+        lda #bcd32
+        sta byteSpriteAddr
+        ; lda #$1
+        ; sta byteSpriteTile
+        jsr byteSprite
         rts
-
-
 
 .endif
 
