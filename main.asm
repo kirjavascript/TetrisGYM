@@ -113,6 +113,11 @@ factorB24 := paceRAM+$F
 binaryTemp := paceRAM+$C
 sign := paceRAM+$F
 
+byteSpriteRAM := $63
+byteSpriteXOffset := byteSpriteRAM
+byteSpriteYOffset := byteSpriteRAM+1
+byteSpriteAddr := byteSpriteRAM+2
+
 ; ... $009A
 spriteXOffset   := $00A0
 spriteYOffset   := $00A1
@@ -894,64 +899,17 @@ renderMenuVars:
 
 menuCounter := tmp1
 menuYTmp := tmp2
-menuXTmp := tmp2
 
         ; render seed
 
-        ldy #0
-@seedMenuLoop:
-        tya
-        asl
-        asl
-        asl
-        asl
-        adc #$b8
-        sta menuXTmp
-
-        ldx oamStagingLength
+        lda #$b8
+        sta byteSpriteXOffset
         lda #$4F
-        sta oamStaging, x
-        inx
-        lda set_seed_input, y
-        and #$F0
-        lsr a
-        lsr a
-        lsr a
-        lsr a
-        sta oamStaging, x
-        inx
-        lda #$00
-        sta oamStaging, x
-        inx
-        lda menuXTmp
-        sta oamStaging, x
-        inx
+        sta byteSpriteYOffset
+        lda #set_seed_input
+        sta byteSpriteAddr
 
-        lda #$4F
-        sta oamStaging, x
-        inx
-        lda set_seed_input, y
-        and #$F
-        sta oamStaging, x
-        inx
-        lda #$00
-        sta oamStaging, x
-        inx
-        lda menuXTmp
-        adc #$8
-        sta oamStaging, x
-        inx
-
-        ; increase OAM index
-        lda #$08
-        clc
-        adc oamStagingLength
-        sta oamStagingLength
-
-        iny
-        cpy #3
-        bne @seedMenuLoop
-
+        jsr byteSprite
 
         ; render config vars
 
@@ -1012,6 +970,66 @@ menuXTmp := tmp2
         adc #$18
         sta spriteIndexInOamContentLookup
         jsr loadSpriteIntoOamStaging
+        rts
+
+
+byteSprite:
+menuXTmp := tmp2
+
+        ldy #0
+@seedMenuLoop:
+        tya
+        asl
+        asl
+        asl
+        asl
+        adc byteSpriteXOffset
+        sta menuXTmp
+
+        ldx oamStagingLength
+        lda byteSpriteYOffset
+        sta oamStaging, x
+        inx
+        lda (byteSpriteAddr), y
+        and #$F0
+        lsr a
+        lsr a
+        lsr a
+        lsr a
+        sta oamStaging, x
+        inx
+        lda #$00
+        sta oamStaging, x
+        inx
+        lda menuXTmp
+        sta oamStaging, x
+        inx
+
+        lda byteSpriteYOffset
+        sta oamStaging, x
+        inx
+        lda set_seed_input, y
+        and #$F
+        sta oamStaging, x
+        inx
+        lda #$00
+        sta oamStaging, x
+        inx
+        lda menuXTmp
+        adc #$8
+        sta oamStaging, x
+        inx
+
+        ; increase OAM index
+        lda #$08
+        clc
+        adc oamStagingLength
+        sta oamStagingLength
+
+        iny
+        cpy #3
+        bne @seedMenuLoop
+
         rts
 
 gameMode_levelMenu:
