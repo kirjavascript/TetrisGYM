@@ -508,6 +508,7 @@ gameModeState_updatePlayer1:
         lda heldButtons_player1
         sta heldButtons
 
+        jsr checkDebugGameplay
         jsr practiseAdvanceGame
         jsr branchOnPlayStatePlayer1
 
@@ -6930,8 +6931,6 @@ practisePrepareNext:
         rts
 
 practiseAdvanceGame:
-        jsr checkDebugGameplay
-
         lda practiseType
         cmp #MODE_TSPINS
         bne @skipTSpins
