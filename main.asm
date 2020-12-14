@@ -1277,6 +1277,9 @@ gameModeState_initGameBackground:
         .addr   game_palette
         jsr bulkCopyToPpu
         .addr   game_nametable
+
+        jsr showPaceDiffText
+        beq @skipTop
         lda #$20
         sta PPUADDR
         lda #$B8
@@ -1287,6 +1290,8 @@ gameModeState_initGameBackground:
         jsr twoDigsToPPU
         lda highScoreScoresA+2
         jsr twoDigsToPPU
+@skipTop:
+
         lda #$20
         sta tmp1
         lda #$83
@@ -1295,6 +1300,25 @@ gameModeState_initGameBackground:
         jsr debugNametableUI
         jmp gameModeState_initGameBackground_finish
 
+showPaceDiffText:
+        lda practiseType
+        cmp #MODE_PACE
+        bne @done
+        lda #$20
+        sta PPUADDR
+        lda #$98
+        sta PPUADDR
+        lda #$D
+        sta PPUDATA
+        lda #$12
+        sta PPUDATA
+        lda #$F
+        sta PPUDATA
+        lda #$F
+        sta PPUDATA
+        lda #0
+@done:
+        rts
 
 displayModeText:
         ldx practiseType
@@ -7463,6 +7487,7 @@ checkTetrisReady:
 
 ; compensate for scoring potential
 ; alternative target under 100 ?
+; show during pause - gameHUD
 
 targetTable:
         .byte $FC,$10
