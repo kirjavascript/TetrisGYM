@@ -41,15 +41,16 @@ MODE_FLOOR := 6
 MODE_TAP := 7
 MODE_GARBAGE := 8
 MODE_DROUGHT := 9
-MODE_DEBUG := 10
-MODE_PAL := 11
+MODE_INPUT_DISPLAY := 10
+MODE_DEBUG := 11
+MODE_PAL := 12
 
-MODE_QUANTITY := 12
+MODE_QUANTITY := 13
 MODE_GAME_QUANTITY := 10
-MODE_CONFIG_QUANTITY := 8
+MODE_CONFIG_QUANTITY := 9
 MODE_CONFIG_OFFSET := MODE_QUANTITY - MODE_CONFIG_QUANTITY
 
-.define MENUSIZES $F, $6, $C, $20, $4, $12, $1, $1
+.define MENUSIZES $F, $6, $C, $20, $4, $12, $1, $1, $1
 
 .macro MODENAMES
     .byte   "TETRIS"
@@ -202,8 +203,6 @@ presetIndex := $60E
 pausedOutOfDateRenderFlags := $60F ; 0 - statistics 1 - saveslot
 debugLevelEdit := $610
 debugNextCounter := $611
-debugShowController := $612
-menuSeedCursorIndex := $613
 
 ; ... $67F
 musicStagingSq1Lo:= $0680
@@ -267,15 +266,17 @@ highScoreScoresB:= $073C
 highScoreLevels := $0748
 initMagic   := $0750                        ; Initialized to a hard-coded number. When resetting, if not correct number then it knows this is a cold boot
 
-menuVars := $760
+menuSeedCursorIndex := $760
+menuVars := $761
 paceModifier := menuVars+0
 presetModifier := menuVars+1
 floorModifier := menuVars+2
 tapModifier := menuVars+3
 garbageModifier := menuVars+4
 droughtModifier := menuVars+5
-debugFlag := menuVars+6
-palFlag := menuVars+7
+inputDisplayFlag := menuVars+6
+debugFlag := menuVars+7
+palFlag := menuVars+8
 
 ; ... $7FF
 PPUCTRL     := $2000
@@ -866,7 +867,7 @@ renderMenuVars:
         asl a
         asl a
         clc
-        adc #$47
+        adc #$3F
         sta spriteYOffset
         lda #$17
         sta spriteXOffset
@@ -876,7 +877,7 @@ renderMenuVars:
         jmp @cursorFinished
 
 @seedCursor:
-        lda #$4D
+        lda #$45
         sta spriteYOffset
         lda menuSeedCursorIndex
         asl a
@@ -907,7 +908,7 @@ menuXTmp := tmp2
         sta menuXTmp
 
         ldx oamStagingLength
-        lda #$57
+        lda #$4F
         sta oamStaging, x
         inx
         lda set_seed_input, y
@@ -925,7 +926,7 @@ menuXTmp := tmp2
         sta oamStaging, x
         inx
 
-        lda #$57
+        lda #$4F
         sta oamStaging, x
         inx
         lda set_seed_input, y
@@ -961,7 +962,7 @@ menuXTmp := tmp2
         asl
         asl
         asl
-        adc #$67
+        adc #$5F
         sta menuYTmp
 
         ; handle boolean
@@ -1298,28 +1299,9 @@ gameModeState_initGameBackground:
         lda #$83
         sta tmp2
         jsr displayModeText
+        jsr statisticsNametablePatch ; for input display
         jsr debugNametableUI
         jmp gameModeState_initGameBackground_finish
-
-showPaceDiffText:
-        lda practiseType
-        cmp #MODE_PACE
-        bne @done
-        lda #$20
-        sta PPUADDR
-        lda #$98
-        sta PPUADDR
-        lda #$D
-        sta PPUDATA
-        lda #$12
-        sta PPUDATA
-        lda #$F
-        sta PPUDATA
-        lda #$F
-        sta PPUDATA
-        lda #0
-@done:
-        rts
 
 displayModeText:
         ldx practiseType
@@ -1356,7 +1338,6 @@ debugNametableUI:
         lda debugFlag
         beq @notDebug
         jsr saveStateNametableUI
-        jsr statisticsNametablePatch
         jsr saveSlotNametablePatch
 @notDebug:
         rts
@@ -1399,7 +1380,7 @@ statisticsNametablePatch:
         ldx #8
         ldy #$68
 @loop:
-        lda debugShowController
+        lda inputDisplayFlag
         beq @show
         ldy #$FF
 @show:
@@ -1407,6 +1388,26 @@ statisticsNametablePatch:
         iny
         dex
         bne @loop
+        rts
+
+showPaceDiffText:
+        lda practiseType
+        cmp #MODE_PACE
+        bne @done
+        lda #$20
+        sta PPUADDR
+        lda #$98
+        sta PPUADDR
+        lda #$D
+        sta PPUDATA
+        lda #$12
+        sta PPUDATA
+        lda #$F
+        sta PPUDATA
+        lda #$F
+        sta PPUDATA
+        lda #0
+@done:
         rts
 
 savestate_nametable_patch:
@@ -4634,45 +4635,6 @@ renderDebugHUD:
         sta spriteIndexInOamContentLookup
         jsr loadSpriteIntoOamStaging
 @noSprite:
-
-        ; controller input
-        lda debugShowController
-        beq @noInput
-        lda heldButtons_player1
-        sta tmp1
-        ldy #0
-@inputLoop:
-        lda tmp1
-        and #1
-        beq @inputContinue
-        ldx oamStagingLength
-        lda controllerInputY, y
-        adc #$4C
-        sta oamStaging, x
-        inx
-        lda controllerInputTiles, y
-        sta oamStaging, x
-        inx
-        lda #$01
-        sta oamStaging, x
-        inx
-        lda controllerInputX, y
-        adc #$13
-        sta oamStaging, x
-        inx
-        ; increase OAM index
-        lda #$04
-        clc
-        adc oamStagingLength
-        sta oamStagingLength
-@inputContinue:
-        lda tmp1
-        ror
-        sta tmp1
-        iny
-        cpy #8
-        bmi @inputLoop
-@noInput:
         rts
 
 controllerInputTiles:
@@ -4711,9 +4673,9 @@ debugSelectMenuControls:
         and #BUTTON_RIGHT
         beq @skipDebugController
         ; toggle controller
-        lda debugShowController
+        lda inputDisplayFlag
         eor #1
-        sta debugShowController
+        sta inputDisplayFlag
         lda pausedOutOfDateRenderFlags
         ora #$1
         sta pausedOutOfDateRenderFlags
@@ -6873,7 +6835,6 @@ music_endings_noiseScript:
 
 .if PRACTISE_MODE
 
-
 practiseRowCompletePatch:
         lda practiseType
         cmp #MODE_TSPINS
@@ -6912,6 +6873,7 @@ practiseRowCompletePatch:
         cmp #$EF
         rts
 
+
 practisePrepareNext:
         lda practiseType
         cmp #MODE_PACE
@@ -6931,6 +6893,8 @@ practisePrepareNext:
         rts
 
 practiseAdvanceGame:
+        jsr controllerInputDisplay
+
         lda practiseType
         cmp #MODE_TSPINS
         bne @skipTSpins
@@ -6960,6 +6924,46 @@ practiseAdvanceGame:
         bne @skipPace
         jsr advanceGamePace
 @skipPace:
+        rts
+
+controllerInputDisplay:
+        lda inputDisplayFlag
+        beq @noInput
+        lda heldButtons_player1
+        sta tmp1
+        ldy #0
+@inputLoop:
+        lda tmp1
+        and #1
+        beq @inputContinue
+        ldx oamStagingLength
+        lda controllerInputY, y
+        adc #$4C
+        sta oamStaging, x
+        inx
+        lda controllerInputTiles, y
+        sta oamStaging, x
+        inx
+        lda #$01
+        sta oamStaging, x
+        inx
+        lda controllerInputX, y
+        adc #$13
+        sta oamStaging, x
+        inx
+        ; increase OAM index
+        lda #$04
+        clc
+        adc oamStagingLength
+        sta oamStagingLength
+@inputContinue:
+        lda tmp1
+        ror
+        sta tmp1
+        iny
+        cpy #8
+        bmi @inputLoop
+@noInput:
         rts
 
 
