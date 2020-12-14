@@ -12,9 +12,9 @@ const tiles = `
 W0W################################
 WWW################################
 W#W###########qwwwwwwwwwweqwwwwwwe#
-W#W##qwwwwwwe#a LINES-   da      d#
+W#W##qwwwwwwe#a LINES-000da      d#
 W#W##a      d#zxxxxxxxxxxcaTOP   d#
-W#W##zxxxxxxc#############a000000d#
+W#W##zxxxxxxc#############a      d#
 W#W############          #a      d#
 W#W############          #aSCORE d#
 X0W#qwwwwwwwwe#          #a000000d#

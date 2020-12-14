@@ -521,7 +521,7 @@ gameModeState_updatePlayer1:
         inc gameModeState
         rts
 
-gameModeState_next: ; previously updatePlayer2
+gameModeState_next:
         inc gameModeState
         rts
 
@@ -6933,7 +6933,7 @@ practiseAdvanceGame:
 @skipTap:
 
         lda practiseType
-        cmp #MODE_SEED
+        cmp #MODE_PACE
         bne @skipPace
         jsr advanceGamePace
 @skipPace:
@@ -7054,9 +7054,9 @@ renderTSpin:
         tax
         ; draw tspin
         lda #$EF
-        sta $03bC, x
-        sta $03bD, x
-        sta $03bE, x
+        sta $03bc, x
+        sta $03bd, x
+        sta $03be, x
         sta $03c7, x
         sta $03b3, x
         ldy tspinType
@@ -7456,7 +7456,8 @@ checkTetrisReady:
 ; clear at start of game
 ; targetTable
     ; after 230 lines hide ui
-; if first number is 0, show sign
+; if first number is 0, show sign (change to A/B)
+;
 
 ; set paceModifier to A
 
@@ -7577,6 +7578,64 @@ prepareNextPace:
         rts
 
 advanceGamePace:
+
+        ; TODO: create bytesprites
+        ; TODO: replace 'top'
+
+        ldy #0
+@loop:
+        tya
+        asl
+        asl
+        asl
+        asl
+        adc #$C0
+        sta tmp2
+
+        ldx oamStagingLength
+        lda #$27
+        sta oamStaging, x
+        inx
+        lda bcd32, y
+        sta tmp3
+        and #$F0
+        lsr a
+        lsr a
+        lsr a
+        lsr a
+        sta oamStaging, x
+        inx
+        lda #$00
+        sta oamStaging, x
+        inx
+        lda tmp2
+        sta oamStaging, x
+        inx
+
+        lda #$27
+        sta oamStaging, x
+        inx
+        lda tmp3
+        and #$F
+        sta oamStaging, x
+        inx
+        lda #$00
+        sta oamStaging, x
+        inx
+        lda tmp2
+        adc #$8
+        sta oamStaging, x
+        inx
+
+        ; increase OAM index
+        lda #$08
+        clc
+        adc oamStagingLength
+        sta oamStagingLength
+
+        iny
+        cpy #3
+        bne @loop
         rts
 
 
