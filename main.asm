@@ -7513,8 +7513,7 @@ checkTetrisReady:
         rts
 
 ; pace = score - ((target / 230) * lines)
-
-; I'm using pace = score - ((target / 230) * lines)
+; target = p <= 100 ? 4000 : 4000 + ((lines - 110) / (230 - 110)) * 348
 
 
 ; TODO
@@ -7523,12 +7522,16 @@ checkTetrisReady:
 
 ; compensate for scoring potential
 ; alternative target under 100 ?
+; factor in startLevel, currentLevel
 
 ; set paceModifier to A
-
+; support PAL
 
 targetTable:
         .byte $FC,$10
+        .byte $A0,$0F
+
+; 45 byte lookup
 
 prepareNextPace:
         ; lines BCD -> binary

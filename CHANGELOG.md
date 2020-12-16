@@ -2,6 +2,7 @@
 
 ## [v3]
 - Set Seed Trainer
+- Pace Trainer
 - Controller input can be enabled outside of debug mode
 
 ## [v2]
