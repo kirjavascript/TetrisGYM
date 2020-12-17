@@ -7515,6 +7515,20 @@ checkTetrisReady:
 ; pace = score - ((target / 230) * lines)
 ; target = p <= 100 ? 4000 : 4000 + ((lines - 110) / (230 - 110)) * 348
 
+; t = 110
+; for(i=10;i<=230;i+=10) {
+;     if (i <= t) {
+;         p = 4000;
+;     } else {
+;         p = 4000 + (((i-t) / (230-t)) * 348 )
+;     }
+;     console.log(`${i} lines - ${0|p * i} points ${0|p}`)
+
+; }
+
+; remove the division potentially
+; shift decimal point for floating
+
 
 ; TODO
 ; targetTable
