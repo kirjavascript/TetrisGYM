@@ -11,7 +11,7 @@ PRACTISE_MODE := 1
 DEBUG_MODE := 1
 NO_MUSIC := 1
 ALWAYS_NEXT_BOX := 1
-AUTO_WIN := 0
+AUTO_WIN := 1
 SWAPUD := 0
 
 .if SWAPUD
@@ -112,6 +112,10 @@ factorA24 := paceRAM+$C
 factorB24 := paceRAM+$F
 binaryTemp := paceRAM+$C
 sign := paceRAM+$F
+dividend := paceRAM+$4
+divisor := paceRAM+$7
+remainder := paceRAM+$A
+pztemp := paceRAM+$D
 
 byteSpriteRAM := $73
 byteSpriteXOffset := byteSpriteRAM
@@ -5143,6 +5147,42 @@ unsigned_mul24:
 
 	jmp @loop			; end while
 
+unsigned_div24:
+        lda #0	        ;preset remainder to 0
+	sta remainder
+	sta remainder+1
+	sta remainder+2
+	ldx #24	        ;repeat for each bit: ...
+
+@divloop:
+        asl dividend	;dividend lb & hb*2, msb -> Carry
+	rol dividend+1
+	rol dividend+2
+	rol remainder	;remainder lb & hb * 2 + msb from carry
+	rol remainder+1
+	rol remainder+2
+	lda remainder
+	sec
+	sbc divisor	;substract divisor to see if it fits in
+	tay	        ;lb result -> Y, for we may need it later
+	lda remainder+1
+	sbc divisor+1
+	sta pztemp
+	lda remainder+2
+	sbc divisor+2
+	bcc @skip	;if carry=0 then divisor didn't fit in yet
+
+	sta remainder+2	;else save substraction result as new remainder,
+	lda pztemp
+	sta remainder+1
+	sty remainder
+	inc dividend 	;and INCrement result cause divisor fit in 1 times
+
+@skip:
+        dex
+	bne @divloop
+	rts
+
 ; End of "PRG_chunk1" segment
 .code
 
@@ -7515,41 +7555,20 @@ checkTetrisReady:
 ; pace = score - ((target / 230) * lines)
 ; target = p <= 100 ? 4000 : 4000 + ((lines - 110) / (230 - 110)) * 348
 
-; t = 110
-; for(i=10;i<=230;i+=10) {
-;     if (i <= t) {
-;         p = 4000;
-;     } else {
-;         p = 4000 + (((i-t) / (230-t)) * 348 )
-;     }
-;     console.log(`${i} lines - ${0|p * i} points ${0|p}`)
-
-; }
-
-; remove the division potentially
-; shift decimal point for floating
-
-
 ; TODO
 ; targetTable
     ; after 230 lines hide ui
-
-; compensate for scoring potential
-; alternative target under 100 ?
-; factor in startLevel, currentLevel
 
 ; set paceModifier to A
 ; support PAL
 
 targetTable:
-        .byte $FC,$10
-        .byte $A0,$0F
+        .byte $A0,$0F,$5C,$01
 
 ; 45 byte lookup
 
 prepareNextPace:
         ; lines BCD -> binary
-        ; TODO: use target counter instead for better perf
         lda lines
         sta bcd32
         lda lines+1
@@ -7559,26 +7578,17 @@ prepareNextPace:
         sta bcd32+3
         jsr BCD_BIN
 
-        ; use lines as first factor
+        ; use target multiplier as factor B
+
+        jsr paceTarget
+
+        ; use lines as factor A
 
         lda binary32
         sta factorA24
         lda #0
         sta factorA24+1
         sta factorA24+2
-
-        ; use target multiplier as other factor
-
-        lda paceModifier
-        lda #0
-        asl
-        tax
-        lda targetTable, x
-        sta factorB24
-        lda targetTable+1, x
-        sta factorB24+1
-        lda #0
-        sta factorB24+2
 
         ; get actual score target in product24
 
@@ -7680,6 +7690,107 @@ prepareNextPace:
         sta paceRAM
 @noSign:
 
+        rts
+
+lineTargetThreshold := 110
+target := 0
+
+paceTarget:
+        lda binary32
+        cmp #lineTargetThreshold+1
+        bcc @baseTarget
+
+        sbc #lineTargetThreshold
+
+        ; store the value as if multiplied by 100
+        sta dividend+2
+        lda #0
+        sta dividend
+        sta dividend+1
+
+        ; / (230 - 110)
+        lda #120
+        sta divisor
+        lda #0
+        sta divisor+1
+        sta divisor+2
+
+        jsr unsigned_div24
+
+        ; result in dividend, copy as first factor
+
+        lda dividend+1
+        sta factorA24
+        lda dividend+2
+        sta factorA24+1
+        lda #0
+        sta factorA24+2
+
+        ; pace target multiplier as other factor
+
+        lda #$5C
+        sta factorB24
+        lda #$01
+        sta factorB24+1
+        lda #0
+        sta factorB24+2
+
+        jsr unsigned_mul24
+
+        ; additional target data now in product24
+
+        ; we take the high bytes, so round the low one
+
+        lda product24+0
+        cmp #$80
+        bcc @noRounding
+
+        clc
+        lda product24+1
+        adc #1
+        sta product24+1
+
+        lda product24+2
+        adc #0 ; this load/add/load has an effect if the carry flag is set
+        sta product24+2
+
+
+@noRounding:
+
+        ; add the base target value to the additional target amount
+
+        ldx #0
+        clc
+        lda product24+1
+        adc targetTable, x
+        sta product24
+        lda product24+2
+        adc targetTable+1, x
+        sta product24+1
+        lda #0
+        adc #0
+        sta product24+2
+
+        ; use target as next factor
+
+        lda product24+0
+        sta factorB24+0
+        lda product24+1
+        sta factorB24+1
+        lda product24+2
+        sta factorB24+2
+
+        jmp @done
+
+@baseTarget:
+        ldx #0
+        lda targetTable, x
+        sta factorB24
+        lda targetTable+1, x
+        sta factorB24+1
+        lda #0
+        sta factorB24+2
+@done:
         rts
 
 gameHUDPace:
