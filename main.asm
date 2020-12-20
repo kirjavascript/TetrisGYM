@@ -4925,6 +4925,277 @@ handleLevelEditor:
 
 .endif
 
+; pace = score - ((target / 230) * lines)
+; target = p <= 100 ? 4000 : 4000 + ((lines - 110) / (230 - 110)) * 348
+
+; rough guide: https://docs.google.com/spreadsheets/d/1FKUkx8borKvwwTFmFoM2j7FqMPFoJ4GkdFtO5JIekFE/edit#gid=465512309
+
+; TODO
+; fill out targetTable
+; set paceModifier to A
+
+targetTable:
+        .byte $A0,$0F,$5C,$01
+
+; 45 byte lookup
+
+prepareNextPace:
+        ; lines BCD -> binary
+        lda lines
+        sta bcd32
+        lda lines+1
+        sta bcd32+1
+        lda #0
+        sta bcd32+2
+        sta bcd32+3
+        jsr BCD_BIN
+
+        ; check if lines > 230
+        lda binary32+1
+        bne @moreThan230
+        lda binary32
+        cmp #230
+        bcc @lessThan230
+@moreThan230:
+        lda #$AA
+        sta paceRAM
+        sta paceRAM+1
+        sta paceRAM+2
+        rts
+@lessThan230:
+
+        ; use target multiplier as factor B
+
+        jsr paceTarget
+
+        ; use lines as factor A
+
+        lda binary32
+        sta factorA24
+        lda #0
+        sta factorA24+1
+        sta factorA24+2
+
+        ; get actual score target in product24
+
+        jsr unsigned_mul24
+
+        ; convert score to binary
+
+        lda score
+        sta bcd32
+        lda score+1
+        sta bcd32+1
+        lda score+2
+        sta bcd32+2
+        lda #0
+        sta bcd32+3
+
+        ; normalise score base to BCD
+        lda bcd32+2
+        cmp #$A0
+        bcc @noverflow
+        sbc #$A0
+        sta bcd32+2
+        lda #$1
+        sta bcd32+3
+@noverflow:
+        jsr BCD_BIN
+
+        ; score in binary32, target in product24
+
+        ; do subtraction
+
+        sec
+        lda binary32
+        sbc product24
+        sta binaryTemp
+        lda binary32+1
+        sbc product24+1
+        sta binaryTemp+1
+        lda binary32+2
+        sbc product24+2
+        sta binaryTemp+2
+
+        ; convert to unsigned, extract sign
+
+        lda #0
+        sta sign
+        lda binaryTemp+2
+        and #$80
+        beq @positive
+        lda #1
+        sta sign
+        lda binaryTemp
+        eor #$FF
+        adc #1
+        sta binaryTemp
+        lda binaryTemp+1
+        eor #$FF
+        sta binaryTemp+1
+        lda binaryTemp+2
+        eor #$FF
+        sta binaryTemp+2
+@positive:
+
+        lda binaryTemp
+        sta binary32
+        lda binaryTemp+1
+        sta binary32+1
+        lda binaryTemp+2
+        sta binary32+2
+        lda #0
+        sta binary32+3
+
+        ; back to BCD
+
+        jsr BIN_BCD
+
+        ; reorder data
+
+        lda bcd32
+        sta paceRAM+2
+        lda bcd32+1
+        sta paceRAM+1
+        lda bcd32+2
+        sta paceRAM
+
+        ; check if highest nybble is empty and use it for a sign
+        ldx #$B0
+        lda sign
+        beq @negative
+        ldx #$A0
+@negative:
+        stx tmp3
+
+        lda paceRAM
+        and #$F0
+        bne @noSign
+        lda paceRAM
+        adc tmp3
+        sta paceRAM
+@noSign:
+
+        rts
+
+lineTargetThreshold := 110
+target := 0
+
+paceTarget:
+        lda binary32
+        cmp #lineTargetThreshold+1
+        bcc @baseTarget
+
+        sbc #lineTargetThreshold
+
+        ; store the value as if multiplied by 100
+        sta dividend+2
+        lda #0
+        sta dividend
+        sta dividend+1
+
+        ; / (230 - 110)
+        lda #120
+        sta divisor
+        lda #0
+        sta divisor+1
+        sta divisor+2
+
+        jsr unsigned_div24
+
+        ; result in dividend, copy as first factor
+
+        lda dividend+1
+        sta factorA24
+        lda dividend+2
+        sta factorA24+1
+        lda #0
+        sta factorA24+2
+
+        ; pace target multiplier as other factor
+
+        lda #$5C
+        sta factorB24
+        lda #$01
+        sta factorB24+1
+        lda #0
+        sta factorB24+2
+
+        jsr unsigned_mul24
+
+        ; additional target data now in product24
+
+        ; we take the high bytes, so round the low one
+
+        lda product24+0
+        cmp #$80
+        bcc @noRounding
+
+        clc
+        lda product24+1
+        adc #1
+        sta product24+1
+
+        lda product24+2
+        adc #0 ; this load/add/load has an effect if the carry flag is set
+        sta product24+2
+
+
+@noRounding:
+
+        ; add the base target value to the additional target amount
+
+        ldx #0
+        clc
+        lda product24+1
+        adc targetTable, x
+        sta product24
+        lda product24+2
+        adc targetTable+1, x
+        sta product24+1
+        lda #0
+        adc #0
+        sta product24+2
+
+        ; use target as next factor
+
+        lda product24+0
+        sta factorB24+0
+        lda product24+1
+        sta factorB24+1
+        lda product24+2
+        sta factorB24+2
+
+        jmp @done
+
+@baseTarget:
+        ldx #0
+        lda targetTable, x
+        sta factorB24
+        lda targetTable+1, x
+        sta factorB24+1
+        lda #0
+        sta factorB24+2
+@done:
+        rts
+
+gameHUDPace:
+        lda #$C0
+        sta byteSpriteXOffset
+        lda #$27
+        sta byteSpriteYOffset
+        lda #paceRAM
+        sta byteSpriteAddr
+
+        ldx #$E0
+        lda sign
+        beq @positive
+        ldx #$F0
+@positive:
+        stx byteSpriteTile
+        jsr byteSprite_base
+        rts
+
 ; math routines for pace mode
 
 ;This routine converts a packed 8 digit BCD value in memory loactions
@@ -7550,277 +7821,6 @@ checkTetrisReady:
         inx
         dey
         bne @loop
-        rts
-
-; pace = score - ((target / 230) * lines)
-; target = p <= 100 ? 4000 : 4000 + ((lines - 110) / (230 - 110)) * 348
-
-; rough guide: https://docs.google.com/spreadsheets/d/1FKUkx8borKvwwTFmFoM2j7FqMPFoJ4GkdFtO5JIekFE/edit#gid=465512309
-
-; TODO
-; targetTable
-; set paceModifier to A
-
-targetTable:
-        .byte $A0,$0F,$5C,$01
-
-; 45 byte lookup
-
-prepareNextPace:
-        ; lines BCD -> binary
-        lda lines
-        sta bcd32
-        lda lines+1
-        sta bcd32+1
-        lda #0
-        sta bcd32+2
-        sta bcd32+3
-        jsr BCD_BIN
-
-        ; check if lines > 230
-        lda binary32+1
-        bne @moreThan230
-        lda binary32
-        cmp #230
-        bcc @lessThan230
-@moreThan230:
-        lda #$AA
-        sta paceRAM
-        sta paceRAM+1
-        sta paceRAM+2
-        rts
-@lessThan230:
-
-        ; use target multiplier as factor B
-
-        jsr paceTarget
-
-        ; use lines as factor A
-
-        lda binary32
-        sta factorA24
-        lda #0
-        sta factorA24+1
-        sta factorA24+2
-
-        ; get actual score target in product24
-
-        jsr unsigned_mul24
-
-        ; convert score to binary
-
-        lda score
-        sta bcd32
-        lda score+1
-        sta bcd32+1
-        lda score+2
-        sta bcd32+2
-        lda #0
-        sta bcd32+3
-
-        ; normalise score base to BCD
-        lda bcd32+2
-        cmp #$A0
-        bcc @noverflow
-        sbc #$A0
-        sta bcd32+2
-        lda #$1
-        sta bcd32+3
-@noverflow:
-        jsr BCD_BIN
-
-        ; score in binary32, target in product24
-
-        ; do subtraction
-
-        sec
-        lda binary32
-        sbc product24
-        sta binaryTemp
-        lda binary32+1
-        sbc product24+1
-        sta binaryTemp+1
-        lda binary32+2
-        sbc product24+2
-        sta binaryTemp+2
-
-        ; convert to unsigned, extract sign
-
-        lda #0
-        sta sign
-        lda binaryTemp+2
-        and #$80
-        beq @positive
-        lda #1
-        sta sign
-        lda binaryTemp
-        eor #$FF
-        adc #1
-        sta binaryTemp
-        lda binaryTemp+1
-        eor #$FF
-        sta binaryTemp+1
-        lda binaryTemp+2
-        eor #$FF
-        sta binaryTemp+2
-@positive:
-
-        lda binaryTemp
-        sta binary32
-        lda binaryTemp+1
-        sta binary32+1
-        lda binaryTemp+2
-        sta binary32+2
-        lda #0
-        sta binary32+3
-
-        ; back to BCD
-
-        jsr BIN_BCD
-
-        ; reorder data
-
-        lda bcd32
-        sta paceRAM+2
-        lda bcd32+1
-        sta paceRAM+1
-        lda bcd32+2
-        sta paceRAM
-
-        ; check if highest nybble is empty and use it for a sign
-        ldx #$B0
-        lda sign
-        beq @negative
-        ldx #$A0
-@negative:
-        stx tmp3
-
-        lda paceRAM
-        and #$F0
-        bne @noSign
-        lda paceRAM
-        adc tmp3
-        sta paceRAM
-@noSign:
-
-        rts
-
-lineTargetThreshold := 110
-target := 0
-
-paceTarget:
-        lda binary32
-        cmp #lineTargetThreshold+1
-        bcc @baseTarget
-
-        sbc #lineTargetThreshold
-
-        ; store the value as if multiplied by 100
-        sta dividend+2
-        lda #0
-        sta dividend
-        sta dividend+1
-
-        ; / (230 - 110)
-        lda #120
-        sta divisor
-        lda #0
-        sta divisor+1
-        sta divisor+2
-
-        jsr unsigned_div24
-
-        ; result in dividend, copy as first factor
-
-        lda dividend+1
-        sta factorA24
-        lda dividend+2
-        sta factorA24+1
-        lda #0
-        sta factorA24+2
-
-        ; pace target multiplier as other factor
-
-        lda #$5C
-        sta factorB24
-        lda #$01
-        sta factorB24+1
-        lda #0
-        sta factorB24+2
-
-        jsr unsigned_mul24
-
-        ; additional target data now in product24
-
-        ; we take the high bytes, so round the low one
-
-        lda product24+0
-        cmp #$80
-        bcc @noRounding
-
-        clc
-        lda product24+1
-        adc #1
-        sta product24+1
-
-        lda product24+2
-        adc #0 ; this load/add/load has an effect if the carry flag is set
-        sta product24+2
-
-
-@noRounding:
-
-        ; add the base target value to the additional target amount
-
-        ldx #0
-        clc
-        lda product24+1
-        adc targetTable, x
-        sta product24
-        lda product24+2
-        adc targetTable+1, x
-        sta product24+1
-        lda #0
-        adc #0
-        sta product24+2
-
-        ; use target as next factor
-
-        lda product24+0
-        sta factorB24+0
-        lda product24+1
-        sta factorB24+1
-        lda product24+2
-        sta factorB24+2
-
-        jmp @done
-
-@baseTarget:
-        ldx #0
-        lda targetTable, x
-        sta factorB24
-        lda targetTable+1, x
-        sta factorB24+1
-        lda #0
-        sta factorB24+2
-@done:
-        rts
-
-gameHUDPace:
-        lda #$C0
-        sta byteSpriteXOffset
-        lda #$27
-        sta byteSpriteYOffset
-        lda #paceRAM
-        sta byteSpriteAddr
-
-        ldx #$E0
-        lda sign
-        beq @positive
-        ldx #$F0
-@positive:
-        stx byteSpriteTile
-        jsr byteSprite_base
         rts
 
 .endif
