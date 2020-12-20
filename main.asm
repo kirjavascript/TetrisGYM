@@ -4969,11 +4969,9 @@ prepareNextPace:
 @lessThan230:
 
         ; use target multiplier as factor B
-
         jsr paceTarget
 
         ; use lines as factor A
-
         lda binary32
         sta factorA24
         lda #0
@@ -4981,11 +4979,9 @@ prepareNextPace:
         sta factorA24+2
 
         ; get actual score target in product24
-
         jsr unsigned_mul24
 
         ; convert score to binary
-
         lda score
         sta bcd32
         lda score+1
@@ -5009,7 +5005,6 @@ prepareNextPace:
         ; score in binary32, target in product24
 
         ; do subtraction
-
         sec
         lda binary32
         sbc product24
@@ -5022,7 +5017,6 @@ prepareNextPace:
         sta binaryTemp+2
 
         ; convert to unsigned, extract sign
-
         lda #0
         sta sign
         lda binaryTemp+2
@@ -5052,11 +5046,9 @@ prepareNextPace:
         sta binary32+3
 
         ; back to BCD
-
         jsr BIN_BCD
 
         ; reorder data
-
         lda bcd32
         sta paceRAM+2
         lda bcd32+1
@@ -5108,7 +5100,6 @@ paceTarget:
         jsr unsigned_div24
 
         ; result in dividend, copy as first factor
-
         lda dividend+1
         sta factorA24
         lda dividend+2
@@ -5117,7 +5108,6 @@ paceTarget:
         sta factorA24+2
 
         ; pace target multiplier as other factor
-
         lda #$5C
         sta factorB24
         lda #$01
@@ -5130,11 +5120,9 @@ paceTarget:
         ; additional target data now in product24
 
         ; we take the high bytes, so round the low one
-
         lda product24+0
         cmp #$80
         bcc @noRounding
-
         clc
         lda product24+1
         adc #1
@@ -5143,12 +5131,9 @@ paceTarget:
         lda product24+2
         adc #0 ; this load/add/load has an effect if the carry flag is set
         sta product24+2
-
-
 @noRounding:
 
         ; add the base target value to the additional target amount
-
         ldx #0
         clc
         lda product24+1
@@ -5162,7 +5147,6 @@ paceTarget:
         sta product24+2
 
         ; use target as next factor
-
         lda product24+0
         sta factorB24+0
         lda product24+1
