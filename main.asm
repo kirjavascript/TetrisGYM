@@ -4938,7 +4938,7 @@ handleLevelEditor:
 .endif
 
 ; pace = score - ((target / 230) * lines)
-; target = lines <= 100 ? 4000 : 4000 + ((lines - 110) / (230 - 110)) * 348
+; target = lines <= 110 ? 4000 : 4000 + ((lines - 110) / (230 - 110)) * 348
 
 ; rough guide: https://docs.google.com/spreadsheets/d/1FKUkx8borKvwwTFmFoM2j7FqMPFoJ4GkdFtO5JIekFE/edit#gid=465512309
 
@@ -4946,13 +4946,13 @@ lineTargetThreshold := 110
 
 targetTable:
         .byte $0,$0,$0,$0
-        .byte $0,$0,$0,$0
-        .byte $0,$0,$0,$0
-        .byte $0,$0,$0,$0
-        .byte $0,$0,$0,$0
-        .byte $0,$0,$0,$0
+        .byte $68,$1,$4B,$0 ; 1
+        .byte $F8,$2,$6E,$0 ; 2
+        .byte $7E,$4,$9A,$0 ; 3
+        .byte $E6,$5,$E5,$0 ; 4
+        .byte $6C,$7,$12,$1 ; 5
         .byte $CA,$8,$67,$1 ; 6
-        .byte $0,$0,$0,$0
+        .byte $5A,$A,$89,$1 ; 7
         .byte $B8,$B,$DE,$1 ; 8
         .byte $48,$D,$1,$2 ; 9
         .byte $A0,$F,$5C,$1 ; A
