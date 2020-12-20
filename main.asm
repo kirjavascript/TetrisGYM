@@ -583,6 +583,10 @@ gameMode_legalScreen: ; boot
         dex
         bpl @loop
 
+        ; default pace to A
+        lda #$A
+        sta paceModifier
+
         ; region detection
         ldx #0
         ldy #0
@@ -4926,15 +4930,15 @@ handleLevelEditor:
 .endif
 
 ; pace = score - ((target / 230) * lines)
-; target = p <= 100 ? 4000 : 4000 + ((lines - 110) / (230 - 110)) * 348
+; target = lines <= 100 ? 4000 : 4000 + ((lines - 110) / (230 - 110)) * 348
 
 ; rough guide: https://docs.google.com/spreadsheets/d/1FKUkx8borKvwwTFmFoM2j7FqMPFoJ4GkdFtO5JIekFE/edit#gid=465512309
 
 ; TODO
 ; fill out targetTable
-; set paceModifier to A
 
 targetTable:
+        .byte $0,$0,$0,$0
         .byte $A0,$0F,$5C,$01
 
 ; 45 byte lookup
