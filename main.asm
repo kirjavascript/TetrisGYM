@@ -12,6 +12,7 @@ DEBUG_MODE := 1
 NO_MUSIC := 1
 ALWAYS_NEXT_BOX := 1
 AUTO_WIN := 0
+NO_SCORING := 0
 SWAPUD := 0
 
 .if SWAPUD
@@ -3108,6 +3109,9 @@ L9BD0:  lda lines+1
 L9BFB:  dex
         bne incrementLines
 addHoldDownPoints:
+.if NO_SCORING
+        jmp L9C27
+.endif
         lda holdDownPoints
         cmp #$02
         bmi addLineClearPoints
@@ -3134,6 +3138,9 @@ L9C27:  lda outOfDateRenderFlags
         ora #$04
         sta outOfDateRenderFlags
 addLineClearPoints:
+.if NO_SCORING
+        jmp addLineClearPointsDone
+.endif
         lda #$00
         sta holdDownPoints
         lda levelNumber
@@ -3185,6 +3192,7 @@ L9C84:
         ; score limit used to live here
         dec generalCounter
         bne L9C37
+addLineClearPointsDone:
         lda outOfDateRenderFlags
         ora #$04
         sta outOfDateRenderFlags
@@ -5075,7 +5083,6 @@ prepareNextPace:
         rts
 
 lineTargetThreshold := 110
-target := 0
 
 paceTarget:
         lda binary32
