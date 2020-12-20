@@ -4942,14 +4942,25 @@ handleLevelEditor:
 
 ; rough guide: https://docs.google.com/spreadsheets/d/1FKUkx8borKvwwTFmFoM2j7FqMPFoJ4GkdFtO5JIekFE/edit#gid=465512309
 
-; TODO
-; fill out targetTable
+lineTargetThreshold := 110
 
 targetTable:
         .byte $0,$0,$0,$0
-        .byte $A0,$0F,$5C,$01
-
-; 45 byte lookup
+        .byte $0,$0,$0,$0
+        .byte $0,$0,$0,$0
+        .byte $0,$0,$0,$0
+        .byte $0,$0,$0,$0
+        .byte $0,$0,$0,$0
+        .byte $0,$0,$0,$0
+        .byte $0,$0,$0,$0
+        .byte $B8,$B,$DE,$1 ; 8
+        .byte $0,$0,$0,$0
+        .byte $A0,$0F,$5C,$1 ; A
+        .byte $0,$0,$0,$0
+        .byte $0,$0,$0,$0
+        .byte $0,$0,$0,$0
+        .byte $0,$0,$0,$0
+        .byte $0,$0,$0,$0
 
 prepareNextPace:
         ; lines BCD -> binary
@@ -5081,8 +5092,6 @@ prepareNextPace:
 @noSign:
 
         rts
-
-lineTargetThreshold := 110
 
 paceTarget:
         lda binary32
