@@ -7555,12 +7555,11 @@ checkTetrisReady:
 ; pace = score - ((target / 230) * lines)
 ; target = p <= 100 ? 4000 : 4000 + ((lines - 110) / (230 - 110)) * 348
 
+; rough guide: https://docs.google.com/spreadsheets/d/1FKUkx8borKvwwTFmFoM2j7FqMPFoJ4GkdFtO5JIekFE/edit#gid=465512309
+
 ; TODO
 ; targetTable
-    ; after 230 lines hide ui
-
 ; set paceModifier to A
-; support PAL
 
 targetTable:
         .byte $A0,$0F,$5C,$01
@@ -7577,6 +7576,20 @@ prepareNextPace:
         sta bcd32+2
         sta bcd32+3
         jsr BCD_BIN
+
+        ; check if lines > 230
+        lda binary32+1
+        bne @moreThan230
+        lda binary32
+        cmp #230
+        bcc @lessThan230
+@moreThan230:
+        lda #$AA
+        sta paceRAM
+        sta paceRAM+1
+        sta paceRAM+2
+        rts
+@lessThan230:
 
         ; use target multiplier as factor B
 
