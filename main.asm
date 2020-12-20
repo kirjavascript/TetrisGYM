@@ -11,8 +11,8 @@ PRACTISE_MODE := 1
 DEBUG_MODE := 1
 NO_MUSIC := 1
 ALWAYS_NEXT_BOX := 1
-AUTO_WIN := 0
-NO_SCORING := 0
+AUTO_WIN := 1
+NO_SCORING := 1
 SWAPUD := 0
 
 .if SWAPUD
@@ -5115,9 +5115,10 @@ paceTarget:
         sta factorA24+2
 
         ; pace target multiplier as other factor
-        lda #$5C
+        jsr paceTargetOffset
+        lda targetTable+2, x
         sta factorB24
-        lda #$01
+        lda targetTable+3, x
         sta factorB24+1
         lda #0
         sta factorB24+2
@@ -5141,7 +5142,7 @@ paceTarget:
 @noRounding:
 
         ; add the base target value to the additional target amount
-        ldx #0
+        jsr paceTargetOffset
         clc
         lda product24+1
         adc targetTable, x
@@ -5164,7 +5165,7 @@ paceTarget:
         jmp @done
 
 @baseTarget:
-        ldx #0
+        jsr paceTargetOffset
         lda targetTable, x
         sta factorB24
         lda targetTable+1, x
@@ -5172,6 +5173,13 @@ paceTarget:
         lda #0
         sta factorB24+2
 @done:
+        rts
+
+paceTargetOffset:
+        lda paceModifier
+        asl
+        asl
+        tax
         rts
 
 gameHUDPace:
