@@ -1,9 +1,9 @@
 # Changelog
 
 ## [v3]
-- Set Seed Trainer
 - Pace Trainer
-- Controller input can be enabled outside of debug mode
+- Seed Trainer
+- Controller input can be enabled outside of Debug Mode
 - Tweaks to make Garbage Trainer more realistic
 
 ## [v2]
