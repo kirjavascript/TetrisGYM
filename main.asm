@@ -4955,8 +4955,8 @@ targetTable:
         .byte $5A,$A,$89,$1 ; 7
         .byte $B8,$B,$DE,$1 ; 8
         .byte $3E,$D,$B,$2 ; 9
-        .byte $A0,$F,$5C,$1 ; A (recalc with 100)
-        .byte $2C,$10,$83,$2 ; B (recalc with 100)
+        .byte $A0,$F,$5C,$1 ; A
+        .byte $2C,$10,$83,$2 ; B
         .byte $94,$11,$CD,$2 ; C
         .byte $38,$13,$DC,$2 ; D
         .byte $B4,$14,$13,$3 ; E
