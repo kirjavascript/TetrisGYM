@@ -390,19 +390,19 @@ initRamContinued:
         dec tmp2
         bpl @zeroOutPages
         lda initMagic
-        cmp #$12
+        cmp #$54
         bne @initHighScoreTable
         lda initMagic+1
-        cmp #$34
+        cmp #$2D
         bne @initHighScoreTable
         lda initMagic+2
-        cmp #$56
+        cmp #$47
         bne @initHighScoreTable
         lda initMagic+3
-        cmp #$78
+        cmp #$59
         bne @initHighScoreTable
         lda initMagic+4
-        cmp #$9A
+        cmp #$4D
         bne @initHighScoreTable
         jmp @continueWarmBootInit
 
@@ -417,15 +417,15 @@ initRamContinued:
         jmp @initHighScoreTable
 
 @continueColdBootInit:
-        lda #$12
+        lda #$54
         sta initMagic
-        lda #$34
+        lda #$2D
         sta initMagic+1
-        lda #$56
+        lda #$47
         sta initMagic+2
-        lda #$78
+        lda #$59
         sta initMagic+3
-        lda #$9A
+        lda #$4D
         sta initMagic+4
 @continueWarmBootInit:
         ldx #$89
@@ -1499,7 +1499,7 @@ gameModeState_initGameState:
         sta saveStateDirty
         sta completedLines ; reset during tetris bugfix
 
-        ; OEM continues
+        ; OEM stuff
         sta tetriminoY
         sta vramRow
         sta fallTimer
@@ -3078,9 +3078,8 @@ incrementLines:
 L9BC7:  lda lines
         and #$0F
         bne L9BFB
-        jmp L9BD0
 
-L9BD0:  lda lines+1
+        lda lines+1
         sta generalCounter2
         lda lines
         sta generalCounter
