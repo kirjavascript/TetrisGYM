@@ -1098,13 +1098,9 @@ gameMode_levelMenu:
         jmp @forceStartLevelToRange
 
 gameMode_levelMenu_processPlayer1Navigation:
-        lda originalY
-        sta selectingLevelOrHeight
         lda newlyPressedButtons_player1
         sta newlyPressedButtons
-        jsr gameMode_levelMenu_handleLevelHeightNavigation
-        lda selectingLevelOrHeight
-        sta originalY
+        jsr gameMode_levelMenu_handleLevelNavigation
         lda newlyPressedButtons_player1
         cmp #BUTTON_START
         bne @checkBPressed
@@ -1147,50 +1143,31 @@ gameMode_levelMenu_processPlayer1Navigation:
         jmp gameMode_levelMenu_processPlayer1Navigation
 
 ; Starts by checking if right pressed
-gameMode_levelMenu_handleLevelHeightNavigation:
+gameMode_levelMenu_handleLevelNavigation:
         lda newlyPressedButtons
         cmp #$01
         bne @checkLeftPressed
         lda #$01
         sta soundEffectSlot1Init
-        lda selectingLevelOrHeight
-        bne @rightPressedForHeightSelection
         lda startLevel
         cmp #$A ; used to be 9
         beq @checkLeftPressed
         inc startLevel
-        jmp @checkLeftPressed
-
-@rightPressedForHeightSelection:
-        ; lda startHeight
-        ; cmp #$05
-        ; beq @checkLeftPressed
-        ; inc startHeight
 @checkLeftPressed:
         lda newlyPressedButtons
         cmp #$02
         bne @checkDownPressed
         lda #$01
         sta soundEffectSlot1Init
-        lda selectingLevelOrHeight
-        bne @leftPressedForHeightSelection
         lda startLevel
         beq @checkDownPressed
         dec startLevel
-        jmp @checkDownPressed
-
-@leftPressedForHeightSelection:
-        ; lda startHeight
-        ; beq @checkDownPressed
-        ; dec startHeight
 @checkDownPressed:
         lda newlyPressedButtons
         cmp #$04
         bne @checkUpPressed
         lda #$01
         sta soundEffectSlot1Init
-        lda selectingLevelOrHeight
-        bne @downPressedForHeightSelection
         lda startLevel
         cmp #$05
         bpl @checkUpPressed
@@ -1199,21 +1176,12 @@ gameMode_levelMenu_handleLevelHeightNavigation:
         sta startLevel
         jmp @checkUpPressed
 
-@downPressedForHeightSelection:
-        ; lda startHeight
-        ; cmp #$03
-        ; bpl @checkUpPressed
-        ; inc startHeight
-        ; inc startHeight
-        ; inc startHeight
 @checkUpPressed:
         lda newlyPressedButtons
         cmp #$08
         bne @checkAPressed
         lda #$01
         sta soundEffectSlot1Init
-        lda selectingLevelOrHeight
-        bne @upPressedForHeightSelection
         lda startLevel
         cmp #$0A
         beq @checkAPressed ; dont do anything on 29
@@ -1224,30 +1192,10 @@ gameMode_levelMenu_handleLevelHeightNavigation:
         sta startLevel
         jmp @checkAPressed
 
-@upPressedForHeightSelection:
-        ; lda startHeight
-        ; cmp #$03
-        ; bmi @checkAPressed
-        ; dec startHeight
-        ; dec startHeight
-        ; dec startHeight
 @checkAPressed:
-        lda gameType
-        beq @showSelection
-        lda newlyPressedButtons
-        cmp #$80
-        bne @showSelection
-        lda #$01
-        sta soundEffectSlot1Init
-        lda selectingLevelOrHeight
-        eor #$01
-        sta selectingLevelOrHeight
-@showSelection:
-        lda selectingLevelOrHeight
-        bne @showSelectionLevel
         lda frameCounter
         and #$03
-        beq @skipShowingSelectionLevel
+        beq @ret
 @showSelectionLevel:
         ldx startLevel
         lda levelToSpriteYOffset,x
@@ -1256,24 +1204,6 @@ gameMode_levelMenu_handleLevelHeightNavigation:
         sta spriteIndexInOamContentLookup
         ldx startLevel
         lda levelToSpriteXOffset,x
-        sta spriteXOffset
-        jsr loadSpriteIntoOamStaging
-@skipShowingSelectionLevel:
-        lda gameType
-        beq @ret
-        lda selectingLevelOrHeight
-        beq @showSelectionHeight
-        lda frameCounter
-        and #$03
-        beq @ret
-@showSelectionHeight:
-        ldx startHeight
-        lda heightToPpuHighAddr,x
-        sta spriteYOffset
-        lda #$00
-        sta spriteIndexInOamContentLookup
-        ldx startHeight
-        lda heightToPpuLowAddr,x
         sta spriteXOffset
         jsr loadSpriteIntoOamStaging
 @ret:   rts
