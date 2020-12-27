@@ -137,7 +137,7 @@ generalCounter2 := $00A9
 generalCounter3 := $00AA
 generalCounter4 := $00AB
 generalCounter5 := $00AC
-selectingLevelOrHeight:= $00AD              ; 0-level, 1-height
+positionValidTmp:= $00AD              ; 0-level, 1-height
 originalY   := $00AE
 dropSpeed   := $00AF
 tmpCurrentPiece := $00B0                    ; Only used as a temporary
@@ -154,7 +154,7 @@ renderMode  := $00BD
 ; numberOfPlayers := $00BE
 nextPiece   := $00BF                        ; Stored by its orientation ID
 gameMode    := $00C0                        ; 0=legal, 1=title, 2=type menu, 3=level menu, 4=play and ending and high score, 5=demo, 6=start demo
-gameType    := $00C1                        ; A=0, B=1
+; gameType    := $00C1                        ; A=0, B=1
 musicType   := $00C2                        ; 0-3; 3 is off
 sleepCounter    := $00C3                    ; canon is legalScreenCounter1
 
@@ -2103,12 +2103,12 @@ isPositionValid:
         adc generalCounter4
         clc
         adc generalCounter
-        sta selectingLevelOrHeight
+        sta positionValidTmp
         inx
         inx
         lda orientationTable,x
         clc
-        adc selectingLevelOrHeight
+        adc positionValidTmp
         tay
         lda (playfieldAddr),y
         cmp #$EF
@@ -2747,14 +2747,14 @@ playState_lockTetrimino:
         adc generalCounter4
         clc
         adc generalCounter
-        sta selectingLevelOrHeight
+        sta positionValidTmp
         inx
         lda orientationTable,x
         sta generalCounter5
         inx
         lda orientationTable,x
         clc
-        adc selectingLevelOrHeight
+        adc positionValidTmp
         tay
         lda generalCounter5
         ; BLOCK_TILES
@@ -2963,30 +2963,7 @@ playState_updateLinesAndStatistics:
         lda outOfDateRenderFlags
         ora #$01
         sta outOfDateRenderFlags
-        lda gameType
-        beq @gameTypeA
-        lda completedLines
-        sta generalCounter
-        lda lines
-        sec
-        sbc generalCounter
-        sta lines
-        bpl @checkForBorrow
-        lda #$00
-        sta lines
-        jmp addHoldDownPoints
 
-@checkForBorrow:
-        and #$0F
-        cmp #$0A
-        bmi addHoldDownPoints
-        lda lines
-        sec
-        sbc #$06
-        sta lines
-        jmp addHoldDownPoints
-
-@gameTypeA:
         ldx completedLines
 incrementLines:
         inc lines
@@ -3311,8 +3288,6 @@ demoButtonsTable_indexIncr:
         rts
 
 gameMode_startDemo:
-        lda #$00
-        sta gameType
         sta startLevel
         sta gameModeState
         sta playState
@@ -3367,10 +3342,6 @@ showHighScores:
 MMC1_Control    := * + 1
         .addr   high_scores_nametable
         lda #$00
-        sta generalCounter2
-        lda gameType
-        beq @copyEntry
-        lda #$04
         sta generalCounter2
 @copyEntry:
         lda generalCounter2
@@ -3460,10 +3431,6 @@ byteToBcdTable:
 handleHighScoreIfNecessary:
         lda #$00
         sta highScoreEntryRawPos
-        lda gameType
-        beq @compareWithPos
-        lda #$04
-        sta highScoreEntryRawPos
 @compareWithPos:
         lda highScoreEntryRawPos
         sta generalCounter2
@@ -3551,13 +3518,6 @@ adjustHighScores:
 ; reg a: start byte to copy
 copyHighScoreNameToNextIndex:
         sta generalCounter
-        lda gameType
-        beq @offsetAdjustedForGameType
-        lda #$18
-        clc
-        adc generalCounter
-        sta generalCounter
-@offsetAdjustedForGameType:
         lda #$05
         sta generalCounter2
 @copyLetter:
@@ -3582,13 +3542,6 @@ copyHighScoreNameToNextIndex:
 ; reg a: start byte to copy
 copyHighScoreScoreToNextIndex:
         tax
-        lda gameType
-        beq @xAdjustedForGameType
-        txa
-        clc
-        adc #$0C
-        tax
-@xAdjustedForGameType:
         lda highScoreScoresA,x
         sta highScoreScoresA+3,x
         inx
@@ -3602,13 +3555,6 @@ copyHighScoreScoreToNextIndex:
 ; reg a: start byte to copy
 copyHighScoreLevelToNextIndex:
         tax
-        lda gameType
-        beq @xAdjustedForGameType
-        txa
-        clc
-        adc #$04
-        tax
-@xAdjustedForGameType:
         lda highScoreLevels,x
         sta highScoreLevels+1,x
         rts
