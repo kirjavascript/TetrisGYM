@@ -5913,6 +5913,11 @@ soundEffectSlot1_rotateTetriminoPlaying:
 
 soundEffectSlot1_tetrisAchievedInit:
         lda #$05
+        ldy palFlag
+        cpy #0
+        beq @ntsc
+        lda #$4
+@ntsc:
         ldy #$30
         jsr LE417
         lda #$10
@@ -5926,6 +5931,11 @@ LE417:  jmp initSoundEffectShared
 
 soundEffectSlot1_lineCompletedInit:
         lda #$05
+        ldy palFlag
+        cpy #0
+        beq @ntsc
+        lda #$4
+@ntsc:
         ldy #$34
         jsr LE417
         lda #$08
@@ -5937,6 +5947,11 @@ soundEffectSlot1_lineCompletedPlaying:
         bne LE442
 soundEffectSlot1_lineClearingInit:
         lda #$04
+        ldy palFlag
+        cpy #0
+        beq @ntsc
+        lda #$3
+@ntsc:
         ldy #$38
         jsr LE417
         lda #$00
@@ -6024,6 +6039,11 @@ LE4E9:  jmp soundEffectSlot1Playing_stop
 
 soundEffectSlot1_levelUpInit:
         lda #$06
+        ldy palFlag
+        cpy #0
+        beq @ntsc
+        lda #$5
+@ntsc:
         ldy #$1C
         jmp initSoundEffectShared
 
