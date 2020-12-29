@@ -4830,7 +4830,7 @@ targetTable:
         .byte $5A,$A,$89,$1 ; 7
         .byte $B8,$B,$DE,$1 ; 8
         .byte $3E,$D,$B,$2 ; 9
-        .byte $A0,$F,$5C,$1 ; A
+        .byte $F2,$E,$A,$2 ; A
         .byte $2C,$10,$83,$2 ; B
         .byte $94,$11,$CD,$2 ; C
         .byte $38,$13,$DC,$2 ; D

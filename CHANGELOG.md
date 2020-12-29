@@ -4,6 +4,7 @@
 - Pace Trainer
 - Seed Trainer
 - Controller input can be enabled outside of Debug Mode
+- PAL Mode now has correct SFX
 - Tweaks to make Garbage Trainer more realistic
 
 ## [v2]

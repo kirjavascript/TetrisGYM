@@ -11,16 +11,18 @@
 * [Trainers](#modes)
     * [Tetris](#tetris)
     * [T-Spins](#t-spins)
+    * [Seed](#seed)
     * [Stacking](#stacking)
+    * [Pace](#pace)
     * [Setups](#setups)
     * [Floor](#floor)
     * [(Quick)Tap](#%28quick%29-tap)
     * [Garbage](#garbage)
     * [Drought](#drought)
+* [Input Display](#input-display)
 * [Debug Mode](#debug-mode)
     * [Level Editor](#level-editor)
     * [Savestates](#savestates)
-    * [Controller Input Display](#controller-input-display)
 * [PAL Mode](#pal-mode)
 * [Resources](#resources)
 
@@ -50,11 +52,42 @@ Same gameplay as Type-A, with some improvements: no score cap, no rocket, no cur
 
 Spawn T-Spins in random positions. Additional entry delay on successful T-Spin to prepare for the next state.
 
+### Seed
+
+Provides same piece sets for VS battles (or practise).
+
+Press `select` to generate a random seed.
+
 ### Stacking
 
 ![Stacking](/screens/stacking.png)
 
 An experiment in highlighting areas of the playfield.
+
+### Pace
+
+![Pace](/screens/pace.png)
+
+Indicates how close you are to achieving a score by 230 lines. Loosely based on Tetris rate.
+
+You can choose scores up to and including 1.5m in increments of 100k.
+
+This can be adjusted for transition or PAL games;
+
+| value | score at 130 lines |
+| ----- | ------------------ |
+| 4 | 201261 |
+| 5 | 252936 |
+| 6 | 300278 |
+| 7 | 353015 |
+| 8 | 400356 |
+| 9 | 452031 |
+| A | 508690 |
+| B | 552131 |
+| C | 600535 |
+| D | 655460 |
+| E | 706051 |
+| F | 752310 |
 
 ### Setups
 
@@ -101,6 +134,15 @@ Different styles of garbage to dig through.
 Create artificially inflated droughts. Increasing the value causes less I pieces.
 
 0 = normal gameplay I = no line pieces
+
+### Input Display
+
+![Controller](/screens/controller.png)
+
+In debug mode
+
+* Select + Right  
+        Toggle controller input display
 
 ## Debug Mode
 
@@ -156,13 +198,6 @@ Savestates allow you to save and reload playfields as many times as you want. Th
 Savestates require SRAM to work. Tested and working on Everdrive / Emulator / MiSTerFPGA.
 
 Combined with the level editor, savestates are effective for practising specific scenarios.
-
-### Controller input display
-
-![Controller](/screens/controller.png)
-
-* Select + Right  
-        Toggle controller input display
 
 ## PAL Mode
 
