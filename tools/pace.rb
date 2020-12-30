@@ -36,21 +36,21 @@ def print_pace(threshold, target, range, step = 1)
       points = base + (((index-threshold) / (230.0-threshold)) * mult)
     end
 
-    # print "
-    #   T: #{target.to_s(16).upcase}\
-    #   L: #{index}\
-    #   M: #{points.floor}\
-    #   P: #{(points * index).floor}\
-    # "
+    print "
+      T: #{target.to_s(16).upcase}\
+      L: #{index}\
+      M: #{points.floor}\
+      P: #{(points * index).floor}\
+    "
 
-    print "| #{target.to_s(16).upcase} | #{(points * index).floor} |\n"
+    # print "| #{target.to_s(16).upcase} | #{(points * index).floor} |\n"
   end
 end
 
 # pp targets
 
 for target in 0..0xF
-  print_pace 110, target, 130..130, 1
+  # print_pace 110, target, 130..130, 1
 end
 
-# print_pace 110, 0xA, 1..23, 10
+print_pace 110, 0xA, 1..23, 10

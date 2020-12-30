@@ -1450,7 +1450,7 @@ gameModeState_initGameState:
         sta demoIndex
         sta demoButtonsAddr
         sta spawnID
-        lda #$DD
+        lda #$70
         sta demoButtonsAddr+1
         lda #$03
         sta renderMode
@@ -3191,6 +3191,7 @@ pollControllerButtons:
         lda gameMode
         cmp #$05
         beq @demoGameMode
+        ; beq @recording
         jsr pollController
         rts
 
@@ -3249,8 +3250,8 @@ pollControllerButtons:
         lda gameMode
         cmp #$05
         bne @ret2
-        lda $D0
-        cmp #$FF
+        ; lda $D0
+        ; cmp #$FF
         bne @ret2
         lda heldButtons_player1
         cmp demo_heldButtons
@@ -3263,7 +3264,7 @@ pollControllerButtons:
         sta (demoButtonsAddr,x)
         jsr demoButtonsTable_indexIncr
         lda demoButtonsAddr+1
-        cmp #$DF
+        cmp #$DF ; check movie has ended
         beq @ret2
         lda heldButtons_player1
         sta demo_heldButtons
@@ -3288,9 +3289,9 @@ demoButtonsTable_indexIncr:
         rts
 
 gameMode_startDemo:
-        sta startLevel
         sta gameModeState
         sta playState
+        sta startLevel
         lda #$05
         sta gameMode
         jmp gameMode_playAndEndingHighScore_jmp
