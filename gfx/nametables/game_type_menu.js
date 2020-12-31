@@ -53,6 +53,16 @@ const practise = Buffer.from(buffer);
     }
 });
 
+const drawTiles = (x, y, w, h, offset) => {
+    x += 3;
+    const pixel = x+ (y*35);
+    for (let i=0;w>i;i++) {
+        for (let j=0;h>j;j++) {
+            practise[pixel + i + (j * 35)] = offset+i + (j * 0x10);
+        }
+    }
+}
+
 // palettes
 // DR - DL - UR - UL
 const palettes = p => p.trim().match(/.+\n.+$/gm)
