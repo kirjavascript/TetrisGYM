@@ -3274,7 +3274,6 @@ pollControllerButtons:
 
 @buttonsNotChanged:
         inc demo_repeats
-        rts
 
 @ret2:  rts
 
