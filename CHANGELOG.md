@@ -1,5 +1,8 @@
 # Changelog
 
+## [v4]
+- Added new setup (L/J doubletuck)
+
 ## [v3]
 - Pace Trainer
 - Seed Trainer
@@ -17,7 +20,7 @@
     - Hard Garbage
     - Infinite Digging
 - Piece distribution in Setups Trainer is now even
-- Added new setup (L/J doubletuck)
+- Added new setup (L/J double spintuck)
 - Wraparound on main menu cursor
 - Display current trainer during gameplay / level select
 - Fixed some NES Tetris bugs;
