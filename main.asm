@@ -273,7 +273,7 @@ currentlyPlayingMusicTrack:= $06FD          ; Copied from musicTrack
 unreferenced_soundRngTmp:= $06FF
 highScoreNames  := $0700
 highScoreScoresA:= $0730
-highScoreScoresB:= $073C
+; highScoreScoresB:= $073C
 highScoreLevels := $0748
 initMagic   := $0750                        ; Initialized to a hard-coded number. When resetting, if not correct number then it knows this is a cold boot
 
@@ -573,6 +573,8 @@ playState_playerControlsActiveTetrimino:
         rts
 
 gameMode_legalScreen: ; boot
+        ; ABSS goes to gameTypeMenu instead of here
+
         ; set start level to 18
         lda #$08
         sta startLevel
@@ -3797,7 +3799,7 @@ gameModeState_startButtonHandling:
 
         jsr practiseGameHUD
 .if DEBUG_MODE
-        jsr practisePausePatch
+        jsr debugMode
 .else
         jsr stageSpriteForNextPiece
         jsr stageSpriteForCurrentPiece
@@ -4657,7 +4659,7 @@ pauseDrawPieces:
         jsr stageSpriteForCurrentPiece
         rts
 
-practisePausePatch:
+debugMode:
 
 DEBUG_ORIGINAL_Y := tmp1
 DEBUG_ORIGINAL_CURRENT_PIECE := tmp2
