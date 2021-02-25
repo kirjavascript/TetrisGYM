@@ -211,9 +211,9 @@ Dictate if the NTSC or PAL gameplay mechanics should be used. Should automatical
 TetrisGYM fixes some well known bugs in the oridinal game;
 
 - Resetting during a tetris no longer creates an invalid state
+- Level numbers are correct past level 29
 - Tetrimino colours are correct past level 138
 - Game no longer crashes after ~1550 lines
-- Level numbers are correct past 29
 
 ## Resources
 
