@@ -7,8 +7,8 @@
 </div>
 <br>
 
-* [Getting Started](#guide)
-* [Trainers](#modes)
+* [Getting Started](#getting-started)
+* [Trainers](#trainers)
     * [Tetris](#tetris)
     * [T-Spins](#t-spins)
     * [Seed](#seed)
@@ -24,6 +24,7 @@
     * [Level Editor](#level-editor)
     * [Savestates](#savestates)
 * [PAL Mode](#pal-mode)
+* [Bugfixes](#bugfixes)
 * [Resources](#resources)
 
 ## Getting Started
@@ -204,6 +205,15 @@ Combined with the level editor, savestates are effective for practising specific
 ## PAL Mode
 
 Dictate if the NTSC or PAL gameplay mechanics should be used. Should automatically detect region, but can be manually overwritten otherwise.
+
+## Bugfixes
+
+TetrisGYM fixes some well known bugs in the oridinal game;
+
+- Resetting during a tetris no longer creates an invalid state
+- Tetrimino colours are correct past level 138
+- Game no longer crashes after ~1550 lines
+- Level numbers are correct past 29
 
 ## Resources
 

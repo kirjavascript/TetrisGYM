@@ -1222,17 +1222,6 @@ heightToPpuLowAddr:
         .byte   $9C,$AC,$BC,$9C,$AC,$BC
 musicSelectionTable:
         .byte   $03,$04,$05,$FF,$06,$07,$08,$FF
-render_mode_menu_screens:
-        lda currentPpuCtrl
-        and #$FC
-        sta currentPpuCtrl
-        sta PPUCTRL
-        lda #$00
-        sta ppuScrollX
-        sta PPUSCROLL
-        sta ppuScrollY
-        sta PPUSCROLL
-        rts
 
 gameModeState_initGameBackground:
         jsr updateAudioWaitForNmiAndDisablePpuRendering
@@ -2130,6 +2119,18 @@ isPositionValid:
 @invalid:
         lda #$FF
         sta generalCounter
+        rts
+
+render_mode_menu_screens:
+        lda currentPpuCtrl
+        and #$FC
+        sta currentPpuCtrl
+        sta PPUCTRL
+        lda #$00
+        sta ppuScrollX
+        sta PPUSCROLL
+        sta ppuScrollY
+        sta PPUSCROLL
         rts
 
 render_mode_pause:
