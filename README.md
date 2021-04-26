@@ -208,7 +208,7 @@ Dictate if the NTSC or PAL gameplay mechanics should be used. Should automatical
 
 ## Bugfixes
 
-TetrisGYM fixes some well known bugs in the oridinal game;
+TetrisGYM fixes some well known bugs in the original game;
 
 - Resetting during a tetris no longer creates an invalid state
 - Level numbers are correct past level 29

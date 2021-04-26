@@ -13,16 +13,9 @@ NO_MUSIC := 1
 ALWAYS_NEXT_BOX := 1
 AUTO_WIN := 0
 NO_SCORING := 0
-SWAPUD := 0
 
-.if SWAPUD
-    BUTTON_UP := $4
-    BUTTON_DOWN := $8
-.else
-    BUTTON_DOWN := $4
-    BUTTON_UP := $8
-.endif
-
+BUTTON_DOWN := $4
+BUTTON_UP := $8
 BUTTON_RIGHT := $1
 BUTTON_LEFT := $2
 BUTTON_B := $40
