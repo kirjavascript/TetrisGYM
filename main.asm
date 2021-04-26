@@ -13,13 +13,23 @@ NO_MUSIC := 1
 ALWAYS_NEXT_BOX := 1
 AUTO_WIN := 0
 NO_SCORING := 0
+GOOFY := 0
 
+.if GOOFY
+BUTTON_DOWN := $8
+BUTTON_UP := $4
+BUTTON_RIGHT := $2
+BUTTON_LEFT := $1
+BUTTON_B := $80
+BUTTON_A := $40
+.else
 BUTTON_DOWN := $4
 BUTTON_UP := $8
 BUTTON_RIGHT := $1
 BUTTON_LEFT := $2
 BUTTON_B := $40
 BUTTON_A := $80
+.endif
 BUTTON_SELECT := $20
 BUTTON_START := $10
 
@@ -1140,7 +1150,7 @@ gameMode_levelMenu_processPlayer1Navigation:
 ; Starts by checking if right pressed
 gameMode_levelMenu_handleLevelNavigation:
         lda newlyPressedButtons
-        cmp #$01
+        cmp #BUTTON_RIGHT
         bne @checkLeftPressed
         lda #$01
         sta soundEffectSlot1Init
@@ -1150,7 +1160,7 @@ gameMode_levelMenu_handleLevelNavigation:
         inc startLevel
 @checkLeftPressed:
         lda newlyPressedButtons
-        cmp #$02
+        cmp #BUTTON_LEFT
         bne @checkDownPressed
         lda #$01
         sta soundEffectSlot1Init
@@ -1159,7 +1169,7 @@ gameMode_levelMenu_handleLevelNavigation:
         dec startLevel
 @checkDownPressed:
         lda newlyPressedButtons
-        cmp #$04
+        cmp #BUTTON_DOWN
         bne @checkUpPressed
         lda #$01
         sta soundEffectSlot1Init
@@ -1173,7 +1183,7 @@ gameMode_levelMenu_handleLevelNavigation:
 
 @checkUpPressed:
         lda newlyPressedButtons
-        cmp #$08
+        cmp #BUTTON_UP
         bne @checkAPressed
         lda #$01
         sta soundEffectSlot1Init
@@ -1482,8 +1492,8 @@ rotate_tetrimino:
         asl a
         tax
         lda newlyPressedButtons
-        and #$80
-        cmp #$80
+        and #BUTTON_A
+        cmp #BUTTON_A
         bne @aNotPressed
         inx
         lda rotationTable,x
@@ -1496,8 +1506,8 @@ rotate_tetrimino:
 
 @aNotPressed:
         lda newlyPressedButtons
-        and #$40
-        cmp #$40
+        and #BUTTON_B
+        cmp #BUTTON_B
         bne @ret
         lda rotationTable,x
         sta currentPiece
@@ -1522,7 +1532,7 @@ drop_tetrimino:
         lda autorepeatY
         bpl @notBeginningOfGame
         lda newlyPressedButtons
-        and #$04
+        and #BUTTON_DOWN
         beq @incrementAutorepeatY
         lda #$00
         sta autorepeatY
@@ -1534,7 +1544,7 @@ drop_tetrimino:
         bne @lookupDropSpeed
         lda newlyPressedButtons
         and #$0F
-        cmp #$04
+        cmp #BUTTON_DOWN
         bne @lookupDropSpeed
         lda #$01
         sta autorepeatY
@@ -1543,7 +1553,7 @@ drop_tetrimino:
 @autorepeating:
         lda heldButtons
         and #$0F
-        cmp #$04
+        cmp #BUTTON_DOWN
         beq @downPressed
         lda #$00
         sta autorepeatY
@@ -1621,7 +1631,7 @@ shift_tetrimino:
         lda tetriminoX
         sta originalY
         lda heldButtons
-        and #$04
+        and #BUTTON_DOWN
         bne @ret
         lda newlyPressedButtons
         and #$03
@@ -1642,7 +1652,7 @@ shift_tetrimino:
         sta autorepeatX
 @buttonHeldDown:
         lda heldButtons
-        and #$01
+        and #BUTTON_RIGHT
         beq @notPressingRight
         inc tetriminoX
         jsr isPositionValid
@@ -1653,7 +1663,7 @@ shift_tetrimino:
 
 @notPressingRight:
         lda heldButtons
-        and #$02
+        and #BUTTON_LEFT
         beq @ret
         dec tetriminoX
         jsr isPositionValid
