@@ -581,6 +581,7 @@ gameMode_legalScreen: ; boot
         ; set start level to 18
         lda #$08
         sta startLevel
+
         ; zero out config memory (possibly unnecessary)
         lda #0
         ldx #MODE_CONFIG_QUANTITY
@@ -588,6 +589,11 @@ gameMode_legalScreen: ; boot
         sta menuVars, x
         dex
         bpl @loop
+
+        ; reset cursors (seems to cause problems on misterFPGA)
+        lda #$0
+        sta practiseType
+        sta menuSeedCursorIndex
 
         ; default pace to A
         lda #$A
