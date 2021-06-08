@@ -2597,7 +2597,7 @@ pickTetriminoSeed:
 @loop:
         jsr setSeedNextRNG
         dec tmp3
-        cmp #0
+        lda tmp3
         bne @loop
 @compatMode:
 
