@@ -2568,14 +2568,6 @@ pickTetriminoPre:
         beq pickTetriminoPreset
         jmp pickRandomTetrimino
 
-pickTetriminoPost:
-        lda practiseType
-        cmp #MODE_DROUGHT
-        beq pickTetriminoDrought
-        lda spawnID ; restore A
-        rts
-
-
 pickTetriminoTSpin:
         lda #$2
         sta spawnID
@@ -2587,9 +2579,27 @@ pickTetriminoTap:
         rts
 
 pickTetriminoSeed:
-        ldx #set_seed
-        ldy #$02
-        jsr generateNextPseudorandomNumber
+        jsr setSeedNextRNG
+
+        ; SPSv2
+
+        lda set_seed_input+2
+        ror
+        ror
+        ror
+        ror
+        and #$F
+        cmp #0
+        beq @compatMode
+
+        adc #1
+        sta tmp3 ; step + 1 in tmp3
+@loop:
+        jsr setSeedNextRNG
+        dec tmp3
+        cmp #0
+        bne @loop
+@compatMode:
 
         inc set_seed+2 ; 'spawnCount'
         lda set_seed
@@ -2624,6 +2634,12 @@ pickTetriminoSeed:
         sta spawnID
         rts
 
+setSeedNextRNG:
+        ldx #set_seed
+        ldy #$02
+        jsr generateNextPseudorandomNumber
+        rts
+
 pickTetriminoPreset:
 presetBitmask := tmp2
 @start:
@@ -2654,6 +2670,13 @@ presetBitmask := tmp2
         ldx presetIndex ; restore RNG
         lda spawnTable,x
         sta spawnID
+        rts
+
+pickTetriminoPost:
+        lda practiseType
+        cmp #MODE_DROUGHT
+        beq pickTetriminoDrought
+        lda spawnID ; restore A
         rts
 
 pickTetriminoDrought:
