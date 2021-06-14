@@ -278,6 +278,7 @@ highScoreNames  := $0700
 highScoreScoresA:= $0730
 ; highScoreScoresB:= $073C
 highScoreLevels := $0748
+; .. bunch of unused stuff: highScoreNames sized
 initMagic   := $0750                        ; Initialized to a hard-coded number. When resetting, if not correct number then it knows this is a cold boot
 
 menuSeedCursorIndex := $760
@@ -578,6 +579,11 @@ playState_playerControlsActiveTetrimino:
 gameMode_legalScreen: ; boot
         ; ABSS goes to gameTypeMenu instead of here
 
+        ; reset cursors (seems to cause problems on misterFPGA)
+        lda #$0
+        sta practiseType
+        sta menuSeedCursorIndex
+
         ; set start level to 18
         lda #$08
         sta startLevel
@@ -590,34 +596,9 @@ gameMode_legalScreen: ; boot
         dex
         bpl @loop
 
-        ; reset cursors (seems to cause problems on misterFPGA)
-        lda #$0
-        sta practiseType
-        sta menuSeedCursorIndex
-
         ; default pace to A
         lda #$A
         sta paceModifier
-
-        ; region detection
-        ldx #0
-        ldy #0
-@vwait1:
-        bit $2002
-        bpl @vwait1
-@vwait2:
-        inx
-        bne @noincy
-        iny
-@noincy:
-        bit $2002
-        bpl @vwait2
-
-        cpx #$40 ;
-        bmi @ntsc
-        lda #1
-        sta palFlag
-@ntsc:
 
         ; fallthrough
 gameMode_titleScreen:

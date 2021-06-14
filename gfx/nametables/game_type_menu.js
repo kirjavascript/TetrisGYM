@@ -38,7 +38,7 @@ const tiles = `
 ##W#a                       ╤╣╢╡╠d#
 ##W#a                       ╔╓╒║═d#
 ##W#a                       ╄╃╂╁╀d#
-##W#a V3                    ┴┳┲┱┰d#
+##W#a V3.1                  ┴┳┲┱┰d#
 ##W#a                       ┤┣┢┡┠d#
 ##W#zxxxxxxxxxxxxxxxxxxxxxxxxxxxxc#
 ##W################################
