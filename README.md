@@ -61,6 +61,10 @@ Provides same piece sets for VS battles (or practise).
 
 Press `select` to generate a random seed.
 
+The seed trainer was improved in v3.1 to give a 'better' distribution of cases.
+
+Different versions of TetrisGYM can still share SPS by setting the fifth digit to `0`.
+
 ### Stacking
 
 ![Stacking](/screens/stacking.png)
