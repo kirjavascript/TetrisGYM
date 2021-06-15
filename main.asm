@@ -217,6 +217,7 @@ presetIndex := $60E
 pausedOutOfDateRenderFlags := $60F ; 0 - statistics 1 - saveslot
 debugLevelEdit := $610
 debugNextCounter := $611
+regionFlag := $612
 
 ; ... $67F
 musicStagingSq1Lo:= $0680
@@ -278,6 +279,7 @@ highScoreNames  := $0700
 highScoreScoresA:= $0730
 ; highScoreScoresB:= $073C
 highScoreLevels := $0748
+; .. bunch of unused stuff: highScoreNames sized
 initMagic   := $0750                        ; Initialized to a hard-coded number. When resetting, if not correct number then it knows this is a cold boot
 
 menuSeedCursorIndex := $760
@@ -330,9 +332,9 @@ MMC1_CHR1   := $DFFF
 .segment    "PRG_chunk1": absolute
 
 ; incremented to reset MMC1 reg
-initRam:ldx #$00
+initRam:
+        ldx #$00
         jmp initRamContinued
-
 nmi:    pha
         txa
         pha
@@ -500,6 +502,53 @@ initRamContinued:
 @continue:
         jmp @mainLoop
 
+checkRegion:
+        lda regionFlag
+        beq @check
+        rts
+@check:
+        lda #1
+        sta regionFlag
+; region detection via http://forums.nesdev.com/viewtopic.php?p=163258#p163258
+;;; use the power-on wait to detect video system-
+	ldx #0
+	ldy #0
+@vwait1:
+	bit $2002
+	bpl @vwait1  ; at this point, about 27384 cycles have passed
+@vwait2:
+	inx
+	bne @noincy
+	iny
+@noincy:
+	bit $2002
+	bpl @vwait2  ; at this point, about 57165 cycles have passed
+
+;;; BUT because of a hardware oversight, we might have missed a vblank flag.
+;;;  so we need to both check for 1Vbl and 2Vbl
+;;; NTSC NES: 29780 cycles / 12.005 -> $9B0 or $1361 (Y:X)
+;;; PAL NES:  33247 cycles / 12.005 -> $AD1 or $15A2
+;;; Dendy:    35464 cycles / 12.005 -> $B8A or $1714
+
+	tya
+	cmp #16
+	bcc @nodiv2
+	lsr
+@nodiv2:
+	clc
+	adc #<-9
+	cmp #3
+	bcc @noclip3
+	lda #3
+@noclip3:
+;;; Right now, A contains 0,1,2,3 for NTSC,PAL,Dendy,Bad
+        cmp #0
+        beq @ntsc
+        lda #1
+        sta palFlag
+@ntsc:
+        rts
+
 gameMode_playAndEndingHighScore_jmp:
         jsr gameMode_playAndEndingHighScore
         rts
@@ -578,6 +627,11 @@ playState_playerControlsActiveTetrimino:
 gameMode_legalScreen: ; boot
         ; ABSS goes to gameTypeMenu instead of here
 
+        ; reset cursors (seems to cause problems on misterFPGA)
+        lda #$0
+        sta practiseType
+        sta menuSeedCursorIndex
+
         ; set start level to 18
         lda #$08
         sta startLevel
@@ -590,34 +644,9 @@ gameMode_legalScreen: ; boot
         dex
         bpl @loop
 
-        ; reset cursors (seems to cause problems on misterFPGA)
-        lda #$0
-        sta practiseType
-        sta menuSeedCursorIndex
-
         ; default pace to A
         lda #$A
         sta paceModifier
-
-        ; region detection
-        ldx #0
-        ldy #0
-@vwait1:
-        bit $2002
-        bpl @vwait1
-@vwait2:
-        inx
-        bne @noincy
-        iny
-@noincy:
-        bit $2002
-        bpl @vwait2
-
-        cpx #$40 ;
-        bmi @ntsc
-        lda #1
-        sta palFlag
-@ntsc:
 
         ; fallthrough
 gameMode_titleScreen:
@@ -651,6 +680,7 @@ gameMode_gameTypeMenu:
         jsr changeCHRBank0
         lda #$00
         jsr changeCHRBank1
+        jsr checkRegion
         jsr waitForVBlankAndEnableNmi
         jsr updateAudioWaitForNmiAndResetOamStaging
         jsr updateAudioWaitForNmiAndEnablePpuRendering
@@ -2568,14 +2598,6 @@ pickTetriminoPre:
         beq pickTetriminoPreset
         jmp pickRandomTetrimino
 
-pickTetriminoPost:
-        lda practiseType
-        cmp #MODE_DROUGHT
-        beq pickTetriminoDrought
-        lda spawnID ; restore A
-        rts
-
-
 pickTetriminoTSpin:
         lda #$2
         sta spawnID
@@ -2587,9 +2609,27 @@ pickTetriminoTap:
         rts
 
 pickTetriminoSeed:
-        ldx #set_seed
-        ldy #$02
-        jsr generateNextPseudorandomNumber
+        jsr setSeedNextRNG
+
+        ; SPSv2
+
+        lda set_seed_input+2
+        ror
+        ror
+        ror
+        ror
+        and #$F
+        cmp #0
+        beq @compatMode
+
+        adc #1
+        sta tmp3 ; step + 1 in tmp3
+@loop:
+        jsr setSeedNextRNG
+        dec tmp3
+        lda tmp3
+        bne @loop
+@compatMode:
 
         inc set_seed+2 ; 'spawnCount'
         lda set_seed
@@ -2624,6 +2664,12 @@ pickTetriminoSeed:
         sta spawnID
         rts
 
+setSeedNextRNG:
+        ldx #set_seed
+        ldy #$02
+        jsr generateNextPseudorandomNumber
+        rts
+
 pickTetriminoPreset:
 presetBitmask := tmp2
 @start:
@@ -2654,6 +2700,13 @@ presetBitmask := tmp2
         ldx presetIndex ; restore RNG
         lda spawnTable,x
         sta spawnID
+        rts
+
+pickTetriminoPost:
+        lda practiseType
+        cmp #MODE_DROUGHT
+        beq pickTetriminoDrought
+        lda spawnID ; restore A
         rts
 
 pickTetriminoDrought:
