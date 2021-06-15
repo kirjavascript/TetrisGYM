@@ -217,6 +217,7 @@ presetIndex := $60E
 pausedOutOfDateRenderFlags := $60F ; 0 - statistics 1 - saveslot
 debugLevelEdit := $610
 debugNextCounter := $611
+regionFlag := $612
 
 ; ... $67F
 musicStagingSq1Lo:= $0680
@@ -502,6 +503,12 @@ initRamContinued:
         jmp @mainLoop
 
 checkRegion:
+        lda regionFlag
+        beq @check
+        rts
+@check:
+        lda #1
+        sta regionFlag
 ; region detection via http://forums.nesdev.com/viewtopic.php?p=163258#p163258
 ;;; use the power-on wait to detect video system-
 	ldx #0
@@ -618,7 +625,6 @@ playState_playerControlsActiveTetrimino:
         rts
 
 gameMode_legalScreen: ; boot
-        jsr checkRegion
         ; ABSS goes to gameTypeMenu instead of here
 
         ; reset cursors (seems to cause problems on misterFPGA)
@@ -674,6 +680,7 @@ gameMode_gameTypeMenu:
         jsr changeCHRBank0
         lda #$00
         jsr changeCHRBank1
+        jsr checkRegion
         jsr waitForVBlankAndEnableNmi
         jsr updateAudioWaitForNmiAndResetOamStaging
         jsr updateAudioWaitForNmiAndEnablePpuRendering
