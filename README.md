@@ -108,7 +108,8 @@ Several preset playfields for practising different types of tucks and spins.
 3. I
 4. Buco
 5. Various
-6. L / J Double
+6. L / J Spintuck
+7. L / J Doubletuck
 
 ### Floor
 
