@@ -512,6 +512,7 @@ checkRegion:
 ; region detection via http://forums.nesdev.com/viewtopic.php?p=163258#p163258
 ;;; use the power-on wait to detect video system-
 	ldx #0
+        stx palFlag ; extra zeroing
 	ldy #0
 @vwait1:
 	bit $2002
