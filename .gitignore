@@ -4,6 +4,7 @@
 *.pyc
 tetris.lst
 tetris.lbl
+tetris.map
 tetris.dbg
 tetris.bps
 tetris.ips
