@@ -41,4 +41,5 @@
 .charmap '^', $29
 .charmap '(', $2a
 .charmap ')', $2b
+.charmap '#', $ef
 .charmap ' ', $ff

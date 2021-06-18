@@ -54,7 +54,7 @@ MODE_GAME_QUANTITY := 10
 MODE_CONFIG_QUANTITY := 9
 MODE_CONFIG_OFFSET := MODE_QUANTITY - MODE_CONFIG_QUANTITY
 
-.define MENUSIZES $F, $7, $C, $20, $4, $12, $1, $1, $3
+.define MENUSIZES $F, $7, $C, $20, $4, $12, $1, $1, $1
 
 .macro MODENAMES
     .byte   "TETRIS"
@@ -1319,14 +1319,14 @@ displayModeText:
 
         ldy #6
 @writeChar:
-        lda modeText, x
+        lda modeNames, x
         sta PPUDATA
         inx
         dey
         bne @writeChar
         rts
 
-modeText:
+modeNames:
 MODENAMES
 
 debugNametableUI:
