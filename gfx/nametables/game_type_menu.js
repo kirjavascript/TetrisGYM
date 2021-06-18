@@ -4,10 +4,6 @@ const buffer = readFileSync(__dirname + '/game_type_menu_nametable.bin');
 
 let lookup = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ-,\'>################qweadzxc###############/##!#########[]()###############.############################################################################################################################################### ';
 
-lookup = [...lookup].map((d, i) => d === '#' ? String.fromCharCode(/*9472+*/9726-i):d).join``
-
-console.log(lookup.match(/.{16}/g).join('\n'));
-
 const chars = [...buffer].map(value => lookup[value] || '__NOWAYNOWAY');
 
 console.log(chars.join('').match(/.{35}/g).join('\n'));
@@ -15,11 +11,11 @@ console.log(chars.join('').match(/.{35}/g).join('\n'));
 const tiles = `
 ##W################################
 ##W#########qwwwwwwwwwwwwe#########
-##W#qwwwwwww] ╎╍╌╋╊╉╈╇╆╅ [wwwwwwwe#
-##W#a         ┾┽┼┻┺┹┸┷┶┵         d#
-##W#a         ┮┭┬┫┪┩┨┧┦┥         d#
-##W#a         ┞┝├┛┚┙┘┗┖┕         d#
-##W#a         ┎┍┌┋┊┉┈┇┆┅         d#
+##W#qwwwwwww]            [wwwwwwwe#
+##W#a                            d#
+##W#a                            d#
+##W#a                            d#
+##W#a                            d#
 ##W#a                            d#
 ##W#a   TETRIS                   d#
 ##W#a   T-SPINS                  d#
@@ -35,11 +31,11 @@ const tiles = `
 ##W#a   DEBUG MODE               d#
 ##W#a   PAL MODE                 d#
 ##W#a                            d#
-##W#a                       ╤╣╢╡╠d#
-##W#a                       ╔╓╒║═d#
-##W#a                       ╄╃╂╁╀d#
-##W#a V3.1                  ┴┳┲┱┰d#
-##W#a                       ┤┣┢┡┠d#
+##W#a                            d#
+##W#a                            d#
+##W#a                            d#
+##W#a V3.1                       d#
+##W#a                            d#
 ##W#zxxxxxxxxxxxxxxxxxxxxxxxxxxxxc#
 ##W################################
 ##W################################
@@ -62,6 +58,9 @@ const drawTiles = (x, y, w, h, offset) => {
         }
     }
 }
+
+drawTiles(11, 2, 10, 5, 0xB0); // draw logo
+drawTiles(25, 22, 5, 5, 0x9A); // draw QR code
 
 // palettes
 // DR - DL - UR - UL
