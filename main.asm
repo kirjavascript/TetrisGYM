@@ -1319,14 +1319,14 @@ displayModeText:
 
         ldy #6
 @writeChar:
-        lda modeNames, x
+        lda modeText, x
         sta PPUDATA
         inx
         dey
         bne @writeChar
         rts
 
-modeNames:
+modeText:
 MODENAMES
 
 debugNametableUI:
