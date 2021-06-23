@@ -675,7 +675,7 @@ gameMode_gameTypeMenu:
         jsr disableNmi
         jsr bulkCopyToPpu
         .addr   title_palette
-        jsr bulkCopyToPpu
+        jsr copyRleNametableToPpu
         .addr   game_type_menu_nametable
         lda #$00
         jsr changeCHRBank0
@@ -4313,7 +4313,7 @@ defaultHighScoresTable:
         .byte   $00 ;Game B 3rd Entry Level
         .byte   $00 ;unknown
         .byte   $FF
-game_type_menu_nametable:
+game_type_menu_nametable: ; RLE
         .incbin "gfx/nametables/game_type_menu_nametable_practise.bin"
 level_menu_nametable:
         .incbin "gfx/nametables/level_menu_nametable_practise.bin"
@@ -4323,6 +4323,8 @@ enter_high_score_nametable:
         .incbin "gfx/nametables/enter_high_score_nametable_practise.bin"
 high_scores_nametable:
         .incbin "gfx/nametables/high_scores_nametable.bin"
+
+.include "gfx/nametables/rle.asm"
 
 .include "presets/presets.asm"
 

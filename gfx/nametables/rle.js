@@ -1,5 +1,4 @@
-function konamiComp(_buffer) {
-    const buffer = Array.from(_buffer);
+function konamiComp(buffer) {
     const compressed = [];
 
     for (let i = 0; i < buffer.length;) {
@@ -27,14 +26,23 @@ function konamiComp(_buffer) {
             compressed.push([0x80 + count, buffer.slice(i, count + i)]);
             i += count;
         }
-
     }
 
     compressed.push(0xFF);
 
-    const flat = compressed.flat(Infinity);
-
-    console.log(`compressed ${buffer.length} -> ${flat.length}`);
-
-    return flat;
+    return compressed.flat(Infinity);
 }
+
+module.exports = function (buffer) {
+    const array = Array.from(buffer);
+    const stripped = [];
+    while (array.length) {
+        const next = array.splice(0, 35);
+        stripped.push(...next.slice(3));
+    }
+
+    const compressed = konamiComp(stripped)
+
+    console.log(`compressed ${buffer.length} -> ${compressed.length}`);
+    return Buffer.from(compressed);
+};
