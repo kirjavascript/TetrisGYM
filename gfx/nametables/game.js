@@ -54,4 +54,7 @@ for (let i = 0; i < 8; i++) {
     game[320 + i] = 0x68 + i;
 }
 
-writeFileSync(__dirname + '/game_nametable_practise.bin', game);
+writeFileSync(
+    __dirname + '/game_nametable_practise.bin',
+    require('./rle')(game),
+);

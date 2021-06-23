@@ -84,4 +84,7 @@ const palettes = p => p.trim().match(/.+\n.+$/gm)
     `)],
 ].forEach(([index, attributes]) => attributes.forEach((byte, i) => { practise[i+index] = byte; }));
 
-writeFileSync(__dirname + '/level_menu_nametable_practise.bin', practise);
+writeFileSync(
+    __dirname + '/level_menu_nametable_practise.bin',
+    require('./rle')(practise),
+);

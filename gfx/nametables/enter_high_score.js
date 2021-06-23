@@ -48,4 +48,8 @@ const practise = Buffer.from(buffer);
         practise[i] = lookup.indexOf(d);
     }
 });
-writeFileSync(__dirname + '/enter_high_score_nametable_practise.bin', practise);
+
+writeFileSync(
+    __dirname + '/enter_high_score_nametable_practise.bin',
+    require('./rle')(practise),
+);

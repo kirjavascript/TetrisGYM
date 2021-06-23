@@ -1104,7 +1104,7 @@ gameMode_levelMenu:
         jsr changeCHRBank1
         jsr bulkCopyToPpu
         .addr   menu_palette
-        jsr bulkCopyToPpu
+        jsr copyRleNametableToPpu
         .addr   level_menu_nametable
         lda #$20
         sta tmp1
@@ -1272,7 +1272,7 @@ gameModeState_initGameBackground:
         jsr changeCHRBank1
         jsr bulkCopyToPpu
         .addr   game_palette
-        jsr bulkCopyToPpu
+        jsr copyRleNametableToPpu
         .addr   game_nametable
 
         jsr showPaceDiffText
@@ -3645,7 +3645,7 @@ highScoreEntryScreen:
         jsr changeCHRBank1
         jsr bulkCopyToPpu
         .addr   menu_palette
-        jsr bulkCopyToPpu
+        jsr copyRleNametableToPpu
         .addr   enter_high_score_nametable
         jsr showHighScores
         lda #$02
@@ -4315,11 +4315,11 @@ defaultHighScoresTable:
         .byte   $FF
 game_type_menu_nametable: ; RLE
         .incbin "gfx/nametables/game_type_menu_nametable_practise.bin"
-level_menu_nametable:
+level_menu_nametable: ; RLE
         .incbin "gfx/nametables/level_menu_nametable_practise.bin"
-game_nametable:
+game_nametable: ; RLE
         .incbin "gfx/nametables/game_nametable_practise.bin"
-enter_high_score_nametable:
+enter_high_score_nametable: ; RLE
         .incbin "gfx/nametables/enter_high_score_nametable_practise.bin"
 high_scores_nametable:
         .incbin "gfx/nametables/high_scores_nametable.bin"
