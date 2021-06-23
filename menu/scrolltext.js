@@ -21,7 +21,7 @@ const toNum = char => chars.includes(char) ? chars.indexOf(char) : 0xFF;
 const toBytes = text => [...text].map(d=>'$'+toNum(d).toString(16)).join(',') + ',$ef';
 
 const header = scrollText.map((_,i) => `\t\t.addr scrollText${i}`).join('\n');
-const items = scrollText.map((text,i) => `scrollText${i}:\t.byte ${toBytes(text)} ; ${text}`).join('\n');
+const items = scrollText.map((text,i) => `scrollText${i.toString(16)}:\t.byte ${toBytes(text)} ; ${text}`).join('\n');
 
 
 const template = `scrollText:
