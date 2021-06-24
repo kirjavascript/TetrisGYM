@@ -46,7 +46,6 @@ copyRleNametableToPpu:
 rleDecodeToPpu:
         ; y is current input offset
         ; x is chunk length remaining
-        .export rleDecodeToPpu
         ldy     #$00
 
 @processChunk:

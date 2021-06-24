@@ -2171,6 +2171,7 @@ render_mode_menu_screens:
         sta PPUSCROLL
         sta ppuScrollY
         sta PPUSCROLL
+
         rts
 
 render_mode_pause:

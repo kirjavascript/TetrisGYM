@@ -9,36 +9,36 @@ const chars = [...buffer].map(value => lookup[value] || '__NOWAYNOWAY');
 console.log(chars.join('').match(/.{35}/g).join('\n'));
 
 const tiles = `
-##W################################
-##W#########qwwwwwwwwwwwwe#########
-##W#qwwwwwww]            [wwwwwwwe#
-##W#a                            d#
-##W#a                            d#
-##W#a                            d#
-##W#a                            d#
-##W#a                            d#
-##W#a   TETRIS                   d#
-##W#a   T-SPINS                  d#
-##W#a   SEED                     d#
-##W#a   STACKING                 d#
-##W#a   PACE                     d#
-##W#a   SETUPS                   d#
-##W#a   FLOOR                    d#
-##W#a   (QUICK)TAP               d#
-##W#a   GARBAGE                  d#
-##W#a   DROUGHT                  d#
-##W#a   INPUT DISPLAY            d#
-##W#a   DEBUG MODE               d#
-##W#a   PAL MODE                 d#
-##W#a                            d#
-##W#a                            d#
-##W#a                            d#
-##W#a                            d#
-##W#a V4                         d#
-##W#a                            d#
-##W#zxxxxxxxxxxxxxxxxxxxxxxxxxxxxc#
-##W################################
-##W################################
+###################################
+############qwwwwwwwwwwwwe#########
+####qwwwwwww]            [wwwwwwwe#
+####a                            d#
+####a                            d#
+####a                            d#
+####a                            d#
+####a                            d#
+####a                            d#
+####a                            d#
+####a                            d#
+####a                            d#
+####a                            d#
+####a                            d#
+####a                            d#
+####a                            d#
+####a                            d#
+####a                            d#
+####a                            d#
+####a                            d#
+####a                            d#
+####a                            d#
+####a                            d#
+####a                            d#
+####a                            d#
+####a V4                         d#
+####a                            d#
+####zxxxxxxxxxxxxxxxxxxxxxxxxxxxxc#
+###################################
+###################################
 `;
 
 // tiles
