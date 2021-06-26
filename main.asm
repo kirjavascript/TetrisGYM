@@ -189,8 +189,9 @@ newlyPressedButtons_player2:= $00F6
 heldButtons_player1:= $00F7
 heldButtons_player2:= $00F8
 joy1Location    := $00FB                    ; normal=0; 1 or 3 for expansion
-ppuScrollY  := $00FC                        ; Set to 0 many places, but not read
-ppuScrollX  := $00FD                        ; Set to 0 many places, but not read
+
+; $FC, $FD free
+
 currentPpuMask  := $00FE
 currentPpuCtrl  := $00FF
 stack       := $0100
@@ -360,11 +361,7 @@ nmi:    pha
         ldx #rng_seed
         ldy #$02
         jsr generateNextPseudorandomNumber
-        lda #$00
-        sta ppuScrollX
-        sta PPUSCROLL
-        sta ppuScrollY
-        sta PPUSCROLL
+        ; PPUSCROLL used to be reset here
         lda #$01
         sta verticalBlankingInterval
         jsr pollControllerButtons
@@ -438,10 +435,8 @@ initRamContinued:
         dex
         stx rng_seed+1
         ldy #$00
-        sty ppuScrollX
         sty PPUSCROLL
         ldy #$00
-        sty ppuScrollY
         sty PPUSCROLL
         lda #$90
         sta currentPpuCtrl
@@ -659,9 +654,7 @@ render_mode_legal_and_title_screens:
         and #$FC
         sta currentPpuCtrl
         lda #$00
-        sta ppuScrollX
         sta PPUSCROLL
-        sta ppuScrollY
         sta PPUSCROLL
         rts
 
@@ -2162,15 +2155,13 @@ isPositionValid:
         rts
 
 render_mode_menu_screens:
-        lda currentPpuCtrl
-        and #$FC
-        sta currentPpuCtrl
-        sta PPUCTRL
-        lda #$0
-        sta ppuScrollX
-        sta PPUSCROLL
-        sta ppuScrollY
-        sta PPUSCROLL
+        ; lda currentPpuCtrl
+        ; and #$FC
+        ; sta currentPpuCtrl
+        ; sta PPUCTRL
+        ; lda #$0
+        ; sta PPUSCROLL
+        ; sta PPUSCROLL
         rts
 
 render_mode_pause:
@@ -2334,10 +2325,8 @@ render_mode_play_and_demo:
 @setPaletteColor:
         stx PPUDATA
         ldy #$00
-        sty ppuScrollX
         sty PPUSCROLL
         ldy #$00
-        sty ppuScrollY
         sty PPUSCROLL
         rts
 
@@ -3808,9 +3797,7 @@ render_mode_congratulations_screen:
         lda highScoreCharToTile,x
         sta PPUDATA
         lda #$00
-        sta ppuScrollX
         sta PPUSCROLL
-        sta ppuScrollY
         sta PPUSCROLL
         sta outOfDateRenderFlags
 @ret:   rts

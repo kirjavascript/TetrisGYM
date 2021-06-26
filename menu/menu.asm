@@ -1,6 +1,7 @@
 .include "scrolltext.asm"
 
 
+; http://forums.nesdev.com/viewtopic.php?p=64111#64111
 
 ; menuRAM := $613
 ; menuCurrentLine :=
