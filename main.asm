@@ -374,8 +374,8 @@ irq:    rti
 
 render: lda renderMode
         jsr switch_s_plus_2a
-        .addr   render_mode_legal_and_title_screens
-        .addr   render_mode_menu_screens
+        .addr   render_mode_static
+        .addr   render_mode_scroll
         .addr   render_mode_congratulations_screen
         .addr   render_mode_play_and_demo
         .addr   render_mode_pause
@@ -649,20 +649,11 @@ gameMode_titleScreen:
         inc gameMode
         rts
 
-render_mode_legal_and_title_screens:
-        lda currentPpuCtrl
-        and #$FC
-        sta currentPpuCtrl
-        lda #$00
-        sta PPUSCROLL
-        sta PPUSCROLL
-        rts
-
 gameMode_gameTypeMenu:
         inc initRam
         lda #$10
         jsr setMMC1Control
-        lda #$01
+        lda #$0
         sta renderMode
         jsr updateAudioWaitForNmiAndDisablePpuRendering
         jsr disableNmi
@@ -1087,7 +1078,7 @@ gameMode_levelMenu:
         lda #$10
         jsr setMMC1Control
         jsr updateAudio2
-        lda #$01
+        lda #$0
         sta renderMode
         jsr updateAudioWaitForNmiAndDisablePpuRendering
         jsr disableNmi
@@ -2154,14 +2145,23 @@ isPositionValid:
         sta generalCounter
         rts
 
-render_mode_menu_screens:
-        ; lda currentPpuCtrl
-        ; and #$FC
-        ; sta currentPpuCtrl
-        ; sta PPUCTRL
-        ; lda #$0
-        ; sta PPUSCROLL
-        ; sta PPUSCROLL
+render_mode_static:
+        lda currentPpuCtrl
+        and #$FC
+        sta currentPpuCtrl
+        lda #$00
+        sta PPUSCROLL
+        sta PPUSCROLL
+        rts
+
+render_mode_scroll:
+        lda currentPpuCtrl
+        and #$FC
+        sta currentPpuCtrl
+        sta PPUCTRL
+        lda frameCounter
+        sta PPUSCROLL
+        sta PPUSCROLL
         rts
 
 render_mode_pause:

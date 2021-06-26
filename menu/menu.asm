@@ -1,5 +1,9 @@
 .include "scrolltext.asm"
 
+; make nametable longer
+; sort out yscroll for it
+; coarse rendering
+
 
 ; http://forums.nesdev.com/viewtopic.php?p=64111#64111
 
