@@ -133,7 +133,7 @@ spriteYOffset   := $00A1
 spriteIndexInOamContentLookup:= $00A2
 outOfDateRenderFlags:= $00A3                ; Bit 0-lines 1-level 2-score 6-stats 7-high score entry letter
 
-; ... $00A6                   ; Somehow used for two players, but seems broken
+; ... $00A6
 gameModeState   := $00A7                    ; For values, see playState_checkForCompletedRows
 generalCounter  := $00A8                    ; canon is legalScreenCounter2
 generalCounter2 := $00A9
@@ -2166,12 +2166,11 @@ render_mode_menu_screens:
         and #$FC
         sta currentPpuCtrl
         sta PPUCTRL
-        lda #$00
+        lda #$0
         sta ppuScrollX
         sta PPUSCROLL
         sta ppuScrollY
         sta PPUSCROLL
-
         rts
 
 render_mode_pause:
