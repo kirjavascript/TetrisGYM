@@ -34,7 +34,7 @@ addrHi  := addrLo+1
 copyRleNametableToPpu:
         jsr     copyAddrAtReturnAddressToTmp_incrReturnAddrBy2
         ldx     PPUSTATUS
-        lda     #$20
+        lda     #$24
         sta     PPUADDR
         lda     #$00
         sta     PPUADDR

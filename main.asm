@@ -653,7 +653,7 @@ gameMode_gameTypeMenu:
         inc initRam
         lda #$10
         jsr setMMC1Control
-        lda #$0
+        lda #$1
         sta renderMode
         jsr updateAudioWaitForNmiAndDisablePpuRendering
         jsr disableNmi
@@ -2155,12 +2155,16 @@ render_mode_static:
         rts
 
 render_mode_scroll:
+        lda #%00011
+        sta $8000
+
         lda currentPpuCtrl
         and #$FC
         sta currentPpuCtrl
         sta PPUCTRL
-        lda frameCounter
+        lda #0
         sta PPUSCROLL
+        lda frameCounter
         sta PPUSCROLL
         rts
 
