@@ -651,7 +651,7 @@ gameMode_titleScreen:
 
 gameMode_gameTypeMenu:
         inc initRam
-        lda #$10
+        lda #%10011 ; used to be $10 (enable horizontal mirroring)
         jsr setMMC1Control
         lda #$1
         sta renderMode
@@ -2155,16 +2155,13 @@ render_mode_static:
         rts
 
 render_mode_scroll:
-        lda #%00011
-        sta $8000
-
         lda currentPpuCtrl
         and #$FC
         sta currentPpuCtrl
         sta PPUCTRL
         lda #0
         sta PPUSCROLL
-        lda frameCounter
+        ; lda frameCounter
         sta PPUSCROLL
         rts
 
