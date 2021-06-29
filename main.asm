@@ -3381,6 +3381,11 @@ gameModeState_checkForResetKeyCombo:
 @reset: jsr updateAudio2
         lda #$02 ; straight to menu screen
         sta gameMode
+
+        ; switch to blank charmap
+        ; stops glitching when resetting
+        lda #$02
+        jsr changeCHRBank1
         rts
 
 ; It looks like the jsr _must_ do nothing, otherwise reg a != gameModeState in mainLoop and there would not be any waiting on vsync
