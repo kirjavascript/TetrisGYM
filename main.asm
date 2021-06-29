@@ -651,10 +651,9 @@ gameMode_titleScreen:
 
 gameMode_gameTypeMenu:
         inc initRam
-        ; lda #%10011 ; used to be $10 (enable horizontal mirroring)
-        lda #$10
+        lda #%10011 ; used to be $10 (enable horizontal mirroring)
         jsr setMMC1Control
-        lda #$0
+        lda #$1
         sta renderMode
         jsr updateAudioWaitForNmiAndDisablePpuRendering
         jsr disableNmi
@@ -662,6 +661,10 @@ gameMode_gameTypeMenu:
         .addr   title_palette
         jsr copyRleNametableToPpu
         .addr   game_type_menu_nametable
+        lda #$28
+        sta tmp3
+        jsr copyRleNametableToPpuOffset
+        .addr   level_menu_nametable
         lda #$00
         jsr changeCHRBank0
         lda #$00
@@ -2162,7 +2165,7 @@ render_mode_scroll:
         sta PPUCTRL
         lda #0
         sta PPUSCROLL
-        lda frameCounter
+        ; lda frameCounter
         sta PPUSCROLL
         rts
 

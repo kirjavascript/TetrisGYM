@@ -33,16 +33,24 @@ function konamiComp(buffer) {
     return compressed.flat(Infinity);
 }
 
-module.exports = function (buffer) {
-    const array = Array.from(buffer);
+function strip(_array) {
+    const array = [..._array];
     const stripped = [];
     while (array.length) {
         const next = array.splice(0, 35);
         stripped.push(...next.slice(3));
     }
+    return stripped;
+}
 
-    const compressed = konamiComp(stripped)
-
+module.exports = function (buffer) {
+    const array = Array.from(buffer);
+    const compressed = konamiComp(strip(array));
     console.log(`compressed ${buffer.length} -> ${compressed.length}`);
     return Buffer.from(compressed);
 };
+
+Object.assign(module.exports, {
+    strip,
+    konamiComp,
+});

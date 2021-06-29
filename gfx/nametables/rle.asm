@@ -30,11 +30,15 @@
 
 addrLo  := $0000
 addrHi  := addrLo+1
+addrOff := addrLo+2
 
 copyRleNametableToPpu:
+        lda     #$20
+        sta     addrOff
+copyRleNametableToPpuOffset:
         jsr     copyAddrAtReturnAddressToTmp_incrReturnAddrBy2
         ldx     PPUSTATUS
-        lda     #$20
+        lda     addrOff
         sta     PPUADDR
         lda     #$00
         sta     PPUADDR
