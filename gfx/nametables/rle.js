@@ -50,7 +50,4 @@ module.exports = function (buffer) {
     return Buffer.from(compressed);
 };
 
-Object.assign(module.exports, {
-    strip,
-    konamiComp,
-});
+Object.assign(module.exports, { konamiComp });
