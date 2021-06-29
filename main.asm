@@ -664,7 +664,7 @@ gameMode_gameTypeMenu:
         lda #$28
         sta tmp3
         jsr copyRleNametableToPpuOffset
-        .addr   level_menu_nametable
+        .addr   game_type_menu_nametable_extra
         lda #$00
         jsr changeCHRBank0
         lda #$00
@@ -2165,7 +2165,10 @@ render_mode_scroll:
         sta PPUCTRL
         lda #0
         sta PPUSCROLL
-        ; lda frameCounter
+        lda practiseType
+        asl
+        asl
+        asl
         sta PPUSCROLL
         rts
 
@@ -3485,7 +3488,7 @@ byteToBcdTable:
         .byte   $24,$25,$26,$27,$28,$29,$30,$31
         .byte   $32,$33,$34,$35,$36,$37,$38,$39
         .byte   $40,$41,$42,$43,$44,$45,$46,$47
-        .byte   $48,$49
+        .byte   $48,$49,$50,$51,$52,$53,$54,$55
 
 ; Adjusts high score table and handles data entry, if necessary
 handleHighScoreIfNecessary:
@@ -4307,6 +4310,8 @@ defaultHighScoresTable:
         .byte   $FF
 game_type_menu_nametable: ; RLE
         .incbin "gfx/nametables/game_type_menu_nametable_practise.bin"
+game_type_menu_nametable_extra: ; RLE
+        .incbin "gfx/nametables/game_type_menu_nametable_extra.bin"
 level_menu_nametable: ; RLE
         .incbin "gfx/nametables/level_menu_nametable_practise.bin"
 game_nametable: ; RLE

@@ -27,7 +27,7 @@ function printNT(buffer, lookup) {
     console.log(chars.join('').match(/.{32}/g).join('\n'));
 }
 
-function drawNT(buffer, lookup, tiles) {
+function drawTiles(buffer, lookup, tiles) {
     [...tiles.trim().split('\n').join('')].forEach((d, i) => {
         if (d !== '#') {
             buffer[i] = lookup.indexOf(d);
@@ -35,7 +35,7 @@ function drawNT(buffer, lookup, tiles) {
     });
 }
 
-function drawTiles(buffer, x, y, w, h, offset) {
+function drawRect(buffer, x, y, w, h, offset) {
     x += 3;
     const pixel = x+ (y*32);
     for (let i=0;w>i;i++) {
@@ -66,7 +66,7 @@ module.exports = {
     readStripe,
     writeRLE,
     printNT,
-    drawNT,
     drawTiles,
+    drawRect,
     drawAttrs,
 };
