@@ -1,5 +1,8 @@
 # Changelog
 
+## [v4]
+- 
+
 ## [v3.1]
 - Added new setup (L/J doubletuck)
 - Added improved seeds while retaining backwards compatibility

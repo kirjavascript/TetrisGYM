@@ -651,9 +651,10 @@ gameMode_titleScreen:
 
 gameMode_gameTypeMenu:
         inc initRam
-        lda #%10011 ; used to be $10 (enable horizontal mirroring)
+        ; lda #%10011 ; used to be $10 (enable horizontal mirroring)
+        lda #$10
         jsr setMMC1Control
-        lda #$1
+        lda #$0
         sta renderMode
         jsr updateAudioWaitForNmiAndDisablePpuRendering
         jsr disableNmi
@@ -2161,7 +2162,7 @@ render_mode_scroll:
         sta PPUCTRL
         lda #0
         sta PPUSCROLL
-        ; lda frameCounter
+        lda frameCounter
         sta PPUSCROLL
         rts
 
