@@ -49,7 +49,7 @@ MODE_INPUT_DISPLAY := 10
 MODE_DEBUG := 11
 MODE_PAL := 12
 
-MODE_QUANTITY := 100
+MODE_QUANTITY := 13
 MODE_GAME_QUANTITY := 10
 MODE_CONFIG_QUANTITY := 9
 MODE_CONFIG_OFFSET := MODE_QUANTITY - MODE_CONFIG_QUANTITY
@@ -2180,14 +2180,14 @@ render_mode_scroll:
         lda #0
         sta PPUSCROLL
 
-        lda practiseType
-        asl
-        asl
-        asl
-        cmp menuScrollY
-        bcc @skip
-        inc menuScrollY
-@skip:
+        ; lda practiseType
+        ; asl
+        ; asl
+        ; asl
+        ; cmp menuScrollY
+        ; bcc @skip
+        ; inc menuScrollY
+; @skip:
 
         lda menuScrollY
         sta PPUSCROLL
