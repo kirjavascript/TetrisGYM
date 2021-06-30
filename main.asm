@@ -218,7 +218,6 @@ presetIndex := $60E
 pausedOutOfDateRenderFlags := $60F ; 0 - statistics 1 - saveslot
 debugLevelEdit := $610
 debugNextCounter := $611
-regionFlag := $612
 
 ; ... $67F
 musicStagingSq1Lo:= $0680
@@ -501,12 +500,6 @@ initRamContinued:
         jmp @mainLoop
 
 checkRegion:
-        lda regionFlag
-        beq @check
-        rts
-@check:
-        lda #1
-        sta regionFlag
 ; region detection via http://forums.nesdev.com/viewtopic.php?p=163258#p163258
 ;;; use the power-on wait to detect video system-
 	ldx #0
@@ -556,7 +549,7 @@ branchOnGameMode:
         lda gameMode
         jsr switch_s_plus_2a
         .addr   gameMode_legalScreen
-        .addr   gameMode_titleScreen
+        .addr   gameMode_titleScreen_unused
         .addr   gameMode_gameTypeMenu
         .addr   gameMode_levelMenu
         .addr   gameMode_playAndEndingHighScore_jmp
@@ -647,10 +640,15 @@ gameMode_legalScreen: ; boot
         lda #$A
         sta paceModifier
 
-        ; fallthrough
-gameMode_titleScreen:
-        inc gameMode
+        ; detect region
+        jsr updateAudioWaitForNmiAndDisablePpuRendering
+        jsr checkRegion
+
+        lda #2
+        sta gameMode
         rts
+
+gameMode_titleScreen_unused:
 
 gameMode_gameTypeMenu:
         inc initRam
@@ -676,7 +674,6 @@ gameMode_gameTypeMenu:
         jsr changeCHRBank0
         lda #$00
         jsr changeCHRBank1
-        jsr checkRegion
         jsr waitForVBlankAndEnableNmi
         jsr updateAudioWaitForNmiAndResetOamStaging
         jsr updateAudioWaitForNmiAndEnablePpuRendering
