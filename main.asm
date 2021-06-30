@@ -49,7 +49,7 @@ MODE_INPUT_DISPLAY := 10
 MODE_DEBUG := 11
 MODE_PAL := 12
 
-MODE_QUANTITY := 13
+MODE_QUANTITY := 100
 MODE_GAME_QUANTITY := 10
 MODE_CONFIG_QUANTITY := 9
 MODE_CONFIG_OFFSET := MODE_QUANTITY - MODE_CONFIG_QUANTITY
@@ -283,8 +283,11 @@ highScoreLevels := $0748
 ; .. bunch of unused stuff: highScoreNames sized
 initMagic   := $0750                        ; Initialized to a hard-coded number. When resetting, if not correct number then it knows this is a cold boot
 
-menuSeedCursorIndex := $760
-menuVars := $761
+menuRAM := $760
+menuSeedCursorIndex := menuRAM+0
+menuScrollY := menuRAM+1
+; menuScrollYTarget := menuRAM+1
+menuVars := $763
 paceModifier := menuVars+0
 presetModifier := menuVars+1
 floorModifier := menuVars+2
@@ -918,6 +921,7 @@ renderMenuVars:
         asl a
         clc
         adc #$3F
+        sbc menuScrollY
         sta spriteYOffset
         lda #$17
         sta spriteXOffset
@@ -928,6 +932,7 @@ renderMenuVars:
 
 @seedCursor:
         lda #$45
+        sbc menuScrollY
         sta spriteYOffset
         lda menuSeedCursorIndex
         asl a
@@ -949,6 +954,7 @@ menuYTmp := tmp2
         lda #$b8
         sta byteSpriteXOffset
         lda #$4F
+        sbc menuScrollY
         sta byteSpriteYOffset
         lda #set_seed_input
         sta byteSpriteAddr
@@ -965,6 +971,7 @@ menuYTmp := tmp2
         asl
         asl
         adc #$5F
+        sbc menuScrollY
         sta menuYTmp
 
         ; handle boolean
@@ -979,6 +986,8 @@ menuYTmp := tmp2
 
         ldx oamStagingLength
         lda menuYTmp
+
+
         sta oamStaging, x
         inx
         lda menuVars, y
@@ -2163,16 +2172,24 @@ render_mode_static:
         rts
 
 render_mode_scroll:
+        ; TODO: redo
         lda currentPpuCtrl
         and #$FC
         sta currentPpuCtrl
         sta PPUCTRL
         lda #0
         sta PPUSCROLL
+
         lda practiseType
         asl
         asl
         asl
+        cmp menuScrollY
+        bcc @skip
+        inc menuScrollY
+@skip:
+
+        lda menuScrollY
         sta PPUSCROLL
         rts
 

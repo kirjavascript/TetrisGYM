@@ -7,7 +7,7 @@ const {
     drawAttrs,
 } = require('./nametables');
 
-let lookup = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ-,\'>################qweadzxc###############/##!#########[]()###############.############################################################################################################################################### ';
+const lookup = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ-,\'>################qweadzxc###############/##!#########[]()###############.############################################################################################################################################### ';
 
 const buffer = readStripe(__dirname + '/game_type_menu_nametable.bin');
 const extra = [...buffer];
@@ -36,41 +36,41 @@ drawTiles(buffer, lookup, `
 #a    INPUT DISPLAY           d#
 #a    DEBUG MODE              d#
 #a    PAL MODE                d#
-#a                            d#
-#a                            d#
-#a                            d#
-#a                            d#
-#a                            d#
-#a                            d#
-#a                            d#
-#a                            d#
-#a                            d#
+#a    MODE                    d#
+#a    MODE                    d#
+#a    MODE                    d#
+#a    MODE                    d#
+#a    MODE                    d#
+#a    MODE                    d#
+#a    MODE                    d#
+#a    MODE                    d#
+#a    MODE                    d#
 `);drawTiles(extra, lookup, `
-#a                            d#
-#a                            d#
-#a                            d#
-#a                            d#
-#a                            d#
-#a                            d#
-#a                            d#
-#a                            d#
-#a                            d#
-#a                            d#
-#a                            d#
-#a                            d#
-#a                            d#
-#a                            d#
-#a                            d#
-#a                            d#
-#a                            d#
-#a                            d#
-#a                            d#
-#a                            d#
-#a                            d#
-#a                            d#
-#a                            d#
-#a                            d#
-#a                            d#
+#a    MODE                    d#
+#a    MODE                    d#
+#a    MODE                    d#
+#a    MODE                    d#
+#a    MODE                    d#
+#a    MODE                    d#
+#a    MODE                    d#
+#a    MODE                    d#
+#a    MODE                    d#
+#a    MODE                    d#
+#a    MODE                    d#
+#a    MODE                    d#
+#a    MODE                    d#
+#a    MODE                    d#
+#a    MODE                    d#
+#a    MODE                    d#
+#a    MODE                    d#
+#a    MODE                    d#
+#a    MODE                    d#
+#a    MODE                    d#
+#a    MODE                    d#
+#a    MODE                    d#
+#a    MODE                    d#
+#a    MODE                    d#
+#a    MODE                    d#
 #a                            d#
 #a                            d#
 #zxxxxxxxxxxxxxxxxxxxxxxxxxxxxc#
