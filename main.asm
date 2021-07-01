@@ -2171,6 +2171,7 @@ render_mode_static:
         rts
 
 render_mode_scroll:
+        ; TODO: fix
         ; TODO: redo
         lda currentPpuCtrl
         and #$FC
@@ -2179,14 +2180,20 @@ render_mode_scroll:
         lda #0
         sta PPUSCROLL
 
-        ; lda practiseType
-        ; asl
-        ; asl
-        ; asl
-        ; cmp menuScrollY
-        ; bcc @skip
-        ; inc menuScrollY
-; @skip:
+        lda practiseType
+        asl
+        asl
+        asl
+        cmp menuScrollY
+        beq @skip2
+        ; not equal
+        cmp menuScrollY
+        bmi @skip
+        inc menuScrollY
+        jmp @skip2
+@skip:
+        dec menuScrollY
+@skip2:
 
         lda menuScrollY
         sta PPUSCROLL
