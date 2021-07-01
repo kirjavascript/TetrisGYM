@@ -929,7 +929,7 @@ renderMenuVars:
         jmp @cursorFinished
 
 @seedCursor:
-        lda #MENU_SPRITE_Y_BASE + 6
+        lda #MENU_SPRITE_Y_BASE + 7
         sbc menuScrollY
         sta spriteYOffset
         lda menuSeedCursorIndex
