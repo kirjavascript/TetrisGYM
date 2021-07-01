@@ -11,7 +11,7 @@ PRACTISE_MODE := 1
 DEBUG_MODE := 1
 NO_MUSIC := 1
 ALWAYS_NEXT_BOX := 1
-AUTO_WIN := 0
+AUTO_WIN := 1
 NO_SCORING := 0
 GOOFY := 0
 
@@ -33,8 +33,6 @@ BUTTON_A := $80
 BUTTON_SELECT := $20
 BUTTON_START := $10
 
-BLOCK_TILES := $7B
-
 MODE_TETRIS := 0
 MODE_TSPINS := 1
 MODE_SEED := 2
@@ -53,6 +51,9 @@ MODE_QUANTITY := 13
 MODE_GAME_QUANTITY := 10
 MODE_CONFIG_QUANTITY := 9
 MODE_CONFIG_OFFSET := MODE_QUANTITY - MODE_CONFIG_QUANTITY
+
+MENU_SPRITE_Y_BASE := $47
+BLOCK_TILES := $7B
 
 .define MENUSIZES $F, $7, $C, $20, $4, $12, $1, $1, $1
 
@@ -917,7 +918,7 @@ renderMenuVars:
         asl a
         asl a
         clc
-        adc #$3F
+        adc #MENU_SPRITE_Y_BASE + 1
         sbc menuScrollY
         sta spriteYOffset
         lda #$17
@@ -928,7 +929,7 @@ renderMenuVars:
         jmp @cursorFinished
 
 @seedCursor:
-        lda #$45
+        lda #MENU_SPRITE_Y_BASE + 6
         sbc menuScrollY
         sta spriteYOffset
         lda menuSeedCursorIndex
@@ -950,7 +951,7 @@ menuYTmp := tmp2
 
         lda #$b8
         sta byteSpriteXOffset
-        lda #$4F
+        lda #MENU_SPRITE_Y_BASE + $10
         sbc menuScrollY
         sta byteSpriteYOffset
         lda #set_seed_input
@@ -967,7 +968,8 @@ menuYTmp := tmp2
         asl
         asl
         asl
-        adc #$5F
+        ; adc #$5F
+        adc #MENU_SPRITE_Y_BASE + $21
         sbc menuScrollY
         sta menuYTmp
 
@@ -3507,6 +3509,7 @@ byteToBcdTable:
         .byte   $32,$33,$34,$35,$36,$37,$38,$39
         .byte   $40,$41,$42,$43,$44,$45,$46,$47
         .byte   $48,$49,$50,$51,$52,$53,$54,$55
+        .byte   $56,$57,$58,$59,$60
 
 ; Adjusts high score table and handles data entry, if necessary
 handleHighScoreIfNecessary:

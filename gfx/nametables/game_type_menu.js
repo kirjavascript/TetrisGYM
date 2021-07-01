@@ -23,6 +23,7 @@ drawTiles(buffer, lookup, `
 #a                            d#
 #a                            d#
 #a                            d#
+#a                            d#
 #a    TETRIS                  d#
 #a    T-SPINS                 d#
 #a    SEED                    d#
@@ -36,7 +37,6 @@ drawTiles(buffer, lookup, `
 #a    INPUT DISPLAY           d#
 #a    DEBUG MODE              d#
 #a    PAL MODE                d#
-#a    MODE                    d#
 #a    MODE                    d#
 #a    MODE                    d#
 #a    MODE                    d#
@@ -78,14 +78,14 @@ drawTiles(buffer, lookup, `
 ################################
 `);
 
-drawRect(buffer, 8, 1, 10, 5, 0xB0); // draw logo
+drawRect(buffer, 8, 2, 10, 5, 0xB0); // draw logo
 // drawRect(buffer, 22, 22, 5, 5, 0x9A); // draw QR code
 
 drawAttrs(buffer, [`
-    2222211111122222
-    2222211111122222
-    2222211111122222
     2222222222222222
+    2222211111122222
+    2222211111122222
+    2222211111122222
     2222222222222222
     2222222222222222
     2222222222222222
