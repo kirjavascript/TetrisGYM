@@ -347,9 +347,6 @@ nmi:    pha
         lda #$00
         sta oamStagingLength
         jsr render
-
-
-
         dec sleepCounter
         lda sleepCounter
         cmp #$FF
@@ -377,14 +374,6 @@ nmi:    pha
         tax
         pla
 irq:    rti
-
-resetScroll:
-        ; lda renderMode
-        ; cmp #1 ; render_mode_scroll
-        ; beq @altScroll
-; @altScroll:
-        rts
-
 
 render: lda renderMode
         jsr switch_s_plus_2a
