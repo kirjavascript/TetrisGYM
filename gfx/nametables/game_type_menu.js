@@ -37,14 +37,14 @@ drawTiles(buffer, lookup, `
 #a    INPUT DISPLAY           d#
 #a    DEBUG MODE              d#
 #a    PAL MODE                d#
-#a                            d#
-#a                            d#
-#a                            d#
-#a                            d#
-#a                            d#
-#a                            d#
-#a                            d#
-#a                            d#
+#a    MODE                    d#
+#a    MODE                    d#
+#a    MODE                    d#
+#a    MODE                    d#
+#a    MODE                    d#
+#a    MODE                    d#
+#a    MODE                    d#
+#a    MODE                    d#
 `);drawTiles(extra, lookup, `
 #a                            d#
 #a                            d#

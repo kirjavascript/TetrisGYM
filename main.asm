@@ -15,21 +15,12 @@ AUTO_WIN := 0
 NO_SCORING := 0
 GOOFY := 0
 
-.if GOOFY
-BUTTON_DOWN := $8
-BUTTON_UP := $4
-BUTTON_RIGHT := $2
-BUTTON_LEFT := $1
-BUTTON_B := $80
-BUTTON_A := $40
-.else
 BUTTON_DOWN := $4
 BUTTON_UP := $8
 BUTTON_RIGHT := $1
 BUTTON_LEFT := $2
 BUTTON_B := $40
 BUTTON_A := $80
-.endif
 BUTTON_SELECT := $20
 BUTTON_START := $10
 
@@ -47,7 +38,7 @@ MODE_INPUT_DISPLAY := 10
 MODE_DEBUG := 11
 MODE_PAL := 12
 
-MODE_QUANTITY := 13
+MODE_QUANTITY := 21
 MODE_GAME_QUANTITY := 10
 MODE_CONFIG_QUANTITY := 9
 MODE_CONFIG_OFFSET := MODE_QUANTITY - MODE_CONFIG_QUANTITY
@@ -2185,15 +2176,15 @@ render_mode_scroll:
         asl
         asl
         cmp menuScrollY
-        beq @skip2
+        beq @endscroll
         ; not equal
         cmp menuScrollY
-        bmi @skip
+        bmi @lessThan
         inc menuScrollY
-        jmp @skip2
-@skip:
+        jmp @endscroll
+@lessThan:
         dec menuScrollY
-@skip2:
+@endscroll:
 
         lda menuScrollY
         sta PPUSCROLL
@@ -4133,6 +4124,19 @@ pollController_actualRead:
         rol tmp2
         dex
         bne @readNextBit
+
+.if GOOFY
+        lda newlyPressedButtons_player1
+        asl
+        and #$AA
+        sta tmp3
+
+        lda newlyPressedButtons_player1
+        and #$AA
+        lsr
+        ora tmp3
+        sta newlyPressedButtons_player1
+.endif
         rts
 
 addExpansionPortInputAsControllerInput:
