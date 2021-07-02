@@ -653,8 +653,6 @@ gameMode_titleScreen_unused:
 
 gameMode_gameTypeMenu:
         inc initRam
-        lda menuScrollY
-        sta PPUSCROLL
         ; switch to blank charmap
         ; (stops glitching when resetting)
         lda #$02
