@@ -1524,7 +1524,19 @@ gameModeState_initGameState:
         rts
 
 initPlayfieldForTypeB:
-        lda #$C ; $0C
+        ldy #$0C
+        lda typeBModifier
+        cmp #$6
+        bmi @defaultTypeB
+        sbc #$5
+        asl
+        adc #$0c
+        tay
+@defaultTypeB:
+        tya
+; @normalStart:
+;         lda #$0C
+; @abnormalStart:
         sta generalCounter
 L87E7:  lda generalCounter
         beq L884A
@@ -1575,19 +1587,33 @@ L8824:  ldx #$17
         dec generalCounter
         bne L87E7
 L884A:
+
         ldx typeBModifier
         lda typeBBlankInitCountByHeightTable,x
         tay
         lda #$EF
 L885D:  sta playfield,y
         dey
-        cpy #$FF
+        cpy #$0
         bne L885D
+
+        ; ldx typeBModifier
+        ; lda typeBBlankInitCountByHeightTable,x
+        ; tax
+        ; lda #$EF
+; @invizLoop:
+        ; sta playfield, x
+; @emptyTile:
+        ; dex
+        ; bne @invizLoop
+
+        ; lda #$00
+        ; sta vramRow
         rts
 
-        ; 0, 3, 5, 8, 10, 12, ??
+        ; 0 3 5 8 10 12 -> 14 16 18
 typeBBlankInitCountByHeightTable:
-        .byte $C8,$AA,$96,$78,$64,$50 ; $3C,$28,$14,$0
+        .byte $C8,$AA,$96,$78,$64,$50,$3C,$28,$14
 rngTable:
         .byte $EF,$7B,$EF,$7C,$7D,$7D,$EF
         .byte $EF
