@@ -2831,14 +2831,14 @@ playState_lockTetrimino:
         sta vramRow
         ldx #$C8
         lda #BLOCK_TILES+3
-@loop:
+@invizLoop:
         ldy playfield, x
         cpy #INVISIBLE_TILE
-        bne @empty
+        bne @emptyTile
         sta playfield, x
-@empty:
+@emptyTile:
         dex
-        bne @loop
+        bne @invizLoop
         rts
 
 @notGameOver:
