@@ -1515,16 +1515,17 @@ gameModeState_initGameState:
         bne @notTypeB
         lda #$25
         sta lines
-        lda #$47
-        sta outOfDateRenderFlags
-        jsr updateAudioWaitForNmiAndResetOamStaging
-        jsr initPlayfieldForTypeB
-        jmp @typeContinue
 @notTypeB:
+
         lda #$47
         sta outOfDateRenderFlags
         jsr updateAudioWaitForNmiAndResetOamStaging
-@typeContinue:
+
+        lda practiseType
+        cmp #MODE_TYPEB
+        bne @noTypeBPlayfield
+        jsr initPlayfieldForTypeB
+@noTypeBPlayfield:
 
         ldx musicType
         lda musicSelectionTable,x
@@ -1601,7 +1602,8 @@ L885D:  sta playfield,y
         dey
         cpy #$0
         bne L885D
-initPlayfieldForTypeB_return:
+        lda #$00
+        sta vramRow
         rts
 
         ; 0 3 5 8 10 12 -> 14 16 18
@@ -3193,6 +3195,31 @@ playState_updateLinesAndStatistics:
         lda outOfDateRenderFlags
         ora #$01
         sta outOfDateRenderFlags
+
+; type-b lines decrement
+        lda practiseType
+        cmp #MODE_TYPEB
+        bne @notTypeB
+        lda completedLines
+        sta generalCounter
+        lda lines
+        sec
+        sbc generalCounter
+        sta lines
+        bpl @checkForBorrow
+        lda #$00
+        sta lines
+        jmp addHoldDownPoints
+@checkForBorrow:
+        and #$0F
+        cmp #$0A
+        bmi addHoldDownPoints
+        lda lines
+        sec
+        sbc #$06
+        sta lines
+        jmp addHoldDownPoints
+@notTypeB:
 
         ldx completedLines
 incrementLines:
