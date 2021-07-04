@@ -3119,6 +3119,17 @@ playState_checkForCompletedRows_return:
         rts
 
 playState_prepareNext:
+        ; bTypeGoalCheck
+        lda practiseType
+        cmp #MODE_TYPEB
+        bne @bTypeEnd
+        lda lines
+        bne @bTypeEnd
+        lda #$0A ; playState_checkStartGameOver
+        sta playState
+        rts
+@bTypeEnd:
+
         jsr practisePrepareNext
         inc playState
         rts
