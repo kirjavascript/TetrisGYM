@@ -28,6 +28,7 @@ drawTiles(buffer, lookup, `
 #a    T-SPINS                 d#
 #a    SEED                    d#
 #a    STACKING                d#
+#a    INVISIBLE               d#
 #a    PACE                    d#
 #a    SETUPS                  d#
 #a    FLOOR                   d#
@@ -38,7 +39,6 @@ drawTiles(buffer, lookup, `
 #a    GOOFY FOOT              d#
 #a    DEBUG MODE              d#
 #a    PAL MODE                d#
-#a                            d#
 #a                            d#
 #a                            d#
 #a                            d#

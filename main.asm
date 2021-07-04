@@ -27,19 +27,20 @@ MODE_TETRIS := 0
 MODE_TSPINS := 1
 MODE_SEED := 2
 MODE_PARITY := 3
-MODE_PACE := 4
-MODE_PRESETS := 5
-MODE_FLOOR := 6
-MODE_TAP := 7
-MODE_GARBAGE := 8
-MODE_DROUGHT := 9
-MODE_INPUT_DISPLAY := 10
-MODE_GOOFY := 11
-MODE_DEBUG := 12
-MODE_PAL := 13
+MODE_INVISIBLE := 4
+MODE_PACE := 5
+MODE_PRESETS := 6
+MODE_FLOOR := 7
+MODE_TAP := 8
+MODE_GARBAGE := 9
+MODE_DROUGHT := 10
+MODE_INPUT_DISPLAY := 11
+MODE_GOOFY := 12
+MODE_DEBUG := 13
+MODE_PAL := 14
 
-MODE_QUANTITY := 14
-MODE_GAME_QUANTITY := 10
+MODE_QUANTITY := 15
+MODE_GAME_QUANTITY := 11
 MODE_CONFIG_QUANTITY := 10
 MODE_CONFIG_OFFSET := MODE_QUANTITY - MODE_CONFIG_QUANTITY
 
@@ -54,6 +55,7 @@ INVISIBLE_TILE := $43
     .byte   "TSPINS"
     .byte   " SEED "
     .byte   "STACKN"
+    .byte   "INVZBL"
     .byte   " PACE "
     .byte   "SETUPS"
     .byte   "FLOOR "
@@ -978,8 +980,7 @@ menuYTmp := tmp2
         asl
         asl
         asl
-        ; adc #$5F
-        adc #MENU_SPRITE_Y_BASE + $21
+        adc #MENU_SPRITE_Y_BASE + (MODE_CONFIG_OFFSET * 8)
         sbc menuScrollY
         sta menuYTmp
 
