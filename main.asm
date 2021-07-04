@@ -1513,7 +1513,91 @@ gameModeState_initGameState:
         lda musicSelectionTable,x
         jsr setMusicTrack
         inc gameModeState
+        jsr initPlayfieldForTypeB
         rts
+
+initPlayfieldForTypeB:
+        lda     #$12 ; $0C
+        sta     generalCounter
+L87E7:  lda     generalCounter
+        beq     L884A
+        lda     #$14
+        sec
+        sbc     generalCounter
+        sta     generalCounter2
+        lda     #$00
+        sta     vramRow
+        lda     #$09
+        sta     generalCounter3
+L87FC:  ldx     #$17
+        ldy     #$02
+        jsr     generateNextPseudorandomNumber
+        lda     rng_seed
+        and     #$07
+        tay
+        lda     rngTable,y
+        sta     generalCounter4
+        ldx     generalCounter2
+        lda     multBy10Table,x
+        clc
+        adc     generalCounter3
+        tay
+        lda     generalCounter4
+        sta     playfield,y
+        lda     generalCounter3
+        beq     L8824
+        dec     generalCounter3
+        jmp     L87FC
+
+L8824:  ldx     #$17
+        ldy     #$02
+        jsr     generateNextPseudorandomNumber
+        lda     rng_seed
+        and     #$0F
+        cmp     #$0A
+        bpl     L8824
+        sta     generalCounter5
+        ldx     generalCounter2
+        lda     multBy10Table,x
+        clc
+        adc     generalCounter5
+        tay
+        lda     #$EF
+        sta     playfield,y
+        jsr     updateAudioWaitForNmiAndResetOamStaging
+        dec     generalCounter
+        bne     L87E7
+L884A:  ;ldx     #$C8
+L884C:  ;lda     playfield,x
+        ; sta     playfieldForSecondPlayer,x
+        ;dex
+        ;bne     L884C
+        ; ldx     player1_startHeight
+        ; ldx     #2
+        ; lda     typeBBlankInitCountByHeightTable,x
+        lda #$50
+        tay
+        lda     #$EF
+L885D:  sta     playfield,y
+        dey
+        cpy     #$FF
+        bne     L885D
+        ; ldx     player2_startHeight
+        ; lda     typeBBlankInitCountByHeightTable,x
+        ; tay
+        ; lda     #$EF
+L886D:
+        ; sta     playfieldForSecondPlayer,y
+        ; dey
+        ; cpy     #$FF
+        ; bne     L886D
+L8875:  rts
+
+typeBBlankInitCountByHeightTable:
+        .byte $C8,$AA,$96,$78,$64,$50 ; $3C,$28,$14,$0
+rngTable:
+        .byte $EF,$7B,$EF,$7C,$7D,$7D,$EF
+        .byte $EF
 
 gameModeState_updateCountersAndNonPlayerState:
         lda #$01
