@@ -45,6 +45,7 @@ MODE_CONFIG_OFFSET := MODE_QUANTITY - MODE_CONFIG_QUANTITY
 
 MENU_SPRITE_Y_BASE := $47
 BLOCK_TILES := $7B
+INVISIBLE_TILE := $43
 
 .define MENUSIZES $F, $7, $C, $20, $4, $12, $1, $1, $1, $1
 
@@ -2808,11 +2809,26 @@ L9996:  lda generalCounter
 playState_lockTetrimino:
         jsr isPositionValid
         beq @notGameOver
+; gameOver:
         lda #$02
         sta soundEffectSlot0Init
-        lda #$0A
+        lda #$0A ; playState_checkStartGameOver
         sta playState
         jsr updateAudio2
+
+        ; make invisible tiles visible
+        lda #$00
+        sta vramRow
+        ldx #$C8
+        lda #BLOCK_TILES+3
+@loop:
+        ldy playfield, x
+        cpy #INVISIBLE_TILE
+        bne @empty
+        sta playfield, x
+@empty:
+        dex
+        bne @loop
         rts
 
 @notGameOver:
@@ -2879,7 +2895,6 @@ playState_checkStartGameOver:
         lda newlyPressedButtons_player1
         cmp #$10
         bne @ret2
-@exitGame:
         lda #$00
         sta playState
         sta newlyPressedButtons_player1
