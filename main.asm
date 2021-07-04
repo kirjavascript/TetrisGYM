@@ -1509,17 +1509,26 @@ gameModeState_initGameState:
         jsr generateNextPseudorandomNumber
         jsr chooseNextTetrimino
         sta nextPiece
-        lda #$47
-        sta outOfDateRenderFlags
-        jsr updateAudioWaitForNmiAndResetOamStaging
-        ldx musicType
-        lda musicSelectionTable,x
-        jsr setMusicTrack
+
         lda practiseType
         cmp #MODE_TYPEB
         bne @notTypeB
+        lda #$25
+        sta lines
+        lda #$47
+        sta outOfDateRenderFlags
+        jsr updateAudioWaitForNmiAndResetOamStaging
         jsr initPlayfieldForTypeB
+        jmp @typeContinue
 @notTypeB:
+        lda #$47
+        sta outOfDateRenderFlags
+        jsr updateAudioWaitForNmiAndResetOamStaging
+@typeContinue:
+
+        ldx musicType
+        lda musicSelectionTable,x
+        jsr setMusicTrack
         inc gameModeState
         rts
 
@@ -1584,7 +1593,6 @@ L8824:  ldx #$17
         dec generalCounter
         bne L87E7
 L884A:
-
         ldx typeBModifier
         lda typeBBlankInitCountByHeightTable,x
         tay
@@ -1593,6 +1601,7 @@ L885D:  sta playfield,y
         dey
         cpy #$0
         bne L885D
+initPlayfieldForTypeB_return:
         rts
 
         ; 0 3 5 8 10 12 -> 14 16 18
