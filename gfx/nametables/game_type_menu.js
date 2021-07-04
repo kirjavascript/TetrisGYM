@@ -35,16 +35,16 @@ drawTiles(buffer, lookup, `
 #a    GARBAGE                 d#
 #a    DROUGHT                 d#
 #a    INPUT DISPLAY           d#
+#a    GOOFY FOOT              d#
 #a    DEBUG MODE              d#
 #a    PAL MODE                d#
-#a    MODE                    d#
-#a    MODE                    d#
-#a    MODE                    d#
-#a    MODE                    d#
-#a    MODE                    d#
-#a    MODE                    d#
-#a    MODE                    d#
-#a    MODE                    d#
+#a                            d#
+#a                            d#
+#a                            d#
+#a                            d#
+#a                            d#
+#a                            d#
+#a                            d#
 `);drawTiles(extra, lookup, `
 #a                            d#
 #a                            d#

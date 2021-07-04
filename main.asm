@@ -35,18 +35,19 @@ MODE_TAP := 7
 MODE_GARBAGE := 8
 MODE_DROUGHT := 9
 MODE_INPUT_DISPLAY := 10
-MODE_DEBUG := 11
-MODE_PAL := 12
+MODE_GOOFY := 12
+MODE_DEBUG := 12
+MODE_PAL := 13
 
-MODE_QUANTITY := 21
+MODE_QUANTITY := 14
 MODE_GAME_QUANTITY := 10
-MODE_CONFIG_QUANTITY := 9
+MODE_CONFIG_QUANTITY := 10
 MODE_CONFIG_OFFSET := MODE_QUANTITY - MODE_CONFIG_QUANTITY
 
 MENU_SPRITE_Y_BASE := $47
 BLOCK_TILES := $7B
 
-.define MENUSIZES $F, $7, $C, $20, $4, $12, $1, $1, $1
+.define MENUSIZES $F, $7, $C, $20, $4, $12, $1, $1, $1, $1
 
 .macro MODENAMES
     .byte   "TETRIS"
@@ -277,8 +278,7 @@ initMagic   := $0750                        ; Initialized to a hard-coded number
 menuRAM := $760
 menuSeedCursorIndex := menuRAM+0
 menuScrollY := menuRAM+1
-; menuScrollYTarget := menuRAM+1
-menuVars := $763
+menuVars := $762
 paceModifier := menuVars+0
 presetModifier := menuVars+1
 floorModifier := menuVars+2
@@ -286,8 +286,9 @@ tapModifier := menuVars+3
 garbageModifier := menuVars+4
 droughtModifier := menuVars+5
 inputDisplayFlag := menuVars+6
-debugFlag := menuVars+7
-palFlag := menuVars+8
+goofyFlag := menuVars+7
+debugFlag := menuVars+8
+palFlag := menuVars+9
 
 ; ... $7FF
 PPUCTRL     := $2000
@@ -4125,7 +4126,9 @@ pollController_actualRead:
         dex
         bne @readNextBit
 
-.if GOOFY
+        lda goofyFlag
+        beq @noGoofy
+
         lda newlyPressedButtons_player1
         asl
         and #$AA
@@ -4136,7 +4139,7 @@ pollController_actualRead:
         lsr
         ora tmp3
         sta newlyPressedButtons_player1
-.endif
+@noGoofy:
         rts
 
 addExpansionPortInputAsControllerInput:
