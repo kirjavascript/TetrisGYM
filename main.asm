@@ -980,7 +980,7 @@ menuYTmp := tmp2
         asl
         asl
         asl
-        adc #MENU_SPRITE_Y_BASE + (MODE_CONFIG_OFFSET * 8)
+        adc #MENU_SPRITE_Y_BASE + (MODE_CONFIG_OFFSET * 8) + 1
         sbc menuScrollY
         sta menuYTmp
 
