@@ -13,7 +13,6 @@ NO_MUSIC := 1
 ALWAYS_NEXT_BOX := 1
 AUTO_WIN := 0
 NO_SCORING := 0
-GOOFY := 0
 
 BUTTON_DOWN := $4
 BUTTON_UP := $8
@@ -35,7 +34,7 @@ MODE_TAP := 7
 MODE_GARBAGE := 8
 MODE_DROUGHT := 9
 MODE_INPUT_DISPLAY := 10
-MODE_GOOFY := 12
+MODE_GOOFY := 11
 MODE_DEBUG := 12
 MODE_PAL := 13
 
@@ -830,7 +829,7 @@ menuConfigControls:
         ; load config type from offset
         lda practiseType
         cmp #MODE_CONFIG_OFFSET
-        bmi @skipConfig
+        bmi @endConfig
         lda practiseType
         sbc #MODE_CONFIG_OFFSET
         tax
@@ -847,6 +846,7 @@ menuConfigControls:
         dec menuVars, x
         lda #$01
         sta soundEffectSlot1Init
+        jsr checkGoofy
 @skipLeftConfig:
 
         ; check if pressing right
@@ -860,8 +860,25 @@ menuConfigControls:
         inc menuVars, x
         lda #$01
         sta soundEffectSlot1Init
+        jsr checkGoofy
 @skipRightConfig:
-@skipConfig:
+@endConfig:
+        rts
+
+checkGoofy:
+        lda practiseType
+        cmp #MODE_GOOFY
+        bne @noFlip
+        lda heldButtons_player1
+        asl
+        and #$AA
+        sta tmp3
+        lda heldButtons_player1
+        and #$AA
+        lsr
+        ora tmp3
+        sta heldButtons_player1
+@noFlip:
         rts
 
 practiseTypeMenuControls:
@@ -4125,21 +4142,6 @@ pollController_actualRead:
         rol tmp2
         dex
         bne @readNextBit
-
-        lda goofyFlag
-        beq @noGoofy
-
-        lda newlyPressedButtons_player1
-        asl
-        and #$AA
-        sta tmp3
-
-        lda newlyPressedButtons_player1
-        and #$AA
-        lsr
-        ora tmp3
-        sta newlyPressedButtons_player1
-@noGoofy:
         rts
 
 addExpansionPortInputAsControllerInput:
@@ -4168,6 +4170,20 @@ pollController:
         lda newlyPressedButtons_player2
         and generalCounter3
         sta newlyPressedButtons_player2
+
+        lda goofyFlag
+        beq @noGoofy
+        lda newlyPressedButtons_player1
+        asl
+        and #$AA
+        sta tmp3
+        lda newlyPressedButtons_player1
+        and #$AA
+        lsr
+        ora tmp3
+        sta newlyPressedButtons_player1
+@noGoofy:
+
 diffOldAndNewButtons:
         ldx #$01
 @diffForPlayer:
@@ -4179,6 +4195,9 @@ diffOldAndNewButtons:
         sty heldButtons_player1,x
         dex
         bpl @diffForPlayer
+        rts
+
+flipNewlyPressed:
         rts
 
 memset_ppu_page_and_more:

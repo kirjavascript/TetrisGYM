@@ -1,11 +1,11 @@
 # Changelog
 
 ## [v4]
-- 
+- Added Goofyfoot Toggle
 
 ## [v3.1]
 - Added new setup (L/J doubletuck)
-- Added improved seeds while retaining backwards compatibility
+- Improved seeds while retaining backwards compatibility
 - Improved region detection
 
 ## [v3]
