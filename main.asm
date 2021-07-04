@@ -2445,6 +2445,15 @@ updateLineClearingAnimation:
         lda frameCounter
         and #$03
         bne @ret
+        ; invisible mode stuff
+        ldy #$FF
+        lda practiseType
+        cmp #MODE_INVISIBLE
+        bne @notInvisible
+        ldy #BLOCK_TILES
+@notInvisible:
+        sty tmp3
+
         lda #$00
         sta generalCounter3
 @whileCounter3LessThan4:
@@ -2469,7 +2478,7 @@ updateLineClearingAnimation:
         clc
         adc generalCounter
         sta PPUADDR
-        lda #$FF
+        lda tmp3 ; #$FF
         sta PPUDATA
         lda generalCounter2
         sta PPUADDR
@@ -2478,7 +2487,7 @@ updateLineClearingAnimation:
         clc
         adc generalCounter
         sta PPUADDR
-        lda #$FF
+        lda tmp3 ; #$FF
         sta PPUDATA
 @nextRow:
         inc generalCounter3
@@ -2871,6 +2880,12 @@ playState_lockTetrimino:
         inx
         lda orientationTable,x
         sta generalCounter5
+        lda practiseType
+        cmp #MODE_INVISIBLE
+        bne @notInvisible
+        lda #INVISIBLE_TILE
+        sta generalCounter5
+@notInvisible:
         inx
         lda orientationTable,x
         clc

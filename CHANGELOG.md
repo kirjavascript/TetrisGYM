@@ -1,7 +1,8 @@
 # Changelog
 
 ## [v4]
-- Added Goofyfoot Toggle
+- Invisible Trainer
+- Goofyfoot Toggle
 
 ## [v3.1]
 - Added new setup (L/J doubletuck)
