@@ -31,6 +31,7 @@ drawTiles(buffer, lookup, `
 #a    INVISIBLE               d#
 #a    PACE                    d#
 #a    SETUPS                  d#
+#a    TYPE-B                  d#
 #a    FLOOR                   d#
 #a    (QUICK)TAP              d#
 #a    GARBAGE                 d#
@@ -39,7 +40,6 @@ drawTiles(buffer, lookup, `
 #a    GOOFY FOOT              d#
 #a    DEBUG MODE              d#
 #a    PAL MODE                d#
-#a                            d#
 #a                            d#
 #a                            d#
 #a                            d#
@@ -95,7 +95,7 @@ drawAttrs(buffer, [`
     2222222222222222
     2222222222222222
     2222222222222222
-    2333222222222222
+    2332222222222222
     2222222222222222
     2222222222222222
     2222222222222222

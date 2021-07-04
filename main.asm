@@ -30,25 +30,26 @@ MODE_PARITY := 3
 MODE_INVISIBLE := 4
 MODE_PACE := 5
 MODE_PRESETS := 6
-MODE_FLOOR := 7
-MODE_TAP := 8
-MODE_GARBAGE := 9
-MODE_DROUGHT := 10
-MODE_INPUT_DISPLAY := 11
-MODE_GOOFY := 12
-MODE_DEBUG := 13
-MODE_PAL := 14
+MODE_TYPEB := 7
+MODE_FLOOR := 8
+MODE_TAP := 9
+MODE_GARBAGE := 10
+MODE_DROUGHT := 11
+MODE_INPUT_DISPLAY := 12
+MODE_GOOFY := 13
+MODE_DEBUG := 14
+MODE_PAL := 15
 
-MODE_QUANTITY := 15
-MODE_GAME_QUANTITY := 11
-MODE_CONFIG_QUANTITY := 10
+MODE_QUANTITY := 16
+MODE_GAME_QUANTITY := 12
+MODE_CONFIG_QUANTITY := 11
 MODE_CONFIG_OFFSET := MODE_QUANTITY - MODE_CONFIG_QUANTITY
 
 MENU_SPRITE_Y_BASE := $47
 BLOCK_TILES := $7B
 INVISIBLE_TILE := $43
 
-.define MENUSIZES $F, $7, $C, $20, $4, $12, $1, $1, $1, $1
+.define MENUSIZES $F, $7, $8, $C, $20, $4, $12, $1, $1, $1, $1
 
 .macro MODENAMES
     .byte   "TETRIS"
@@ -283,14 +284,15 @@ menuScrollY := menuRAM+1
 menuVars := $762
 paceModifier := menuVars+0
 presetModifier := menuVars+1
-floorModifier := menuVars+2
-tapModifier := menuVars+3
-garbageModifier := menuVars+4
-droughtModifier := menuVars+5
-inputDisplayFlag := menuVars+6
-goofyFlag := menuVars+7
-debugFlag := menuVars+8
-palFlag := menuVars+9
+typeBModifier := menuVars+2
+floorModifier := menuVars+3
+tapModifier := menuVars+4
+garbageModifier := menuVars+5
+droughtModifier := menuVars+6
+inputDisplayFlag := menuVars+7
+goofyFlag := menuVars+8
+debugFlag := menuVars+9
+palFlag := menuVars+10
 
 ; ... $7FF
 PPUCTRL     := $2000
@@ -1513,11 +1515,11 @@ gameModeState_initGameState:
         lda musicSelectionTable,x
         jsr setMusicTrack
         inc gameModeState
-        jsr initPlayfieldForTypeB
+        ; jsr initPlayfieldForTypeB
         rts
 
 initPlayfieldForTypeB:
-        lda     #$12 ; $0C
+        lda     #$C ; $0C
         sta     generalCounter
 L87E7:  lda     generalCounter
         beq     L884A
@@ -1575,7 +1577,7 @@ L884C:  ;lda     playfield,x
         ; ldx     player1_startHeight
         ; ldx     #2
         ; lda     typeBBlankInitCountByHeightTable,x
-        lda #$50
+        lda #$AA
         tay
         lda     #$EF
 L885D:  sta     playfield,y
