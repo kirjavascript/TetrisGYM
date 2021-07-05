@@ -31,7 +31,7 @@ drawTiles(buffer, lookup, `
 #a    INVISIBLE               d#
 #a    PACE                    d#
 #a    SETUPS                  d#
-#a    TYPE-B                  d#
+#a    B-TYPE                  d#
 #a    FLOOR                   d#
 #a    (QUICK)TAP              d#
 #a    GARBAGE                 d#

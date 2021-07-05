@@ -59,7 +59,7 @@ INVISIBLE_TILE := $43
     .byte   "INVZBL"
     .byte   " PACE "
     .byte   "SETUPS"
-    .byte   "TYPE-B"
+    .byte   "B-TYPE"
     .byte   "FLOOR "
     .byte   "QCKTAP"
     .byte   "GARBGE"
