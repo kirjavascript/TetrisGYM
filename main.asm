@@ -3127,12 +3127,30 @@ playState_prepareNext:
         bne @bTypeEnd
         lda #$0A ; playState_checkStartGameOver
         sta playState
+
+        ldx #$5C
+        ldy #$0
+@copySuccessGraphic:
+        lda typebSuccessGraphic,y
+        cmp #$80
+        beq @graphicCopied
+        sta playfield,x
+        inx
+        iny
+        jmp @copySuccessGraphic
+@graphicCopied:
+        lda #$00
+        sta vramRow
+
         rts
 @bTypeEnd:
 
         jsr practisePrepareNext
         inc playState
         rts
+
+typebSuccessGraphic:
+        .byte   $17,$12,$0C,$0E,$FF,$28,$80
 
 playState_receiveGarbage:
         ldy pendingGarbage

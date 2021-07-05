@@ -2,6 +2,7 @@
 
 ## [v4]
 - Invisible Trainer
+- Type-B Trainer
 - Goofyfoot Toggle
 
 ## [v3.1]
