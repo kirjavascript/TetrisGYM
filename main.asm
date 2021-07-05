@@ -2375,19 +2375,43 @@ render_mode_play_and_demo:
         lda outOfDateRenderFlags
         and #$02
         beq @renderScore
+
         ldx levelNumber
         lda levelDisplayTable,x
         sta generalCounter
+
+        lda practiseType
+        cmp #MODE_TYPEB
+        beq @renderLevelTypeB
+
         lda #$22
         sta PPUADDR
         lda #$BA
         sta PPUADDR
         lda generalCounter
         jsr twoDigsToPPU
+        jmp @renderLevelEnd
+
+@renderLevelTypeB:
+        lda #$22
+        sta PPUADDR
+        lda #$B9
+        sta PPUADDR
+        lda generalCounter
+        jsr twoDigsToPPU
+        lda #$24
+        sta PPUDATA
+        lda typeBModifier
+        sta PPUDATA
+        jmp @renderLevelEnd
+
+
+@renderLevelEnd:
         jsr updatePaletteForLevel
         lda outOfDateRenderFlags
         and #$FD
         sta outOfDateRenderFlags
+
 @renderScore:
         lda outOfDateRenderFlags
         and #$04
