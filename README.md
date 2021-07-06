@@ -222,6 +222,5 @@ TetrisGYM fixes some well known bugs in the original game;
 
 ## Resources
 
-base disassembly: [https://github.com/CelestialAmber/TetrisNESDisasm](https://github.com/CelestialAmber/TetrisNESDisasm)  
-disassembly information: [https://github.com/ejona86/taus](https://github.com/ejona86/taus)
-
+Tools and references: [https://github.com/ejona86/taus](https://github.com/ejona86/taus)  
+Disassembly, based on work from TAUS: [https://github.com/CelestialAmber/TetrisNESDisasm](https://github.com/CelestialAmber/TetrisNESDisasm)  

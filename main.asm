@@ -3151,7 +3151,6 @@ playState_prepareNext:
         bne @bTypeEnd
         lda #$0A ; playState_checkStartGameOver
         sta playState
-
         ldx #$5C
         ldy #$0
 @copySuccessGraphic:
@@ -3375,7 +3374,8 @@ L9C37:  lda completedLines
         adc #$60
         sta score
         inc score+1
-L9C4E:  inx
+L9C4E:
+        inx
         lda pointsTable,x
         clc
         adc score+1
@@ -3387,7 +3387,8 @@ L9C4E:  inx
         clc
         adc #$06
         sta score+1
-L9C64:  lda score+1
+L9C64:
+        lda score+1
         and #$F0
         cmp #$A0
         bcc L9C75
@@ -3396,14 +3397,15 @@ L9C64:  lda score+1
         adc #$60
         sta score+1
         inc score+2
-L9C75:  lda score+2
-        and #$0F
-        cmp #$0A
-        bcc L9C84
-        lda score+2
-        clc
-        adc #$06
-        sta score+2
+L9C75:
+        ; lda score+2
+        ; and #$0F
+        ; cmp #$0A
+        ; bcc L9C84
+        ; lda score+2
+        ; clc
+        ; adc #$06
+        ; sta score+2
 L9C84:
         ; score limit used to live here
         dec generalCounter
