@@ -11,7 +11,7 @@ PRACTISE_MODE := 1
 DEBUG_MODE := 1
 NO_MUSIC := 1
 ALWAYS_NEXT_BOX := 1
-AUTO_WIN := 0
+AUTO_WIN := 1
 NO_SCORING := 0
 
 BUTTON_DOWN := $4
@@ -3151,6 +3151,23 @@ playState_prepareNext:
         bne @bTypeEnd
         lda #$0A ; playState_checkStartGameOver
         sta playState
+
+        ; ldx levelNumber
+        ; lda levelDisplayTable, x
+        ; and #$F
+
+        ; ASL  A
+        ; ADC  #$80
+        ; ROL  A
+        ; ASL  A
+        ; ADC  #$80
+        ; ROL  A
+
+
+
+        ; +2 +1
+        ; put score in top for now
+
         ldx #$5C
         ldy #$0
 @copySuccessGraphic:
@@ -3312,8 +3329,8 @@ L9BC7:  lda lines
         bpl L9BFB
 
         ; clamp levelNumber
-        cmp #$EF
-        beq L9BFB
+        ; cmp #$EF
+        ; beq L9BFB
 
         inc levelNumber
         lda #$06
