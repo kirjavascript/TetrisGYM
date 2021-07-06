@@ -3415,14 +3415,14 @@ L9C64:
         sta score+1
         inc score+2
 L9C75:
-        ; lda score+2
-        ; and #$0F
-        ; cmp #$0A
-        ; bcc L9C84
-        ; lda score+2
-        ; clc
-        ; adc #$06
-        ; sta score+2
+        lda score+2
+        and #$0F
+        cmp #$0A
+        bcc L9C84
+        lda score+2
+        clc
+        adc #$06
+        sta score+2
 L9C84:
         ; score limit used to live here
         dec generalCounter
