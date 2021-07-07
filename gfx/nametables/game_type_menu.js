@@ -34,14 +34,14 @@ drawTiles(buffer, lookup, `
 #a    B-TYPE                  d#
 #a    FLOOR                   d#
 #a    (QUICK)TAP              d#
+#a    MARATHON                d#
+#a    TRANSITION              d#
 #a    GARBAGE                 d#
 #a    DROUGHT                 d#
 #a    INPUT DISPLAY           d#
 #a    GOOFY FOOT              d#
 #a    DEBUG MODE              d#
 #a    PAL MODE                d#
-#a                            d#
-#a                            d#
 #a                            d#
 #a                            d#
 #a                            d#
