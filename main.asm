@@ -2884,7 +2884,7 @@ pickTetriminoDrought:
         lda spawnID ; restore A
         cmp #$12
         bne @droughtDone
-        lda spawnCount
+        lda rng_seed+1
         and #$F
         adc #1 ; always adds 1 so code continues as normal if droughtModifier is 0
         cmp droughtModifier
