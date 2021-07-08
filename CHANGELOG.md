@@ -4,6 +4,7 @@
 - Invisible Trainer
 - Type-B Trainer
 - Goofyfoot Toggle
+- Improved drought logic
 
 ## [v3.1]
 - Added new setup (L/J doubletuck)

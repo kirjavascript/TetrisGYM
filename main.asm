@@ -3152,21 +3152,29 @@ playState_prepareNext:
         lda #$0A ; playState_checkStartGameOver
         sta playState
 
-        ; ldx levelNumber
-        ; lda levelDisplayTable, x
-        ; and #$F
+        ; patch levelNumber with score multiplier
+        ldx levelNumber
+        stx tmp3 ; and save a copy
+        lda levelDisplayTable, x
+        and #$F
+        clc
+        adc typeBModifier
+        sta levelNumber
+        dec levelNumber
 
-        ; ASL  A
-        ; ADC  #$80
-        ; ROL  A
-        ; ASL  A
-        ; ADC  #$80
-        ; ROL  A
+        ; todo: fix level 0
+        ; todo: vblank sleep
+        ; todo: sound effects
 
+        ; patch some stuff
+        lda #$5
+        sta completedLines
+        jsr addLineClearPoints
+        dec playState
 
-
-        ; +2 +1
-        ; put score in top for now
+        ; restore level
+        lda tmp3
+        sta levelNumber
 
         ldx #$5C
         ldy #$0
@@ -3437,8 +3445,8 @@ addLineClearPointsDone:
         rts
 
 pointsTable:
-        .word   $0000,$0040,$0100,$0300
-        .word   $1200
+        .word   $0000,$0040,$0100,$0300,$1200
+        .word   $1000 ; used in b-type score
 updatePlayfield:
         ldx tetriminoY
         dex
