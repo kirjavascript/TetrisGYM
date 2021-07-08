@@ -1513,7 +1513,7 @@ gameModeState_initGameState:
         lda practiseType
         cmp #MODE_TYPEB
         bne @notTypeB
-        lda #$25
+        lda #$0
         sta lines
 @notTypeB:
 
@@ -3160,9 +3160,9 @@ playState_prepareNext:
         clc
         adc typeBModifier
         sta levelNumber
+        beq @typeBScoreDone
         dec levelNumber
 
-        ; todo: fix level 0
         ; todo: vblank sleep
         ; todo: sound effects
 
@@ -3173,6 +3173,7 @@ playState_prepareNext:
         dec playState
 
         ; restore level
+@typeBScoreDone:
         lda tmp3
         sta levelNumber
 
