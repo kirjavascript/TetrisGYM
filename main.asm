@@ -1513,7 +1513,7 @@ gameModeState_initGameState:
         lda practiseType
         cmp #MODE_TYPEB
         bne @notTypeB
-        lda #$3
+        lda #$25
         sta lines
 @notTypeB:
 
