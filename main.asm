@@ -1513,7 +1513,7 @@ gameModeState_initGameState:
         lda practiseType
         cmp #MODE_TYPEB
         bne @notTypeB
-        lda #$A
+        lda #$3
         sta lines
 @notTypeB:
 
@@ -3149,37 +3149,8 @@ playState_prepareNext:
         bne @bTypeEnd
         lda lines
         bne @bTypeEnd
-        lda #$0A ; playState_checkStartGameOver
-        sta playState
 
-        ; play sfx
-        lda #$4
-        sta soundEffectSlot1Init
-
-        ; patch levelNumber with score multiplier
-        ldx levelNumber
-        stx tmp3 ; and save a copy
-        lda levelDisplayTable, x
-        and #$F
-        clc
-        adc typeBModifier
-        sta levelNumber
-        beq @typeBScoreDone
-        dec levelNumber
-
-        ; todo: vblank sleep
-
-        ; patch some stuff
-        lda #$5
-        sta completedLines
-        jsr addLineClearPoints
-        dec playState
-
-        ; restore level
-@typeBScoreDone:
-        lda tmp3
-        sta levelNumber
-
+        ; copy success graphic
         ldx #$5C
         ldy #$0
 @copySuccessGraphic:
@@ -3194,11 +3165,49 @@ playState_prepareNext:
         lda #$00
         sta vramRow
 
+        lda #$40
+        jsr sleep_for_a_vblanks
+        lda #$0A ; playState_checkStartGameOver
+        sta playState
+
+        ; play sfx
+        lda #$6
+        sta soundEffectSlot1Init
+
+        ; patch levelNumber with score multiplier
+        ldx levelNumber
+        stx tmp3 ; and save a copy
+        lda levelDisplayTable, x
+        and #$F
+        clc
+        adc typeBModifier
+        sta levelNumber
+        beq @typeBScoreDone
+        dec levelNumber
+
+        ; patch some stuff
+        lda #$5
+        sta completedLines
+        jsr addLineClearPoints
+        dec playState
+
+        ; restore level
+@typeBScoreDone:
+        lda tmp3
+        sta levelNumber
+
         rts
 @bTypeEnd:
 
         jsr practisePrepareNext
         inc playState
+        rts
+
+sleep_for_a_vblanks:
+        sta     sleepCounter
+@loop:  jsr     updateAudioWaitForNmiAndResetOamStaging
+        lda     sleepCounter
+        bne     @loop
         rts
 
 typebSuccessGraphic:
@@ -5705,6 +5714,7 @@ unsigned_div24:
         dex
 	bne @divloop
 	rts
+
 
 ; End of "PRG_chunk1" segment
 .code
