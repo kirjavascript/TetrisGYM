@@ -1513,7 +1513,7 @@ gameModeState_initGameState:
         lda practiseType
         cmp #MODE_TYPEB
         bne @notTypeB
-        lda #$0
+        lda #$A
         sta lines
 @notTypeB:
 
@@ -3152,6 +3152,10 @@ playState_prepareNext:
         lda #$0A ; playState_checkStartGameOver
         sta playState
 
+        ; play sfx
+        lda #$4
+        sta soundEffectSlot1Init
+
         ; patch levelNumber with score multiplier
         ldx levelNumber
         stx tmp3 ; and save a copy
@@ -3164,7 +3168,6 @@ playState_prepareNext:
         dec levelNumber
 
         ; todo: vblank sleep
-        ; todo: sound effects
 
         ; patch some stuff
         lda #$5
