@@ -7381,6 +7381,7 @@ advanceGameTSpins:
         sta playState
         lda #0
         sta tspinX
+        sta vramRow
         inc score
 
         lda #$20
