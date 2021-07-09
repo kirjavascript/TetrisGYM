@@ -7368,7 +7368,6 @@ advanceGameTSpins:
         lda statsByType
         sta tspinQuantity
 @qtyEnd:
-
         ; reset score if tspinQuantity doesnt match
         lda score
         bne @scrub
@@ -7380,10 +7379,6 @@ advanceGameTSpins:
 @scrub:
         lda tspinQuantity
         beq @continue
-        ; lda tetriminoY
-        ; cmp #5
-        ; bmi @continue
-        ; lda tspinQuantity
         cmp statsByType
         beq @continue
 
@@ -7426,8 +7421,9 @@ advanceGameTSpins_actual:
         jsr addLineClearPoints
         dec playState
 
-        ; TODO: copy score to top
+        inc score
 
+        ; TODO: copy score to top
         lda #$20
         sta spawnDelay
         lda #$EF ; magic number in stageSpriteForCurrentPiece
