@@ -567,12 +567,7 @@ gameModeState_updatePlayer1:
         jsr practiseGameHUD
         jsr branchOnPlayStatePlayer1
 
-        lda tetriminoX
-        cmp #$EF ; set in tspin code
-        beq @skip
         jsr stageSpriteForCurrentPiece
-@skip:
-
         jsr stageSpriteForNextPiece
         inc gameModeState
         rts
@@ -1513,7 +1508,7 @@ gameModeState_initGameState:
         lda practiseType
         cmp #MODE_TYPEB
         bne @notTypeB
-        lda #$1
+        lda #$25
         sta lines
 @notTypeB:
 
@@ -1827,6 +1822,8 @@ shift_tetrimino:
 
 stageSpriteForCurrentPiece:
         lda tetriminoX
+        cmp #$EF ; set in tspin code
+        beq stageSpriteForCurrentPiece_return
         asl a
         asl a
         asl a
@@ -1898,6 +1895,7 @@ L8A93:  inc oamStagingLength
         inx
         dec generalCounter2
         bne L8A4B
+stageSpriteForCurrentPiece_return:
         rts
 
 orientationTable:
@@ -3170,7 +3168,7 @@ playState_prepareNext:
         sta soundEffectSlot1Init
 
         lda #$30
-        jsr sleep_for_a_vblanks
+        jsr sleep
         lda #$0A ; playState_checkStartGameOver
         sta playState
 
@@ -3203,7 +3201,7 @@ playState_prepareNext:
         inc playState
         rts
 
-sleep_for_a_vblanks:
+sleep:
         sta     sleepCounter
 @loop:  jsr     updateAudioWaitForNmiAndResetOamStaging
         lda     sleepCounter
@@ -3448,10 +3446,10 @@ L9C84:
         ; score limit used to live here
         dec generalCounter
         bne L9C37
-addLineClearPointsDone:
         lda outOfDateRenderFlags
         ora #$04
         sta outOfDateRenderFlags
+addLineClearPointsDone:
         lda #$00
         sta completedLines
         inc playState
@@ -7366,30 +7364,38 @@ advanceGameTSpins:
         lda #8
         sbc tspinX
         cmp tetriminoX
-        bne @notFinished
+        bne @notInPosition
         lda #18
         sbc tspinY
         cmp tetriminoY
-        bne @notFinished
+        bne @notInPosition
         ; check the orientation
         lda currentPiece
         cmp #2
-        bne @notFinished
+        bne @notSuccessful
 
         ; set successful tspin vars
         lda #$3
         sta playState
         lda #0
         sta tspinX
-        sta vramRow
-        inc score
+        sta vramRow ; shorter to do it here than in rendering
+
+        ; add score
+        lda #$2
+        sta completedLines
+        jsr addLineClearPoints
+        dec playState
 
         lda #$20
         sta spawnDelay
         lda #$EF ; magic number in stageSpriteForCurrentPiece
         sta tetriminoX
 
-@notFinished:
+
+@notSuccessful:
+
+@notInPosition:
         ; check if a tspin is setup
         lda tspinX
         cmp #0

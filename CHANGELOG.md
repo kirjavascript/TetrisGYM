@@ -1,10 +1,13 @@
 # Changelog
 
 ## [v4]
+- B-Type Trainer (height 0-8)
 - Invisible Trainer
-- Type-B Trainer
 - Goofyfoot Toggle
 - Improved drought logic
+- Improved T-Spin Trainer
+    - Fixed timing/rendering glitches
+    - Fixed scoring
 
 ## [v3.1]
 - Added new setup (L/J doubletuck)
