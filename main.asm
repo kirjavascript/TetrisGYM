@@ -204,6 +204,7 @@ dasValueLow := $603
 tspinX := $604
 tspinY := $605
 tspinType := $606
+tspinQuantity := $60E ; reusing presetIndex
 parityIndex := $607
 parityCount := $608
 parityColor := $609
@@ -211,7 +212,7 @@ saveStateDirty := $60A
 saveStateSlot := $60B
 saveStateSpriteType := $60C
 saveStateSpriteDelay := $60D
-presetIndex := $60E
+presetIndex := $60E ; can be mangled in other modes
 pausedOutOfDateRenderFlags := $60F ; 0 - statistics 1 - saveslot
 debugLevelEdit := $610
 debugNextCounter := $611
@@ -1468,6 +1469,7 @@ gameModeState_initGameState:
         sta saveStateSpriteDelay
         sta saveStateDirty
         sta completedLines ; reset during tetris bugfix
+        sta presetIndex ; actually for tspinQuantity
 
         ; OEM stuff
         sta tetriminoY
@@ -7247,19 +7249,16 @@ practiseAdvanceGame:
         bne @skipTSpins
         jsr advanceGameTSpins
 @skipTSpins:
-
         lda practiseType
         cmp #MODE_PRESETS
         bne @skipPresets
         jsr advanceGamePreset
 @skipPresets:
-
         lda practiseType
         cmp #MODE_FLOOR
         bne @skipFloor
         jsr advanceGameFloor
 @skipFloor:
-
         lda practiseType
         cmp #MODE_TAP
         bne @skipTap
@@ -7360,15 +7359,55 @@ advanceGamePreset:
 
 
 advanceGameTSpins:
+        ; track the tspin quantity on the first tspin attempt
+        lda tspinQuantity
+        bne @qtyEnd
+        lda tetriminoX
+        cmp #$EF
+        beq @qtyEnd
+        lda statsByType
+        sta tspinQuantity
+@qtyEnd:
+
+        ; reset score if tspinQuantity doesnt match
+        lda score
+        bne @scrub
+        lda score+1
+        bne @scrub
+        lda score+2
+        bne @scrub
+        jmp @continue
+@scrub:
+        lda tspinQuantity
+        beq @continue
+        ; lda tetriminoY
+        ; cmp #5
+        ; bmi @continue
+        ; lda tspinQuantity
+        cmp statsByType
+        beq @continue
+
+        ; reset score
+        lda #0
+        sta score
+        sta score+1
+        sta score+2
+
+        lda outOfDateRenderFlags
+        ora #$04
+        sta outOfDateRenderFlags
+@continue:
+
+advanceGameTSpins_actual:
         ; see if the sprite has reached the right position
         lda #8
         sbc tspinX
         cmp tetriminoX
-        bne @notInPosition
+        bne @notSuccessful
         lda #18
         sbc tspinY
         cmp tetriminoY
-        bne @notInPosition
+        bne @notSuccessful
         ; check the orientation
         lda currentPiece
         cmp #2
@@ -7387,15 +7426,14 @@ advanceGameTSpins:
         jsr addLineClearPoints
         dec playState
 
+        ; TODO: copy score to top
+
         lda #$20
         sta spawnDelay
         lda #$EF ; magic number in stageSpriteForCurrentPiece
         sta tetriminoX
 
-
 @notSuccessful:
-
-@notInPosition:
         ; check if a tspin is setup
         lda tspinX
         cmp #0
@@ -7422,6 +7460,9 @@ generateNewTSpin:
         txa
         and #1
         sta tspinType
+
+        lda #0
+        sta tspinQuantity
 
 renderTSpin:
         jsr clearPlayfield
