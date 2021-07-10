@@ -6,8 +6,8 @@
 - Goofyfoot Toggle
 - Improved drought logic
 - Improved T-Spin Trainer
-    - Added scoring
     - Fixed timing/rendering glitches
+    - Added still broken, but better scoring
 
 ## [v3.1]
 - Added new setup (L/J doubletuck)
