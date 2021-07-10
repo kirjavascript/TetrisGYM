@@ -980,6 +980,7 @@ renderMenuVars:
 @cursorFinished:
 
 menuCounter := tmp1
+menuRAMCounter := tmp3
 menuYTmp := tmp2
 
         ; render seed
@@ -998,6 +999,7 @@ menuYTmp := tmp2
         ; YTAX
         lda #0
         sta menuCounter
+        sta menuRAMCounter
 @loop:
         lda menuCounter
         asl
@@ -1007,10 +1009,16 @@ menuYTmp := tmp2
         sbc menuScrollY
         sta menuYTmp
 
+        ldy menuRAMCounter ; gap support
+
         ; handle boolean
         lda menuCounter
-        tay
-        lda menuConfigSizeLookup, y
+        tax ; used to get loaded into Y
+        lda menuConfigSizeLookup, x
+
+        beq @loopNext ; gap support
+        inc menuRAMCounter ; only increment RAM when config size isnt zero
+
         cmp #1
         bne @notBool
         jsr @renderBool
