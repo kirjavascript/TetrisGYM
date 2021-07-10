@@ -3359,6 +3359,10 @@ L9BC7:  lda lines
         and #$0F
         bne L9BFB
 
+        lda practiseType
+        cmp #MODE_TRANSITION
+        beq @nextLevel
+
         lda lines+1
         sta generalCounter2
         lda lines
@@ -3379,6 +3383,7 @@ L9BC7:  lda lines
         ; cmp #$EF
         ; beq L9BFB
 
+@nextLevel:
         inc levelNumber
         lda #$06
         sta soundEffectSlot1Init
