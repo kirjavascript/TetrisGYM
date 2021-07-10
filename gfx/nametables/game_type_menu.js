@@ -28,19 +28,19 @@ drawTiles(buffer, lookup, `
 #a    T-SPINS                 d#
 #a    SEED                    d#
 #a    STACKING                d#
-#a    INVISIBLE               d#
 #a    PACE                    d#
 #a    SETUPS                  d#
 #a    B-TYPE                  d#
 #a    FLOOR                   d#
 #a    (QUICK)TAP              d#
+#a    INVISIBLE               d#
+#a    TRANSITION              d#
 #a    GARBAGE                 d#
 #a    DROUGHT                 d#
 #a    INPUT DISPLAY           d#
 #a    GOOFY FOOT              d#
 #a    DEBUG MODE              d#
 #a    PAL MODE                d#
-#a                            d#
 #a                            d#
 #a                            d#
 #a                            d#

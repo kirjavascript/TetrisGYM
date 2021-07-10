@@ -27,22 +27,23 @@ MODE_TETRIS := 0
 MODE_TSPINS := 1
 MODE_SEED := 2
 MODE_PARITY := 3
-MODE_INVISIBLE := 4
-MODE_PACE := 5
-MODE_PRESETS := 6
-MODE_TYPEB := 7
-MODE_FLOOR := 8
-MODE_TAP := 9
-MODE_GARBAGE := 10
-MODE_DROUGHT := 11
-MODE_INPUT_DISPLAY := 12
-MODE_GOOFY := 13
-MODE_DEBUG := 14
-MODE_PAL := 15
+MODE_PACE := 4
+MODE_PRESETS := 5
+MODE_TYPEB := 6
+MODE_FLOOR := 7
+MODE_TAP := 8
+MODE_INVISIBLE := 9
+MODE_TRANSITION := 10
+MODE_GARBAGE := 11
+MODE_DROUGHT := 12
+MODE_INPUT_DISPLAY := 13
+MODE_GOOFY := 14
+MODE_DEBUG := 15
+MODE_PAL := 16
 
-MODE_QUANTITY := 16
-MODE_GAME_QUANTITY := 12
-MODE_CONFIG_QUANTITY := 11
+MODE_QUANTITY := 17
+MODE_GAME_QUANTITY := 13
+MODE_CONFIG_QUANTITY := 13
 MODE_CONFIG_OFFSET := MODE_QUANTITY - MODE_CONFIG_QUANTITY
 
 MENU_SPRITE_Y_BASE := $47
@@ -50,21 +51,22 @@ BLOCK_TILES := $7B
 INVISIBLE_TILE := $43
 
 ; menuConfigSizeLookup
-.define MENUSIZES $F, $7, $8, $C, $20, $4, $12, $1, $1, $1, $1
+.define MENUSIZES $F, $7, $8, $C, $20, $0, $0, $4, $12, $1, $1, $1, $1
 
 .macro MODENAMES
     .byte   "TETRIS"
     .byte   "TSPINS"
     .byte   " SEED "
     .byte   "STACKN"
-    .byte   "INVZBL"
     .byte   " PACE "
     .byte   "SETUPS"
     .byte   "B-TYPE"
     .byte   "FLOOR "
     .byte   "QCKTAP"
+    .byte   "INVZBL"
+    .byte   "TRNSTN"
     .byte   "GARBGE"
-    .byte   "DRUGHT"
+    .byte   "LOBARS"
 .endmacro
 
         .setcpu "6502"
@@ -619,8 +621,8 @@ gameMode_legalScreen: ; boot
         sta practiseType
         sta menuSeedCursorIndex
 
-        ; set start level to 18
-        lda #$08
+        ; set start level to 8/18
+        lda #$8
         sta startLevel
 
         ; default pace to A
