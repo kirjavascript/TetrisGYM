@@ -623,14 +623,6 @@ gameMode_legalScreen: ; boot
         lda #$08
         sta startLevel
 
-        ; zero out config memory (possibly unnecessary)
-        lda #0
-        ldx #MODE_CONFIG_QUANTITY
-@loop:
-        sta menuVars, x
-        dex
-        bpl @loop
-
         ; default pace to A
         lda #$A
         sta paceModifier
