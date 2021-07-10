@@ -49,6 +49,7 @@ MENU_SPRITE_Y_BASE := $47
 BLOCK_TILES := $7B
 INVISIBLE_TILE := $43
 
+; menuConfigSizeLookup
 .define MENUSIZES $F, $7, $8, $C, $20, $4, $12, $1, $1, $1, $1
 
 .macro MODENAMES
@@ -831,10 +832,33 @@ menuConfigControls:
         ; load config type from offset
         lda practiseType
         cmp #MODE_CONFIG_OFFSET
-        bmi @endConfig
+        bmi @configEnd
         lda practiseType
         sbc #MODE_CONFIG_OFFSET
-        tax
+        sta tmp3
+
+        ; account for 'gaps' in config items of size zero
+        ; previously the offset was just set on X directly
+
+        ldx #0 ; memory offset we want
+        ldy #0 ; cursor
+@searchByte:
+        cpy tmp3
+        bne @notYet
+        lda menuConfigSizeLookup, y
+        beq @configEnd ; no config here
+        jmp @searchEnd
+@notYet:
+        lda menuConfigSizeLookup, y
+        beq @noMem
+        inx
+@noMem:
+        iny
+        jmp @searchByte
+@searchEnd:
+
+        ; actual offset now in Y
+        ; RAM offset now in X
 
         ; check if pressing left
         lda newlyPressedButtons_player1
@@ -857,14 +881,14 @@ menuConfigControls:
         bne @skipRightConfig
         ; check if within the offset
         lda menuVars, x
-        cmp menuConfigSizeLookup, x
+        cmp menuConfigSizeLookup, y
         bpl @skipRightConfig
         inc menuVars, x
         lda #$01
         sta soundEffectSlot1Init
         jsr checkGoofy
 @skipRightConfig:
-@endConfig:
+@configEnd:
         rts
 
 checkGoofy:
@@ -7420,8 +7444,6 @@ advanceGameTSpins_actual:
         sta completedLines
         jsr addLineClearPoints
         dec playState
-
-        inc score
 
         ; TODO: copy score to top
         lda #$20
