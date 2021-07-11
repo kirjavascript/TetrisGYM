@@ -52,7 +52,7 @@ BLOCK_TILES := $7B
 INVISIBLE_TILE := $43
 
 ; menuConfigSizeLookup
-.define MENUSIZES $F, $7, $8, $C, $20, $0, $0, $0, $4, $12, $1, $1, $1, $1
+.define MENUSIZES $F, $7, $8, $C, $20, $F, $0, $0, $4, $12, $1, $1, $1, $1
 
 .macro MODENAMES
     .byte   "TETRIS"
@@ -295,12 +295,13 @@ presetModifier := menuVars+1
 typeBModifier := menuVars+2
 floorModifier := menuVars+3
 tapModifier := menuVars+4
-garbageModifier := menuVars+5
-droughtModifier := menuVars+6
-inputDisplayFlag := menuVars+7
-goofyFlag := menuVars+8
-debugFlag := menuVars+9
-palFlag := menuVars+10
+transitionModifier := menuVars+5
+garbageModifier := menuVars+6
+droughtModifier := menuVars+7
+inputDisplayFlag := menuVars+8
+goofyFlag := menuVars+9
+debugFlag := menuVars+10
+palFlag := menuVars+11
 
 ; ... $7FF
 PPUCTRL     := $2000
@@ -1559,6 +1560,12 @@ gameModeState_initGameState:
         sta nextPiece
 
         lda practiseType
+        cmp #MODE_TRANSITION
+        bne @notTransition
+        jsr transitionModeSetup
+@notTransition:
+
+        lda practiseType
         cmp #MODE_TYPEB
         bne @notTypeB
         lda #$25
@@ -1579,6 +1586,51 @@ gameModeState_initGameState:
         lda musicSelectionTable,x
         jsr setMusicTrack
         inc gameModeState
+        rts
+
+transitionModeSetup:
+        ; set lines
+
+        ; level + 1
+        lda levelNumber
+        adc #$1
+        sta tmp1
+        ; max(10, level - 4)
+        sbc #$5
+        cmp #10
+        bpl @noMin
+        lda #10
+@noMin:
+        ; smallest
+        cmp tmp1
+        bmi @smaller
+        lda tmp1
+@smaller:
+        ; render from A
+        tax
+        dex
+        lda levelDisplayTable, x
+        and #$F
+        rol
+        rol
+        rol
+        rol
+        sta lines
+        lda levelDisplayTable, x
+        and #$F0
+        lsr
+        lsr
+        lsr
+        lsr
+        sta lines+1
+        ; set score
+
+        lda transitionModifier
+        rol
+        rol
+        rol
+        rol
+        sta score+2
         rts
 
 initPlayfieldForTypeB:
@@ -1894,7 +1946,7 @@ ghostPiece:
         jsr isPositionValid
         beq @loop
         dec tetriminoY
-        lda #$D
+        lda #$1D
         sta pieceTileModifier
         jsr stageSpriteForCurrentPiece_actual
         lda tmp3
