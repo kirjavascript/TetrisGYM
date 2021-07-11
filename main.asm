@@ -1884,6 +1884,9 @@ stageSpriteForCurrentPiece:
         rts
 
 ghostPiece:
+        lda playState
+        cmp #3
+        bpl @noGhost
         lda tetriminoY
         sta tmp3
 @loop:
@@ -1896,6 +1899,7 @@ ghostPiece:
         jsr stageSpriteForCurrentPiece_actual
         lda tmp3
         sta tetriminoY
+@noGhost:
         rts
 
 tileModifierForCurrentPiece:
