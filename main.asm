@@ -106,6 +106,7 @@ lineIndex   := $0057                        ; Iteration count of playState_check
 startHeight := $0058
 garbageHole := $0059                        ; Position of hole in received garbage
 garbageDelay  := $005A
+pieceTileModifier := $005B ; above $80 - use a single one, below - use an offset
 
 paceRAM := $60 ; $12 bytes
 binary32 := paceRAM+$0
@@ -1849,8 +1850,9 @@ shift_tetrimino:
 @ret:   rts
 
 stageSpriteForCurrentPiece:
-        ; ; reskinOffset #$80 means whatever
-        ; jsr stageSpriteForCurrentPiece_actual
+        lda #$0
+        sta pieceTileModifier
+        jsr stageSpriteForCurrentPiece_actual
         ; lda tetriminoY
         ; sta tmp3
 ; @loop:
@@ -1858,12 +1860,31 @@ stageSpriteForCurrentPiece:
         ; jsr isPositionValid
         ; beq @loop
         ; dec tetriminoY
+        ; lda #$D
+        ; sta pieceTileModifier
         ; jsr stageSpriteForCurrentPiece_actual
         ; lda tmp3
         ; sta tetriminoY
-        ; rts
+        rts
 
-; stageSpriteForCurrentPiece_actual:
+tileModifierForCurrentPiece:
+        lda pieceTileModifier
+        beq @tileNormal
+        and #$80
+        bne @tileSingle
+; @tileMultiple:
+        lda orientationTable,x
+        clc
+        adc pieceTileModifier
+        rts
+@tileSingle:
+        lda pieceTileModifier
+        rts
+@tileNormal:
+        lda orientationTable,x
+        rts
+
+stageSpriteForCurrentPiece_actual:
         lda tetriminoX
         cmp #$EF ; set in tspin code
         beq stageSpriteForCurrentPiece_return
@@ -1903,9 +1924,8 @@ L8A4B:  lda orientationTable,x
         inc oamStagingLength
         iny
         inx
-        lda orientationTable,x
-
-        ; BLOCK_TILES
+        jsr tileModifierForCurrentPiece ; used to just load from orientationTable
+        ; lda orientationTable, x
         sta oamStaging,y
         inc oamStagingLength
         iny
@@ -4951,8 +4971,8 @@ renderDebugHUD:
 
 controllerInputTiles:
         ; .byte "RLDUSSBA"
-        .byte $90, $91, $92, $93
-        .byte $94, $94, $95, $95
+        .byte $D0, $D1, $D2, $D3
+        .byte $D4, $D4, $D5, $D5
 controllerInputX:
         .byte $8, $0, $5, $4
         .byte $1D, $14, $27, $30
