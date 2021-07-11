@@ -1849,6 +1849,21 @@ shift_tetrimino:
 @ret:   rts
 
 stageSpriteForCurrentPiece:
+        ; ; reskinOffset #$80 means whatever
+        ; jsr stageSpriteForCurrentPiece_actual
+        ; lda tetriminoY
+        ; sta tmp3
+; @loop:
+        ; inc tetriminoY
+        ; jsr isPositionValid
+        ; beq @loop
+        ; dec tetriminoY
+        ; jsr stageSpriteForCurrentPiece_actual
+        ; lda tmp3
+        ; sta tetriminoY
+        ; rts
+
+; stageSpriteForCurrentPiece_actual:
         lda tetriminoX
         cmp #$EF ; set in tspin code
         beq stageSpriteForCurrentPiece_return
@@ -1889,6 +1904,7 @@ L8A4B:  lda orientationTable,x
         iny
         inx
         lda orientationTable,x
+
         ; BLOCK_TILES
         sta oamStaging,y
         inc oamStagingLength

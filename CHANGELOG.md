@@ -3,6 +3,7 @@
 ## [v4]
 - B-Type Trainer (height 0-8)
 - Invisible Trainer
+- Transition Trainer
 - Goofyfoot Toggle
 - Improved drought logic
 - Improved T-Spin Trainer
