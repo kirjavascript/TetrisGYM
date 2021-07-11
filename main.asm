@@ -1593,7 +1593,8 @@ transitionModeSetup:
 
         ; level + 1
         lda levelNumber
-        adc #$1
+        clc
+        adc #1
         sta tmp1
         ; max(10, level - 4)
         sbc #$5
@@ -1608,7 +1609,7 @@ transitionModeSetup:
 @smaller:
         ; render from A
         tax
-        dex
+        dex ; 10 lines before transition
         lda levelDisplayTable, x
         and #$F
         rol
