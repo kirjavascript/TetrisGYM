@@ -32,18 +32,19 @@ MODE_PRESETS := 5
 MODE_TYPEB := 6
 MODE_FLOOR := 7
 MODE_TAP := 8
-MODE_INVISIBLE := 9
-MODE_TRANSITION := 10
-MODE_GARBAGE := 11
-MODE_DROUGHT := 12
-MODE_INPUT_DISPLAY := 13
-MODE_GOOFY := 14
-MODE_DEBUG := 15
-MODE_PAL := 16
+MODE_TRANSITION := 9
+MODE_INVISIBLE := 10
+MODE_HARDDROP := 11
+MODE_GARBAGE := 12
+MODE_DROUGHT := 13
+MODE_INPUT_DISPLAY := 14
+MODE_GOOFY := 15
+MODE_DEBUG := 16
+MODE_PAL := 17
 
-MODE_QUANTITY := 17
-MODE_GAME_QUANTITY := 13
-MODE_CONFIG_QUANTITY := 13
+MODE_QUANTITY := 18
+MODE_GAME_QUANTITY := 14
+MODE_CONFIG_QUANTITY := 14
 MODE_CONFIG_OFFSET := MODE_QUANTITY - MODE_CONFIG_QUANTITY
 
 MENU_SPRITE_Y_BASE := $47
@@ -51,7 +52,7 @@ BLOCK_TILES := $7B
 INVISIBLE_TILE := $43
 
 ; menuConfigSizeLookup
-.define MENUSIZES $F, $7, $8, $C, $20, $0, $0, $4, $12, $1, $1, $1, $1
+.define MENUSIZES $F, $7, $8, $C, $20, $0, $0, $0, $4, $12, $1, $1, $1, $1
 
 .macro MODENAMES
     .byte   "TETRIS"
@@ -63,8 +64,9 @@ INVISIBLE_TILE := $43
     .byte   "B-TYPE"
     .byte   "FLOOR "
     .byte   "QCKTAP"
-    .byte   "INVZBL"
     .byte   "TRNSTN"
+    .byte   "INVZBL"
+    .byte   "HRDDRP"
     .byte   "GARBGE"
     .byte   "LOBARS"
 .endmacro
@@ -609,9 +611,31 @@ branchOnPlayStatePlayer1:
         .addr   playState_checkStartGameOver
         .addr   playState_incrementPlayState
 playState_playerControlsActiveTetrimino:
+        lda practiseType
+        cmp #MODE_HARDDROP
+        bne @soft
+        jsr harddrop_tetrimino
+@soft:
         jsr shift_tetrimino
         jsr rotate_tetrimino
         jsr drop_tetrimino
+        rts
+
+harddrop_tetrimino:
+        lda newlyPressedButtons
+        and #BUTTON_UP
+        beq @noHard
+        lda tetriminoY
+@loop:
+        inc tetriminoY
+        jsr isPositionValid
+        beq @loop
+        dec tetriminoY
+        lda #0
+        sta autorepeatY
+        lda dropSpeed
+        sta fallTimer
+@noHard:
         rts
 
 gameMode_legalScreen: ; boot
@@ -1853,18 +1877,25 @@ stageSpriteForCurrentPiece:
         lda #$0
         sta pieceTileModifier
         jsr stageSpriteForCurrentPiece_actual
-        ; lda tetriminoY
-        ; sta tmp3
-; @loop:
-        ; inc tetriminoY
-        ; jsr isPositionValid
-        ; beq @loop
-        ; dec tetriminoY
-        ; lda #$D
-        ; sta pieceTileModifier
-        ; jsr stageSpriteForCurrentPiece_actual
-        ; lda tmp3
-        ; sta tetriminoY
+
+        lda practiseType
+        cmp #MODE_HARDDROP
+        beq ghostPiece
+        rts
+
+ghostPiece:
+        lda tetriminoY
+        sta tmp3
+@loop:
+        inc tetriminoY
+        jsr isPositionValid
+        beq @loop
+        dec tetriminoY
+        lda #$D
+        sta pieceTileModifier
+        jsr stageSpriteForCurrentPiece_actual
+        lda tmp3
+        sta tetriminoY
         rts
 
 tileModifierForCurrentPiece:
