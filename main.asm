@@ -1973,46 +1973,6 @@ orientationTable:
         .byte   $00,$7B,$FE,$00,$7B,$FF,$00,$7B
         .byte   $00,$00,$7B,$01,$00,$FF,$00,$00
         .byte   $FF,$00,$00,$FF,$00,$00,$FF,$00
-        lda spriteIndexInOamContentLookup
-        asl a
-        asl a
-        sta generalCounter
-        asl a
-        clc
-        adc generalCounter
-        tay
-        ldx oamStagingLength
-        lda #$04
-        sta generalCounter2
-L8B9D:  lda orientationTable,y
-        clc
-        asl a
-        asl a
-        asl a
-        adc spriteYOffset
-        sta oamStaging,x
-        inx
-        iny
-        lda orientationTable,y
-        sta oamStaging,x
-        inx
-        iny
-        lda #$02
-        sta oamStaging,x
-        inx
-        lda orientationTable,y
-        clc
-        asl a
-        asl a
-        asl a
-        adc spriteXOffset
-        sta oamStaging,x
-        inx
-        iny
-        dec generalCounter2
-        bne L8B9D
-        stx oamStagingLength
-        rts
 
 stageSpriteForNextPiece:
 .if !ALWAYS_NEXT_BOX
