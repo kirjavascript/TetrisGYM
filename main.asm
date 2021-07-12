@@ -2692,7 +2692,7 @@ updateLineClearingAnimation:
         lda frameCounter
         and #$03
         bne @ret
-        ; invisible mode stuff
+        ; invisible mode show blocks intead of empty
         ldy #$FF
         lda practiseType
         cmp #MODE_INVISIBLE
