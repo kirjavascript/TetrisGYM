@@ -2407,8 +2407,6 @@ render_mode_static:
         rts
 
 render_mode_scroll:
-        ; TODO: fix
-        ; TODO: redo
         lda currentPpuCtrl
         and #$FC
         sta currentPpuCtrl
@@ -2424,7 +2422,7 @@ render_mode_scroll:
         beq @endscroll
         ; not equal
         cmp menuScrollY
-        bmi @lessThan
+        bcc @lessThan
         inc menuScrollY
         jmp @endscroll
 @lessThan:
