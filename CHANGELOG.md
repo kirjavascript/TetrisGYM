@@ -10,6 +10,7 @@
 - Improved T-Spin Trainer
     - Fixed timing/rendering glitches
     - Added still broken, but better scoring
+- Show seed in level select and gameplay screens
 
 ## [v3.1]
 - Added new setup (L/J doubletuck)

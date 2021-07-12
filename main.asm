@@ -1362,6 +1362,23 @@ gameModeState_initGameBackground:
 
 displayModeText:
         ldx practiseType
+        cpx #MODE_SEED
+        bne @drawModeName
+        ; draw seed instead
+        lda tmp1
+        sta PPUADDR
+        lda tmp2
+        sta PPUADDR
+        lda set_seed_input
+        jsr twoDigsToPPU
+        lda set_seed_input+1
+        jsr twoDigsToPPU
+        lda set_seed_input+2
+        jsr twoDigsToPPU
+        rts
+
+@drawModeName:
+        ; ldx practiseType
         lda #0
 @loopAddr:
         cpx #0
@@ -3443,6 +3460,7 @@ L9BC7:  lda lines
         and #$0F
         bne L9BFB
 
+        ; probably not needed, because lines are already patches correctly
         lda practiseType
         cmp #MODE_TRANSITION
         beq @nextLevel
