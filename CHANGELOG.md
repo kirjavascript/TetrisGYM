@@ -2,15 +2,14 @@
 
 ## [v4]
 - B-Type Trainer (height 0-8)
-- Invisible Trainer
 - Transition Trainer
+- Invisible Trainer
 - Hard Drop Trainer
-- Goofyfoot Toggle
+- Goofyfoot Mode
 - Improved drought logic
-- Improved T-Spin Trainer
-    - Fixed timing/rendering glitches
-    - Added still broken, but better scoring
 - Show seed in level select and gameplay screens
+- Fixed timing/rendering glitches in T-Spins
+- Added still broken, but better scoring for T-Spins
 
 ## [v3.1]
 - Added new setup (L/J doubletuck)
