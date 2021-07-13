@@ -611,7 +611,30 @@ branchOnPlayStatePlayer1:
         .addr   playState_noop
         .addr   playState_checkStartGameOver
         .addr   playState_incrementPlayState
+
+hzRAM := $612
+hzFrameCounter := hzRAM+0
+; hzFrameStartTap := $5D
+; hzFrameEndTap := $5D
+; distance
+
+hzReset:
+        lda #0
+        sta hzFrameCounter
+        sta hzFrameCounter+1
+        rts
+hzTick:
+        lda hzFrameCounter
+        clc
+        adc #$01
+        sta hzFrameCounter
+        lda #$00
+        adc hzFrameCounter+1
+        sta hzFrameCounter+1
+        rts
+
 playState_playerControlsActiveTetrimino:
+        jsr hzTick
         lda practiseType
         cmp #MODE_HARDDROP
         bne @soft
@@ -2829,6 +2852,7 @@ playState_spawnNextTetrimino:
 
         lda #$00
         sta fallTimer
+        jsr hzReset
         sta tetriminoY
         lda #$05
         sta tetriminoX
