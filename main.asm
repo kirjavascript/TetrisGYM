@@ -613,13 +613,15 @@ branchOnPlayStatePlayer1:
         .addr   playState_incrementPlayState
 
 hzRAM := $612
-hzFrameCounter := hzRAM+0
+hzTapCounter := hzRAM+0
+hzFrameCounter := hzRAM+1
 ; hzFrameStartTap := $5D
 ; hzFrameEndTap := $5D
 ; distance
 
 hzReset:
         lda #0
+        sta hzTapCounter
         sta hzFrameCounter
         sta hzFrameCounter+1
         rts
@@ -631,6 +633,9 @@ hzTick:
         lda #$00
         adc hzFrameCounter+1
         sta hzFrameCounter+1
+        rts
+hzTap:
+
         rts
 
 playState_playerControlsActiveTetrimino:

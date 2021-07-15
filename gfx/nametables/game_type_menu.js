@@ -16,7 +16,7 @@ printNT(buffer, lookup);
 
 drawTiles(buffer, lookup, `
 #a                            d#
-#a                            d#
+#a  BETA - DO NOT DISTRIBUTE  d#
 #a                            d#
 #a                            d#
 #a                            d#
