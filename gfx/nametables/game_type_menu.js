@@ -16,7 +16,7 @@ printNT(buffer, lookup);
 
 drawTiles(buffer, lookup, `
 #a                            d#
-#a  BETA - DO NOT DISTRIBUTE  d#
+#a                            d#
 #a                            d#
 #a                            d#
 #a                            d#
@@ -73,13 +73,19 @@ drawTiles(buffer, lookup, `
 #a                            d#
 #a                            d#
 #a                            d#
-#zxxxxxxxxxxxxxxxxxxxxxxxxxxxxc#
-################################
-################################
+#a                            d#
+#a                            d#
+#a                            d#
 `);
 
+
 drawRect(buffer, 8, 2, 10, 5, 0xB0); // draw logo
-// drawRect(buffer, 22, 22, 5, 5, 0x9A); // draw QR code
+// drawRect(extra, 20, 0, 5, 5, 0x9A); // draw QR code
+
+const urlX = 1;
+const urlY = 16;
+drawRect(extra, urlX, urlY, 12, 1, 0x74);
+drawRect(extra, urlX+12, urlY, 12, 1, 0x84);
 
 drawAttrs(buffer, [`
     2222222222222222
@@ -95,11 +101,15 @@ drawAttrs(buffer, [`
     2222222222222222
     2222222222222222
     2222222222222222
-    2332222222222222
+    2222222222222222
     2222222222222222
     2222222222222222
     2222222222222222
 `]);
+
+const line = '2'.repeat(16);
+const screen = Array.from({ length: 8 }, () => line).join('\n');
+drawAttrs(extra, [screen, screen]);
 
 writeRLE(
     __dirname + '/game_type_menu_nametable_practise.bin',
