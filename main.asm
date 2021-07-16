@@ -1613,7 +1613,7 @@ gameModeState_initGameState:
         lda practiseType
         cmp #MODE_TYPEB
         bne @notTypeB
-        lda #$1
+        lda #$25
         sta lines
 @notTypeB:
 
@@ -3323,7 +3323,6 @@ playState_prepareNext:
         lda #$4
         sta soundEffectSlot1Init
 
-        lda #$30
         jsr sleep_typeb
         lda #$0A ; playState_checkStartGameOver
         sta playState
@@ -3358,12 +3357,13 @@ playState_prepareNext:
         rts
 
 sleep_typeb:
-        sta     sleepCounter
-        jsr     stageSpriteForNextPiece
-@loop:  jsr     updateAudioWaitForNmiAndResetOamStaging
-        jsr     stageSpriteForNextPiece
-        lda     sleepCounter
-        bne     @loop
+        lda #$30
+        sta sleepCounter
+        jsr stageSpriteForNextPiece
+@loop:  jsr updateAudioWaitForNmiAndResetOamStaging
+        jsr stageSpriteForNextPiece
+        lda sleepCounter
+        bne @loop
         rts
 
 typebSuccessGraphic:
