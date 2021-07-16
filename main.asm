@@ -44,15 +44,13 @@ MODE_PAL := 17
 
 MODE_QUANTITY := 18
 MODE_GAME_QUANTITY := 14
-MODE_CONFIG_QUANTITY := 14
-MODE_CONFIG_OFFSET := MODE_QUANTITY - MODE_CONFIG_QUANTITY
 
 MENU_SPRITE_Y_BASE := $47
 BLOCK_TILES := $7B
 INVISIBLE_TILE := $43
 
 ; menuConfigSizeLookup
-.define MENUSIZES $F, $7, $8, $C, $20, $F, $0, $0, $4, $12, $1, $1, $1, $1
+.define MENUSIZES $0, $0, $0, $0, $F, $7, $8, $C, $20, $F, $0, $0, $4, $12, $1, $1, $1, $1
 
 .macro MODENAMES
     .byte   "TETRIS"
@@ -877,21 +875,13 @@ seedControls:
         jmp gameTypeLoopContinue
 
 menuConfigControls:
-        ; load config type from offset
-        lda practiseType
-        cmp #MODE_CONFIG_OFFSET
-        bmi @configEnd
-        lda practiseType
-        sbc #MODE_CONFIG_OFFSET
-        sta tmp3
-
         ; account for 'gaps' in config items of size zero
         ; previously the offset was just set on X directly
 
         ldx #0 ; memory offset we want
         ldy #0 ; cursor
 @searchByte:
-        cpy tmp3
+        cpy practiseType
         bne @notYet
         lda menuConfigSizeLookup, y
         beq @configEnd ; no config here
@@ -1053,7 +1043,7 @@ menuYTmp := tmp2
         asl
         asl
         asl
-        adc #MENU_SPRITE_Y_BASE + (MODE_CONFIG_OFFSET * 8) + 1
+        adc #MENU_SPRITE_Y_BASE + 1
         sbc menuScrollY
         sta menuYTmp
 
@@ -1097,7 +1087,7 @@ menuYTmp := tmp2
 @loopNext:
         inc menuCounter
         lda menuCounter
-        cmp #MODE_CONFIG_QUANTITY
+        cmp #MODE_QUANTITY
         bne @loop
         rts
 
