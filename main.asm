@@ -613,11 +613,13 @@ branchOnPlayStatePlayer1:
 hzRAM := $612
 hzTapCounter := hzRAM+0
 hzFrameCounter := hzRAM+1
-; hzFrameStartTap := $5D
-; hzFrameEndTap := $5D
-; distance
+hzFrameStartTap := hzRAM+3 ; also functions as delay
+hzFrameEndTap := hzRAM+5
+; distance / height
 
 hzReset:
+        ; render here
+
         lda #0
         sta hzTapCounter
         sta hzFrameCounter
@@ -631,9 +633,22 @@ hzTick:
         lda #$00
         adc hzFrameCounter+1
         sta hzFrameCounter+1
-        rts
-hzTap:
 
+        ; detect inputs
+        lda newlyPressedButtons_player1
+        and #BUTTON_LEFT
+        bne hzTap
+        lda newlyPressedButtons_player1
+        and #BUTTON_RIGHT
+        bne hzTap
+        rts
+
+hzTap:
+        ; cmp 0
+        ; bsr set start tap
+        ;
+
+        inc hzTapCounter
         rts
 
 playState_playerControlsActiveTetrimino:
@@ -1750,7 +1765,7 @@ L885D:  sta playfield,y
 typeBBlankInitCountByHeightTable:
         .byte $C8,$AA,$96,$78,$64,$50,$3C,$28,$14
 rngTable:
-        .byte $EF,$7B,$EF,$7C,$7D,$7D,$EF
+        .byte $EF,$7B,$EF,$7C,$7D,$7E,$EF
         .byte $EF
 
 gameModeState_updateCountersAndNonPlayerState:
