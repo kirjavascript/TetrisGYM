@@ -615,17 +615,20 @@ hzTapCounter := hzRAM+0
 hzFrameCounter := hzRAM+1
 hzFrameStartTap := hzRAM+3 ; also functions as delay
 hzFrameEndTap := hzRAM+5
+hzFrameLockPiece := hzRAM+7
 ; distance / height
 
-hzReset:
+hzFrame:
         ; render here
+
+        ; TODO: call in initgame / something other than next piece
 
         lda #0
         sta hzTapCounter
         sta hzFrameCounter
         sta hzFrameCounter+1
         rts
-hzTick:
+hzControl:
         lda hzFrameCounter
         clc
         adc #$01
@@ -644,15 +647,24 @@ hzTick:
         rts
 
 hzTap:
-        ; cmp 0
-        ; bsr set start tap
-        ;
+        lda hzTapCounter
+        bne @notFirstTap
+        lda hzFrameCounter
+        sta hzFrameStartTap
+        lda hzFrameCounter+1
+        sta hzFrameStartTap+1
+@notFirstTap:
+
+        lda hzFrameCounter
+        sta hzFrameEndTap
+        lda hzFrameCounter+1
+        sta hzFrameEndTap+1
 
         inc hzTapCounter
         rts
 
 playState_playerControlsActiveTetrimino:
-        jsr hzTick
+        jsr hzControl
         lda practiseType
         cmp #MODE_HARDDROP
         bne @soft
@@ -1765,7 +1777,7 @@ L885D:  sta playfield,y
 typeBBlankInitCountByHeightTable:
         .byte $C8,$AA,$96,$78,$64,$50,$3C,$28,$14
 rngTable:
-        .byte $EF,$7B,$EF,$7C,$7D,$7E,$EF
+        .byte $EF,$7B,$EF,$7C,$7D,$7D,$EF
         .byte $EF
 
 gameModeState_updateCountersAndNonPlayerState:
@@ -2866,7 +2878,7 @@ playState_spawnNextTetrimino:
 
         lda #$00
         sta fallTimer
-        jsr hzReset
+        jsr hzFrame
         sta tetriminoY
         lda #$05
         sta tetriminoX
