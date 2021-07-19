@@ -3626,13 +3626,13 @@ updatePlayfield:
 @ret:   rts
 
 gameModeState_handleGameOver:
-        lda #$05
-        sta generalCounter2
-        lda playState
-        cmp #$00
-        beq @gameOver
-        lda #$1 ; deleting this line causes the next piece to flash (?)
-        jmp @ret
+        ; lda #$05
+        ; sta generalCounter2
+        ; lda playState
+        ; cmp #$00
+        ; beq @gameOver
+        ; lda #$1 ; deleting this line causes the next piece to flash (?)
+        ; jmp @ret
 @gameOver:
         lda #$03
         sta renderMode
@@ -4085,6 +4085,11 @@ highScoreEntryScreen:
         jsr copyRleNametableToPpu
         .addr   enter_high_score_nametable
         jsr showHighScores
+        lda #$21
+        sta tmp1
+        lda #$89
+        sta tmp2
+        jsr displayModeText
         lda #$02
         sta renderMode
         jsr waitForVBlankAndEnableNmi
