@@ -4282,7 +4282,7 @@ gameModeState_startButtonHandling:
         lda #$04 ; render_mode_pause
         sta renderMode
         jsr updateAudioAndWaitForNmi
-        lda #$1E
+        lda #$1E ; $16 for black
         sta PPUMASK
         lda #$FF
         ldx #$02
@@ -4301,12 +4301,8 @@ gameModeState_startButtonHandling:
         jsr loadSpriteIntoOamStaging
 
         jsr practiseGameHUD
-.if DEBUG_MODE
         jsr debugMode
-.else
-        jsr stageSpriteForNextPiece
-        jsr stageSpriteForCurrentPiece
-.endif
+        ; debugMode calls stageSpriteForNextPiece, stageSpriteForCurrentPiece
 
         lda newlyPressedButtons_player1
         cmp #$10
