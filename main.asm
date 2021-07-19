@@ -50,7 +50,7 @@ BLOCK_TILES := $7B
 INVISIBLE_TILE := $43
 
 ; menuConfigSizeLookup
-.define MENUSIZES $0, $0, $0, $0, $F, $7, $8, $C, $20, $F, $0, $0, $4, $12, $1, $1, $1, $1
+.define MENUSIZES $0, $0, $0, $0, $F, $7, $8, $C, $20, $10, $0, $0, $4, $12, $1, $1, $1, $1
 
 .macro MODENAMES
     .byte   "TETRIS"
@@ -1624,6 +1624,17 @@ gameModeState_initGameState:
         rts
 
 transitionModeSetup:
+        ; set score
+
+        lda transitionModifier
+        cmp #$10 ; (SXTOKL compat)
+        beq @ret
+        rol
+        rol
+        rol
+        rol
+        sta score+2
+
         ; set lines
 
         ; level + 1
@@ -1659,14 +1670,7 @@ transitionModeSetup:
         lsr
         lsr
         sta lines+1
-        ; set score
-
-        lda transitionModifier
-        rol
-        rol
-        rol
-        rol
-        sta score+2
+@ret:
         rts
 
 initPlayfieldForTypeB:
@@ -3479,7 +3483,7 @@ L9BC7:  lda lines
         and #$0F
         bne L9BFB
 
-        ; probably not needed, because lines are already patches correctly
+        ; needed when mode is set to G (SXTOKL compat)
         lda practiseType
         cmp #MODE_TRANSITION
         beq @nextLevel
@@ -3626,13 +3630,13 @@ updatePlayfield:
 @ret:   rts
 
 gameModeState_handleGameOver:
-        ; lda #$05
-        ; sta generalCounter2
-        ; lda playState
-        ; cmp #$00
-        ; beq @gameOver
-        ; lda #$1 ; deleting this line causes the next piece to flash (?)
-        ; jmp @ret
+        lda #$05
+        sta generalCounter2
+        lda playState
+        cmp #$00
+        beq @gameOver
+        lda #$1 ; deleting this line causes the next piece to flash (?)
+        jmp @ret
 @gameOver:
         lda #$03
         sta renderMode
