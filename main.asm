@@ -687,6 +687,7 @@ hzTap:
         sta hzTapCounter
         sta hzFrameCounter+1
         ; treat it as if the piece spawned a frame ago
+        ; that way 1 frame of no tap and one of tap cancels and is neutral, and you can divide the rest
         lda #2
         sta hzFrameCounter
 @within:
@@ -697,9 +698,9 @@ hzTap:
         sta hzDebounceCounter
 
         ; ignore 1 and 2 taps
-        ; lda hzTapCounter
-        ; cmp #3
-        ; bcc @calcEnd
+        lda hzTapCounter
+        cmp #3
+        bcc @calcEnd
 
         lda #$7A
         sta factorB24
