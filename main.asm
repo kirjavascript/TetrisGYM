@@ -635,13 +635,9 @@ hzResult := $5C ; 2 byte
 ; bizhawk testing
 
 ; display: taps <s>delay</s> / frame tetrimino diff ?
+; game genie graphics
 
-        ; TODO: call in initgame / something other than next piece
-        ; TODO: only update counter on 3+ taps
-        ; TODO include max / raw
-        ; TODO: piece / burst modes
-
-hzDebounceThreshold := $12
+hzDebounceThreshold := $10
 
 hzStart: ; called in playState_spawnNextTetrimino
         lda #0
@@ -649,6 +645,7 @@ hzStart: ; called in playState_spawnNextTetrimino
         sta hzFrameCounter
         sta hzFrameCounter+1
         sta hzDebounceCounter
+        sta hzResult+2
         rts
 
 hzControl:
@@ -692,6 +689,11 @@ hzTap:
         inc hzTapCounter
         lda #0
         sta hzDebounceCounter
+
+        ; ignore 1 and 2 taps
+        lda hzTapCounter
+        cmp #3
+        bcc @calcEnd
 
         lda #$7A
         sta factorB24
@@ -749,10 +751,9 @@ hzTap:
         lda bcd32+1
         sta hzResult
 
+@calcEnd:
         lda hzTapCounter
         sta hzResult+2
-
-
         rts
 
 playState_playerControlsActiveTetrimino:
@@ -1735,6 +1736,8 @@ gameModeState_initGameState:
         bne @noTypeBPlayfield
         jsr initPlayfieldForTypeB
 @noTypeBPlayfield:
+
+        jsr hzStart
 
         ldx musicType
         lda musicSelectionTable,x
