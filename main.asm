@@ -639,13 +639,17 @@ hzResult := $5C ; 2 byte
 
 hzDebounceThreshold := $10
 
+7 frames is 0.116476421844 seconds
+4 taps divided by 0.116476421844
+
 hzStart: ; called in playState_spawnNextTetrimino, gameModeState_initGameState
         lda #0
         sta hzTapCounter
-        sta hzFrameCounter
         sta hzFrameCounter+1
         sta hzDebounceCounter
         sta hzResult+2
+        lda #1
+        sta hzFrameCounter
         rts
 
 hzControl:
@@ -686,7 +690,7 @@ hzTap:
         sta hzTapCounter
         sta hzFrameCounter+1
         ; treat it as if the piece spawned a frame ago
-        lda #1
+        lda #2
         sta hzFrameCounter
 @within:
 
@@ -696,9 +700,9 @@ hzTap:
         sta hzDebounceCounter
 
         ; ignore 1 and 2 taps
-        lda hzTapCounter
-        cmp #3
-        bcc @calcEnd
+        ; lda hzTapCounter
+        ; cmp #3
+        ; bcc @calcEnd
 
         lda #$7A
         sta factorB24
