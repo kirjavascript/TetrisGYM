@@ -601,7 +601,7 @@ branchOnPlayStatePlayer1:
         sta byteSpriteXOffset
         lda #MENU_SPRITE_Y_BASE
         sta byteSpriteYOffset
-        lda #dividend
+        lda #bcd32
         sta byteSpriteAddr
         jsr byteSprite
         lda playState
@@ -630,15 +630,12 @@ hzFrameCounter := hzRAM+1
 ; hzFrameResult := hzRAM+7
 ; distance / height
 
-; display: hz, delay (minimal / realistic?)
+; display: max hz, raw hz, delay
 
 hzFrame:
-        ; render here
-
         ; TODO: call in initgame / something other than next piece
-        ; TODO: PAL
         ; TODO: save result away for pace corrupting it
-        ; TODO: remove debug
+        ; TODO include max / raw
         lda #0
         sta hzTapCounter
         sta hzFrameCounter
@@ -660,37 +657,46 @@ hzControl:
         lda newlyPressedButtons_player1
         and #BUTTON_RIGHT
         bne hzTap
-
-
         rts
 
 
         ; 2 taps 60 frames -> 2hz
         ; 1 tap 30 frames -> 2hz
         ; taps * 60.098 / frames
+        ; PAL is 50.006
 
 hzTap:
         inc hzTapCounter
 
-        lda hzTapCounter
-        sta factorA24
-        lda #60
+        lda #$7A
         sta factorB24
+        lda #$17
+        sta factorB24+1
         lda #0
         sta factorA24+1
         sta factorA24+2
-        sta factorB24+1
         sta factorB24+2
+
+        lda hzTapCounter
+        sta factorA24
+
+        lda palFlag
+        beq @notPAL
+        sta factorA24
+        lda #$89
+        sta factorB24
+        lda #$13
+@notPAL:
 
         jsr unsigned_mul24
 
-        ; taps * 60 now in product24
+        ; taps * 6010 now in product24
 
         lda product24
         sta dividend
         lda product24+1
         sta dividend+1
-        lda #0 ; can never reach here
+        lda product24+2
         sta dividend+2
 
         lda hzFrameCounter
@@ -700,7 +706,18 @@ hzTap:
         lda #0
         sta divisor+2
 
-        jsr unsigned_div24 ; hz in dividend
+        jsr unsigned_div24 ; hz*100 in dividend
+
+        lda dividend
+        sta binary32
+        lda dividend+1
+        sta binary32+1
+        lda dividend+2
+        sta binary32+2
+        lda #0
+        sta binary32+3
+
+        jsr BIN_BCD ; hz*100 as BCD in bcd32
 
         rts
 
