@@ -595,7 +595,17 @@ gameMode_playAndEndingHighScore:
         .addr   gameModeState_startButtonHandling
         .addr   gameModeState_vblankThenRunState2
 branchOnPlayStatePlayer1:
+
+        ; debug
+        lda #$C0
+        sta byteSpriteXOffset
+        lda #MENU_SPRITE_Y_BASE
+        sta byteSpriteYOffset
+        lda #dividend
+        sta byteSpriteAddr
+        jsr byteSprite
         lda playState
+
         jsr switch_s_plus_2a
         .addr   playState_unassignOrientationId
         .addr   playState_playerControlsActiveTetrimino
@@ -610,19 +620,25 @@ branchOnPlayStatePlayer1:
         .addr   playState_checkStartGameOver
         .addr   playState_incrementPlayState
 
+; TODO: move this
 hzRAM := $612
 hzTapCounter := hzRAM+0
 hzFrameCounter := hzRAM+1
-hzFrameStartTap := hzRAM+3 ; also functions as delay
-hzFrameEndTap := hzRAM+5
-hzFrameLockPiece := hzRAM+7
+; hzFrameStartTap := hzRAM+3 ; also functions as delay
+; hzFrameEndTap := hzRAM+5
+; hzFrameLockPiece := hzRAM+7
+; hzFrameResult := hzRAM+7
 ; distance / height
+
+; display: hz, delay (minimal / realistic?)
 
 hzFrame:
         ; render here
 
         ; TODO: call in initgame / something other than next piece
-
+        ; TODO: PAL
+        ; TODO: save result away for pace corrupting it
+        ; TODO: remove debug
         lda #0
         sta hzTapCounter
         sta hzFrameCounter
@@ -644,23 +660,48 @@ hzControl:
         lda newlyPressedButtons_player1
         and #BUTTON_RIGHT
         bne hzTap
+
+
         rts
 
+
+        ; 2 taps 60 frames -> 2hz
+        ; 1 tap 30 frames -> 2hz
+        ; taps * 60.098 / frames
+
 hzTap:
-        lda hzTapCounter
-        bne @notFirstTap
-        lda hzFrameCounter
-        sta hzFrameStartTap
-        lda hzFrameCounter+1
-        sta hzFrameStartTap+1
-@notFirstTap:
-
-        lda hzFrameCounter
-        sta hzFrameEndTap
-        lda hzFrameCounter+1
-        sta hzFrameEndTap+1
-
         inc hzTapCounter
+
+        lda hzTapCounter
+        sta factorA24
+        lda #60
+        sta factorB24
+        lda #0
+        sta factorA24+1
+        sta factorA24+2
+        sta factorB24+1
+        sta factorB24+2
+
+        jsr unsigned_mul24
+
+        ; taps * 60 now in product24
+
+        lda product24
+        sta dividend
+        lda product24+1
+        sta dividend+1
+        lda #0 ; can never reach here
+        sta dividend+2
+
+        lda hzFrameCounter
+        sta divisor
+        lda hzFrameCounter+1
+        sta divisor+1
+        lda #0
+        sta divisor+2
+
+        jsr unsigned_div24 ; hz in dividend
+
         rts
 
 playState_playerControlsActiveTetrimino:
@@ -4628,9 +4669,6 @@ diffOldAndNewButtons:
         bpl @diffForPlayer
         rts
 
-flipNewlyPressed:
-        rts
-
 memset_ppu_page_and_more:
         sta tmp1
         stx tmp2
@@ -5641,7 +5679,7 @@ gameHUDPace:
         jsr byteSprite_base
         rts
 
-; math routines for pace mode
+; math routines
 
 ;This routine converts a packed 8 digit BCD value in memory loactions
 ;binary32 to binary32+3 to a binary value with the dp value in location
