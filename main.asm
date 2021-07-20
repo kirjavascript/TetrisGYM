@@ -11,7 +11,7 @@ PRACTISE_MODE := 1
 DEBUG_MODE := 1
 NO_MUSIC := 1
 ALWAYS_NEXT_BOX := 1
-AUTO_WIN := 1
+AUTO_WIN := 0
 NO_SCORING := 0
 
 BUTTON_DOWN := $4
@@ -601,7 +601,7 @@ branchOnPlayStatePlayer1:
         sta byteSpriteXOffset
         lda #MENU_SPRITE_Y_BASE
         sta byteSpriteYOffset
-        lda #bcd32
+        lda #hzResult
         sta byteSpriteAddr
         jsr byteSprite
         lda playState
@@ -623,31 +623,36 @@ branchOnPlayStatePlayer1:
 ; TODO: move this
 hzRAM := $612
 hzTapCounter := hzRAM+0
-hzFrameCounter := hzRAM+1
+hzFrameCounter := hzRAM+1 ; 2 byte
+hzDebounceCounter := hzRAM+3 ; 1 byte
+hzResult := $5C ; 2 byte
 ; hzFrameStartTap := hzRAM+3 ; also functions as delay
 ; hzFrameEndTap := hzRAM+5
 ; hzFrameLockPiece := hzRAM+7
 ; hzFrameResult := hzRAM+7
 ; distance / height /
 
-; display: max hz, raw hz, taps <s>delay</s> / frame tetrimino X ?
+; bizhawk testing
+
+; display: taps <s>delay</s> / frame tetrimino diff ?
 
         ; TODO: call in initgame / something other than next piece
-        ; TODO: save result away for pace corrupting it
+        ; TODO: only update counter on 3+ taps
         ; TODO include max / raw
         ; TODO: piece / burst modes
 
-; TODO: debounce counter
-        ; have spawn trigger another reset
+hzDebounceThreshold := $12
 
-hzStart:
+hzStart: ; called in playState_spawnNextTetrimino
         lda #0
         sta hzTapCounter
         sta hzFrameCounter
         sta hzFrameCounter+1
+        sta hzDebounceCounter
         rts
 
 hzControl:
+        ; tick frame counter
         lda hzFrameCounter
         clc
         adc #$01
@@ -655,6 +660,13 @@ hzControl:
         lda #$00
         adc hzFrameCounter+1
         sta hzFrameCounter+1
+
+        ; tick debounce counter
+        lda hzDebounceCounter
+        cmp #hzDebounceThreshold
+        beq @elapsed
+        inc hzDebounceCounter
+@elapsed:
 
         ; detect inputs
         lda newlyPressedButtons_player1
@@ -669,7 +681,17 @@ hzControl:
         ; PAL is 50.006
 
 hzTap:
+        ; check if debouncing meets threshold
+        lda hzDebounceCounter
+        cmp #hzDebounceThreshold
+        bne @within
+        jsr hzStart
+@within:
+
+        ; increment taps, reset debounce
         inc hzTapCounter
+        lda #0
+        sta hzDebounceCounter
 
         lda #$7A
         sta factorB24
@@ -723,9 +745,12 @@ hzTap:
         jsr BIN_BCD ; hz*100 as BCD in bcd32
 
         lda bcd32
-        sta bcd32+2
-        lda #0
-        sta bcd32
+        sta hzResult+1
+        lda bcd32+1
+        sta hzResult
+
+        lda hzTapCounter
+        sta hzResult+2
 
 
         rts
@@ -2943,9 +2968,9 @@ playState_spawnNextTetrimino:
 @noSaveState:
 .endif
 
+        jsr hzStart
         lda #$00
         sta fallTimer
-        jsr hzStart
         sta tetriminoY
         lda #$05
         sta tetriminoX
