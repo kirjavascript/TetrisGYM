@@ -639,9 +639,6 @@ hzResult := $5C ; 2 byte
 
 hzDebounceThreshold := $10
 
-7 frames is 0.116476421844 seconds
-4 taps divided by 0.116476421844
-
 hzStart: ; called in playState_spawnNextTetrimino, gameModeState_initGameState
         lda #0
         sta hzTapCounter
