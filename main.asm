@@ -11,7 +11,7 @@ PRACTISE_MODE := 1
 DEBUG_MODE := 1
 NO_MUSIC := 1
 ALWAYS_NEXT_BOX := 1
-AUTO_WIN := 0
+AUTO_WIN := 1
 NO_SCORING := 0
 
 BUTTON_DOWN := $4
@@ -628,19 +628,25 @@ hzFrameCounter := hzRAM+1
 ; hzFrameEndTap := hzRAM+5
 ; hzFrameLockPiece := hzRAM+7
 ; hzFrameResult := hzRAM+7
-; distance / height
+; distance / height /
 
-; display: max hz, raw hz, delay
+; display: max hz, raw hz, taps <s>delay</s> / frame tetrimino X ?
 
-hzFrame:
         ; TODO: call in initgame / something other than next piece
         ; TODO: save result away for pace corrupting it
         ; TODO include max / raw
+        ; TODO: piece / burst modes
+
+; TODO: debounce counter
+        ; have spawn trigger another reset
+
+hzStart:
         lda #0
         sta hzTapCounter
         sta hzFrameCounter
         sta hzFrameCounter+1
         rts
+
 hzControl:
         lda hzFrameCounter
         clc
@@ -659,10 +665,7 @@ hzControl:
         bne hzTap
         rts
 
-
-        ; 2 taps 60 frames -> 2hz
-        ; 1 tap 30 frames -> 2hz
-        ; taps * 60.098 / frames
+        ; hz = taps * 60.098 / frames
         ; PAL is 50.006
 
 hzTap:
@@ -718,6 +721,12 @@ hzTap:
         sta binary32+3
 
         jsr BIN_BCD ; hz*100 as BCD in bcd32
+
+        lda bcd32
+        sta bcd32+2
+        lda #0
+        sta bcd32
+
 
         rts
 
@@ -2936,7 +2945,7 @@ playState_spawnNextTetrimino:
 
         lda #$00
         sta fallTimer
-        jsr hzFrame
+        jsr hzStart
         sta tetriminoY
         lda #$05
         sta tetriminoX
