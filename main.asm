@@ -620,6 +620,11 @@ branchOnPlayStatePlayer1:
         .addr   playState_checkStartGameOver
         .addr   playState_incrementPlayState
 
+; hz = 60.098 * (taps - 1) / (frames - 1)
+; PAL is 50.006
+;
+; HydrantDude explains how and why the formula works here: https://discord.com/channels/374368504465457153/405470199400235013/867156217259884574
+
 ; TODO: move this
 hzRAM := $612
 hzTapCounter := hzRAM+0
@@ -633,23 +638,25 @@ hzResult := $5C ; 2 byte
 ; distance / height /
 
 ; bizhawk testing
+; hook up to das to test
 
 ; display: taps <s>delay</s> / frame tetrimino diff ?
 ; game genie graphics
+
 
 hzDebounceThreshold := $10
 
 hzStart: ; called in playState_spawnNextTetrimino, gameModeState_initGameState
         lda #0
         sta hzTapCounter
-        sta hzFrameCounter+1
+        lda #hzDebounceThreshold
         sta hzDebounceCounter
-        sta hzResult+2
-        lda #1
-        sta hzFrameCounter
+        ; frame counter is reset on first tap
         rts
 
 hzControl:
+        lda hzTapCounter
+        beq @notTapping
         ; tick frame counter
         lda hzFrameCounter
         clc
@@ -658,6 +665,7 @@ hzControl:
         lda #$00
         adc hzFrameCounter+1
         sta hzFrameCounter+1
+@notTapping:
 
         ; tick debounce counter
         lda hzDebounceCounter
@@ -675,20 +683,15 @@ hzControl:
         bne hzTap
         rts
 
-        ; hz = taps * 60.098 / frames
-        ; PAL is 50.006
-
 hzTap:
-        ; check if debouncing meets threshold
+        ; check if debouncing meets threshold, and this is a fresh tap
         lda hzDebounceCounter
         cmp #hzDebounceThreshold
         bne @within
         lda #0
         sta hzTapCounter
         sta hzFrameCounter+1
-        ; treat it as if the piece spawned a frame ago
-        ; that way 1 frame of no tap and one of tap cancels and is neutral, and you can divide the rest
-        lda #2
+        ; 0 is the first frame (4 means 5 frames)
         sta hzFrameCounter
 @within:
 
@@ -712,6 +715,7 @@ hzTap:
         sta factorB24+2
 
         lda hzTapCounter
+        sbc #1
         sta factorA24
 
         lda palFlag
@@ -724,7 +728,7 @@ hzTap:
 
         jsr unsigned_mul24
 
-        ; taps * 6010 now in product24
+        ; taps-1 * 6010 now in product24
 
         lda product24
         sta dividend
@@ -732,6 +736,8 @@ hzTap:
         sta dividend+1
         lda product24+2
         sta dividend+2
+
+        ; then divide by the hzFrameCounter, which should be frames-1
 
         lda hzFrameCounter
         sta divisor
