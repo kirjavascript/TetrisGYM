@@ -48,7 +48,8 @@ MODE_QUANTITY := 20
 MODE_GAME_QUANTITY := 14
 
 MENU_SPRITE_Y_BASE := $47
-MENU_MAX_Y_SCROLL := $40
+MENU_MAX_Y_SCROLL := $0
+MENU_TOP_MARGIN_SCROLL := 6 ; blocks
 BLOCK_TILES := $7B
 INVISIBLE_TILE := $43
 
@@ -2573,6 +2574,11 @@ render_mode_scroll:
         sta PPUSCROLL
 
         lda practiseType
+        cmp #MENU_TOP_MARGIN_SCROLL
+        bcs @underflow
+        lda #MENU_TOP_MARGIN_SCROLL+1
+@underflow:
+        sbc #MENU_TOP_MARGIN_SCROLL
         asl
         asl
         asl
