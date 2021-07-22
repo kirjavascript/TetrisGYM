@@ -101,7 +101,7 @@ drawRect(buffer, 8, 2, 10, 5, 0xB0); // draw logo
 // drawRect(extra, 20, 0, 5, 5, 0x9A); // draw QR code
 
 const urlX = 1;
-const urlY = 16;
+const urlY = 1;
 drawRect(extra, urlX, urlY, 12, 1, 0x74);
 drawRect(extra, urlX+12, urlY, 12, 1, 0x84);
 
@@ -127,7 +127,16 @@ drawAttrs(buffer, [`
 
 const line = '2'.repeat(16);
 const screen = Array.from({ length: 8 }, () => line).join('\n');
-drawAttrs(extra, [screen, screen]);
+drawAttrs(extra, [`
+    2233333333333322
+    2222222222222222
+    2222222222222222
+    2222222222222222
+    2222222222222222
+    2222222222222222
+    2222222222222222
+    2222222222222222
+`, screen]);
 
 writeRLE(
     __dirname + '/game_type_menu_nametable_practise.bin',
