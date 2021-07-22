@@ -46,6 +46,7 @@ MODE_PAL := 19
 
 MODE_QUANTITY := 20
 MODE_GAME_QUANTITY := 14
+MODE_CONFIG_SIZE := 13
 
 MENU_SPRITE_Y_BASE := $47
 MENU_MAX_Y_SCROLL := $18
@@ -812,6 +813,14 @@ gameMode_legalScreen: ; boot
         lda #$8
         sta startLevel
 
+        ; zero out config memory
+        lda #0
+        ldx #MODE_CONFIG_SIZE
+@loop:
+        sta menuVars, x
+        dex
+        bpl @loop
+
         ; default pace to A
         lda #$A
         sta paceModifier
@@ -823,8 +832,6 @@ gameMode_legalScreen: ; boot
         lda #2
         sta gameMode
         rts
-
-gameMode_titleScreen_unused:
 
 blank_palette:
         lda #$3F
@@ -839,6 +846,7 @@ blank_palette:
         bne @loadPaletteLoop
         rts
 
+gameMode_titleScreen_unused:
 gameMode_gameTypeMenu:
         inc initRam
         ; switch to blank charmap
