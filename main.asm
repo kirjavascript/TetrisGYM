@@ -827,17 +827,16 @@ gameMode_legalScreen: ; boot
 gameMode_titleScreen_unused:
 
 blank_palette:
-        lda $2002 ; read PPU status to reset the high/low latch
+        lda PPUSTATUS
         lda #$3F
-        sta $2006 ; high byte of $3F00
-        lda #$00
-        sta $2006 ; low byte of $3F00
-        ldx #$00
+        sta PPUADDR
+        lda #$0
+        sta PPUADDR
+        ldx #$10
 @loadPaletteLoop:
-        lda #$0F
+        lda #$F
         sta $2007
-        inx
-        cpx #$10
+        dex
         bne @loadPaletteLoop
         rts
 
