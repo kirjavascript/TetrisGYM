@@ -48,11 +48,12 @@ MODE_QUANTITY := 20
 MODE_GAME_QUANTITY := 14
 
 MENU_SPRITE_Y_BASE := $47
+MENU_MAX_Y_SCROLL := $40
 BLOCK_TILES := $7B
 INVISIBLE_TILE := $43
 
 ; menuConfigSizeLookup
-.define MENUSIZES $0, $0, $0, $0, $F, $7, $8, $C, $20, $10, $0, $0, $4, $12, 0, $1, $1, $1, $1, $1
+.define MENUSIZES $0, $0, $0, $0, $F, $7, $8, $C, $20, $10, $0, $0, $4, $12, $0, $1, $1, $1, $1, $1
 
 .macro MODENAMES
     .byte   "TETRIS"
@@ -2587,6 +2588,11 @@ render_mode_scroll:
 @endscroll:
 
         lda menuScrollY
+        cmp #MENU_MAX_Y_SCROLL
+        bcc @uncapped
+        lda #MENU_MAX_Y_SCROLL
+        sta menuScrollY
+@uncapped:
         sta PPUSCROLL
         rts
 

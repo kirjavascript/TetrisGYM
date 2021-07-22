@@ -5,6 +5,8 @@
 - Transition Trainer
 - Invisible Trainer
 - Hard Drop Trainer
+- Tapping Display
+- Tap/Roll Speedtest
 - Goofyfoot Mode
 - Improved drought logic
 - Show current seed in level select and gameplay screens
