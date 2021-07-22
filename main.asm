@@ -827,7 +827,6 @@ gameMode_legalScreen: ; boot
 gameMode_titleScreen_unused:
 
 blank_palette:
-        lda PPUSTATUS
         lda #$3F
         sta PPUADDR
         lda #$0
@@ -835,7 +834,7 @@ blank_palette:
         ldx #$10
 @loadPaletteLoop:
         lda #$F
-        sta $2007
+        sta PPUDATA
         dex
         bne @loadPaletteLoop
         rts
