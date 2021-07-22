@@ -38,12 +38,12 @@ drawTiles(buffer, lookup, `
 #a    HARD DROP               d#
 #a    GARBAGE                 d#
 #a    DROUGHT                 d#
+#a    TAP/ROLL SPEED          d#
+#a    HZ DISPLAY              d#
 #a    INPUT DISPLAY           d#
 #a    GOOFY FOOT              d#
 #a    DEBUG MODE              d#
 #a    PAL MODE                d#
-#a                            d#
-#a                            d#
 #a                            d#
 `);drawTiles(extra, lookup, `
 #a                            d#

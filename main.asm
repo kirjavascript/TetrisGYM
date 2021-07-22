@@ -37,12 +37,14 @@ MODE_INVISIBLE := 10
 MODE_HARDDROP := 11
 MODE_GARBAGE := 12
 MODE_DROUGHT := 13
-MODE_INPUT_DISPLAY := 14
-MODE_GOOFY := 15
-MODE_DEBUG := 16
-MODE_PAL := 17
+MODE_SPEED_TEST := 14
+MODE_HZ_DISPLAY := 15
+MODE_INPUT_DISPLAY := 16
+MODE_GOOFY := 17
+MODE_DEBUG := 18
+MODE_PAL := 19
 
-MODE_QUANTITY := 18
+MODE_QUANTITY := 20
 MODE_GAME_QUANTITY := 14
 
 MENU_SPRITE_Y_BASE := $47
@@ -50,7 +52,7 @@ BLOCK_TILES := $7B
 INVISIBLE_TILE := $43
 
 ; menuConfigSizeLookup
-.define MENUSIZES $0, $0, $0, $0, $F, $7, $8, $C, $20, $10, $0, $0, $4, $12, $1, $1, $1, $1
+.define MENUSIZES $0, $0, $0, $0, $F, $7, $8, $C, $20, $10, $0, $0, $4, $12, 0, $1, $1, $1, $1, $1
 
 .macro MODENAMES
     .byte   "TETRIS"
@@ -296,10 +298,11 @@ tapModifier := menuVars+4
 transitionModifier := menuVars+5
 garbageModifier := menuVars+6
 droughtModifier := menuVars+7
-inputDisplayFlag := menuVars+8
-goofyFlag := menuVars+9
-debugFlag := menuVars+10
-palFlag := menuVars+11
+hzFlag := menuVars+8
+inputDisplayFlag := menuVars+9
+goofyFlag := menuVars+10
+debugFlag := menuVars+11
+palFlag := menuVars+12
 
 ; ... $7FF
 PPUCTRL     := $2000
@@ -631,20 +634,14 @@ hzTapCounter := hzRAM+0
 hzFrameCounter := hzRAM+1 ; 2 byte
 hzDebounceCounter := hzRAM+3 ; 1 byte
 hzResult := $5C ; 2 byte
-; hzFrameStartTap := hzRAM+3 ; also functions as delay
-; hzFrameEndTap := hzRAM+5
-; hzFrameLockPiece := hzRAM+7
-; hzFrameResult := hzRAM+7
+hzDebounceThreshold := $10
 ; distance / height /
-
-; bizhawk testing
-; hook up to das to test
 
 ; display: taps <s>delay</s> / frame tetrimino diff ?
 ; game genie graphics
 
+; make tapqty red-amber-green too
 
-hzDebounceThreshold := $10
 
 hzStart: ; called in playState_spawnNextTetrimino, gameModeState_initGameState
         lda #0
@@ -654,7 +651,7 @@ hzStart: ; called in playState_spawnNextTetrimino, gameModeState_initGameState
         ; frame counter is reset on first tap
         rts
 
-hzControl:
+hzControl: ; called in playState_playerControlsActiveTetrimino
         lda hzTapCounter
         beq @notTapping
         ; tick frame counter
@@ -765,20 +762,22 @@ hzTap:
         sta hzResult
 
 @calcEnd:
-        lda hzTapCounter
+        ldx hzTapCounter
+        lda byteToBcdTable, x
         sta hzResult+2
         rts
 
 playState_playerControlsActiveTetrimino:
+        jsr shift_tetrimino
+        jsr rotate_tetrimino
+        jsr drop_tetrimino
+
         jsr hzControl
         lda practiseType
         cmp #MODE_HARDDROP
         bne @soft
         jsr harddrop_tetrimino
 @soft:
-        jsr shift_tetrimino
-        jsr rotate_tetrimino
-        jsr drop_tetrimino
         rts
 
 harddrop_tetrimino:
@@ -1166,6 +1165,7 @@ menuYTmp := tmp2
         jsr byteSprite
 
         ; render config vars
+
 
         ; YTAX
         lda #0
@@ -1791,14 +1791,14 @@ transitionModeSetup:
         ; render from A
         tax
         dex ; 10 lines before transition
-        lda levelDisplayTable, x
+        lda byteToBcdTable, x
         and #$F
         rol
         rol
         rol
         rol
         sta lines
-        lda levelDisplayTable, x
+        lda byteToBcdTable, x
         and #$F0
         lsr
         lsr
