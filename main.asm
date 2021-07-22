@@ -291,7 +291,8 @@ initMagic   := $0750                        ; Initialized to a hard-coded number
 menuRAM := $760
 menuSeedCursorIndex := menuRAM+0
 menuScrollY := menuRAM+1
-menuVars := $762
+menuPaletteDelay := menuRAM+2
+menuVars := $763
 paceModifier := menuVars+0
 presetModifier := menuVars+1
 typeBModifier := menuVars+2
@@ -825,10 +826,24 @@ gameMode_legalScreen: ; boot
 
 gameMode_titleScreen_unused:
 
+blank_palette:
+          lda $2002 ; read PPU status to reset the high/low latch
+          lda #$3F
+          sta $2006 ; write the high byte of $3F00 address
+          lda #$00
+          sta $2006 ; write the low byte of $3F00 address
+          ldx #$00
+@loadPaletteLoop:
+          lda #$0F
+          sta $2007
+          inx
+          cpx #$10
+          bne @loadPaletteLoop
+
 gameMode_gameTypeMenu:
         inc initRam
         ; switch to blank charmap
-        ; (stops glitching when resetting)
+        ; (stops glitching when resetting
         lda #$02
         jsr changeCHRBank1
         lda #%10011 ; used to be $10 (enable horizontal mirroring)
@@ -837,8 +852,9 @@ gameMode_gameTypeMenu:
         sta renderMode
         jsr updateAudioWaitForNmiAndDisablePpuRendering
         jsr disableNmi
-        jsr bulkCopyToPpu
-        .addr   title_palette
+        jsr blank_palette
+        lda #$3
+        sta menuPaletteDelay ; title_palette loaded in render_mode_scroll
         jsr copyRleNametableToPpu
         .addr   game_type_menu_nametable
         lda #$28
@@ -2566,6 +2582,18 @@ render_mode_static:
         rts
 
 render_mode_scroll:
+        ; handle loading of palette
+        lda menuPaletteDelay
+        beq @loadedPalette
+        cmp #1
+        bne @waitingPalette
+        jsr bulkCopyToPpu
+        .addr   title_palette
+@waitingPalette:
+        dec menuPaletteDelay
+@loadedPalette:
+
+        ; handle scroll
         lda currentPpuCtrl
         and #$FC
         sta currentPpuCtrl
