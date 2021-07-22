@@ -5,9 +5,27 @@ const {
     drawTiles,
     drawRect,
     drawAttrs,
+    flatLookup,
 } = require('./nametables');
 
-const lookup = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ-,\'>################qweadzxc###############/##!#########[]()###############.############################################################################################################################################### ';
+const lookup = flatLookup(`
+0123456789ABCDEF
+GHIJKLMNOPQRSTUV
+WXYZ-,˙>########
+########qweadzxc
+###############/
+##!#########[]()
+###############.
+################
+################
+################
+################
+################
+################
+################
+################
+###############
+`);
 
 const buffer = readStripe(__dirname + '/game_type_menu_nametable.bin');
 const extra = [...buffer];

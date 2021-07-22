@@ -61,6 +61,10 @@ function drawAttrs(buffer, attrs) {
     });
 }
 
+function flatLookup(lookup) {
+    return lookup.trim().split('\n').map(d=>d.padEnd(16)).join('');
+}
+
 module.exports = {
     strip,
     readStripe,
@@ -69,4 +73,5 @@ module.exports = {
     drawTiles,
     drawRect,
     drawAttrs,
+    flatLookup,
 };
