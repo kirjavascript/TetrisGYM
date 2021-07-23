@@ -5744,9 +5744,9 @@ hzTap:
         lda #0
         sta hzDebounceCounter
 
-        ; ignore 1 and 2 taps
+        ; ignore 1 tap
         lda hzTapCounter
-        cmp #3
+        cmp #2
         bcc @calcEnd
 
         lda #$7A
@@ -5764,10 +5764,10 @@ hzTap:
 
         lda palFlag
         beq @notPAL
-        sta factorA24
         lda #$89
         sta factorB24
         lda #$13
+        sta factorB24+1
 @notPAL:
 
         jsr unsigned_mul24
