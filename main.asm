@@ -815,12 +815,10 @@ gameMode_legalScreen: ; boot
         sta startLevel
 
         ; zero out config memory
-        ; seems to get corrupted on fceux and misterfpga
-        ; mesen is fine, untested on hardware - probably broken
         lda #0
-        ldx #MODE_CONFIG_SIZE
+        ldx #$9F
 @loop:
-        sta menuVars, x
+        sta menuRAM, x
         dex
         bpl @loop
 
