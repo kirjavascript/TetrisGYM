@@ -603,7 +603,6 @@ gameMode_playAndEndingHighScore:
         .addr   gameModeState_startButtonHandling
         .addr   gameModeState_vblankThenRunState2
 branchOnPlayStatePlayer1:
-
         ; debug
         lda hzFlag
         beq @noHz
@@ -614,9 +613,9 @@ branchOnPlayStatePlayer1:
         lda #hzResult
         sta byteSpriteAddr
         jsr byteSprite
-        lda playState
 @noHz:
 
+        lda playState
         jsr switch_s_plus_2a
         .addr   playState_unassignOrientationId
         .addr   playState_playerControlsActiveTetrimino
@@ -1020,7 +1019,7 @@ menuThrottleNew:
         sta menuMoveThrottle
         rts
 menuThrottleContinue:
-        lda #$6
+        lda #$5
         sta menuMoveThrottle
         rts
 
