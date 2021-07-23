@@ -5680,11 +5680,12 @@ hzRAM := $612
 hzTapCounter := hzRAM+0
 hzFrameCounter := hzRAM+1 ; 2 byte
 hzDebounceCounter := hzRAM+3 ; 1 byte
+hzTapDirection := hzRAM+4 ; 1 byte
 hzResult := $5C ; 2 byte
 hzDebounceThreshold := $10
 ; distance / height /
 
-; display: taps <s>delay</s> / frame tetrimino diff ?
+; display: taps direction < / > <s>delay</s> / frame tetrimino diff ?
 ; game genie graphics
 
 ; make tapqty red-amber-green too
@@ -5728,10 +5729,16 @@ hzControl: ; called in playState_playerControlsActiveTetrimino
         rts
 
 hzTap:
-        ; check if debouncing meets threshold, and this is a fresh tap
+        tax ; button direction
+        lda hzTapDirection
+        cpx hzTapDirection
+        bne @fresh
+        ; if debouncing meets threshold, this is a fresh tap
         lda hzDebounceCounter
         cmp #hzDebounceThreshold
         bne @within
+@fresh:
+        stx hzTapDirection
         lda #0
         sta hzTapCounter
         sta hzFrameCounter+1
