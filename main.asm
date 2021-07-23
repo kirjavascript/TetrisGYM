@@ -928,7 +928,7 @@ seedControls:
         sta set_seed_input+2
 @skipSeedSelect:
 
-        ldx #BUTTON_LEFT
+        lda #BUTTON_LEFT
         jsr menuThrottle
         beq @skipSeedLeft
         lda #$01
@@ -941,7 +941,7 @@ seedControls:
         dec menuSeedCursorIndex
 @skipSeedLeft:
 
-        ldx #BUTTON_RIGHT
+        lda #BUTTON_RIGHT
         jsr menuThrottle
         beq @skipSeedRight
         lda #$01
@@ -964,9 +964,12 @@ seedControls:
 
         ; handle changing seed vals
 
-        lda newlyPressedButtons_player1
-        cmp #BUTTON_UP
-        bne @skipSeedUp
+        ; lda newlyPressedButtons_player1
+        ; cmp #BUTTON_UP
+        ; bne @skipSeedUp
+        lda #BUTTON_UP
+        jsr menuThrottle
+        beq @skipSeedUp
         lda #$01
         sta soundEffectSlot1Init
         lda menuSeedCursorIndex
@@ -996,9 +999,9 @@ seedControls:
         sta set_seed_input, x
 @skipSeedUp:
 
-        lda newlyPressedButtons_player1
-        cmp #BUTTON_DOWN
-        bne @skipSeedDown
+        lda #BUTTON_DOWN
+        jsr menuThrottle
+        beq @skipSeedDown
         lda #$01
         sta soundEffectSlot1Init
         lda menuSeedCursorIndex
@@ -1035,41 +1038,6 @@ seedControls:
         jmp gameTypeLoopContinue
 
 menuConfigControls:
-        ; check if pressing left
-        ldx #BUTTON_LEFT
-        jsr menuThrottle
-        beq @skipLeftConfig
-        jsr menuConfigOffsets
-        beq @skipLeftConfig
-        ; check if zero
-        lda menuVars, x
-        cmp #0
-        beq @skipLeftConfig
-        ; dec value
-        dec menuVars, x
-        lda #$01
-        sta soundEffectSlot1Init
-        jsr checkGoofy
-@skipLeftConfig:
-
-        ; check if pressing right
-        ldx #BUTTON_RIGHT
-        jsr menuThrottle
-        beq @skipRightConfig
-        jsr menuConfigOffsets
-        beq @skipRightConfig
-        ; check if within the offset
-        lda menuVars, x
-        cmp menuConfigSizeLookup, y
-        bpl @skipRightConfig
-        inc menuVars, x
-        lda #$01
-        sta soundEffectSlot1Init
-        jsr checkGoofy
-@skipRightConfig:
-        rts
-
-menuConfigOffsets:
         ; account for 'gaps' in config items of size zero
         ; previously the offset was just set on X directly
 
@@ -1079,6 +1047,7 @@ menuConfigOffsets:
         cpy practiseType
         bne @notYet
         lda menuConfigSizeLookup, y
+        beq @configEnd
         ; if zero, caller will beq to skip the config
         jmp @searchEnd
 @notYet:
@@ -1092,6 +1061,36 @@ menuConfigOffsets:
 
         ; actual offset now in Y
         ; RAM offset now in X
+
+        ; check if pressing left
+        lda #BUTTON_LEFT
+        jsr menuThrottle
+        beq @skipLeftConfig
+        ; check if zero
+        lda menuVars, x
+        cmp #0
+        beq @skipLeftConfig
+        ; dec value
+        dec menuVars, x
+        lda #$01
+        sta soundEffectSlot1Init
+        jsr checkGoofy
+@skipLeftConfig:
+
+        ; check if pressing right
+        lda #BUTTON_RIGHT
+        jsr menuThrottle
+        beq @skipRightConfig
+        ; check if within the offset
+        lda menuVars, x
+        cmp menuConfigSizeLookup, y
+        bpl @skipRightConfig
+        inc menuVars, x
+        lda #$01
+        sta soundEffectSlot1Init
+        jsr checkGoofy
+@skipRightConfig:
+@configEnd:
         rts
 
 menuConfigSizeLookup:
@@ -1115,7 +1114,7 @@ checkGoofy:
 
 practiseTypeMenuControls:
         ; down
-        ldx #BUTTON_DOWN
+        lda #BUTTON_DOWN
         jsr menuThrottle
         beq @downEnd
         lda #$01
@@ -1130,7 +1129,7 @@ practiseTypeMenuControls:
 @downEnd:
 
         ; up
-        ldx #BUTTON_UP
+        lda #BUTTON_UP
         jsr menuThrottle
         beq @upEnd
         lda #$01
@@ -1145,9 +1144,12 @@ practiseTypeMenuControls:
         rts
 
 menuThrottle: ; add DAS-like movement to the menu
-        cpx newlyPressedButtons_player1
+        sta tmp3
+        lda newlyPressedButtons_player1
+        cmp tmp3
         beq menuThrottleNew
-        cpx heldButtons_player1
+        lda heldButtons_player1
+        cmp tmp3
         bne @endThrottle
         dec menuMoveThrottle
         beq menuThrottleContinue
