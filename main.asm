@@ -49,7 +49,7 @@ MODE_GAME_QUANTITY := 14
 MODE_CONFIG_SIZE := 13
 
 MENU_SPRITE_Y_BASE := $47
-MENU_MAX_Y_SCROLL := $18
+MENU_MAX_Y_SCROLL := $20
 MENU_TOP_MARGIN_SCROLL := 7 ; blocks
 BLOCK_TILES := $7B
 INVISIBLE_TILE := $43
@@ -292,8 +292,9 @@ initMagic   := $0750                        ; Initialized to a hard-coded number
 menuRAM := $760
 menuSeedCursorIndex := menuRAM+0
 menuScrollY := menuRAM+1
-menuPaletteDelay := menuRAM+2
-menuVars := $763
+menuMoveThrottle := menuRAM+2
+menuPaletteDelay := menuRAM+3
+menuVars := $764
 paceModifier := menuVars+0
 presetModifier := menuVars+1
 typeBModifier := menuVars+2
@@ -814,6 +815,8 @@ gameMode_legalScreen: ; boot
         sta startLevel
 
         ; zero out config memory
+        ; seems to get corrupted on fceux and misterfpga
+        ; mesen is fine, untested on hardware - probably broken
         lda #0
         ldx #MODE_CONFIG_SIZE
 @loop:
@@ -925,9 +928,9 @@ seedControls:
         sta set_seed_input+2
 @skipSeedSelect:
 
-        lda newlyPressedButtons_player1
-        cmp #BUTTON_LEFT
-        bne @skipSeedLeft
+        ldx #BUTTON_LEFT
+        jsr menuThrottle
+        beq @skipSeedLeft
         lda #$01
         sta soundEffectSlot1Init
         lda menuSeedCursorIndex
@@ -938,9 +941,9 @@ seedControls:
         dec menuSeedCursorIndex
 @skipSeedLeft:
 
-        lda newlyPressedButtons_player1
-        cmp #BUTTON_RIGHT
-        bne @skipSeedRight
+        ldx #BUTTON_RIGHT
+        jsr menuThrottle
+        beq @skipSeedRight
         lda #$01
         sta soundEffectSlot1Init
         inc menuSeedCursorIndex
@@ -1032,33 +1035,12 @@ seedControls:
         jmp gameTypeLoopContinue
 
 menuConfigControls:
-        ; account for 'gaps' in config items of size zero
-        ; previously the offset was just set on X directly
-
-        ldx #0 ; memory offset we want
-        ldy #0 ; cursor
-@searchByte:
-        cpy practiseType
-        bne @notYet
-        lda menuConfigSizeLookup, y
-        beq @configEnd ; no config here
-        jmp @searchEnd
-@notYet:
-        lda menuConfigSizeLookup, y
-        beq @noMem
-        inx
-@noMem:
-        iny
-        jmp @searchByte
-@searchEnd:
-
-        ; actual offset now in Y
-        ; RAM offset now in X
-
         ; check if pressing left
-        lda newlyPressedButtons_player1
-        cmp #BUTTON_LEFT
-        bne @skipLeftConfig
+        ldx #BUTTON_LEFT
+        jsr menuThrottle
+        beq @skipLeftConfig
+        jsr menuConfigOffsets
+        beq @skipLeftConfig
         ; check if zero
         lda menuVars, x
         cmp #0
@@ -1071,9 +1053,11 @@ menuConfigControls:
 @skipLeftConfig:
 
         ; check if pressing right
-        lda newlyPressedButtons_player1
-        cmp #BUTTON_RIGHT
-        bne @skipRightConfig
+        ldx #BUTTON_RIGHT
+        jsr menuThrottle
+        beq @skipRightConfig
+        jsr menuConfigOffsets
+        beq @skipRightConfig
         ; check if within the offset
         lda menuVars, x
         cmp menuConfigSizeLookup, y
@@ -1083,8 +1067,35 @@ menuConfigControls:
         sta soundEffectSlot1Init
         jsr checkGoofy
 @skipRightConfig:
-@configEnd:
         rts
+
+menuConfigOffsets:
+        ; account for 'gaps' in config items of size zero
+        ; previously the offset was just set on X directly
+
+        ldx #0 ; memory offset we want
+        ldy #0 ; cursor
+@searchByte:
+        cpy practiseType
+        bne @notYet
+        lda menuConfigSizeLookup, y
+        ; if zero, caller will beq to skip the config
+        jmp @searchEnd
+@notYet:
+        lda menuConfigSizeLookup, y
+        beq @noMem
+        inx
+@noMem:
+        iny
+        jmp @searchByte
+@searchEnd:
+
+        ; actual offset now in Y
+        ; RAM offset now in X
+        rts
+
+menuConfigSizeLookup:
+        .byte   MENUSIZES
 
 checkGoofy:
         lda practiseType
@@ -1104,9 +1115,9 @@ checkGoofy:
 
 practiseTypeMenuControls:
         ; down
-        lda newlyPressedButtons_player1
-        cmp #BUTTON_DOWN
-        bne @downEnd
+        ldx #BUTTON_DOWN
+        jsr menuThrottle
+        beq @downEnd
         lda #$01
         sta soundEffectSlot1Init
 
@@ -1119,9 +1130,9 @@ practiseTypeMenuControls:
 @downEnd:
 
         ; up
-        lda newlyPressedButtons_player1
-        cmp #BUTTON_UP
-        bne @upEnd
+        ldx #BUTTON_UP
+        jsr menuThrottle
+        beq @upEnd
         lda #$01
         sta soundEffectSlot1Init
         lda practiseType
@@ -1133,8 +1144,24 @@ practiseTypeMenuControls:
 @upEnd:
         rts
 
-menuConfigSizeLookup:
-        .byte   MENUSIZES
+menuThrottle: ; add DAS-like movement to the menu
+        cpx newlyPressedButtons_player1
+        beq menuThrottleNew
+        cpx heldButtons_player1
+        bne @endThrottle
+        dec menuMoveThrottle
+        beq menuThrottleContinue
+@endThrottle:
+        lda #0
+        rts
+menuThrottleNew:
+        lda #$10
+        sta menuMoveThrottle
+        rts
+menuThrottleContinue:
+        lda #$6
+        sta menuMoveThrottle
+        rts
 
 renderMenuVars:
 

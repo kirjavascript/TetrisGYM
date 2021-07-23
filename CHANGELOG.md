@@ -8,11 +8,12 @@
 - Tapping Display
 - Tap/Roll Speedtest
 - Goofyfoot Mode
-- Improved drought logic
+- Added DAS-like menu movement
 - Show current seed in level select and gameplay screens
 - Show current trainer in high score entry screen
 - Fixed timing/rendering glitches in T-Spins
 - Added still broken, but better scoring for T-Spins
+- Improved drought logic
 
 ## [v3.1]
 - Added new setup (L/J doubletuck)
