@@ -60,7 +60,7 @@ drawTiles(buffer, lookup, `
 #a    HZ DISPLAY              d#
 #a    INPUT DISPLAY           d#
 #a    GOOFY FOOT              d#
-#a    DEBUG MODE              d#
+#a    BLOCK TOOL              d#
 #a    PAL MODE                d#
 #a                            d#
 `);drawTiles(extra, lookup, `

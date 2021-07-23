@@ -293,8 +293,9 @@ menuRAM := $760
 menuSeedCursorIndex := menuRAM+0
 menuScrollY := menuRAM+1
 menuMoveThrottle := menuRAM+2
-menuPaletteDelay := menuRAM+3
-menuVars := $764
+menuThrottleTmp := menuRAM+3
+menuPaletteDelay := menuRAM+4
+menuVars := $765
 paceModifier := menuVars+0
 presetModifier := menuVars+1
 typeBModifier := menuVars+2
@@ -1002,12 +1003,12 @@ practiseTypeMenuControls:
         rts
 
 menuThrottle: ; add DAS-like movement to the menu
-        sta tmp3
+        sta menuThrottleTmp
         lda newlyPressedButtons_player1
-        cmp tmp3
+        cmp menuThrottleTmp
         beq menuThrottleNew
         lda heldButtons_player1
-        cmp tmp3
+        cmp menuThrottleTmp
         bne @endThrottle
         dec menuMoveThrottle
         beq menuThrottleContinue
@@ -1019,7 +1020,7 @@ menuThrottleNew:
         sta menuMoveThrottle
         rts
 menuThrottleContinue:
-        lda #$5
+        lda #$4
         sta menuMoveThrottle
         rts
 
@@ -2340,9 +2341,10 @@ sprite03PausePalette6:
         .byte   $00,$1E,$00,$10,$00,$1C,$00,$18
         .byte   $00,$0E,$00,$20,$FF
 sprite05DebugPalette4:
-        .byte   $00,$0D,$00,$00,$00,$0E,$00,$08
-        .byte   $00,$0B,$00,$10,$00,$1E,$00,$18
-        .byte   $00,$10,$00,$20,$FF
+        .byte   $00,$0b,$00,$00,$00,$15,$00,$08
+        .byte   $00,$18,$00,$10,$00,$0c,$00,$18
+        .byte   $00,$14,$00,$20
+        .byte   $FF
 sprite06TPiece:
         .byte   $00,$7B,$02,$FC,$00,$7B,$02,$04
         .byte   $00,$7B,$02,$0C,$08,$7B,$02,$04
@@ -2525,11 +2527,11 @@ render_mode_scroll:
         rts
 
 render_mode_pause:
-        lda pausedOutOfDateRenderFlags
-        and #$01
-        beq @skipStatisticsPatch
-        jsr statisticsNametablePatch
-@skipStatisticsPatch:
+        ; lda pausedOutOfDateRenderFlags
+        ; and #$01
+        ; beq @skipStatisticsPatch
+        ; jsr statisticsNametablePatch
+; @skipStatisticsPatch:
         lda pausedOutOfDateRenderFlags
         and #$02
         beq @skipSaveSlotPatch
@@ -5189,25 +5191,13 @@ debugSelectMenuControls:
         beq debugContinue
 
         lda newlyPressedButtons_player1
-        and #BUTTON_LEFT
+        and #BUTTON_LEFT+BUTTON_RIGHT
         beq @skipDebugType
         ; toggle mode
         lda debugLevelEdit
         eor #1
         sta debugLevelEdit
 @skipDebugType:
-
-        lda newlyPressedButtons_player1
-        and #BUTTON_RIGHT
-        beq @skipDebugController
-        ; toggle controller
-        lda inputDisplayFlag
-        eor #1
-        sta inputDisplayFlag
-        lda pausedOutOfDateRenderFlags
-        ora #$1
-        sta pausedOutOfDateRenderFlags
-@skipDebugController:
 
         jsr checkSaveStateControlsDebug
 
@@ -5273,28 +5263,26 @@ debugContinue:
         sta DEBUG_ORIGINAL_CURRENT_PIECE
 
         ; update position
-        lda newlyPressedButtons_player1
-        and #BUTTON_UP
+        lda #BUTTON_UP
+        jsr menuThrottle
         beq @notPressedUp
         dec tetriminoY
-
 @notPressedUp:
-
-        lda newlyPressedButtons_player1
-        and #BUTTON_DOWN
+        lda #BUTTON_DOWN
+        jsr menuThrottle
         beq @notPressedDown
         inc tetriminoY
 @notPressedDown:
-        lda newlyPressedButtons_player1
-        and #BUTTON_LEFT
+        lda #BUTTON_LEFT
+        jsr menuThrottle
         beq @notPressedLeft
         dec tetriminoX
 @notPressedLeft:
-        lda newlyPressedButtons_player1
-        and #BUTTON_RIGHT
-        beq @notPressingRight
+        lda #BUTTON_RIGHT
+        jsr menuThrottle
+        beq @notPressedRight
         inc tetriminoX
-@notPressingRight:
+@notPressedRight:
 
         ; check mode
         lda debugLevelEdit
