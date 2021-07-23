@@ -605,6 +605,8 @@ gameMode_playAndEndingHighScore:
 branchOnPlayStatePlayer1:
 
         ; debug
+        lda hzFlag
+        beq @noHz
         lda #$C0
         sta byteSpriteXOffset
         lda #MENU_SPRITE_Y_BASE
@@ -613,6 +615,7 @@ branchOnPlayStatePlayer1:
         sta byteSpriteAddr
         jsr byteSprite
         lda playState
+@noHz:
 
         jsr switch_s_plus_2a
         .addr   playState_unassignOrientationId
@@ -628,156 +631,14 @@ branchOnPlayStatePlayer1:
         .addr   playState_checkStartGameOver
         .addr   playState_incrementPlayState
 
-; hz = 60.098 * (taps - 1) / (frames - 1)
-; PAL is 50.006
-;
-; HydrantDude explains how and why the formula works here: https://discord.com/channels/374368504465457153/405470199400235013/867156217259884574
-
-; TODO: move this
-hzRAM := $612
-hzTapCounter := hzRAM+0
-hzFrameCounter := hzRAM+1 ; 2 byte
-hzDebounceCounter := hzRAM+3 ; 1 byte
-hzResult := $5C ; 2 byte
-hzDebounceThreshold := $10
-; distance / height /
-
-; display: taps <s>delay</s> / frame tetrimino diff ?
-; game genie graphics
-
-; make tapqty red-amber-green too
-
-
-hzStart: ; called in playState_spawnNextTetrimino, gameModeState_initGameState
-        lda #0
-        sta hzTapCounter
-        lda #hzDebounceThreshold
-        sta hzDebounceCounter
-        ; frame counter is reset on first tap
-        rts
-
-hzControl: ; called in playState_playerControlsActiveTetrimino
-        lda hzTapCounter
-        beq @notTapping
-        ; tick frame counter
-        lda hzFrameCounter
-        clc
-        adc #$01
-        sta hzFrameCounter
-        lda #$00
-        adc hzFrameCounter+1
-        sta hzFrameCounter+1
-@notTapping:
-
-        ; tick debounce counter
-        lda hzDebounceCounter
-        cmp #hzDebounceThreshold
-        beq @elapsed
-        inc hzDebounceCounter
-@elapsed:
-
-        ; detect inputs
-        lda newlyPressedButtons_player1
-        and #BUTTON_LEFT
-        bne hzTap
-        lda newlyPressedButtons_player1
-        and #BUTTON_RIGHT
-        bne hzTap
-        rts
-
-hzTap:
-        ; check if debouncing meets threshold, and this is a fresh tap
-        lda hzDebounceCounter
-        cmp #hzDebounceThreshold
-        bne @within
-        lda #0
-        sta hzTapCounter
-        sta hzFrameCounter+1
-        ; 0 is the first frame (4 means 5 frames)
-        sta hzFrameCounter
-@within:
-
-        ; increment taps, reset debounce
-        inc hzTapCounter
-        lda #0
-        sta hzDebounceCounter
-
-        ; ignore 1 and 2 taps
-        lda hzTapCounter
-        cmp #3
-        bcc @calcEnd
-
-        lda #$7A
-        sta factorB24
-        lda #$17
-        sta factorB24+1
-        lda #0
-        sta factorA24+1
-        sta factorA24+2
-        sta factorB24+2
-
-        lda hzTapCounter
-        sbc #1
-        sta factorA24
-
-        lda palFlag
-        beq @notPAL
-        sta factorA24
-        lda #$89
-        sta factorB24
-        lda #$13
-@notPAL:
-
-        jsr unsigned_mul24
-
-        ; taps-1 * 6010 now in product24
-
-        lda product24
-        sta dividend
-        lda product24+1
-        sta dividend+1
-        lda product24+2
-        sta dividend+2
-
-        ; then divide by the hzFrameCounter, which should be frames-1
-
-        lda hzFrameCounter
-        sta divisor
-        lda hzFrameCounter+1
-        sta divisor+1
-        lda #0
-        sta divisor+2
-
-        jsr unsigned_div24 ; hz*100 in dividend
-
-        lda dividend
-        sta binary32
-        lda dividend+1
-        sta binary32+1
-        lda dividend+2
-        sta binary32+2
-        lda #0
-        sta binary32+3
-
-        jsr BIN_BCD ; hz*100 as BCD in bcd32
-
-        lda bcd32
-        sta hzResult+1
-        lda bcd32+1
-        sta hzResult
-
-@calcEnd:
-        ldx hzTapCounter
-        lda byteToBcdTable, x
-        sta hzResult+2
-        rts
-
 playState_playerControlsActiveTetrimino:
         jsr shift_tetrimino
         jsr rotate_tetrimino
         jsr drop_tetrimino
-
+        lda hzFlag
+        beq @noHz
         jsr hzControl
+@noHz:
         lda practiseType
         cmp #MODE_HARDDROP
         bne @soft
@@ -5818,6 +5679,152 @@ gameHUDPace:
 @positive:
         stx byteSpriteTile
         jsr byteSprite_base
+        rts
+
+; hz stuff
+
+; hz = 60.098 * (taps - 1) / (frames - 1)
+; PAL is 50.006
+;
+; HydrantDude explains how and why the formula works here: https://discord.com/channels/374368504465457153/405470199400235013/867156217259884574
+
+; TODO: move this
+hzRAM := $612
+hzTapCounter := hzRAM+0
+hzFrameCounter := hzRAM+1 ; 2 byte
+hzDebounceCounter := hzRAM+3 ; 1 byte
+hzResult := $5C ; 2 byte
+hzDebounceThreshold := $10
+; distance / height /
+
+; display: taps <s>delay</s> / frame tetrimino diff ?
+; game genie graphics
+
+; make tapqty red-amber-green too
+
+
+hzStart: ; called in playState_spawnNextTetrimino, gameModeState_initGameState
+        lda #0
+        sta hzTapCounter
+        lda #hzDebounceThreshold
+        sta hzDebounceCounter
+        ; frame counter is reset on first tap
+        rts
+
+hzControl: ; called in playState_playerControlsActiveTetrimino
+        lda hzTapCounter
+        beq @notTapping
+        ; tick frame counter
+        lda hzFrameCounter
+        clc
+        adc #$01
+        sta hzFrameCounter
+        lda #$00
+        adc hzFrameCounter+1
+        sta hzFrameCounter+1
+@notTapping:
+
+        ; tick debounce counter
+        lda hzDebounceCounter
+        cmp #hzDebounceThreshold
+        beq @elapsed
+        inc hzDebounceCounter
+@elapsed:
+
+        ; detect inputs
+        lda newlyPressedButtons_player1
+        and #BUTTON_LEFT
+        bne hzTap
+        lda newlyPressedButtons_player1
+        and #BUTTON_RIGHT
+        bne hzTap
+        rts
+
+hzTap:
+        ; check if debouncing meets threshold, and this is a fresh tap
+        lda hzDebounceCounter
+        cmp #hzDebounceThreshold
+        bne @within
+        lda #0
+        sta hzTapCounter
+        sta hzFrameCounter+1
+        ; 0 is the first frame (4 means 5 frames)
+        sta hzFrameCounter
+@within:
+
+        ; increment taps, reset debounce
+        inc hzTapCounter
+        lda #0
+        sta hzDebounceCounter
+
+        ; ignore 1 and 2 taps
+        lda hzTapCounter
+        cmp #3
+        bcc @calcEnd
+
+        lda #$7A
+        sta factorB24
+        lda #$17
+        sta factorB24+1
+        lda #0
+        sta factorA24+1
+        sta factorA24+2
+        sta factorB24+2
+
+        lda hzTapCounter
+        sbc #1
+        sta factorA24
+
+        lda palFlag
+        beq @notPAL
+        sta factorA24
+        lda #$89
+        sta factorB24
+        lda #$13
+@notPAL:
+
+        jsr unsigned_mul24
+
+        ; taps-1 * 6010 now in product24
+
+        lda product24
+        sta dividend
+        lda product24+1
+        sta dividend+1
+        lda product24+2
+        sta dividend+2
+
+        ; then divide by the hzFrameCounter, which should be frames-1
+
+        lda hzFrameCounter
+        sta divisor
+        lda hzFrameCounter+1
+        sta divisor+1
+        lda #0
+        sta divisor+2
+
+        jsr unsigned_div24 ; hz*100 in dividend
+
+        lda dividend
+        sta binary32
+        lda dividend+1
+        sta binary32+1
+        lda dividend+2
+        sta binary32+2
+        lda #0
+        sta binary32+3
+
+        jsr BIN_BCD ; hz*100 as BCD in bcd32
+
+        lda bcd32
+        sta hzResult+1
+        lda bcd32+1
+        sta hzResult
+
+@calcEnd:
+        ldx hzTapCounter
+        lda byteToBcdTable, x
+        sta hzResult+2
         rts
 
 ; math routines
