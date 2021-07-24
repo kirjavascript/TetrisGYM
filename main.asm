@@ -604,18 +604,6 @@ gameMode_playAndEndingHighScore:
         .addr   gameModeState_startButtonHandling
         .addr   gameModeState_vblankThenRunState2
 branchOnPlayStatePlayer1:
-        ; debug
-        lda hzFlag
-        beq @noHz
-        lda #$C0
-        sta byteSpriteXOffset
-        lda #MENU_SPRITE_Y_BASE
-        sta byteSpriteYOffset
-        lda #hzResult
-        sta byteSpriteAddr
-        jsr byteSprite
-@noHz:
-
         lda playState
         jsr switch_s_plus_2a
         .addr   playState_unassignOrientationId
@@ -739,12 +727,14 @@ gameMode_gameTypeMenu:
         jsr updateAudioWaitForNmiAndEnablePpuRendering
         jsr updateAudioWaitForNmiAndResetOamStaging
         jsr hzStart
-
-gameTypeLoop:
+        ; memset used to happen every loop
         lda #$FF
         ldx #$02
         ldy #$02
         jsr memset_page
+
+gameTypeLoop:
+        jsr renderMenuHz
         jmp seedControls
 
 gameTypeLoopContinue:
@@ -1028,6 +1018,70 @@ menuThrottleNew:
 menuThrottleContinue:
         lda #$4
         sta menuMoveThrottle
+        rts
+
+renderMenuHz:
+MENU_HZ_Y_BASE := MENU_SPRITE_Y_BASE + (MODE_SPEED_TEST * 8) + 1
+        lda #MENU_HZ_Y_BASE
+        sbc menuScrollY
+        sta oamStaging, x
+        inx
+        lda hzTapCounter
+        and #$F
+        sta oamStaging, x
+        inx
+        lda #$00
+        sta oamStaging, x
+        inx
+        lda #$E0
+        sta oamStaging, x
+        inx
+        ; increase OAM index
+        lda #$04
+        clc
+        adc oamStagingLength
+        sta oamStagingLength
+
+        ; hz
+        ldx oamStagingLength
+        lda #MENU_HZ_Y_BASE
+        sbc menuScrollY
+        sta oamStaging, x
+        inx
+        lda hzResult
+        and #$F0
+        lsr
+        lsr
+        lsr
+        lsr
+        sta oamStaging, x
+        inx
+        lda #$00
+        sta oamStaging, x
+        inx
+        lda #$C0
+        sta oamStaging, x
+        inx
+
+        lda #MENU_HZ_Y_BASE
+        sbc menuScrollY
+        sta oamStaging, x
+        inx
+        lda hzResult
+        and #$F
+        sta oamStaging, x
+        inx
+        lda #$00
+        sta oamStaging, x
+        inx
+        lda #$C8
+        sta oamStaging, x
+        inx
+
+        lda #$08
+        clc
+        adc oamStagingLength
+        sta oamStagingLength
         rts
 
 renderMenuVars:
@@ -5687,7 +5741,7 @@ hzTapCounter := hzRAM+0
 hzFrameCounter := hzRAM+1 ; 2 byte
 hzDebounceCounter := hzRAM+3 ; 1 byte
 hzTapDirection := hzRAM+4 ; 1 byte
-hzResult := $5C ; 2 byte
+hzResult := hzRAM+5 ; 2 byte
 hzDebounceThreshold := $10
 ; distance / height /
 
@@ -5821,9 +5875,6 @@ hzTap:
         sta hzResult
 
 @calcEnd:
-        ldx hzTapCounter
-        lda byteToBcdTable, x
-        sta hzResult+2
         rts
 
 ; math routines

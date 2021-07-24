@@ -56,7 +56,7 @@ drawTiles(buffer, lookup, `
 #a    HARD DROP               d#
 #a    GARBAGE                 d#
 #a    DROUGHT                 d#
-#a    TAP/ROLL SPEED          d#
+#a    TAP/ROLL SPEED      ~   d#
 #a    HZ DISPLAY              d#
 #a    INPUT DISPLAY           d#
 #a    GOOFY FOOT              d#

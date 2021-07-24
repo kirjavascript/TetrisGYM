@@ -5,9 +5,9 @@
 - Transition Trainer
 - Invisible Trainer
 - Hard Drop Trainer
-- Tapping Display
 - Tap/Roll Speedtest
-- Goofyfoot Mode
+- Hz Display
+- Goofyfoot support
 - Show current seed in level select and gameplay screens
 - Show current trainer in high score entry screen
 - Fixed timing/rendering glitches in T-Spins
