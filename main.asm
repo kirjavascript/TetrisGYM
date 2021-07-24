@@ -1470,6 +1470,13 @@ gameModeState_initGameBackground:
         jsr twoDigsToPPU
 @skipTop:
 
+        lda #$21
+        sta PPUADDR
+        lda #$63
+        sta PPUADDR
+        lda #$D
+        sta PPUDATA
+
         lda #$20
         sta tmp1
         lda #$83
@@ -2551,7 +2558,11 @@ render_mode_scroll:
         sta PPUCTRL
         lda #0
         sta PPUSCROLL
+        jsr calc_menuScrollY
+        sta PPUSCROLL
+        rts
 
+calc_menuScrollY:
         lda practiseType
         cmp #MENU_TOP_MARGIN_SCROLL
         bcs @underflow
@@ -2578,7 +2589,6 @@ render_mode_scroll:
         lda #MENU_MAX_Y_SCROLL
         sta menuScrollY
 @uncapped:
-        sta PPUSCROLL
         rts
 
 render_mode_pause:
