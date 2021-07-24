@@ -132,6 +132,7 @@ byteSpriteXOffset := byteSpriteRAM
 byteSpriteYOffset := byteSpriteRAM+1
 byteSpriteAddr := byteSpriteRAM+2
 byteSpriteTile := byteSpriteRAM+4
+byteSpriteLen := byteSpriteRAM+5
 
 ; ... $009A
 spriteXOffset   := $00A0
@@ -1042,46 +1043,22 @@ MENU_HZ_Y_BASE := MENU_SPRITE_Y_BASE + (MODE_SPEED_TEST * 8) + 1
         adc oamStagingLength
         sta oamStagingLength
 
-        ; hz
+        ; draw hz 10s unit
         ldx oamStagingLength
         lda #MENU_HZ_Y_BASE
         sbc menuScrollY
-        sta oamStaging, x
-        inx
-        lda hzResult
-        and #$F0
-        lsr
-        lsr
-        lsr
-        lsr
-        sta oamStaging, x
-        inx
-        lda #$00
-        sta oamStaging, x
-        inx
+        sta byteSpriteYOffset
         lda #$C0
-        sta oamStaging, x
-        inx
-
-        lda #MENU_HZ_Y_BASE
-        sbc menuScrollY
-        sta oamStaging, x
-        inx
-        lda hzResult
-        and #$F
-        sta oamStaging, x
-        inx
-        lda #$00
-        sta oamStaging, x
-        inx
-        lda #$C8
-        sta oamStaging, x
-        inx
-
-        lda #$08
-        clc
-        adc oamStagingLength
-        sta oamStagingLength
+        sta byteSpriteXOffset
+        lda #1
+        sta byteSpriteLen
+        lda #0
+        sta byteSpriteTile
+        lda #<hzResult
+        sta byteSpriteAddr
+        lda #>hzResult
+        sta byteSpriteAddr+1
+        jsr byteSprite
         rts
 
 renderMenuVars:
@@ -1135,6 +1112,12 @@ menuYTmp := tmp2
         sta byteSpriteYOffset
         lda #set_seed_input
         sta byteSpriteAddr
+        lda #0
+        sta byteSpriteAddr+1
+        lda #0
+        sta byteSpriteTile
+        lda #3
+        sta byteSpriteLen
         jsr byteSprite
 
         ; render config vars
@@ -1212,11 +1195,6 @@ menuYTmp := tmp2
 
 byteSprite:
 menuXTmp := tmp2
-
-        lda #0
-        sta byteSpriteTile
-
-byteSprite_base:
         ldy #0
 @loop:
         tya
@@ -1270,7 +1248,7 @@ byteSprite_base:
         sta oamStagingLength
 
         iny
-        cpy #3
+        cpy byteSpriteLen
         bne @loop
 
         rts
@@ -5718,6 +5696,8 @@ gameHUDPace:
         sta byteSpriteYOffset
         lda #paceRAM
         sta byteSpriteAddr
+        lda #0
+        sta byteSpriteAddr+1
 
         ldx #$E0
         lda sign
@@ -5725,7 +5705,9 @@ gameHUDPace:
         ldx #$F0
 @positive:
         stx byteSpriteTile
-        jsr byteSprite_base
+        lda #3
+        sta byteSpriteLen
+        jsr byteSprite
         rts
 
 ; hz stuff
