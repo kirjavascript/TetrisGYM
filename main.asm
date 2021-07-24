@@ -738,6 +738,7 @@ gameMode_gameTypeMenu:
         jsr updateAudioWaitForNmiAndResetOamStaging
         jsr updateAudioWaitForNmiAndEnablePpuRendering
         jsr updateAudioWaitForNmiAndResetOamStaging
+        jsr hzStart
 
 gameTypeLoop:
         lda #$FF
@@ -747,6 +748,11 @@ gameTypeLoop:
         jmp seedControls
 
 gameTypeLoopContinue:
+        lda practiseType
+        cmp #MODE_SPEED_TEST
+        bne @noHz
+        jsr hzControl
+@noHz:
         jsr menuConfigControls
         jsr practiseTypeMenuControls
 
@@ -5691,7 +5697,7 @@ hzDebounceThreshold := $10
 ; make tapqty red-amber-green too
 
 
-hzStart: ; called in playState_spawnNextTetrimino, gameModeState_initGameState
+hzStart: ; called in playState_spawnNextTetrimino, gameModeState_initGameState, gameMode_gameTypeMenu
         lda #0
         sta hzTapCounter
         lda #hzDebounceThreshold
@@ -5699,7 +5705,7 @@ hzStart: ; called in playState_spawnNextTetrimino, gameModeState_initGameState
         ; frame counter is reset on first tap
         rts
 
-hzControl: ; called in playState_playerControlsActiveTetrimino
+hzControl: ; called in playState_playerControlsActiveTetrimino, gameTypeLoopContinue
         lda hzTapCounter
         beq @notTapping
         ; tick frame counter
@@ -5730,7 +5736,6 @@ hzControl: ; called in playState_playerControlsActiveTetrimino
 
 hzTap:
         tax ; button direction
-        lda hzTapDirection
         cpx hzTapDirection
         bne @fresh
         ; if debouncing meets threshold, this is a fresh tap
