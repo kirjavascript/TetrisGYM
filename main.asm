@@ -1023,27 +1023,22 @@ menuThrottleContinue:
 
 renderMenuHz:
 MENU_HZ_Y_BASE := MENU_SPRITE_Y_BASE + (MODE_SPEED_TEST * 8) + 1
+        ; taps
         lda #MENU_HZ_Y_BASE
-        sbc menuScrollY
-        sta oamStaging, x
-        inx
+        sta byteSpriteYOffset
+        lda #$E0
+        sta byteSpriteXOffset
         lda hzTapCounter
         and #$F
-        sta oamStaging, x
-        inx
-        lda #$00
-        sta oamStaging, x
-        inx
-        lda #$E0
-        sta oamStaging, x
-        inx
-        ; increase OAM index
-        lda #$04
-        clc
-        adc oamStagingLength
-        sta oamStagingLength
-
-        ; draw hz 10s unit
+        jsr menuSprite
+        ; hz
+        lda #MENU_HZ_Y_BASE
+        sta byteSpriteYOffset
+        lda #$D0
+        sta byteSpriteXOffset
+        lda #$55
+        jsr menuSprite
+        ; hz 10s unit
         ldx oamStagingLength
         lda #MENU_HZ_Y_BASE
         sbc menuScrollY
@@ -1251,6 +1246,28 @@ menuXTmp := tmp2
         cpy byteSpriteLen
         bne @loop
 
+        rts
+
+menuSprite: ; a - value, xoff/yoff
+        tay
+        lda byteSpriteYOffset
+        sbc menuScrollY
+        sta oamStaging, x
+        inx
+        tya
+        sta oamStaging, x
+        inx
+        lda #$00
+        sta oamStaging, x
+        inx
+        lda byteSpriteXOffset
+        sta oamStaging, x
+        inx
+        ; increase OAM index
+        lda #$04
+        clc
+        adc oamStagingLength
+        sta oamStagingLength
         rts
 
 gameMode_levelMenu:
