@@ -81,7 +81,10 @@ SRAM        := $6000 ; 8 delicious kilobytes
 tmp1        := $0000
 tmp2        := $0001
 tmp3        := $0002
-tmpBulkCopyToPpuReturnAddr:= $0005
+tmpX        := $0003
+tmpY        := $0004
+tmpZ        := $0005
+tmpBulkCopyToPpuReturnAddr:= $0006 ; 2 bytes
 patchToPpuAddr  := $0014
 rng_seed    := $0017
 spawnID     := $0019
@@ -728,13 +731,10 @@ gameMode_gameTypeMenu:
         jsr updateAudioWaitForNmiAndEnablePpuRendering
         jsr updateAudioWaitForNmiAndResetOamStaging
         jsr hzStart
-        ; memset used to happen every loop
-        lda #$FF
-        ldx #$02
-        ldy #$02
-        jsr memset_page
 
 gameTypeLoop:
+        ; memset FF-02 used to happen every loop
+        ; but it's done in ResetOamStaging anyway?
         jsr renderMenuHz
         jmp seedControls
 
@@ -1470,12 +1470,10 @@ gameModeState_initGameBackground:
         jsr twoDigsToPPU
 @skipTop:
 
-        lda #$21
-        sta PPUADDR
-        lda #$63
-        sta PPUADDR
-        lda #$D
-        sta PPUDATA
+        lda hzFlag
+        beq @noHz
+        jsr clearStatisticsBox
+@noHz:
 
         lda #$20
         sta tmp1
@@ -1608,6 +1606,37 @@ showPaceDiffText:
         sta PPUDATA
         lda #0
 @done:
+        rts
+
+clearStatisticsBox:
+        lda #$21
+        sta tmpX
+        lda #$63
+        sta tmpY
+
+        ldx #12
+@startLine:
+        lda tmpX
+        sta PPUADDR
+        lda tmpY
+        sta PPUADDR
+
+        ldy #6
+@clearLine:
+        lda #$FF
+        sta PPUDATA
+        dey
+        bne @clearLine
+        ; inc pointer
+        clc
+	lda tmpY
+	adc #$20
+	sta tmpY
+        bcc @noverflow
+        inc tmpX
+@noverflow:
+        dex
+        bne @startLine
         rts
 
 savestate_nametable_patch:
@@ -2735,6 +2764,8 @@ render_mode_play_and_demo:
         sta outOfDateRenderFlags
 
 @renderStats:
+        lda hzFlag
+        bne @renderTetrisFlashAndSound
         lda outOfDateRenderFlags
         and #$40
         beq @renderTetrisFlashAndSound
