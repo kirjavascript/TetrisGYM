@@ -702,6 +702,10 @@ blank_palette:
 
 gameMode_titleScreen_unused:
 gameMode_gameTypeMenu:
+        jsr hzStart
+        jsr calc_menuScrollY
+        sta menuScrollY
+
         inc initRam
         ; switch to blank charmap
         ; (stops glitching when resetting
@@ -730,7 +734,6 @@ gameMode_gameTypeMenu:
         jsr updateAudioWaitForNmiAndResetOamStaging
         jsr updateAudioWaitForNmiAndEnablePpuRendering
         jsr updateAudioWaitForNmiAndResetOamStaging
-        jsr hzStart
 
 gameTypeLoop:
         ; memset FF-02 used to happen every loop
@@ -2587,20 +2590,8 @@ render_mode_scroll:
         sta PPUCTRL
         lda #0
         sta PPUSCROLL
-        jsr calc_menuScrollY
-        sta PPUSCROLL
-        rts
 
-calc_menuScrollY:
-        lda practiseType
-        cmp #MENU_TOP_MARGIN_SCROLL
-        bcs @underflow
-        lda #MENU_TOP_MARGIN_SCROLL+1
-@underflow:
-        sbc #MENU_TOP_MARGIN_SCROLL
-        asl
-        asl
-        asl
+        jsr calc_menuScrollY
         cmp menuScrollY
         beq @endscroll
         ; not equal
@@ -2618,6 +2609,20 @@ calc_menuScrollY:
         lda #MENU_MAX_Y_SCROLL
         sta menuScrollY
 @uncapped:
+
+        sta PPUSCROLL
+        rts
+
+calc_menuScrollY:
+        lda practiseType
+        cmp #MENU_TOP_MARGIN_SCROLL
+        bcs @underflow
+        lda #MENU_TOP_MARGIN_SCROLL+1
+@underflow:
+        sbc #MENU_TOP_MARGIN_SCROLL
+        asl
+        asl
+        asl
         rts
 
 render_mode_pause:
