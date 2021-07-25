@@ -141,7 +141,7 @@ byteSpriteLen := byteSpriteRAM+5
 spriteXOffset   := $00A0
 spriteYOffset   := $00A1
 spriteIndexInOamContentLookup:= $00A2
-outOfDateRenderFlags:= $00A3                ; Bit 0-lines 1-level 2-score 6-stats 7-high score entry letter
+outOfDateRenderFlags:= $00A3                ; Bit 0-lines 1-level 2-score 4-hz 6-stats 7-high score entry letter
 
 ; ... $00A6
 gameModeState   := $00A7                    ; For values, see playState_checkForCompletedRows
@@ -1627,7 +1627,7 @@ clearStatisticsBox:
         sta PPUDATA
         dey
         bne @clearLine
-        ; inc pointer
+        ; add to pointer
         clc
 	lda tmpY
 	adc #$20
@@ -1744,7 +1744,7 @@ gameModeState_initGameState:
         sta lines
 @notTypeB:
 
-        lda #$47
+        lda #$57
         sta outOfDateRenderFlags
         jsr updateAudioWaitForNmiAndResetOamStaging
 
@@ -2715,8 +2715,7 @@ render_mode_play_and_demo:
         sta PPUDATA
         lda typeBModifier
         sta PPUDATA
-        jmp @renderLevelEnd
-
+        ; jmp @renderLevelEnd
 
 @renderLevelEnd:
         jsr updatePaletteForLevel
@@ -2727,7 +2726,7 @@ render_mode_play_and_demo:
 @renderScore:
         lda outOfDateRenderFlags
         and #$04
-        beq @renderStats
+        beq @renderHz
         lda #$21
         sta PPUADDR
         lda #$18
@@ -2762,10 +2761,40 @@ render_mode_play_and_demo:
         lda outOfDateRenderFlags
         and #$FB
         sta outOfDateRenderFlags
-
-@renderStats:
+@renderHz:
         lda hzFlag
-        bne @renderTetrisFlashAndSound
+        beq @renderStats
+        lda outOfDateRenderFlags
+        and #$10
+        beq @renderTetrisFlashAndSound
+
+        ; TODO: line piece stat
+
+        lda #$21
+        sta PPUADDR
+        lda #$83
+        sta PPUADDR
+        lda hzTapCounter
+        sta PPUDATA
+
+        lda #$21
+        sta PPUADDR
+        lda #$C3
+        sta PPUADDR
+        ldx #0
+@hzLoop:
+        lda hzResult, x
+        jsr twoDigsToPPU
+        inx
+        cpx #1
+        bne @hzLoop
+
+        lda outOfDateRenderFlags
+        and #$EF
+        sta outOfDateRenderFlags
+
+        jmp @renderTetrisFlashAndSound
+@renderStats:
         lda outOfDateRenderFlags
         and #$40
         beq @renderTetrisFlashAndSound
@@ -5829,6 +5858,11 @@ hzControl: ; called in playState_playerControlsActiveTetrimino, gameTypeLoopCont
         rts
 
 hzTap:
+        ; update game UI
+        lda outOfDateRenderFlags
+        ora #$10 ; @renderHz
+        sta outOfDateRenderFlags
+
         tax ; button direction
         cpx hzTapDirection
         bne @fresh
