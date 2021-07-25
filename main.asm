@@ -85,7 +85,7 @@ tmpX        := $0003
 tmpY        := $0004
 tmpZ        := $0005
 tmpBulkCopyToPpuReturnAddr:= $0006 ; 2 bytes
-patchToPpuAddr  := $0014
+patchToPpuAddr  := $0014 ; unused
 rng_seed    := $0017
 spawnID     := $0019
 spawnCount  := $001A
@@ -130,12 +130,13 @@ divisor := paceRAM+$7
 remainder := paceRAM+$A
 pztemp := paceRAM+$D
 
-byteSpriteRAM := $73
+byteSpriteRAM := $72
 byteSpriteXOffset := byteSpriteRAM
 byteSpriteYOffset := byteSpriteRAM+1
 byteSpriteAddr := byteSpriteRAM+2
 byteSpriteTile := byteSpriteRAM+4
 byteSpriteLen := byteSpriteRAM+5
+; ... $0078
 
 ; ... $009A
 spriteXOffset   := $00A0
@@ -229,6 +230,14 @@ presetIndex := $60E ; can be mangled in other modes
 pausedOutOfDateRenderFlags := $60F ; 0 - statistics 1 - saveslot
 debugLevelEdit := $610
 debugNextCounter := $611
+paceResult := $612 ; 3 bytes
+paceSign := $615
+hzRAM := $616
+hzTapCounter := hzRAM+0
+hzFrameCounter := hzRAM+1 ; 2 byte
+hzDebounceCounter := hzRAM+3 ; 1 byte
+hzTapDirection := hzRAM+4 ; 1 byte
+hzResult := hzRAM+5 ; 2 byte
 
 ; ... $67F
 musicStagingSq1Lo:= $0680
@@ -1683,13 +1692,13 @@ gameModeState_initGameState:
         lda set_seed_input+2
         sta set_seed+2
 
-        ; paceRAM init
+        ; paceResult init
         lda #$B0
-        sta paceRAM
+        sta paceResult
         lda #$00
-        sta sign
-        sta paceRAM+1
-        sta paceRAM+2
+        sta paceSign
+        sta paceResult+1
+        sta paceResult+2
 
         ; misc
         sta spawnDelay
@@ -5678,26 +5687,27 @@ prepareNextPace:
 
         ; reorder data
         lda bcd32
-        sta paceRAM+2
+        sta paceResult+2
         lda bcd32+1
-        sta paceRAM+1
+        sta paceResult+1
         lda bcd32+2
-        sta paceRAM
+        sta paceResult
 
         ; check if highest nybble is empty and use it for a sign
         ldx #$B0
         lda sign
+        sta paceSign
         beq @negative
         ldx #$A0
 @negative:
         stx tmp3
 
-        lda paceRAM
+        lda paceResult
         and #$F0
         bne @noSign
-        lda paceRAM
+        lda paceResult
         adc tmp3
-        sta paceRAM
+        sta paceResult
 @noSign:
 
         rts
@@ -5805,13 +5815,13 @@ gameHUDPace:
         sta byteSpriteXOffset
         lda #$27
         sta byteSpriteYOffset
-        lda #paceRAM
+        lda #<paceResult
         sta byteSpriteAddr
-        lda #0
+        lda #>paceResult
         sta byteSpriteAddr+1
 
         ldx #$E0
-        lda sign
+        lda paceSign
         beq @positive
         ldx #$F0
 @positive:
@@ -5828,21 +5838,7 @@ gameHUDPace:
 ;
 ; HydrantDude explains how and why the formula works here: https://discord.com/channels/374368504465457153/405470199400235013/867156217259884574
 
-; TODO: move this
-hzRAM := $612
-hzTapCounter := hzRAM+0
-hzFrameCounter := hzRAM+1 ; 2 byte
-hzDebounceCounter := hzRAM+3 ; 1 byte
-hzTapDirection := hzRAM+4 ; 1 byte
-hzResult := hzRAM+5 ; 2 byte
 hzDebounceThreshold := $10
-; distance / height /
-
-; display: taps direction < / > <s>delay</s> / frame tetrimino diff ?
-; game genie graphics
-
-; make tapqty red-amber-green too
-
 
 hzStart: ; called in playState_spawnNextTetrimino, gameModeState_initGameState, gameMode_gameTypeMenu
         lda #0
