@@ -2767,16 +2767,24 @@ render_mode_play_and_demo:
         lda outOfDateRenderFlags
         and #$10
         beq @renderTetrisFlashAndSound
+        ; only set at game start and when player is controlling a piece
+        ; during which, no other tile updates are happening
+
+        ; last I checked you could draw $A extra tiles *every* frame
+        ; without issues, and this uses up TODO tiles
 
         ; TODO: line piece stat
 
+        ; tap counter
         lda #$21
         sta PPUADDR
         lda #$83
         sta PPUADDR
         lda hzTapCounter
+        and #$f
         sta PPUDATA
 
+        ; hz
         lda #$21
         sta PPUADDR
         lda #$C3
@@ -2786,8 +2794,19 @@ render_mode_play_and_demo:
         lda hzResult, x
         jsr twoDigsToPPU
         inx
-        cpx #1
+        cpx #2
         bne @hzLoop
+
+        ; direction
+
+        lda #$22
+        sta PPUADDR
+        lda #$03
+        sta PPUADDR
+        lda hzTapDirection
+        clc
+        adc #$D0
+        sta PPUDATA
 
         lda outOfDateRenderFlags
         and #$EF
@@ -5858,12 +5877,8 @@ hzControl: ; called in playState_playerControlsActiveTetrimino, gameTypeLoopCont
         rts
 
 hzTap:
-        ; update game UI
-        lda outOfDateRenderFlags
-        ora #$10 ; @renderHz
-        sta outOfDateRenderFlags
-
         tax ; button direction
+        dex ; normalize to 1/0
         cpx hzTapDirection
         bne @fresh
         ; if debouncing meets threshold, this is a fresh tap
@@ -5949,6 +5964,11 @@ hzTap:
         sta hzResult
 
 @calcEnd:
+
+        ; update game UI
+        lda outOfDateRenderFlags
+        ora #$10 ; @renderHz
+        sta outOfDateRenderFlags
         rts
 
 ; math routines
