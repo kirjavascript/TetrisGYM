@@ -238,6 +238,7 @@ hzFrameCounter := hzRAM+1 ; 2 byte
 hzDebounceCounter := hzRAM+3 ; 1 byte
 hzTapDirection := hzRAM+4 ; 1 byte
 hzResult := hzRAM+5 ; 2 byte
+hzSpawnDelay := hzRAM+7 ; 2 byte
 
 ; ... $67F
 musicStagingSq1Lo:= $0680
@@ -2778,9 +2779,10 @@ render_mode_play_and_demo:
 @renderHz:
         lda hzFlag
         beq @renderStats
+        ; TODO: clamp stats to longbar only
         lda outOfDateRenderFlags
         and #$10
-        beq @renderTetrisFlashAndSound
+        beq @renderStats
         ; only set at game start and when player is controlling a piece
         ; during which, no other tile updates are happening
 
@@ -2822,6 +2824,15 @@ render_mode_play_and_demo:
         adc #$D0
         sta PPUDATA
 
+        ; direction
+
+        lda #$22
+        sta PPUADDR
+        lda #$23
+        sta PPUADDR
+        lda hzSpawnDelay
+        sta PPUDATA
+
         lda outOfDateRenderFlags
         and #$EF
         sta outOfDateRenderFlags
@@ -2834,24 +2845,24 @@ render_mode_play_and_demo:
         lda #$00
         sta tmpCurrentPiece
 @renderPieceStat:
-        lda tmpCurrentPiece
-        asl a
-        tax
-        lda pieceToPpuStatAddr,x
-        sta PPUADDR
-        lda pieceToPpuStatAddr+1,x
-        sta PPUADDR
-        lda statsByType+1,x
-        sta PPUDATA
-        lda statsByType,x
-        jsr twoDigsToPPU
-        inc tmpCurrentPiece
-        lda tmpCurrentPiece
-        cmp #$07
-        bne @renderPieceStat
-        lda outOfDateRenderFlags
-        and #$BF
-        sta outOfDateRenderFlags
+        ; lda tmpCurrentPiece
+        ; asl a
+        ; tax
+        ; lda pieceToPpuStatAddr,x
+        ; sta PPUADDR
+        ; lda pieceToPpuStatAddr+1,x
+        ; sta PPUADDR
+        ; lda statsByType+1,x
+        ; sta PPUDATA
+        ; lda statsByType,x
+        ; jsr twoDigsToPPU
+        ; inc tmpCurrentPiece
+        ; lda tmpCurrentPiece
+        ; cmp #$07
+        ; bne @renderPieceStat
+        ; lda outOfDateRenderFlags
+        ; and #$BF
+        ; sta outOfDateRenderFlags
 @renderTetrisFlashAndSound:
         lda #$3F
         sta PPUADDR
@@ -5842,6 +5853,7 @@ hzDebounceThreshold := $10
 
 hzStart: ; called in playState_spawnNextTetrimino, gameModeState_initGameState, gameMode_gameTypeMenu
         lda #0
+        sta hzSpawnDelay
         sta hzTapCounter
         lda #hzDebounceThreshold
         sta hzDebounceCounter
@@ -5875,6 +5887,11 @@ hzControl: ; called in playState_playerControlsActiveTetrimino, gameTypeLoopCont
         lda newlyPressedButtons_player1
         and #BUTTON_RIGHT
         bne hzTap
+
+        lda hzTapCounter
+        bne @tapping
+        inc hzSpawnDelay
+@tapping:
         rts
 
 hzTap:

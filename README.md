@@ -16,7 +16,7 @@
     * [Pace](#pace)
     * [Setups](#setups)
     * [Floor](#floor)
-    * [(Quick)Tap](#%28quick%29-tap)
+    * [(Quick)Tap](#quicktap)
     * [Garbage](#garbage)
     * [Drought](#drought)
 * [Input Display](#input-display)
