@@ -116,19 +116,19 @@ garbageHole := $0059                        ; Position of hole in received garba
 garbageDelay  := $005A
 pieceTileModifier := $005B ; above $80 - use a single one, below - use an offset
 
-paceRAM := $60 ; $12 bytes
-binary32 := paceRAM+$0
-bcd32 := paceRAM+$4
-exp := paceRAM+$8
-product24 := paceRAM+$9
-factorA24 := paceRAM+$C
-factorB24 := paceRAM+$F
-binaryTemp := paceRAM+$C
-sign := paceRAM+$F
-dividend := paceRAM+$4
-divisor := paceRAM+$7
-remainder := paceRAM+$A
-pztemp := paceRAM+$D
+mathRAM := $60 ; $12 bytes
+binary32 := mathRAM+$0
+bcd32 := mathRAM+$4
+exp := mathRAM+$8
+product24 := mathRAM+$9
+factorA24 := mathRAM+$C
+factorB24 := mathRAM+$F
+binaryTemp := mathRAM+$C
+sign := mathRAM+$F
+dividend := mathRAM+$4
+divisor := mathRAM+$7
+remainder := mathRAM+$A
+pztemp := mathRAM+$D
 
 byteSpriteRAM := $72
 byteSpriteXOffset := byteSpriteRAM
@@ -2782,7 +2782,7 @@ render_mode_play_and_demo:
         ; TODO: clamp stats to longbar only
         lda outOfDateRenderFlags
         and #$10
-        beq @renderStats
+        beq @renderStatsHz
         ; only set at game start and when player is controlling a piece
         ; during which, no other tile updates are happening
 
@@ -2828,7 +2828,7 @@ render_mode_play_and_demo:
 
         lda #$22
         sta PPUADDR
-        lda #$23
+        lda #$43
         sta PPUADDR
         lda hzSpawnDelay
         sta PPUDATA
@@ -2837,7 +2837,16 @@ render_mode_play_and_demo:
         and #$EF
         sta outOfDateRenderFlags
 
-        jmp @renderTetrisFlashAndSound
+        ; run a patched version of the stats
+@renderStatsHz:
+        lda outOfDateRenderFlags
+        and #$40
+        beq @renderTetrisFlashAndSound
+        lda #$06
+        sta tmpCurrentPiece
+        jmp @renderPieceStat
+
+        ; jmp @renderTetrisFlashAndSound
 @renderStats:
         lda outOfDateRenderFlags
         and #$40
@@ -2845,24 +2854,24 @@ render_mode_play_and_demo:
         lda #$00
         sta tmpCurrentPiece
 @renderPieceStat:
-        ; lda tmpCurrentPiece
-        ; asl a
-        ; tax
-        ; lda pieceToPpuStatAddr,x
-        ; sta PPUADDR
-        ; lda pieceToPpuStatAddr+1,x
-        ; sta PPUADDR
-        ; lda statsByType+1,x
-        ; sta PPUDATA
-        ; lda statsByType,x
-        ; jsr twoDigsToPPU
-        ; inc tmpCurrentPiece
-        ; lda tmpCurrentPiece
-        ; cmp #$07
-        ; bne @renderPieceStat
-        ; lda outOfDateRenderFlags
-        ; and #$BF
-        ; sta outOfDateRenderFlags
+        lda tmpCurrentPiece
+        asl a
+        tax
+        lda pieceToPpuStatAddr,x
+        sta PPUADDR
+        lda pieceToPpuStatAddr+1,x
+        sta PPUADDR
+        lda statsByType+1,x
+        sta PPUDATA
+        lda statsByType,x
+        jsr twoDigsToPPU
+        inc tmpCurrentPiece
+        lda tmpCurrentPiece
+        cmp #$07
+        bne @renderPieceStat
+        lda outOfDateRenderFlags
+        and #$BF
+        sta outOfDateRenderFlags
 @renderTetrisFlashAndSound:
         lda #$3F
         sta PPUADDR
@@ -5610,9 +5619,9 @@ prepareNextPace:
         bcc @lessThan230
 @moreThan230:
         lda #$AA
-        sta paceRAM
-        sta paceRAM+1
-        sta paceRAM+2
+        sta mathRAM
+        sta mathRAM+1
+        sta mathRAM+2
         rts
 @lessThan230:
 
@@ -5889,9 +5898,12 @@ hzControl: ; called in playState_playerControlsActiveTetrimino, gameTypeLoopCont
         bne hzTap
 
         lda hzTapCounter
-        bne @tapping
+        bne @noDelayInc
+        lda hzSpawnDelay
+        cmp #$F
+        beq @noDelayInc
         inc hzSpawnDelay
-@tapping:
+@noDelayInc:
         rts
 
 hzTap:
