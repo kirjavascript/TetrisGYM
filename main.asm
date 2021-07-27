@@ -2789,8 +2789,6 @@ render_mode_play_and_demo:
         ; last I checked you could draw $A extra tiles *every* frame
         ; without issues, and this uses up TODO tiles
 
-        ; TODO: line piece stat
-
         ; tap counter
         lda #$21
         sta PPUADDR
@@ -2801,17 +2799,14 @@ render_mode_play_and_demo:
         sta PPUDATA
 
         ; hz
-        lda #$21
+        lda #$22
         sta PPUADDR
-        lda #$C3
+        lda #$A3
         sta PPUADDR
-        ldx #0
-@hzLoop:
-        lda hzResult, x
+        lda hzResult
         jsr twoDigsToPPU
-        inx
-        cpx #2
-        bne @hzLoop
+        lda hzResult+1
+        jsr twoDigsToPPU
 
         ; direction
 
@@ -2846,7 +2841,6 @@ render_mode_play_and_demo:
         sta tmpCurrentPiece
         jmp @renderPieceStat
 
-        ; jmp @renderTetrisFlashAndSound
 @renderStats:
         lda outOfDateRenderFlags
         and #$40
