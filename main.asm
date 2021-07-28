@@ -1654,10 +1654,9 @@ hzStatsSetup:
 
 ; clearStatisticsPalette
 
-        ; todo: load via stripe
         lda #$23
         sta PPUADDR
-        lda #$E8
+        lda #$D8
         sta PPUADDR
         lda #$B7
         sta PPUDATA
@@ -1668,17 +1667,17 @@ hzStatsSetup:
 
 ; build stats UI
         ; .
-        lda #$22
+        lda #$21
         sta PPUADDR
-        lda #$A5
+        lda #$85
         sta PPUADDR
         lda #$ED
         sta PPUDATA
 
         ; hz
-        lda #$22
+        lda #$21
         sta PPUADDR
-        lda #$A8
+        lda #$88
         sta PPUADDR
         lda #$EC
         sta PPUDATA
@@ -2819,24 +2818,24 @@ render_mode_play_and_demo:
         ; during which, no other tile updates are happening
         ; this uses up $7 PPU tile writes
 
+        ; lda #$21
+        ; sta PPUADDR
+        ; lda #$83
+        ; sta PPUADDR
+        ; lda hzTapCounter
+        ; and #$f
+        ; sta PPUDATA
+
+        ; hz
         lda #$21
         sta PPUADDR
         lda #$83
         sta PPUADDR
-        lda hzTapCounter
-        and #$f
-        sta PPUDATA
-
-        ; hz
-        lda #$22
-        sta PPUADDR
-        lda #$A3
-        sta PPUADDR
         lda hzResult
         jsr twoDigsToPPU
-        lda #$22
+        lda #$21
         sta PPUADDR
-        lda #$A6
+        lda #$86
         sta PPUADDR
         lda hzResult+1
         jsr twoDigsToPPU
