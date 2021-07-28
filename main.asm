@@ -1655,12 +1655,16 @@ hzStatsSetup:
 ; clearStatisticsPalette
 
         ; todo: load via stripe
-        ; lda #$23
-        ; sta PPUADDR
-        ; lda #$E9
-        ; sta PPUADDR
-        ; lda #$55
-        ; sta PPUDATA
+        lda #$23
+        sta PPUADDR
+        lda #$E8
+        sta PPUADDR
+        lda #$B7
+        sta PPUDATA
+        lda #$25
+        sta PPUDATA
+        lda #$ED
+        sta PPUDATA
 
 ; build stats UI
         ; .
