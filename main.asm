@@ -1485,7 +1485,7 @@ gameModeState_initGameBackground:
 
         lda hzFlag
         beq @noHz
-        jsr clearStatisticsBox
+        jsr hzStatsSetup
 @noHz:
 
         lda #$20
@@ -1621,7 +1621,27 @@ showPaceDiffText:
 @done:
         rts
 
-clearStatisticsBox:
+hzStatsSetup:
+; clearStatisticsPalette
+
+        ; todo: load via stripe
+        ; lda #$23
+        ; sta PPUADDR
+        ; lda #$E9
+        ; sta PPUADDR
+        ; lda #$55
+        ; sta PPUDATA
+
+        ; lda #$2B
+        ; sta PPUADDR
+        ; lda #$E9
+        ; sta PPUADDR
+        ; lda #$0F
+        ; sta PPUDATA
+
+        ; sta PPUDATA
+
+; clearStatisticsBox
         lda #$21
         sta tmpX
         lda #$63
@@ -2785,11 +2805,8 @@ render_mode_play_and_demo:
         beq @renderStatsHz
         ; only set at game start and when player is controlling a piece
         ; during which, no other tile updates are happening
+        ; this uses up $7 PPU tile writes
 
-        ; last I checked you could draw $A extra tiles *every* frame
-        ; without issues, and this uses up TODO tiles
-
-        ; tap counter
         lda #$21
         sta PPUADDR
         lda #$83
@@ -2805,6 +2822,10 @@ render_mode_play_and_demo:
         sta PPUADDR
         lda hzResult
         jsr twoDigsToPPU
+        lda #$22
+        sta PPUADDR
+        lda #$A6
+        sta PPUADDR
         lda hzResult+1
         jsr twoDigsToPPU
 
