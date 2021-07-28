@@ -1622,25 +1622,6 @@ showPaceDiffText:
         rts
 
 hzStatsSetup:
-; clearStatisticsPalette
-
-        ; todo: load via stripe
-        ; lda #$23
-        ; sta PPUADDR
-        ; lda #$E9
-        ; sta PPUADDR
-        ; lda #$55
-        ; sta PPUDATA
-
-        ; lda #$2B
-        ; sta PPUADDR
-        ; lda #$E9
-        ; sta PPUADDR
-        ; lda #$0F
-        ; sta PPUDATA
-
-        ; sta PPUDATA
-
 ; clearStatisticsBox
         lda #$21
         sta tmpX
@@ -1670,6 +1651,33 @@ hzStatsSetup:
 @noverflow:
         dex
         bne @startLine
+
+; clearStatisticsPalette
+
+        ; todo: load via stripe
+        ; lda #$23
+        ; sta PPUADDR
+        ; lda #$E9
+        ; sta PPUADDR
+        ; lda #$55
+        ; sta PPUDATA
+
+; build stats UI
+        ; .
+        lda #$22
+        sta PPUADDR
+        lda #$A5
+        sta PPUADDR
+        lda #$ED
+        sta PPUDATA
+
+        ; hz
+        lda #$22
+        sta PPUADDR
+        lda #$A8
+        sta PPUADDR
+        lda #$EC
+        sta PPUDATA
         rts
 
 savestate_nametable_patch:
