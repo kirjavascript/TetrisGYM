@@ -1666,14 +1666,6 @@ hzStatsSetup:
         lda #$ED
         sta PPUDATA
 
-        ; taps
-        lda #$23
-        sta PPUADDR
-        lda #$e1
-        sta PPUADDR
-        lda #$2a
-        sta PPUDATA
-
 ; build stats UI
         ; .
         lda #$21
@@ -1703,8 +1695,6 @@ hzStatsSetup:
         lda #$A
         sta PPUDATA
         lda #$19
-        sta PPUDATA
-        lda #$1C
         sta PPUDATA
 
         ; delay
