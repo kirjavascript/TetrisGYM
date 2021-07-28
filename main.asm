@@ -1654,6 +1654,7 @@ hzStatsSetup:
 
 ; clearStatisticsPalette
 
+        ; hz
         lda #$23
         sta PPUADDR
         lda #$D8
@@ -1663,6 +1664,14 @@ hzStatsSetup:
         lda #$25
         sta PPUDATA
         lda #$ED
+        sta PPUDATA
+
+        ; taps
+        lda #$23
+        sta PPUADDR
+        lda #$e1
+        sta PPUADDR
+        lda #$2a
         sta PPUDATA
 
 ; build stats UI
@@ -1682,6 +1691,8 @@ hzStatsSetup:
         lda #$EC
         sta PPUDATA
 
+        ; todo: stripe
+
         ; taps
         lda #$22
         sta PPUADDR
@@ -1695,7 +1706,29 @@ hzStatsSetup:
         sta PPUDATA
         lda #$1C
         sta PPUDATA
-        lda #$1C
+
+        ; delay
+        lda #$22
+        sta PPUADDR
+        lda #$63
+        sta PPUADDR
+        lda #$D
+        sta PPUDATA
+        lda #$15
+        sta PPUDATA
+        lda #$22
+        sta PPUDATA
+
+        ; dir
+        lda #$22
+        sta PPUADDR
+        lda #$A3
+        sta PPUADDR
+        lda #$D
+        sta PPUDATA
+        lda #$12
+        sta PPUDATA
+        lda #$1B
         sta PPUDATA
 
         rts
@@ -2864,7 +2897,7 @@ render_mode_play_and_demo:
 
         lda #$22
         sta PPUADDR
-        lda #$68
+        lda #$A8
         sta PPUADDR
         lda hzTapDirection
         clc
@@ -2875,7 +2908,7 @@ render_mode_play_and_demo:
 
         lda #$22
         sta PPUADDR
-        lda #$A8
+        lda #$68
         sta PPUADDR
         lda hzSpawnDelay
         sta PPUDATA
