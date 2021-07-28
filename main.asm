@@ -1652,76 +1652,20 @@ hzStatsSetup:
         dex
         bne @startLine
 
-; clearStatisticsPalette
-
-        ; hz
-        lda #$23
-        sta PPUADDR
-        lda #$D8
-        sta PPUADDR
-        lda #$B7
-        sta PPUDATA
-        lda #$25
-        sta PPUDATA
-        lda #$ED
-        sta PPUDATA
-
-; build stats UI
-        ; .
-        lda #$21
-        sta PPUADDR
-        lda #$A5
-        sta PPUADDR
-        lda #$ED
-        sta PPUDATA
-
-        ; hz
-        lda #$21
-        sta PPUADDR
-        lda #$A8
-        sta PPUADDR
-        lda #$EC
-        sta PPUDATA
-
-        ; todo: stripe
-
-        ; taps
-        lda #$22
-        sta PPUADDR
-        lda #$23
-        sta PPUADDR
-        lda #$1D
-        sta PPUDATA
-        lda #$A
-        sta PPUDATA
-        lda #$19
-        sta PPUDATA
-
-        ; delay
-        lda #$22
-        sta PPUADDR
-        lda #$63
-        sta PPUADDR
-        lda #$D
-        sta PPUDATA
-        lda #$15
-        sta PPUDATA
-        lda #$22
-        sta PPUDATA
-
-        ; dir
-        lda #$22
-        sta PPUADDR
-        lda #$A3
-        sta PPUADDR
-        lda #$D
-        sta PPUDATA
-        lda #$12
-        sta PPUDATA
-        lda #$1B
-        sta PPUDATA
-
+;
+        jsr bulkCopyToPpu
+        .addr hzStats
         rts
+
+hzStats:
+        .byte $22, $23, $3, $1D, $A, $19 ; tap
+        .byte $22, $63, $3, $D, $15, $22 ; dly
+        .byte $22, $A3, $3, $D, $12, $1B ; dir
+        .byte $21, $A8, $1, $EC ; hz
+        .byte $21, $A5, $1, $ED ; .
+        .byte $23, $D8, $3, $B7, $25, $ED ; hz palette
+        .byte $FF
+
 
 savestate_nametable_patch:
         .byte   $22,$F7,$38,$39,$39,$39,$39,$39,$39,$3A,$FE
