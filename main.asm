@@ -1605,21 +1605,14 @@ showPaceDiffText:
         lda practiseType
         cmp #MODE_PACE
         bne @done
-        lda #$20
-        sta PPUADDR
-        lda #$98
-        sta PPUADDR
-        lda #$D
-        sta PPUDATA
-        lda #$12
-        sta PPUDATA
-        lda #$F
-        sta PPUDATA
-        lda #$F
-        sta PPUDATA
+        jsr bulkCopyToPpu
+        .addr paceDiffText
         lda #0
 @done:
         rts
+
+paceDiffText:
+        .byte $20, $98, $4, $D, $12, $F, $F, $FF
 
 hzStatsSetup:
 ; clearStatisticsBox
