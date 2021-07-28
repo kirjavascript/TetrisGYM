@@ -1669,7 +1669,7 @@ hzStatsSetup:
         ; .
         lda #$21
         sta PPUADDR
-        lda #$85
+        lda #$A5
         sta PPUADDR
         lda #$ED
         sta PPUDATA
@@ -1677,10 +1677,27 @@ hzStatsSetup:
         ; hz
         lda #$21
         sta PPUADDR
-        lda #$88
+        lda #$A8
         sta PPUADDR
         lda #$EC
         sta PPUDATA
+
+        ; taps
+        lda #$22
+        sta PPUADDR
+        lda #$23
+        sta PPUADDR
+        lda #$1D
+        sta PPUDATA
+        lda #$A
+        sta PPUDATA
+        lda #$19
+        sta PPUDATA
+        lda #$1C
+        sta PPUDATA
+        lda #$1C
+        sta PPUDATA
+
         rts
 
 savestate_nametable_patch:
@@ -2818,44 +2835,47 @@ render_mode_play_and_demo:
         ; during which, no other tile updates are happening
         ; this uses up $7 PPU tile writes
 
-        ; lda #$21
-        ; sta PPUADDR
-        ; lda #$83
-        ; sta PPUADDR
-        ; lda hzTapCounter
-        ; and #$f
-        ; sta PPUDATA
-
         ; hz
+
         lda #$21
         sta PPUADDR
-        lda #$83
+        lda #$A3
         sta PPUADDR
         lda hzResult
         jsr twoDigsToPPU
         lda #$21
         sta PPUADDR
-        lda #$86
+        lda #$A6
         sta PPUADDR
         lda hzResult+1
         jsr twoDigsToPPU
 
-        ; direction
+        ; taps
 
         lda #$22
         sta PPUADDR
-        lda #$03
+        lda #$28
         sta PPUADDR
-        lda hzTapDirection
-        clc
-        adc #$D0
+        lda hzTapCounter
+        and #$f
         sta PPUDATA
 
         ; direction
 
         lda #$22
         sta PPUADDR
-        lda #$43
+        lda #$68
+        sta PPUADDR
+        lda hzTapDirection
+        clc
+        adc #$D0
+        sta PPUDATA
+
+        ; delay
+
+        lda #$22
+        sta PPUADDR
+        lda #$A8
         sta PPUADDR
         lda hzSpawnDelay
         sta PPUDATA
