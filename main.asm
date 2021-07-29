@@ -1616,6 +1616,7 @@ paceDiffText:
 
 hzStatsSetup:
 ; clearStatisticsBox
+; TODO: merge into hzStats for less writes
         lda #$21
         sta tmpX
         lda #$63
@@ -2787,13 +2788,12 @@ render_mode_play_and_demo:
 @renderHz:
         lda hzFlag
         beq @renderStats
-        ; TODO: clamp stats to longbar only
         lda outOfDateRenderFlags
         and #$10
         beq @renderStatsHz
         ; only set at game start and when player is controlling a piece
         ; during which, no other tile updates are happening
-        ; this uses up $7 PPU tile writes
+        ; this is pretty expensive and uses up $7 PPU tile writes and 1 palette write
 
         ; hz
 
@@ -2809,6 +2809,14 @@ render_mode_play_and_demo:
         sta PPUADDR
         lda hzResult+1
         jsr twoDigsToPPU
+
+        ; lda #$22
+        ; sta PPUADDR
+        ; lda #$28
+        ; sta PPUADDR
+        ; lda hzTapCounter
+        ; and #$f
+        ; sta PPUDATA
 
         ; taps
 
@@ -2828,7 +2836,7 @@ render_mode_play_and_demo:
         sta PPUADDR
         lda hzTapDirection
         clc
-        adc #$D0
+        adc #$D6
         sta PPUDATA
 
         ; delay
@@ -4987,7 +4995,7 @@ changePRGBank:
 
 game_palette:
         .byte   $3F,$00,$20,$0F,$30,$12,$16,$0F
-        .byte   $20,$12,$18,$0F,$2C,$16,$29,$0F
+        .byte   $20,$12,$15,$0F,$2C,$16,$29,$0F
         .byte   $3C,$00,$30,$0F,$16,$2A,$22,$0F
         .byte   $10,$16,$2D,$0F,$2C,$16,$29,$0F
         .byte   $3C,$00,$30,$FF
