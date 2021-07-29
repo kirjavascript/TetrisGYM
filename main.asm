@@ -1485,7 +1485,8 @@ gameModeState_initGameBackground:
 
         lda hzFlag
         beq @noHz
-        jsr hzStatsSetup
+        jsr bulkCopyToPpu
+        .addr hzStats
 @noHz:
 
         lda #$20
@@ -1563,6 +1564,7 @@ saveSlotNametablePatch:
         rts
 
 saveStateNametableUI:
+        ; todo: replace with stripe
         ldx #$00
 @nextPpuAddress:
         lda savestate_nametable_patch,x
@@ -1614,50 +1616,22 @@ showPaceDiffText:
 paceDiffText:
         .byte $20, $98, $4, $D, $12, $F, $F, $FF
 
-hzStatsSetup:
-; clearStatisticsBox
-; TODO: merge into hzStats for less writes
-        lda #$21
-        sta tmpX
-        lda #$63
-        sta tmpY
-
-        ldx #12
-@startLine:
-        lda tmpX
-        sta PPUADDR
-        lda tmpY
-        sta PPUADDR
-
-        ldy #6
-@clearLine:
-        lda #$FF
-        sta PPUDATA
-        dey
-        bne @clearLine
-        ; add to pointer
-        clc
-	lda tmpY
-	adc #$20
-	sta tmpY
-        bcc @noverflow
-        inc tmpX
-@noverflow:
-        dex
-        bne @startLine
-
-;
-        jsr bulkCopyToPpu
-        .addr hzStats
-        rts
-
 hzStats:
+        .byte $21, $63, $43, $FF
+        .byte $21, $83, $46, $FF
+        .byte $21, $C3, $46, $FF
+        .byte $21, $E3, $42, $FF
+        .byte $22, $03, $46, $FF
+        .byte $22, $03, $46, $FF
+        .byte $22, $43, $46, $FF
+        .byte $22, $83, $46, $FF
+        .byte $22, $c3, $46, $FF
+        .byte $21, $A8, $1, $EC ; hz
+        .byte $21, $A5, $1, $ED ; .
+        .byte $23, $D8, $2, $B7, $25 ; hz palette
         .byte $22, $23, $3, $1D, $A, $19 ; tap
         .byte $22, $63, $3, $D, $15, $22 ; dly
         .byte $22, $A3, $3, $D, $12, $1B ; dir
-        .byte $21, $A8, $1, $EC ; hz
-        .byte $21, $A5, $1, $ED ; .
-        .byte $23, $D8, $3, $B7, $25, $ED ; hz palette
         .byte $FF
 
 
@@ -2791,63 +2765,7 @@ render_mode_play_and_demo:
         lda outOfDateRenderFlags
         and #$10
         beq @renderStatsHz
-        ; only set at game start and when player is controlling a piece
-        ; during which, no other tile updates are happening
-        ; this is pretty expensive and uses up $7 PPU tile writes and 1 palette write
-
-        ; hz
-
-        lda #$21
-        sta PPUADDR
-        lda #$A3
-        sta PPUADDR
-        lda hzResult
-        jsr twoDigsToPPU
-        lda #$21
-        sta PPUADDR
-        lda #$A6
-        sta PPUADDR
-        lda hzResult+1
-        jsr twoDigsToPPU
-
-        ; lda #$22
-        ; sta PPUADDR
-        ; lda #$28
-        ; sta PPUADDR
-        ; lda hzTapCounter
-        ; and #$f
-        ; sta PPUDATA
-
-        ; taps
-
-        lda #$22
-        sta PPUADDR
-        lda #$28
-        sta PPUADDR
-        lda hzTapCounter
-        and #$f
-        sta PPUDATA
-
-        ; direction
-
-        lda #$22
-        sta PPUADDR
-        lda #$A8
-        sta PPUADDR
-        lda hzTapDirection
-        clc
-        adc #$D6
-        sta PPUDATA
-
-        ; delay
-
-        lda #$22
-        sta PPUADDR
-        lda #$68
-        sta PPUADDR
-        lda hzSpawnDelay
-        sta PPUDATA
-
+        jsr renderHz
         lda outOfDateRenderFlags
         and #$EF
         sta outOfDateRenderFlags
@@ -2910,6 +2828,68 @@ render_mode_play_and_demo:
         sty PPUSCROLL
         ldy #$00
         sty PPUSCROLL
+        rts
+
+renderHz:
+        ; only set at game start and when player is controlling a piece
+        ; during which, no other tile updates are happening
+        ; this is pretty expensive and uses up $7 PPU tile writes and 1 palette write
+
+        ; hz
+
+        lda #$21
+        sta PPUADDR
+        lda #$A3
+        sta PPUADDR
+        lda hzResult
+        jsr twoDigsToPPU
+        lda #$21
+        sta PPUADDR
+        lda #$A6
+        sta PPUADDR
+        lda hzResult+1
+        jsr twoDigsToPPU
+
+        ; palette
+
+        ; lda #$23
+        ; sta PPUADDR
+        ; lda #$D9
+        ; sta PPUADDR
+        ; lda hzResult
+        ; lsr
+        ; sta PPUDATA
+
+        ; taps
+
+        lda #$22
+        sta PPUADDR
+        lda #$28
+        sta PPUADDR
+        lda hzTapCounter
+        and #$f
+        sta PPUDATA
+
+        ; direction
+
+        lda #$22
+        sta PPUADDR
+        lda #$A8
+        sta PPUADDR
+        lda hzTapDirection
+        clc
+        adc #$D6
+        sta PPUDATA
+
+        ; delay
+
+        lda #$22
+        sta PPUADDR
+        lda #$68
+        sta PPUADDR
+        lda hzSpawnDelay
+        sta PPUDATA
+
         rts
 
 pieceToPpuStatAddr:
