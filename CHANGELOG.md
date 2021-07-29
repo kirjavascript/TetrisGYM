@@ -13,7 +13,7 @@
 - Fixed timing/rendering glitches in T-Spins
 - Added still broken, but better scoring for T-Spins
 - Improved drought logic
-- Renamed Debug Mode to Block Tool
+- Rebranded Debug Mode as Block Tool
 - Simplified Block Tool controls
 - Added DAS-like movement to main menu
 - Added DAS-like movement to Block Tool

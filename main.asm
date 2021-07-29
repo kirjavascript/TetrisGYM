@@ -2852,13 +2852,14 @@ renderHz:
 
         ; palette
 
-        ; lda #$23
-        ; sta PPUADDR
-        ; lda #$D9
-        ; sta PPUADDR
-        ; lda hzResult
-        ; lsr
-        ; sta PPUDATA
+        lda #$3F
+        sta PPUADDR
+        lda #$07
+        sta PPUADDR
+        lda hzResult
+        lsr
+        lsr
+        sta PPUDATA
 
         ; taps
 
