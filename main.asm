@@ -239,6 +239,7 @@ hzDebounceCounter := hzRAM+3 ; 1 byte
 hzTapDirection := hzRAM+4 ; 1 byte
 hzResult := hzRAM+5 ; 2 byte
 hzSpawnDelay := hzRAM+7 ; 2 byte
+hzPalette := hzRAM+8 ; 1 byte
 
 ; ... $67F
 musicStagingSq1Lo:= $0680
@@ -2856,9 +2857,7 @@ renderHz:
         sta PPUADDR
         lda #$07
         sta PPUADDR
-        lda hzResult
-        lsr
-        lsr
+        lda hzPalette
         sta PPUDATA
 
         ; taps
@@ -5972,6 +5971,10 @@ hzTap:
 
         jsr unsigned_div24 ; hz*100 in dividend
 
+        ldx dividend+1 ; get hz for palette
+        lda hzPaletteGradient, x
+        sta hzPalette
+
         lda dividend
         sta binary32
         lda dividend+1
@@ -5995,6 +5998,10 @@ hzTap:
         ora #$10 ; @renderHz
         sta outOfDateRenderFlags
         rts
+
+hzPaletteGradient: ; goes up to B
+        .byte $20, $21, $22, $23, $24, $25
+        .byte $26, $27, $28, $29, $2A, $2B
 
 ; math routines
 
