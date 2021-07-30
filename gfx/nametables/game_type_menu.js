@@ -61,12 +61,12 @@ drawTiles(buffer, lookup, `
 #a    INPUT DISPLAY           d#
 #a    GOOFY FOOT              d#
 #a    BLOCK TOOL              d#
+#a    QUAL MODE               d#
 #a    PAL MODE                d#
-#a                            d#
 `);drawTiles(extra, lookup, `
 #a                            d#
-#a V4                         d#
 #a                            d#
+#a V4                         d#
 #a                            d#
 #a                            d#
 #a                            d#
@@ -101,7 +101,7 @@ drawRect(buffer, 8, 2, 10, 5, 0xB0); // draw logo
 // drawRect(extra, 20, 0, 5, 5, 0x9A); // draw QR code
 
 const urlX = 3;
-const urlY = 1;
+const urlY = 2;
 drawRect(extra, urlX, urlY, 12, 1, 0x74);
 drawRect(extra, urlX+12, urlY, 12, 1, 0x84);
 
@@ -128,8 +128,8 @@ drawAttrs(buffer, [`
 const line = '2'.repeat(16);
 const screen = Array.from({ length: 8 }, () => line).join('\n');
 drawAttrs(extra, [`
-    2333333333333332
     2222222222222222
+    2333333333333332
     2222222222222222
     2222222222222222
     2222222222222222

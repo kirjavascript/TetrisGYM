@@ -8,11 +8,11 @@
 .include "charmap.asm"
 
 PRACTISE_MODE := 1
-DEBUG_MODE := 1
 NO_MUSIC := 1
 ALWAYS_NEXT_BOX := 1
 AUTO_WIN := 0
 NO_SCORING := 0
+DEV_MODE := 1
 
 BUTTON_DOWN := $4
 BUTTON_UP := $8
@@ -42,20 +42,20 @@ MODE_HZ_DISPLAY := 15
 MODE_INPUT_DISPLAY := 16
 MODE_GOOFY := 17
 MODE_DEBUG := 18
-MODE_PAL := 19
+MODE_QUAL := 19
+MODE_PAL := 20
 
-MODE_QUANTITY := 20
+MODE_QUANTITY := 21
 MODE_GAME_QUANTITY := 14
-MODE_CONFIG_SIZE := 13
 
 MENU_SPRITE_Y_BASE := $47
-MENU_MAX_Y_SCROLL := $20
+MENU_MAX_Y_SCROLL := $28
 MENU_TOP_MARGIN_SCROLL := 7 ; blocks
 BLOCK_TILES := $7B
 INVISIBLE_TILE := $43
 
 ; menuConfigSizeLookup
-.define MENUSIZES $0, $0, $0, $0, $F, $7, $8, $C, $20, $10, $0, $0, $4, $12, $0, $1, $1, $1, $1, $1
+.define MENUSIZES $0, $0, $0, $0, $F, $7, $8, $C, $20, $10, $0, $0, $4, $12, $0, $1, $1, $1, $1, $1, $1
 
 .macro MODENAMES
     .byte   "TETRIS"
@@ -323,7 +323,8 @@ hzFlag := menuVars+8
 inputDisplayFlag := menuVars+9
 goofyFlag := menuVars+10
 debugFlag := menuVars+11
-palFlag := menuVars+12
+qualFlag := menuVars+12
+palFlag := menuVars+13
 
 ; ... $7FF
 PPUCTRL     := $2000
@@ -690,6 +691,12 @@ gameMode_legalScreen: ; boot
         ; default pace to A
         lda #$A
         sta paceModifier
+
+.if DEV_MODE
+        lda #1
+        sta qualFlag
+        sta hzFlag
+.endif
 
         ; detect region
         jsr updateAudioWaitForNmiAndDisablePpuRendering
@@ -5398,8 +5405,6 @@ renderDebugPlayfield:
         sta vramRow
         rts
 
-.if DEBUG_MODE
-
 debugSelectMenuControls:
         lda heldButtons_player1
         and #BUTTON_SELECT
@@ -5609,8 +5614,6 @@ handleLevelEditor:
         sta tmp3
         dec tmp3
         rts
-
-.endif
 
 ; pace = score - ((target / 230) * lines)
 ; target = lines <= 110 ? 4000 : 4000 + ((lines - 110) / (230 - 110)) * 348
