@@ -1,0 +1,161 @@
+<script>
+const palettes = [
+	[0x16, 0x26, 0x27, 0x28, 0x29, 0x2a, 0x2b, 0x2C, 0x21, 0x22, 0x23, 0x24],
+	[0x16, 0x26, 0x28, 0x29, 0x2a, 0x1a, 0x21, 0x11, 0x12, 0x13, 0x14, 0x15],
+	[0x16, 0x26, 0x28, 0x29, 0x2a, 0x1a, 0x2c, 0x11, 0x2, 0x13, 0x14, 0x15],
+
+	[0x16, 0x26, 0x27, 0x28, 0x29, 0x2a, 0x1a, 0x2c, 0x11, 0x13, 0x14, 0x15],
+      [0x16, 0x26, 0x27, 0x28, 0x29, 0x2a, 0x1a, 0x1c, 0x11, 0x13, 0x14, 0x15],
+];
+
+// https://jsfiddle.net/36mx8q5j/
+</script>
+<table cellspacing="0" cellpadding="10">
+<tbody id="tbody"></tbody><tbody>
+<tr>
+<td style="background:#666666; color:#FFFFFF" align="center">00
+</td>
+<td style="background:#002A88; color:#FFFFFF" align="center">01
+</td>
+<td style="background:#1412A7; color:#FFFFFF" align="center">02
+</td>
+<td style="background:#3B00A4; color:#FFFFFF" align="center">03
+</td>
+<td style="background:#5C007E; color:#FFFFFF" align="center">04
+</td>
+<td style="background:#6E0040; color:#FFFFFF" align="center">05
+</td>
+<td style="background:#6C0700; color:#FFFFFF" align="center">06
+</td>
+<td style="background:#561D00; color:#FFFFFF" align="center">07
+</td>
+<td style="background:#333500; color:#FFFFFF" align="center">08
+</td>
+<td style="background:#0C4800; color:#FFFFFF" align="center">09
+</td>
+<td style="background:#005200; color:#FFFFFF" align="center">0A
+</td>
+<td style="background:#004F08; color:#FFFFFF" align="center">0B
+</td>
+<td style="background:#00404D; color:#FFFFFF" align="center">0C
+</td>
+<td style="background:#000000; color:#FFFFFF" align="center">0D
+</td>
+<td style="background:#000000; color:#FFFFFF" align="center">0E
+</td>
+<td style="background:#000000; color:#FFFFFF" align="center">0F
+</td></tr>
+<tr>
+<td style="background:#ADADAD; color:#FFFFFF" align="center">10
+</td>
+<td style="background:#155FD9; color:#FFFFFF" align="center">11
+</td>
+<td style="background:#4240FF; color:#FFFFFF" align="center">12
+</td>
+<td style="background:#7527FE; color:#FFFFFF" align="center">13
+</td>
+<td style="background:#A01ACC; color:#FFFFFF" align="center">14
+</td>
+<td style="background:#B71E7B; color:#FFFFFF" align="center">15
+</td>
+<td style="background:#B53120; color:#FFFFFF" align="center">16
+</td>
+<td style="background:#994E00; color:#FFFFFF" align="center">17
+</td>
+<td style="background:#6B6D00; color:#FFFFFF" align="center">18
+</td>
+<td style="background:#388700; color:#FFFFFF" align="center">19
+</td>
+<td style="background:#0D9300; color:#FFFFFF" align="center">1A
+</td>
+<td style="background:#008F32; color:#FFFFFF" align="center">1B
+</td>
+<td style="background:#007C8D; color:#FFFFFF" align="center">1C
+</td>
+<td style="background:#000000; color:#FFFFFF" align="center">1D
+</td>
+<td style="background:#000000; color:#FFFFFF" align="center">1E
+</td>
+<td style="background:#000000; color:#FFFFFF" align="center">1F
+</td></tr>
+<tr>
+<td style="background:#FFFFFF; color:#000000" align="center">20
+</td>
+<td style="background:#64B0FF; color:#000000" align="center">21
+</td>
+<td style="background:#9290FF; color:#000000" align="center">22
+</td>
+<td style="background:#C676FF; color:#000000" align="center">23
+</td>
+<td style="background:#F26AFF; color:#000000" align="center">24
+</td>
+<td style="background:#FF6ECC; color:#000000" align="center">25
+</td>
+<td style="background:#FF8170; color:#000000" align="center">26
+</td>
+<td style="background:#EA9E22; color:#000000" align="center">27
+</td>
+<td style="background:#BCBE00; color:#000000" align="center">28
+</td>
+<td style="background:#88D800; color:#000000" align="center">29
+</td>
+<td style="background:#5CE430; color:#000000" align="center">2A
+</td>
+<td style="background:#45E082; color:#000000" align="center">2B
+</td>
+<td style="background:#48CDDE; color:#000000" align="center">2C
+</td>
+<td style="background:#4F4F4F; color:#FFFFFF" align="center">2D
+</td>
+<td style="background:#000000; color:#FFFFFF" align="center">2E
+</td>
+<td style="background:#000000; color:#FFFFFF" align="center">2F
+</td></tr>
+<tr>
+<td style="background:#FFFFFF; color:#000000" align="center">30
+</td>
+<td style="background:#C0DFFF; color:#000000" align="center">31
+</td>
+<td style="background:#D3D2FF; color:#000000" align="center">32
+</td>
+<td style="background:#E8C8FF; color:#000000" align="center">33
+</td>
+<td style="background:#FAC2FF; color:#000000" align="center">34
+</td>
+<td style="background:#FFC4EA; color:#000000" align="center">35
+</td>
+<td style="background:#FFCCC5; color:#000000" align="center">36
+</td>
+<td style="background:#F7D8A5; color:#000000" align="center">37
+</td>
+<td style="background:#E4E594; color:#000000" align="center">38
+</td>
+<td style="background:#CFEF96; color:#000000" align="center">39
+</td>
+<td style="background:#BDF4AB; color:#000000" align="center">3A
+</td>
+<td style="background:#B3F3CC; color:#000000" align="center">3B
+</td>
+<td style="background:#B5EBF2; color:#000000" align="center">3C
+</td>
+<td style="background:#B8B8B8; color:#000000" align="center">3D
+</td>
+<td style="background:#000000; color:#FFFFFF" align="center">3E
+</td>
+<td style="background:#000000; color:#FFFFFF" align="center">3F
+</td></tr></tbody></table>
+<pre id="pre"></pre>
+    <script>
+const colours = [...document.querySelectorAll('td')];
+palettes.forEach(palette => {
+    const gradient = tbody.appendChild(document.createElement('tr'))
+    palette.forEach(num => {
+        const str = num.toString(16).toUpperCase().padStart(2, '0');
+        const node = document.createElement('td');
+        node.textContent = str;
+        node.setAttribute('style', colours.find(n => n.textContent.trim() === str).getAttribute('style'));
+        gradient.appendChild(node)
+    })
+    pre.textContent += `	.byte ${palette.map(d => `$${d.toString(16)}`).join`, `}\n`
+});
+    </script>

@@ -6000,8 +6000,7 @@ hzTap:
         rts
 
 hzPaletteGradient: ; goes up to B
-        .byte $16, $26, $27, $28, $29
-        .byte $2A, $2B, $2C, $21, $22, $23, $14
+	.byte $16, $26, $27, $28, $29, $2a, $1a, $1c, $11, $13, $14, $15
 
 ; math routines
 
