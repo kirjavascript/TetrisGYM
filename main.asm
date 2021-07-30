@@ -651,8 +651,9 @@ playState_playerControlsActiveTetrimino:
 
 harddrop_tetrimino:
         lda newlyPressedButtons
-        and #BUTTON_UP
+        and #BUTTON_UP+BUTTON_SELECT
         beq @noHard
+        sta tmpX
         lda tetriminoY
 @loop:
         inc tetriminoY
@@ -2124,8 +2125,6 @@ ghostPiece:
         dec tetriminoY
         lda frameCounter
         and #1
-        asl
-        asl
         asl
         asl
         adc #$0D
