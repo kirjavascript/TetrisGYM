@@ -577,7 +577,7 @@ branchOnGameMode:
         lda gameMode
         jsr switch_s_plus_2a
         .addr   gameMode_legalScreen
-        .addr   gameMode_titleScreen_unused
+        .addr   gameMode_waitScreen
         .addr   gameMode_gameTypeMenu
         .addr   gameMode_levelMenu
         .addr   gameMode_playAndEndingHighScore_jmp
@@ -695,7 +695,7 @@ gameMode_legalScreen: ; boot
         jsr updateAudioWaitForNmiAndDisablePpuRendering
         jsr checkRegion
 
-        lda #2
+        lda #1
         sta gameMode
         rts
 
@@ -712,7 +712,42 @@ blank_palette:
         bne @loadPaletteLoop
         rts
 
-gameMode_titleScreen_unused:
+gameMode_waitScreen:
+
+        ; lda #$02
+        ; jsr changeCHRBank1
+        ; lda #$10
+        ; jsr setMMC1Control
+        lda #$0
+        sta renderMode
+        jsr updateAudioWaitForNmiAndDisablePpuRendering
+        jsr disableNmi
+        lda #$02
+        jsr changeCHRBank0
+        ; lda #$00
+        ; jsr changeCHRBank1
+        jsr bulkCopyToPpu
+        .addr menu_palette
+        jsr copyRleNametableToPpu
+        .addr   rocket_nametable
+
+        jsr waitForVBlankAndEnableNmi
+        jsr updateAudioWaitForNmiAndResetOamStaging
+        jsr updateAudioWaitForNmiAndEnablePpuRendering
+        jsr updateAudioWaitForNmiAndResetOamStaging
+
+waitLoopCheckStart:
+        lda newlyPressedButtons_player1
+        cmp #BUTTON_START
+        beq waitLoopContinue
+        jsr updateAudioWaitForNmiAndResetOamStaging
+        jmp waitLoopCheckStart
+waitLoopContinue:
+        lda #$02
+        sta soundEffectSlot1Init
+        inc gameMode
+        rts
+
 gameMode_gameTypeMenu:
         jsr hzStart
         jsr calc_menuScrollY
@@ -720,8 +755,8 @@ gameMode_gameTypeMenu:
 
         inc initRam
         ; switch to blank charmap
-        ; (stops glitching when resetting
-        lda #$02
+        ; (stops glitching when resetting)
+        lda #$03
         jsr changeCHRBank1
         lda #%10011 ; used to be $10 (enable horizontal mirroring)
         jsr setMMC1Control
@@ -5031,6 +5066,8 @@ enter_high_score_nametable: ; RLE
         .incbin "gfx/nametables/enter_high_score_nametable_practise.bin"
 high_scores_nametable:
         .incbin "gfx/nametables/high_scores_nametable.bin"
+rocket_nametable:
+        .incbin "gfx/nametables/rocket_nametable.bin"
 
 .include "gfx/nametables/rle.asm"
 
