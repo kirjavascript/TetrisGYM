@@ -695,7 +695,7 @@ gameMode_legalScreen: ; boot
         jsr updateAudioWaitForNmiAndDisablePpuRendering
         jsr checkRegion
 
-        lda #1
+        lda #2
         sta gameMode
         rts
 
@@ -724,8 +724,9 @@ gameMode_waitScreen:
         jsr disableNmi
         lda #$02
         jsr changeCHRBank0
-        ; lda #$00
-        ; jsr changeCHRBank1
+        lda #$02
+        jsr changeCHRBank1
+        ; stripe for loading shit in
         jsr bulkCopyToPpu
         .addr menu_palette
         jsr copyRleNametableToPpu
