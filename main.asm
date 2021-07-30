@@ -2122,7 +2122,13 @@ ghostPiece:
         jsr isPositionValid
         beq @loop
         dec tetriminoY
-        lda #$1D
+        lda frameCounter
+        and #1
+        asl
+        asl
+        asl
+        asl
+        adc #$0D
         sta pieceTileModifier
         jsr stageSpriteForCurrentPiece_actual
         lda tmp3
