@@ -115,6 +115,7 @@ startHeight := $0058
 garbageHole := $0059                        ; Position of hole in received garbage
 garbageDelay  := $005A
 pieceTileModifier := $005B ; above $80 - use a single one, below - use an offset
+curtainRow := $5C
 
 mathRAM := $60 ; $12 bytes
 binary32 := mathRAM+$0
@@ -720,6 +721,14 @@ blank_palette:
         rts
 
 gameMode_waitScreen:
+
+; 11.34
+; 10.75
+
+; 11 / 12
+
+        ; rocket  is $2A8 / $27B frames
+        ; TODO: PAL
 
         ; lda #$02
         ; jsr changeCHRBank1
@@ -3405,6 +3414,8 @@ playState_lockTetrimino:
         sta soundEffectSlot0Init
         lda #$0A ; playState_checkStartGameOver
         sta playState
+        lda #$F0
+        sta curtainRow
         jsr updateAudio2
 
         ; make invisible tiles visible
@@ -3486,6 +3497,8 @@ playState_lockTetrimino:
 @ret:   rts
 
 playState_checkStartGameOver:
+        lda qualFlag
+        bne @qualGameOver
         ; skip curtain / rocket
 
 @checkForStartButton:
@@ -3495,6 +3508,57 @@ playState_checkStartGameOver:
         lda #$00
         sta playState
         sta newlyPressedButtons_player1
+@ret2:  rts
+
+@qualGameOver:
+        lda     curtainRow
+        cmp     #$14
+        beq     @curtainFinished
+        lda     frameCounter
+        and     #$03
+        bne     @ret
+        ldx     curtainRow
+        bmi     @incrementCurtainRow
+        lda     multBy10Table,x
+        tay
+        lda     #$00
+        sta     generalCounter3
+        lda     #$13
+        sta     currentPiece
+@drawCurtainRow:
+        lda     #$4F
+        sta     (playfieldAddr),y
+        iny
+        inc     generalCounter3
+        lda     generalCounter3
+        cmp     #$0A
+        bne     @drawCurtainRow
+        lda     curtainRow
+        sta     vramRow
+@incrementCurtainRow:
+        inc     curtainRow
+        lda     curtainRow
+        cmp     #$14
+        bne     @ret
+@ret:   rts
+
+@curtainFinished:
+        lda     score+2
+        cmp     #$03
+        bcc     @checkForStartButton
+        lda     #$80
+        ; jsr     sleep_for_a_vblanks
+        ; jsr     endingAnimation_maybe
+        jmp     @exitGame
+
+@checkForStartButton:
+        lda     newlyPressedButtons_player1
+        cmp     #$10
+        bne     @ret2
+@exitGame:
+        lda     #$00
+        sta     playState
+        sta     newlyPressedButtons_player1
 @ret2:  rts
 
 playState_checkForCompletedRows:
