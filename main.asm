@@ -897,9 +897,6 @@ seedControls:
 
         ; handle changing seed vals
 
-        ; lda newlyPressedButtons_player1
-        ; cmp #BUTTON_UP
-        ; bne @skipSeedUp
         lda #BUTTON_UP
         jsr menuThrottle
         beq @skipSeedUp
@@ -3557,7 +3554,6 @@ playState_checkStartGameOver:
 endingAnimation:
         ; TODO: trigger at 30k
         ; TODO: confirm timing
-        ; TODO: fix HUD
         jsr updateAudioWaitForNmiAndDisablePpuRendering
         jsr disableNmi
         lda #$02
@@ -3566,6 +3562,46 @@ endingAnimation:
         jsr changeCHRBank1
         jsr copyRleNametableToPpu
         .addr rocket_nametable
+
+        ; lines
+        lda #$20
+        sta PPUADDR
+        lda #$73
+        sta PPUADDR
+        lda lines+1
+        sta PPUDATA
+        lda lines
+        jsr twoDigsToPPU
+
+        ; score
+        lda #$21
+        sta PPUADDR
+        lda #$18
+        sta PPUADDR
+        lda score+2
+        jsr twoDigsToPPU
+        lda score+1
+        jsr twoDigsToPPU
+        lda score
+        jsr twoDigsToPPU
+
+        ; level
+        lda #$22
+        sta PPUADDR
+        lda #$b8
+        sta PPUADDR
+        ldx startLevel
+        lda levelDisplayTable, x
+        jsr twoDigsToPPU
+        lda #$22
+        sta PPUADDR
+        lda #$bb
+        sta PPUADDR
+        ldx levelNumber
+        lda levelDisplayTable, x
+        jsr twoDigsToPPU
+
+
         jsr waitForVBlankAndEnableNmi
         jsr updateAudioWaitForNmiAndResetOamStaging
         jsr updateAudioWaitForNmiAndEnablePpuRendering
@@ -3574,7 +3610,7 @@ endingAnimation:
         sta renderMode
         lda #$1
         sta endingSleepCounter
-        lda #$80
+        lda #$84 ; I think it's $80, so $84 to be safe
         sta endingSleepCounter+1
 
 endingLoop:
