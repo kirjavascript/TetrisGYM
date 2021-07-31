@@ -740,6 +740,11 @@ gameMode_waitScreen:
         jsr updateAudioWaitForNmiAndResetOamStaging
 
         lda #$FF
+        ldx palFlag
+        cpx #0
+        beq @notPAL
+        lda #$CC
+@notPAL:
         sta sleepCounter
 @loop:
         jsr updateAudioWaitForNmiAndResetOamStaging
