@@ -3492,59 +3492,65 @@ playState_checkStartGameOver:
         lda qualFlag
         beq @checkForStartButton
 
-        lda     curtainRow
-        cmp     #$14
-        beq     @curtainFinished
-        lda     frameCounter
-        and     #$03
-        bne     @ret
-        ldx     curtainRow
-        bmi     @incrementCurtainRow
-        lda     multBy10Table,x
+        lda curtainRow
+        cmp #$14
+        beq @curtainFinished
+        lda frameCounter
+        and #$03
+        bne @ret
+        ldx curtainRow
+        bmi @incrementCurtainRow
+        lda multBy10Table,x
         tay
-        lda     #$00
-        sta     generalCounter3
-        lda     #$13
-        sta     currentPiece
+        lda #$00
+        sta generalCounter3
+        lda #$13
+        sta currentPiece
 @drawCurtainRow:
-        lda     #$4F
-        sta     (playfieldAddr),y
+        lda #$4F
+        sta (playfieldAddr),y
         iny
-        inc     generalCounter3
-        lda     generalCounter3
-        cmp     #$0A
-        bne     @drawCurtainRow
-        lda     curtainRow
-        sta     vramRow
+        inc generalCounter3
+        lda generalCounter3
+        cmp #$0A
+        bne @drawCurtainRow
+        lda curtainRow
+        sta vramRow
 @incrementCurtainRow:
-        inc     curtainRow
-        lda     curtainRow
-        cmp     #$14
-        bne     @ret
+        inc curtainRow
+        lda curtainRow
+        cmp #$14
+        bne @ret
 @ret:   rts
 
 @curtainFinished:
-        ; lda     score+2
-        ; cmp     #$03
-        ; bcc     @checkForStartButton
-        lda     #$80
-        jsr     sleep_gameplay
-        jsr     endingAnimation
+        ; lda score+2
+        ; cmp #$03
+        ; bcc @checkForStartButton
+        lda #$80
+        lda palFlag
+        beq @notPAL
+        lda #$66
+@notPAL
+        jsr sleep_gameplay
+        jsr endingAnimation
 
-        jmp     @exitGame
+        jmp @exitGame
 
 @checkForStartButton:
-        lda     newlyPressedButtons_player1
-        cmp     #$10
-        bne     @ret2
+        lda newlyPressedButtons_player1
+        cmp #$10
+        bne @ret2
 @exitGame:
-        lda     #$00
-        sta     playState
-        sta     newlyPressedButtons_player1
+        lda #$00
+        sta playState
+        sta newlyPressedButtons_player1
 @ret2:  rts
 
 endingAnimation:
         ; do pal / ntsc without curtain
+        ; trigger at 30k
+
         ; two digit timer
         ; score
         ; lines
