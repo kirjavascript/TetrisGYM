@@ -2195,6 +2195,12 @@ ghostPiece:
         jsr isPositionValid
         beq @loop
         dec tetriminoY
+
+        ; check if equal to current position
+        lda tetriminoY
+        cmp tmp3
+        beq @noGhost
+
         lda frameCounter
         and #1
         asl
