@@ -3526,9 +3526,9 @@ playState_checkStartGameOver:
 @ret:   rts
 
 @curtainFinished:
-        ; lda score+2
-        ; cmp #$03
-        ; bcc @checkForStartButton
+        lda score+2
+        cmp #$03
+        bcc @checkForStartButton
 
         lda #$80
         ldx palFlag
