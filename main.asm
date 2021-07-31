@@ -3524,21 +3524,14 @@ playState_checkStartGameOver:
 @ret:   rts
 
 @curtainFinished:
-        lda score+2
-        cmp #$03
-        bcc @checkForStartButton
-
-        lda #$1
-        sta endingSleepCounter
-        lda #$80
-        sta endingSleepCounter+1
+        ; lda score+2
+        ; cmp #$03
+        ; bcc @checkForStartButton
 
         lda #$80
         ldx palFlag
         cpx #0
         beq @notPAL
-        lda #$30
-        sta endingSleepCounter+1
         lda #$66
 @notPAL:
         jsr sleep_gameplay
@@ -3557,7 +3550,9 @@ playState_checkStartGameOver:
 @ret2:  rts
 
 endingAnimation:
-        ; trigger at 30k
+        ; TODO: trigger at 30k
+        ; TODO: confirm timing
+        ; TODO: fix HUD
         jsr updateAudioWaitForNmiAndDisablePpuRendering
         jsr disableNmi
         lda #$02
@@ -3572,6 +3567,10 @@ endingAnimation:
         jsr updateAudioWaitForNmiAndResetOamStaging
         lda #$0
         sta renderMode
+        lda #$1
+        sta endingSleepCounter
+        lda #$80
+        sta endingSleepCounter+1
 
 endingLoop:
         jsr updateAudioWaitForNmiAndResetOamStaging
