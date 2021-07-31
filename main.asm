@@ -721,19 +721,6 @@ blank_palette:
         rts
 
 gameMode_waitScreen:
-
-; 11.34
-; 10.75
-
-; 11 / 12
-
-        ; rocket  is $2A8 / $27B frames
-        ; TODO: PAL
-
-        ; lda #$02
-        ; jsr changeCHRBank1
-        ; lda #$10
-        ; jsr setMMC1Control
         lda #$0
         sta renderMode
         jsr updateAudioWaitForNmiAndDisablePpuRendering
@@ -746,7 +733,6 @@ gameMode_waitScreen:
         .addr menu_palette
         jsr copyRleNametableToPpu
         .addr   legal_nametable
-
         jsr waitForVBlankAndEnableNmi
         jsr updateAudioWaitForNmiAndResetOamStaging
         jsr updateAudioWaitForNmiAndEnablePpuRendering
@@ -756,7 +742,6 @@ gameMode_waitScreen:
         sta sleepCounter
 @loop:
         jsr updateAudioWaitForNmiAndResetOamStaging
-
         lda #$1A
         sta byteSpriteXOffset
         lda #$20
@@ -769,7 +754,6 @@ gameMode_waitScreen:
         lda #1
         sta byteSpriteLen
         jsr byteSprite
-
         lda sleepCounter
         bne @loop
 
@@ -3539,12 +3523,15 @@ playState_checkStartGameOver:
 @ret:   rts
 
 @curtainFinished:
-        lda     score+2
-        cmp     #$03
-        bcc     @checkForStartButton
+        ; lda     score+2
+        ; cmp     #$03
+        ; bcc     @checkForStartButton
         lda     #$80
         jsr     sleep_gameplay
-        ; jsr     endingAnimation_maybe
+        jsr     endingAnimation_maybe
+
+        ; do pal / ntsc without curtain
+        ; two digit timer
         jmp     @exitGame
 
 @checkForStartButton:
@@ -3556,6 +3543,38 @@ playState_checkStartGameOver:
         sta     playState
         sta     newlyPressedButtons_player1
 @ret2:  rts
+
+endingAnimation_maybe:
+        jsr     updateAudioWaitForNmiAndDisablePpuRendering; A926
+        jsr     disableNmi                      ; A929
+        lda     #$02                            ; A92C
+        jsr     changeCHRBank0                  ; A92E
+        lda     #$02                            ; A931
+        jsr     changeCHRBank1                  ; A933
+        jsr copyRleNametableToPpu
+        .addr   rocket_nametable
+        ; jsr     bulkCopyToPpu                   ; A93B
+        ; .addr   ending_palette                  ; A93E
+        ; jsr     LA96E                           ; A940
+        jsr     waitForVBlankAndEnableNmi       ; A943
+        jsr     updateAudioWaitForNmiAndResetOamStaging; A946
+        jsr     updateAudioWaitForNmiAndEnablePpuRendering; A949
+        jsr     updateAudioWaitForNmiAndResetOamStaging; A94C
+        lda     #$0                            ; A94F
+        sta     renderMode                      ; A951
+        ; lda     #$0A                            ; A953
+        ; jsr     setMusicTrack                   ; A955
+        lda     #$80                            ; A958
+        ; jsr     render_endingUnskippable        ; A95A
+LA95D:
+        ; jsr     render_ending                   ; A95D
+        jsr     updateAudioWaitForNmiAndResetOamStaging; A960
+        ; lda     ending_customVars               ; A963
+        bne     LA95D                           ; A965
+        lda     newlyPressedButtons_player1     ; A967
+        cmp     #$10                            ; A969
+        bne     LA95D                           ; A96B
+        rts                                     ; A96D
 
 playState_checkForCompletedRows:
         lda vramRow
