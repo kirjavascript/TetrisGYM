@@ -3497,20 +3497,10 @@ playState_lockTetrimino:
 @ret:   rts
 
 playState_checkStartGameOver:
+        ; skip curtain / rocket when not qualling
         lda qualFlag
-        bne @qualGameOver
-        ; skip curtain / rocket
+        beq @checkForStartButton
 
-@checkForStartButton:
-        lda newlyPressedButtons_player1
-        cmp #$10
-        bne @ret2
-        lda #$00
-        sta playState
-        sta newlyPressedButtons_player1
-@ret2:  rts
-
-@qualGameOver:
         lda     curtainRow
         cmp     #$14
         beq     @curtainFinished

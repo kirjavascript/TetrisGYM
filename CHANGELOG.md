@@ -8,6 +8,7 @@
 - Tap/Roll Speedtest
 - Hz Display
 - Goofyfoot support
+- Qual Mode
 - Show current seed in level select and gameplay screens
 - Show current trainer in high score entry screen
 - Fixed timing/rendering glitches in T-Spins
