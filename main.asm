@@ -3543,7 +3543,7 @@ playState_checkStartGameOver:
         cmp     #$03
         bcc     @checkForStartButton
         lda     #$80
-        ; jsr     sleep_for_a_vblanks
+        jsr     sleep_gameplay
         ; jsr     endingAnimation_maybe
         jmp     @exitGame
 
@@ -3688,7 +3688,8 @@ playState_prepareNext:
         lda #$4
         sta soundEffectSlot1Init
 
-        jsr sleep_typeb
+        lda #$30
+        jsr sleep_gameplay
         lda #$0A ; playState_checkStartGameOver
         sta playState
 
@@ -3721,8 +3722,7 @@ playState_prepareNext:
         inc playState
         rts
 
-sleep_typeb:
-        lda #$30
+sleep_gameplay:
         sta sleepCounter
         jsr stageSpriteForNextPiece
 @loop:  jsr updateAudioWaitForNmiAndResetOamStaging
