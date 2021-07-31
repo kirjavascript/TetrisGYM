@@ -3567,10 +3567,12 @@ endingAnimation:
         jsr updateAudioWaitForNmiAndResetOamStaging
         lda #$0
         sta renderMode
-        lda #$2
+
+        lda #$1
         sta endingSleepCounter
         lda #$80
         sta endingSleepCounter+1
+
 endingLoop:
         jsr updateAudioWaitForNmiAndResetOamStaging
 
