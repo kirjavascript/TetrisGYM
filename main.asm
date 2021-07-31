@@ -3524,14 +3524,23 @@ playState_checkStartGameOver:
 @ret:   rts
 
 @curtainFinished:
-        ; lda score+2
-        ; cmp #$03
-        ; bcc @checkForStartButton
+        lda score+2
+        cmp #$03
+        bcc @checkForStartButton
+
+        lda #$1
+        sta endingSleepCounter
         lda #$80
-        lda palFlag
+        sta endingSleepCounter+1
+
+        lda #$80
+        ldx palFlag
+        cpx #0
         beq @notPAL
+        lda #$30
+        sta endingSleepCounter+1
         lda #$66
-@notPAL
+@notPAL:
         jsr sleep_gameplay
         jsr endingAnimation
 
@@ -3548,17 +3557,7 @@ playState_checkStartGameOver:
 @ret2:  rts
 
 endingAnimation:
-        ; do pal / ntsc without curtain
         ; trigger at 30k
-
-        ; two digit timer
-        ; score
-        ; lines
-        ; level
-        ; start level
-        ; 'press start' mapping
-        ; countdown where the 'tetris' text goes
-
         jsr updateAudioWaitForNmiAndDisablePpuRendering
         jsr disableNmi
         lda #$02
@@ -3573,11 +3572,6 @@ endingAnimation:
         jsr updateAudioWaitForNmiAndResetOamStaging
         lda #$0
         sta renderMode
-
-        lda #$1
-        sta endingSleepCounter
-        lda #$80
-        sta endingSleepCounter+1
 
 endingLoop:
         jsr updateAudioWaitForNmiAndResetOamStaging
