@@ -702,7 +702,7 @@ gameMode_legalScreen: ; boot
         jsr updateAudioWaitForNmiAndDisablePpuRendering
         jsr checkRegion
 
-        lda #1
+        lda #2
         sta gameMode
         rts
 
@@ -4133,8 +4133,12 @@ gameModeState_checkForResetKeyCombo:
         rts
 
 @reset: jsr updateAudio2
-        lda #$02 ; straight to menu screen
+        lda #$2 ; straight to menu screen
         sta gameMode
+        lda qualFlag
+        beq @skipLegal
+        dec gameMode
+@skipLegal:
         rts
 
 ; It looks like the jsr _must_ do nothing, otherwise reg a != gameModeState in mainLoop and there would not be any waiting on vsync
