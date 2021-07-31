@@ -171,7 +171,8 @@ nextPiece   := $00BF                        ; Stored by its orientation ID
 gameMode    := $00C0                        ; 0=legal, 1=title, 2=type menu, 3=level menu, 4=play and ending and high score, 5=demo, 6=start demo
 ; gameType    := $00C1                        ; A=0, B=1
 musicType   := $00C2                        ; 0-3; 3 is off
-sleepCounter    := $00C3                    ; canon is legalScreenCounter1
+sleepCounter    := $00C3                    ;
+endingSleepCounter := $00C4                 ; 2 bytes
 
 ; ... $00CD
 demo_heldButtons:= $00CE
@@ -732,7 +733,7 @@ gameMode_waitScreen:
         jsr bulkCopyToPpu
         .addr menu_palette
         jsr copyRleNametableToPpu
-        .addr   legal_nametable
+        .addr legal_nametable
         jsr waitForVBlankAndEnableNmi
         jsr updateAudioWaitForNmiAndResetOamStaging
         jsr updateAudioWaitForNmiAndEnablePpuRendering
@@ -3528,10 +3529,8 @@ playState_checkStartGameOver:
         ; bcc     @checkForStartButton
         lda     #$80
         jsr     sleep_gameplay
-        jsr     endingAnimation_maybe
+        jsr     endingAnimation
 
-        ; do pal / ntsc without curtain
-        ; two digit timer
         jmp     @exitGame
 
 @checkForStartButton:
@@ -3544,37 +3543,65 @@ playState_checkStartGameOver:
         sta     newlyPressedButtons_player1
 @ret2:  rts
 
-endingAnimation_maybe:
-        jsr     updateAudioWaitForNmiAndDisablePpuRendering; A926
-        jsr     disableNmi                      ; A929
-        lda     #$02                            ; A92C
-        jsr     changeCHRBank0                  ; A92E
-        lda     #$02                            ; A931
-        jsr     changeCHRBank1                  ; A933
+endingAnimation:
+        ; do pal / ntsc without curtain
+        ; two digit timer
+        ; score
+        ; lines
+        ; level
+        ; start level
+        ; 'press start' mapping
+        ; countdown where the 'tetris' text goes
+
+        jsr updateAudioWaitForNmiAndDisablePpuRendering
+        jsr disableNmi
+        lda #$02
+        jsr changeCHRBank0
+        lda #$02
+        jsr changeCHRBank1
         jsr copyRleNametableToPpu
-        .addr   rocket_nametable
-        ; jsr     bulkCopyToPpu                   ; A93B
-        ; .addr   ending_palette                  ; A93E
-        ; jsr     LA96E                           ; A940
-        jsr     waitForVBlankAndEnableNmi       ; A943
-        jsr     updateAudioWaitForNmiAndResetOamStaging; A946
-        jsr     updateAudioWaitForNmiAndEnablePpuRendering; A949
-        jsr     updateAudioWaitForNmiAndResetOamStaging; A94C
-        lda     #$0                            ; A94F
-        sta     renderMode                      ; A951
-        ; lda     #$0A                            ; A953
-        ; jsr     setMusicTrack                   ; A955
-        lda     #$80                            ; A958
-        ; jsr     render_endingUnskippable        ; A95A
-LA95D:
-        ; jsr     render_ending                   ; A95D
-        jsr     updateAudioWaitForNmiAndResetOamStaging; A960
-        ; lda     ending_customVars               ; A963
-        bne     LA95D                           ; A965
-        lda     newlyPressedButtons_player1     ; A967
-        cmp     #$10                            ; A969
-        bne     LA95D                           ; A96B
-        rts                                     ; A96D
+        .addr rocket_nametable
+        jsr waitForVBlankAndEnableNmi
+        jsr updateAudioWaitForNmiAndResetOamStaging
+        jsr updateAudioWaitForNmiAndEnablePpuRendering
+        jsr updateAudioWaitForNmiAndResetOamStaging
+        lda #$0
+        sta renderMode
+        lda #$2
+        sta endingSleepCounter
+        lda #$80
+        sta endingSleepCounter+1
+endingLoop:
+        jsr updateAudioWaitForNmiAndResetOamStaging
+
+        ; ticket counter
+        lda endingSleepCounter+1
+        bne @notZero
+        lda endingSleepCounter
+        beq @waitEnd
+        dec endingSleepCounter
+@notZero:
+        dec endingSleepCounter+1
+
+        lda #$1A
+        sta byteSpriteXOffset
+        lda #$20
+        sta byteSpriteYOffset
+        lda #endingSleepCounter
+        sta byteSpriteAddr
+        lda #0
+        sta byteSpriteAddr+1
+        sta byteSpriteTile
+        lda #2
+        sta byteSpriteLen
+        jsr byteSprite
+        jmp endingLoop
+
+@waitEnd:
+        lda newlyPressedButtons_player1
+        cmp #$10
+        bne endingLoop
+        rts
 
 playState_checkForCompletedRows:
         lda vramRow
