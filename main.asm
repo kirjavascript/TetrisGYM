@@ -4661,6 +4661,13 @@ gameModeState_startButtonHandling:
         jmp @ret
 
 @startPressed:
+        ; do nothing if curtain is being lowered
+        lda playState
+        cmp #$0A
+        bne @pause
+        jmp @ret
+
+@pause:
         lda #$05
         sta musicStagingNoiseHi
         lda #$04 ; render_mode_pause
