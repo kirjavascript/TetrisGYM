@@ -702,7 +702,7 @@ gameMode_legalScreen: ; boot
         jsr updateAudioWaitForNmiAndDisablePpuRendering
         jsr checkRegion
 
-        lda #2
+        lda #1
         sta gameMode
         rts
 
@@ -733,16 +733,36 @@ gameMode_waitScreen:
         jsr changeCHRBank0
         lda #$02
         jsr changeCHRBank1
-        ; stripe for loading shit in
         jsr bulkCopyToPpu
         .addr menu_palette
         jsr copyRleNametableToPpu
-        .addr   rocket_nametable
+        .addr   legal_nametable
 
         jsr waitForVBlankAndEnableNmi
         jsr updateAudioWaitForNmiAndResetOamStaging
         jsr updateAudioWaitForNmiAndEnablePpuRendering
         jsr updateAudioWaitForNmiAndResetOamStaging
+
+        lda #$FF
+        sta sleepCounter
+@loop:
+        jsr updateAudioWaitForNmiAndResetOamStaging
+
+        lda #$1A
+        sta byteSpriteXOffset
+        lda #$20
+        sta byteSpriteYOffset
+        lda #sleepCounter
+        sta byteSpriteAddr
+        lda #0
+        sta byteSpriteAddr+1
+        sta byteSpriteTile
+        lda #1
+        sta byteSpriteLen
+        jsr byteSprite
+
+        lda sleepCounter
+        bne @loop
 
 waitLoopCheckStart:
         lda newlyPressedButtons_player1
@@ -5076,6 +5096,8 @@ high_scores_nametable:
         .incbin "gfx/nametables/high_scores_nametable.bin"
 rocket_nametable:
         .incbin "gfx/nametables/rocket_nametable.bin"
+legal_nametable:
+        .incbin "gfx/nametables/legal_nametable.bin"
 
 .include "gfx/nametables/rle.asm"
 
