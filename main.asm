@@ -169,7 +169,7 @@ renderMode  := $00BD
 ; numberOfPlayers := $00BE
 nextPiece   := $00BF                        ; Stored by its orientation ID
 gameMode    := $00C0                        ; 0=legal, 1=title, 2=type menu, 3=level menu, 4=play and ending and high score, 5=demo, 6=start demo
-; gameType    := $00C1                        ; A=0, B=1
+waitScreenStage    := $00C1                        ; used in gameMode_waitScreen
 musicType   := $00C2                        ; 0-3; 3 is off
 sleepCounter    := $00C3                    ;
 endingSleepCounter := $00C4                 ; 2 bytes
@@ -579,7 +579,7 @@ gameMode_playAndEndingHighScore_jmp:
 branchOnGameMode:
         lda gameMode
         jsr switch_s_plus_2a
-        .addr   gameMode_legalScreen
+        .addr   gameMode_bootScreen
         .addr   gameMode_waitScreen
         .addr   gameMode_gameTypeMenu
         .addr   gameMode_levelMenu
@@ -670,7 +670,7 @@ harddrop_tetrimino:
 @noHard:
         rts
 
-gameMode_legalScreen: ; boot
+gameMode_bootScreen: ; boot
         ; ABSS goes to gameTypeMenu instead of here
 
         ; reset cursors (seems to cause problems on misterFPGA)
@@ -722,6 +722,9 @@ blank_palette:
         rts
 
 gameMode_waitScreen:
+        lda #0
+        sta waitScreenStage
+waitScreenLoad:
         lda #$0
         sta renderMode
         jsr updateAudioWaitForNmiAndDisablePpuRendering
@@ -734,10 +737,21 @@ gameMode_waitScreen:
         .addr menu_palette
         jsr copyRleNametableToPpu
         .addr legal_nametable
+
+        lda waitScreenStage
+        beq @justLegal
+        jsr bulkCopyToPpu
+        .addr title_nametable_patch
+@justLegal:
+
         jsr waitForVBlankAndEnableNmi
         jsr updateAudioWaitForNmiAndResetOamStaging
         jsr updateAudioWaitForNmiAndEnablePpuRendering
         jsr updateAudioWaitForNmiAndResetOamStaging
+
+        ; if title, skip wait
+        lda waitScreenStage
+        bne waitLoopCheckStart
 
         lda #$FF
         ldx palFlag
@@ -766,9 +780,14 @@ gameMode_waitScreen:
 waitLoopCheckStart:
         lda newlyPressedButtons_player1
         cmp #BUTTON_START
-        beq waitLoopContinue
+        beq waitLoopNext
         jsr updateAudioWaitForNmiAndResetOamStaging
         jmp waitLoopCheckStart
+waitLoopNext:
+        lda waitScreenStage
+        bne waitLoopContinue
+        inc waitScreenStage
+        jmp waitScreenLoad
 waitLoopContinue:
         lda #$02
         sta soundEffectSlot1Init
@@ -1674,10 +1693,10 @@ showPaceDiffText:
 @done:
         rts
 
-paceDiffText:
+paceDiffText: ; stripe
         .byte $20, $98, $4, $D, $12, $F, $F, $FF
 
-hzStats:
+hzStats: ; stripe
         .byte $21, $63, $43, $FF
         .byte $21, $83, $46, $FF
         .byte $21, $C3, $46, $FF
@@ -4285,7 +4304,7 @@ gameModeState_checkForResetKeyCombo:
         sta gameMode
         lda qualFlag
         beq @skipLegal
-        dec gameMode
+        dec gameMode ; gameMode_waitScreen
 @skipLegal:
         rts
 
@@ -5251,12 +5270,15 @@ game_nametable: ; RLE
         .incbin "gfx/nametables/game_nametable_practise.bin"
 enter_high_score_nametable: ; RLE
         .incbin "gfx/nametables/enter_high_score_nametable_practise.bin"
-high_scores_nametable:
+high_scores_nametable: ; stripe
         .incbin "gfx/nametables/high_scores_nametable.bin"
-rocket_nametable:
+rocket_nametable: ; RLE
         .incbin "gfx/nametables/rocket_nametable.bin"
-legal_nametable:
+legal_nametable: ; RLE
         .incbin "gfx/nametables/legal_nametable.bin"
+title_nametable_patch: ; stripe
+        .byte $21, $69, $5, $1D, $12, $1D, $15, $E
+        .byte $FF
 
 .include "gfx/nametables/rle.asm"
 
