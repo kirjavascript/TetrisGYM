@@ -12,7 +12,7 @@ NO_MUSIC := 1
 ALWAYS_NEXT_BOX := 1
 AUTO_WIN := 0
 NO_SCORING := 0
-DEV_MODE := 1
+DEV_MODE := 0
 
 BUTTON_DOWN := $4
 BUTTON_UP := $8
@@ -686,11 +686,12 @@ gameMode_bootScreen: ; boot
 
         ; zero out config memory
         lda #0
-        ldx #$9F
+        ldx #$A0
 @loop:
-        sta menuRAM, x
         dex
-        bpl @loop
+        sta menuRAM, x
+        cpx #0
+        bne @loop
 
         ; default pace to A
         lda #$A
@@ -703,7 +704,7 @@ gameMode_bootScreen: ; boot
 .endif
 
         ; detect region
-        jsr updateAudioWaitForNmiAndDisablePpuRendering
+        ; jsr updateAudioWaitForNmiAndDisablePpuRendering
         jsr checkRegion
 
         lda #2
@@ -3722,7 +3723,7 @@ endingLoop:
         sta $1
         jsr loadRectIntoOamStaging
 
-        lda #$40
+        lda #$3F
         adc spriteYOffset
         sta spriteYOffset
         lda #$78
