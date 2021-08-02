@@ -2370,8 +2370,10 @@ orientationToSpriteTable:
         .byte   $00,$00,$0C
 
 
-Cathedral:
-        .byte 0, 0, 4, 4, $30, 0, $FF
+spriteCathedral:
+        .byte $0, $8, $8, $6, $0, $40
+        .byte $8, $0, $7, $1, $0, $31
+        .byte $FF
 
 rectBuffer := $500 ; generalCounter
 rectX := rectBuffer+0
@@ -2386,38 +2388,49 @@ rectAddr := rectBuffer+5
 loadRectIntoOamStaging:
         ldy #0
 @copyRect:
+        ldx #0
+@copyRectLoop:
         lda ($0), y
-        cmp #$FF
-        beq @ret
         sta rectBuffer, y
         iny
-        cmp #6
-        bne @copyRect
+        inx
+        cpx #6
+        bne @copyRectLoop
+
+@writeLine:
+        lda rectX
+        sta tmpX
+        lda rectW
+        sta tmpY
+        lda rectAddr
+        sta tmpZ
 
 @writeTile:
-
         ; YTAX
+        ldx oamStagingLength
+
         lda rectY
         clc
         adc spriteYOffset
         sta oamStaging,x
         lda rectAddr
-        sta oamStaging,x
+        sta oamStaging+1,x
         lda rectAttr
-        sta oamStaging,x
+        sta oamStaging+2,x
         lda rectX
         clc
         adc spriteXOffset
-        sta oamStaging,x
+        sta oamStaging+3,x
 
         ; increase OAM index
-        lda #$04
+        lda #$4
         clc
         adc oamStagingLength
         sta oamStagingLength
 
-        ; go right
+        ; next rightwards tile
         lda #$8
+        clc
         adc rectX
         sta rectX
         inc rectAddr
@@ -2426,13 +2439,29 @@ loadRectIntoOamStaging:
         lda rectW
         bne @writeTile
 
+        ; start a new line
+        lda tmpX
+        sta rectX
+        lda tmpY
+        sta rectW
+        lda tmpZ
+        adc #$10
+        sta rectAddr
+        lda #$8
+        adc rectY
+        clc
+        sta rectY
 
-        jmp @copyRect
+        dec rectH
+        lda rectH
+        bne @writeLine
+
+        ; do another rect
+        lda ($0), y
+        cmp #$FF
+        bne @copyRect
 @ret:
         rts
-
-
-
 
 loadSpriteIntoOamStaging:
         clc
@@ -3710,16 +3739,15 @@ endingAnimation:
 endingLoop:
         jsr updateAudioWaitForNmiAndResetOamStaging
 
-        lda #$2C
+        lda #$40
         sta spriteYOffset
-        lda #$1E
+        lda #$20
         sta spriteXOffset
-        lda #<Cathedral
+        lda #<spriteCathedral
         sta $0
-        lda #>Cathedral
+        lda #>spriteCathedral
         sta $1
         jsr loadRectIntoOamStaging
-
 
         ; ticket counter
         lda endingSleepCounter+1
