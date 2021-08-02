@@ -2376,7 +2376,7 @@ spriteCathedral:
         .byte $0, $10, $8, $6, $0, $40
         .byte $FF
 
-rectBuffer := $500 ; generalCounter
+rectBuffer := generalCounter
 rectX := rectBuffer+0
 rectY := rectBuffer+1
 rectW := rectBuffer+2
