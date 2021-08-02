@@ -2368,6 +2368,72 @@ orientationToSpriteTable:
         .byte   $00,$00,$06,$00,$00,$00,$00,$09
         .byte   $08,$00,$0B,$07,$00,$00,$0A,$00
         .byte   $00,$00,$0C
+
+
+Cathedral:
+        .byte 0, 0, 4, 4, $30, 0, $FF
+
+rectBuffer := $500 ; generalCounter
+rectX := rectBuffer+0
+rectY := rectBuffer+1
+rectW := rectBuffer+2
+rectH := rectBuffer+3
+rectAttr := rectBuffer+4
+rectAddr := rectBuffer+5
+
+; <addr in tmp1 >addr in tmp2
+; .byte [x, y, width, height, attr, addr]+ $FF
+loadRectIntoOamStaging:
+        ldy #0
+@copyRect:
+        lda ($0), y
+        cmp #$FF
+        beq @ret
+        sta rectBuffer, y
+        iny
+        cmp #6
+        bne @copyRect
+
+@writeTile:
+
+        ; YTAX
+        lda rectY
+        clc
+        adc spriteYOffset
+        sta oamStaging,x
+        lda rectAddr
+        sta oamStaging,x
+        lda rectAttr
+        sta oamStaging,x
+        lda rectX
+        clc
+        adc spriteXOffset
+        sta oamStaging,x
+
+        ; increase OAM index
+        lda #$04
+        clc
+        adc oamStagingLength
+        sta oamStagingLength
+
+        ; go right
+        lda #$8
+        adc rectX
+        sta rectX
+        inc rectAddr
+
+        dec rectW
+        lda rectW
+        bne @writeTile
+
+
+        jmp @copyRect
+@ret:
+        rts
+
+
+
+
 loadSpriteIntoOamStaging:
         clc
         lda spriteIndexInOamContentLookup
@@ -3643,6 +3709,17 @@ endingAnimation:
 
 endingLoop:
         jsr updateAudioWaitForNmiAndResetOamStaging
+
+        lda #$2C
+        sta spriteYOffset
+        lda #$1E
+        sta spriteXOffset
+        lda #<Cathedral
+        sta $0
+        lda #>Cathedral
+        sta $1
+        jsr loadRectIntoOamStaging
+
 
         ; ticket counter
         lda endingSleepCounter+1
