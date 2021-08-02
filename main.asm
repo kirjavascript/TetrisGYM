@@ -12,7 +12,7 @@ NO_MUSIC := 1
 ALWAYS_NEXT_BOX := 1
 AUTO_WIN := 0
 NO_SCORING := 0
-DEV_MODE := 0
+DEV_MODE := 1
 
 BUTTON_DOWN := $4
 BUTTON_UP := $8
@@ -173,6 +173,7 @@ screenStage    := $00C1                        ; used in gameMode_waitScreen, en
 musicType   := $00C2                        ; 0-3; 3 is off
 sleepCounter    := $00C3                    ;
 endingSleepCounter := $00C4                 ; 2 bytes
+endingRocketCounter := $00C6
 
 ; ... $00CD
 demo_heldButtons:= $00CE
@@ -2419,7 +2420,6 @@ loadRectIntoOamStaging:
         ldx oamStagingLength
 
         lda rectY
-        clc
         adc spriteYOffset
         sta oamStaging,x
         lda rectAddr
@@ -2427,7 +2427,6 @@ loadRectIntoOamStaging:
         lda rectAttr
         sta oamStaging+2,x
         lda rectX
-        clc
         adc spriteXOffset
         sta oamStaging+3,x
 
@@ -2760,7 +2759,7 @@ render_mode_rocket:
         lda #$83
         sta PPUADDR
         lda endingSleepCounter
-        jsr twoDigsToPPU
+        sta PPUDATA
         lda endingSleepCounter+1
         jsr twoDigsToPPU
         jmp @rocketEnd
@@ -3706,10 +3705,14 @@ endingAnimation:
 endingLoop:
         jsr updateAudioWaitForNmiAndResetOamStaging
 
-
+        inc endingRocketCounter
+        lda endingRocketCounter
+        and #$1F
+        tax
+        lda shitSineWave, x
+        adc #$78
 
         ; draw cathedral
-        lda #$78
         sta spriteYOffset
         lda #$68
         sta spriteXOffset
@@ -3719,7 +3722,8 @@ endingLoop:
         sta $1
         jsr loadRectIntoOamStaging
 
-        lda #$B8
+        lda #$40
+        adc spriteYOffset
         sta spriteYOffset
         lda #$78
         sta spriteXOffset
@@ -3758,6 +3762,11 @@ endingLoop:
         cmp #$10
         bne endingLoop
         rts
+
+shitSineWave:
+    ; Array.from({length: 32 }, (_, i) => 4+Math.sin(i/5.2)*5|0).map(d=>'$'+d.toString(16)).join`, `
+        .byte $4, $4, $5, $6, $7, $8, $8, $8, $8, $8, $8, $8, $7, $6, $6, $5, $4, $3, $2, $1, $0, $0, $0, $0, $0, $0, $0, $0, $0, $0, $1, $2
+
 
 playState_checkForCompletedRows:
         lda vramRow
