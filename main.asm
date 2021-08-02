@@ -2379,10 +2379,10 @@ spriteCathedral:
         .byte $FF
 
 spriteCathedralFire0:
-        .byte $8, $0, $2, $1, $0, $A0, $FF
+        .byte $8, $0, $2, $1, $1, $A0, $FF
 
 spriteCathedralFire1:
-        .byte $0, $0, $4, $2, $0, $A2, $FF
+        .byte $0, $0, $4, $2, $1, $A2, $FF
 
 rectBuffer := generalCounter
 rectX := rectBuffer+0
@@ -3649,7 +3649,7 @@ endingAnimation:
         jsr copyRleNametableToPpu
         .addr rocket_nametable
         jsr bulkCopyToPpu
-        .addr game_palette
+        .addr rocket_palette
 
         ; lines
         lda #$20
@@ -3707,7 +3707,7 @@ endingLoop:
         jsr updateAudioWaitForNmiAndResetOamStaging
 
         ; draw cathedral
-        lda #$78
+        adc #$78
         sta spriteYOffset
         lda #$68
         sta spriteXOffset
@@ -5326,6 +5326,10 @@ menu_palette:
         .byte   $3F,$00,$14,$0F,$30,$38,$26,$0F
         .byte   $17,$27,$37,$0F,$30,$12,$00,$0F
         .byte   $16,$2A,$28,$0F,$30,$26,$27,$FF
+rocket_palette:
+        .byte   $3F,$11,$7, $16,$2A,$28,$0f,$37,$18,$38 ; sprite
+        .byte   $3F,$00,$8, $0f,$3C,$38,$00,$0F,$20,$12,$15 ; bg
+        .byte   $FF
 defaultHighScoresTable:
         .byte   $2B,$2B,$2B,$2B,$2B,$2B ; HOWARD
         .byte   $2B,$2B,$2B,$2B,$2B,$2B ; OTASAN
