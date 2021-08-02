@@ -2371,8 +2371,9 @@ orientationToSpriteTable:
 
 
 spriteCathedral:
-        .byte $0, $8, $8, $6, $0, $40
-        .byte $8, $0, $7, $1, $0, $31
+        .byte $20, $0, $1, $1, $0, $30
+        .byte $8, $8, $7, $1, $0, $31
+        .byte $0, $10, $8, $6, $0, $40
         .byte $FF
 
 rectBuffer := $500 ; generalCounter
@@ -2391,7 +2392,7 @@ loadRectIntoOamStaging:
         ldx #0
 @copyRectLoop:
         lda ($0), y
-        sta rectBuffer, y
+        sta rectBuffer, x
         iny
         inx
         cpx #6
