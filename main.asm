@@ -795,7 +795,7 @@ waitLoopContinue:
         rts
 
 gameMode_gameTypeMenu:
-        jmp endingAnimation
+        ; jmp endingAnimation
         jsr hzStart
         jsr calc_menuScrollY
         sta menuScrollY
@@ -1167,7 +1167,7 @@ renderMenuVars:
         sta spriteYOffset
         lda #$17
         sta spriteXOffset
-        lda #$53
+        lda #$1D
         sta spriteIndexInOamContentLookup
         jsr loadSpriteIntoOamStaging
         jmp @cursorFinished
@@ -2541,67 +2541,7 @@ oamContentLookup:
         .addr   spriteOn ; $1A
         .addr   spriteSeedCursor ; $1B
         .addr   spritePressStart ; $1C
-        .addr   sprite02Blank
-        .addr   sprite02Blank
-        .addr   sprite02Blank
-        .addr   sprite02Blank
-        .addr   sprite02Blank
-        .addr   sprite02Blank
-        .addr   sprite02Blank
-        .addr   sprite02Blank
-        .addr   sprite02Blank
-        .addr   sprite02Blank
-        .addr   sprite02Blank
-        .addr   sprite02Blank
-        .addr   sprite02Blank
-        .addr   sprite02Blank
-        .addr   sprite02Blank
-        .addr   sprite02Blank
-        .addr   sprite02Blank
-        .addr   sprite02Blank
-        .addr   sprite02Blank
-        .addr   sprite02Blank
-        .addr   sprite02Blank
-        .addr   sprite02Blank
-        .addr   sprite02Blank
-        .addr   sprite02Blank
-        .addr   sprite02Blank
-        .addr   sprite02Blank
-        .addr   sprite02Blank
-        .addr   sprite02Blank
-        .addr   sprite02Blank
-        .addr   sprite02Blank
-        .addr   sprite02Blank
-        .addr   sprite02Blank
-        .addr   sprite02Blank
-        .addr   sprite02Blank
-        .addr   sprite02Blank
-        .addr   sprite02Blank
-        .addr   sprite02Blank
-        .addr   sprite02Blank
-        .addr   sprite02Blank
-        .addr   sprite02Blank
-        .addr   sprite02Blank
-        .addr   sprite02Blank
-        .addr   sprite02Blank
-        .addr   sprite02Blank
-        .addr   sprite02Blank
-        .addr   sprite02Blank
-        .addr   sprite02Blank
-        .addr   sprite02Blank
-        .addr   sprite02Blank
-        .addr   sprite02Blank
-        .addr   sprite02Blank
-        .addr   sprite02Blank
-        .addr   sprite02Blank
-        .addr   sprite02Blank
-        .addr   sprite53MusicTypeCursor
-        .addr   sprite02Blank
-        .addr   sprite02Blank
-        .addr   isPositionValid
-        .addr   isPositionValid
-        .addr   isPositionValid
-        .addr   isPositionValid
+        .addr   sprite1DMusicTypeCursor ; $1D
 ; Sprites are sets of 4 bytes in the OAM format, terminated by FF. byte0=y, byte1=tile, byte2=attrs, byte3=x
 ; YY AA II XX
 sprite00LevelSelectCursor:
@@ -2676,7 +2616,7 @@ spriteOn:
 spriteSeedCursor:
         .byte   $00,$6B,$00,$00
         .byte   $FF
-sprite53MusicTypeCursor:
+sprite1DMusicTypeCursor:
         .byte   $00,$27,$00,$00
         .byte   $FF
 spritePressStart:
