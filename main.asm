@@ -796,7 +796,9 @@ waitLoopContinue:
         rts
 
 gameMode_gameTypeMenu:
+.if DEV_MODE
         jmp endingAnimation
+.endif
         jsr hzStart
         jsr calc_menuScrollY
         sta menuScrollY
@@ -2767,18 +2769,13 @@ render_mode_rocket:
         bne @stage2
         inc screenStage
         jsr bulkCopyToPpu
-        .addr press_start
+        .addr rocket_nametable_patch
 @stage2:
 @rocketEnd:
         lda #0
         sta PPUSCROLL
         sta PPUSCROLL
         rts
-
-press_start:
-    .byte $20, $e3, 5, $19, $1B, $E, $1c, $1c
-    .byte $21, $03, 5, $1c, $1d, $a, $1b, $1d
-    .byte $FF
 
 render_mode_pause:
         ; lda pausedOutOfDateRenderFlags
@@ -5375,6 +5372,11 @@ legal_nametable: ; RLE
 title_nametable_patch: ; stripe
         .byte $21, $69, $5, $1D, $12, $1D, $15, $E
         .byte $FF
+rocket_nametable_patch: ; stripe
+        .byte $20, $e3, 5, $19, $1B, $E, $1c, $1c
+        .byte $21, $03, 5, $1c, $1d, $a, $1b, $1d
+        .byte $FF
+
 
 .include "gfx/nametables/rle.asm"
 
