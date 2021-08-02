@@ -169,7 +169,7 @@ renderMode  := $00BD
 ; numberOfPlayers := $00BE
 nextPiece   := $00BF                        ; Stored by its orientation ID
 gameMode    := $00C0                        ; 0=legal, 1=title, 2=type menu, 3=level menu, 4=play and ending and high score, 5=demo, 6=start demo
-waitScreenStage    := $00C1                        ; used in gameMode_waitScreen
+screenStage    := $00C1                        ; used in gameMode_waitScreen, endingAnimation
 musicType   := $00C2                        ; 0-3; 3 is off
 sleepCounter    := $00C3                    ;
 endingSleepCounter := $00C4                 ; 2 bytes
@@ -412,6 +412,7 @@ render: lda renderMode
         .addr   render_mode_congratulations_screen
         .addr   render_mode_play_and_demo
         .addr   render_mode_pause
+        .addr   render_mode_rocket
 initRamContinued:
         ldy #$06
         sty tmp2
@@ -723,7 +724,7 @@ blank_palette:
 
 gameMode_waitScreen:
         lda #0
-        sta waitScreenStage
+        sta screenStage
 waitScreenLoad:
         lda #$0
         sta renderMode
@@ -738,7 +739,7 @@ waitScreenLoad:
         jsr copyRleNametableToPpu
         .addr legal_nametable
 
-        lda waitScreenStage
+        lda screenStage
         beq @justLegal
         jsr bulkCopyToPpu
         .addr title_nametable_patch
@@ -750,7 +751,7 @@ waitScreenLoad:
         jsr updateAudioWaitForNmiAndResetOamStaging
 
         ; if title, skip wait
-        lda waitScreenStage
+        lda screenStage
         bne waitLoopCheckStart
 
         lda #$FF
@@ -784,9 +785,9 @@ waitLoopCheckStart:
         jsr updateAudioWaitForNmiAndResetOamStaging
         jmp waitLoopCheckStart
 waitLoopNext:
-        lda waitScreenStage
+        lda screenStage
         bne waitLoopContinue
-        inc waitScreenStage
+        inc screenStage
         jmp waitScreenLoad
 waitLoopContinue:
         lda #$02
@@ -795,7 +796,7 @@ waitLoopContinue:
         rts
 
 gameMode_gameTypeMenu:
-        ; jmp endingAnimation
+        jmp endingAnimation
         jsr hzStart
         jsr calc_menuScrollY
         sta menuScrollY
@@ -2376,7 +2377,7 @@ spriteCathedral:
         .byte $FF
 
 spriteCathedralFire0:
-        .byte $0, $0, $2, $1, $0, $A0, $FF
+        .byte $8, $0, $2, $1, $0, $A0, $FF
 
 spriteCathedralFire1:
         .byte $0, $0, $4, $2, $0, $A2, $FF
@@ -2387,7 +2388,7 @@ rectY := rectBuffer+1
 rectW := rectBuffer+2
 rectH := rectBuffer+3
 rectAttr := rectBuffer+4
-rectAddr := rectBuffer+5
+rectAddr := rectBuffer+5 ; positionValidTmp
 
 ; <addr in tmp1 >addr in tmp2
 ; .byte [x, y, width, height, attr, addr]+ $FF
@@ -2541,7 +2542,7 @@ oamContentLookup:
         .addr   spriteOn ; $1A
         .addr   spriteSeedCursor ; $1B
         .addr   spritePressStart ; $1C
-        .addr   sprite1DMusicTypeCursor ; $1D
+        .addr   spritePractiseTypeCursor ; $1D
 ; Sprites are sets of 4 bytes in the OAM format, terminated by FF. byte0=y, byte1=tile, byte2=attrs, byte3=x
 ; YY AA II XX
 sprite00LevelSelectCursor:
@@ -2616,7 +2617,7 @@ spriteOn:
 spriteSeedCursor:
         .byte   $00,$6B,$00,$00
         .byte   $FF
-sprite1DMusicTypeCursor:
+spritePractiseTypeCursor:
         .byte   $00,$27,$00,$00
         .byte   $FF
 spritePressStart:
@@ -2704,7 +2705,7 @@ render_mode_static:
         rts
 
 render_mode_scroll:
-        ; handle loading of palette
+        ; handle loading of palette (hacky)
         lda menuPaletteDelay
         beq @loadedPalette
         cmp #1
@@ -2755,6 +2756,24 @@ calc_menuScrollY:
         asl
         asl
         asl
+        rts
+
+render_mode_rocket:
+        lda screenStage
+        bne @rocket_end
+        lda #$20
+        sta PPUADDR
+        lda #$83
+        sta PPUADDR
+        lda endingSleepCounter
+        jsr twoDigsToPPU
+        lda endingSleepCounter+1
+        jsr twoDigsToPPU
+
+@rocket_end:
+        lda #0
+        sta PPUSCROLL
+        sta PPUSCROLL
         rts
 
 render_mode_pause:
@@ -3669,12 +3688,14 @@ endingAnimation:
         lda levelDisplayTable, x
         jsr twoDigsToPPU
 
-
         jsr waitForVBlankAndEnableNmi
         jsr updateAudioWaitForNmiAndResetOamStaging
         jsr updateAudioWaitForNmiAndEnablePpuRendering
         jsr updateAudioWaitForNmiAndResetOamStaging
-        lda #$0
+
+        lda #0
+        sta screenStage
+        lda #$5
         sta renderMode
         lda #$1
         sta endingSleepCounter
@@ -3684,6 +3705,7 @@ endingAnimation:
 endingLoop:
         jsr updateAudioWaitForNmiAndResetOamStaging
 
+        ; draw cathedral
         lda #$78
         sta spriteYOffset
         lda #$68
@@ -3694,7 +3716,25 @@ endingLoop:
         sta $1
         jsr loadRectIntoOamStaging
 
-        ; ticket counter
+        lda #$B8
+        sta spriteYOffset
+        lda #$78
+        sta spriteXOffset
+        lda #<spriteCathedralFire0
+        sta $0
+        lda #>spriteCathedralFire0
+        sta $1
+        lda frameCounter
+        and #1
+        beq @otherFrame
+        lda #<spriteCathedralFire1
+        sta $0
+        lda #>spriteCathedralFire1
+        sta $1
+@otherFrame:
+        jsr loadRectIntoOamStaging
+
+        ; rocket counter
         lda endingSleepCounter+1
         bne @notZero
         lda endingSleepCounter
@@ -3702,31 +3742,11 @@ endingLoop:
         dec endingSleepCounter
 @notZero:
         dec endingSleepCounter+1
-
-        lda #$1A
-        sta byteSpriteXOffset
-        lda #$20
-        sta byteSpriteYOffset
-        lda #endingSleepCounter
-        sta byteSpriteAddr
-        lda #0
-        sta byteSpriteAddr+1
-        sta byteSpriteTile
-        lda #2
-        sta byteSpriteLen
-        jsr byteSprite
         jmp endingLoop
 
 @waitEnd:
-        ; press start text
-        lda #$1C
-        sta spriteYOffset
-        lda #$1E
-        sta spriteXOffset
-        lda #$1C
-        sta spriteIndexInOamContentLookup
-        jsr loadSpriteIntoOamStaging
-
+        lda #1
+        sta screenStage
         lda newlyPressedButtons_player1
         cmp #$10
         bne endingLoop
