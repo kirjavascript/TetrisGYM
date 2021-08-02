@@ -2580,11 +2580,12 @@ sprite53MusicTypeCursor:
         .byte   $00,$27,$00,$00
         .byte   $FF
 spritePressStart:
-        .byte   $00,$19,$00,$00,$00,$1b,$00,$08
-        .byte   $00,$0e,$00,$10,$00,$1c,$00,$18
-        .byte   $00,$1c,$00,$20,$08,$1c,$00,$00
-        .byte   $08,$1d,$00,$08,$08,$0a,$00,$10
-        .byte   $08,$1b,$00,$18,$08,$1d,$00,$20
+        .byte   $07,$1c,$01,$00
+        .byte   $07,$1d,$01,$08,$07,$0a,$01,$10
+        .byte   $07,$1b,$01,$18,$07,$1d,$01,$20
+        .byte   $00,$19,$01,$00,$00,$1b,$01,$08
+        .byte   $00,$0e,$01,$10,$00,$1c,$01,$18
+        .byte   $00,$1c,$01,$20
         .byte   $FF
 
 isPositionValid:
@@ -3668,9 +3669,9 @@ endingLoop:
 
 @waitEnd:
         ; press start text
-        lda #$30
+        lda #$1C
         sta spriteYOffset
-        lda #$20
+        lda #$1E
         sta spriteXOffset
         lda #$1C
         sta spriteIndexInOamContentLookup
