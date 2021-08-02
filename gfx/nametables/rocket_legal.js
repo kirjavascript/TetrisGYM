@@ -61,7 +61,7 @@ drawTiles(rocket, lookup, `
 ################################
 `);
 
-// drawRect(rocket, -2, 11, 16, 12, 0x40);
+// drawRect(rocket, -2, 11, 9, 6, 0x30);
 
 drawTiles(legal, lookup, `
 ################################

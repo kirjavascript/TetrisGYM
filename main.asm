@@ -12,7 +12,7 @@ NO_MUSIC := 1
 ALWAYS_NEXT_BOX := 1
 AUTO_WIN := 0
 NO_SCORING := 0
-DEV_MODE := 0
+DEV_MODE := 1
 
 BUTTON_DOWN := $4
 BUTTON_UP := $8
@@ -795,6 +795,7 @@ waitLoopContinue:
         rts
 
 gameMode_gameTypeMenu:
+        jmp endingAnimation
         jsr hzStart
         jsr calc_menuScrollY
         sta menuScrollY
@@ -2433,13 +2434,13 @@ oamContentLookup:
         .addr   sprite02Blank
         .addr   sprite02Blank
         .addr   sprite02Blank
-        .addr   spriteDebugLevelEdit
-        .addr   spriteStateSave
-        .addr   spriteStateLoad
-        .addr   spriteOff
-        .addr   spriteOn
-        .addr   spriteSeedCursor
-        .addr   sprite02Blank
+        .addr   spriteDebugLevelEdit ; $16
+        .addr   spriteStateSave; $17
+        .addr   spriteStateLoad; $18
+        .addr   spriteOff ; $19
+        .addr   spriteOn ; $1A
+        .addr   spriteSeedCursor ; $1B
+        .addr   spritePressStart ; $1C
         .addr   sprite02Blank
         .addr   sprite02Blank
         .addr   sprite02Blank
@@ -2577,6 +2578,13 @@ spriteSeedCursor:
         .byte   $FF
 sprite53MusicTypeCursor:
         .byte   $00,$27,$00,$00
+        .byte   $FF
+spritePressStart:
+        .byte   $00,$19,$00,$00,$00,$1b,$00,$08
+        .byte   $00,$0e,$00,$10,$00,$1c,$00,$18
+        .byte   $00,$1c,$00,$20,$08,$1c,$00,$00
+        .byte   $08,$1d,$00,$08,$08,$0a,$00,$10
+        .byte   $08,$1b,$00,$18,$08,$1d,$00,$20
         .byte   $FF
 
 isPositionValid:
@@ -3571,8 +3579,6 @@ playState_checkStartGameOver:
 @ret2:  rts
 
 endingAnimation:
-        ; TODO: trigger at 30k
-        ; TODO: confirm timing
         jsr updateAudioWaitForNmiAndDisablePpuRendering
         jsr disableNmi
         lda #$02
@@ -3581,6 +3587,8 @@ endingAnimation:
         jsr changeCHRBank1
         jsr copyRleNametableToPpu
         .addr rocket_nametable
+        jsr bulkCopyToPpu
+        .addr game_palette
 
         ; lines
         lda #$20
@@ -3659,6 +3667,15 @@ endingLoop:
         jmp endingLoop
 
 @waitEnd:
+        ; press start text
+        lda #$30
+        sta spriteYOffset
+        lda #$20
+        sta spriteXOffset
+        lda #$1C
+        sta spriteIndexInOamContentLookup
+        jsr loadSpriteIntoOamStaging
+
         lda newlyPressedButtons_player1
         cmp #$10
         bne endingLoop
