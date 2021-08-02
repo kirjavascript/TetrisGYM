@@ -12,7 +12,7 @@ NO_MUSIC := 1
 ALWAYS_NEXT_BOX := 1
 AUTO_WIN := 0
 NO_SCORING := 0
-DEV_MODE := 1
+DEV_MODE := 0
 
 BUTTON_DOWN := $4
 BUTTON_UP := $8
@@ -3706,8 +3706,10 @@ endingAnimation:
 endingLoop:
         jsr updateAudioWaitForNmiAndResetOamStaging
 
+
+
         ; draw cathedral
-        adc #$78
+        lda #$78
         sta spriteYOffset
         lda #$68
         sta spriteXOffset
@@ -5377,8 +5379,8 @@ title_nametable_patch: ; stripe
         .byte $21, $69, $5, $1D, $12, $1D, $15, $E
         .byte $FF
 rocket_nametable_patch: ; stripe
-        .byte $20, $e3, 5, $19, $1B, $E, $1c, $1c
-        .byte $21, $03, 5, $1c, $1d, $a, $1b, $1d
+        .byte $20, $63, 5, $19, $1B, $E, $1c, $1c
+        .byte $20, $83, 5, $1c, $1d, $a, $1b, $1d
         .byte $FF
 
 
