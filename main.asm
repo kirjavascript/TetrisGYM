@@ -2369,12 +2369,17 @@ orientationToSpriteTable:
         .byte   $08,$00,$0B,$07,$00,$00,$0A,$00
         .byte   $00,$00,$0C
 
-
 spriteCathedral:
         .byte $20, $0, $1, $1, $0, $30
         .byte $8, $8, $7, $1, $0, $31
         .byte $0, $10, $8, $6, $0, $40
         .byte $FF
+
+spriteCathedralFire0:
+        .byte $0, $0, $2, $1, $0, $A0, $FF
+
+spriteCathedralFire1:
+        .byte $0, $0, $4, $2, $0, $A2, $FF
 
 rectBuffer := generalCounter
 rectX := rectBuffer+0
@@ -2392,6 +2397,8 @@ loadRectIntoOamStaging:
         ldx #0
 @copyRectLoop:
         lda ($0), y
+        cmp #$FF
+        beq @ret
         sta rectBuffer, x
         iny
         inx
@@ -2403,8 +2410,6 @@ loadRectIntoOamStaging:
         sta tmpX
         lda rectW
         sta tmpY
-        lda rectAddr
-        sta tmpZ
 
 @writeTile:
         ; YTAX
@@ -2431,7 +2436,6 @@ loadRectIntoOamStaging:
 
         ; next rightwards tile
         lda #$8
-        clc
         adc rectX
         sta rectX
         inc rectAddr
@@ -2445,12 +2449,14 @@ loadRectIntoOamStaging:
         sta rectX
         lda tmpY
         sta rectW
-        lda tmpZ
+
+        lda rectAddr
+        sbc rectW
         adc #$10
         sta rectAddr
+
         lda #$8
         adc rectY
-        clc
         sta rectY
 
         dec rectH
@@ -2458,9 +2464,7 @@ loadRectIntoOamStaging:
         bne @writeLine
 
         ; do another rect
-        lda ($0), y
-        cmp #$FF
-        bne @copyRect
+        jmp @copyRect
 @ret:
         rts
 
@@ -3740,9 +3744,9 @@ endingAnimation:
 endingLoop:
         jsr updateAudioWaitForNmiAndResetOamStaging
 
-        lda #$40
+        lda #$78
         sta spriteYOffset
-        lda #$20
+        lda #$68
         sta spriteXOffset
         lda #<spriteCathedral
         sta $0
