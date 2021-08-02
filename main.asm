@@ -2541,7 +2541,7 @@ oamContentLookup:
         .addr   spriteOff ; $19
         .addr   spriteOn ; $1A
         .addr   spriteSeedCursor ; $1B
-        .addr   spritePressStart ; $1C
+        .addr   sprite02Blank
         .addr   spritePractiseTypeCursor ; $1D
 ; Sprites are sets of 4 bytes in the OAM format, terminated by FF. byte0=y, byte1=tile, byte2=attrs, byte3=x
 ; YY AA II XX
@@ -2619,14 +2619,6 @@ spriteSeedCursor:
         .byte   $FF
 spritePractiseTypeCursor:
         .byte   $00,$27,$00,$00
-        .byte   $FF
-spritePressStart:
-        .byte   $07,$1c,$01,$00
-        .byte   $07,$1d,$01,$08,$07,$0a,$01,$10
-        .byte   $07,$1b,$01,$18,$07,$1d,$01,$20
-        .byte   $00,$19,$01,$00,$00,$1b,$01,$08
-        .byte   $00,$0e,$01,$10,$00,$1c,$01,$18
-        .byte   $00,$1c,$01,$20
         .byte   $FF
 
 isPositionValid:
@@ -2760,7 +2752,7 @@ calc_menuScrollY:
 
 render_mode_rocket:
         lda screenStage
-        bne @rocket_end
+        bne @stage1
         lda #$20
         sta PPUADDR
         lda #$83
@@ -2769,12 +2761,24 @@ render_mode_rocket:
         jsr twoDigsToPPU
         lda endingSleepCounter+1
         jsr twoDigsToPPU
-
-@rocket_end:
+        jmp @rocketEnd
+@stage1:
+        cmp #1
+        bne @stage2
+        inc screenStage
+        jsr bulkCopyToPpu
+        .addr press_start
+@stage2:
+@rocketEnd:
         lda #0
         sta PPUSCROLL
         sta PPUSCROLL
         rts
+
+press_start:
+    .byte $20, $e3, 5, $19, $1B, $E, $1c, $1c
+    .byte $21, $03, 5, $1c, $1d, $a, $1b, $1d
+    .byte $FF
 
 render_mode_pause:
         ; lda pausedOutOfDateRenderFlags
@@ -3734,19 +3738,23 @@ endingLoop:
 @otherFrame:
         jsr loadRectIntoOamStaging
 
+        lda screenStage
+        bne @waitEnd
+
         ; rocket counter
         lda endingSleepCounter+1
         bne @notZero
         lda endingSleepCounter
-        beq @waitEnd
+        beq @counterEnd
         dec endingSleepCounter
 @notZero:
         dec endingSleepCounter+1
         jmp endingLoop
 
-@waitEnd:
+@counterEnd:
         lda #1
         sta screenStage
+@waitEnd:
         lda newlyPressedButtons_player1
         cmp #$10
         bne endingLoop
