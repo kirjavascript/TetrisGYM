@@ -12,7 +12,7 @@ NO_MUSIC := 1
 ALWAYS_NEXT_BOX := 1
 AUTO_WIN := 0
 NO_SCORING := 0
-DEV_MODE := 0
+DEV_MODE := 1
 
 BUTTON_DOWN := $4
 BUTTON_UP := $8
@@ -799,7 +799,7 @@ waitLoopContinue:
 
 gameMode_gameTypeMenu:
 .if DEV_MODE
-        jmp endingAnimation
+        jsr endingAnimation
 .endif
         jsr hzStart
         jsr calc_menuScrollY
@@ -3614,9 +3614,11 @@ playState_checkStartGameOver:
 @ret:   rts
 
 @curtainFinished:
+.if !DEV_MODE
         lda score+2
         cmp #$03
         bcc @checkForStartButton
+.endif
 
         lda #$80
         ldx palFlag
@@ -3700,17 +3702,25 @@ endingAnimation:
         sta renderMode
         lda #$1
         sta endingSleepCounter
-        lda #$84 ; I think it's $80, so $84 to be safe
+        lda #$80 ; timed in bizhawk tasstudio to be 1 frame longer than usual
         sta endingSleepCounter+1
 
 endingLoop:
         jsr updateAudioWaitForNmiAndResetOamStaging
 
         inc endingRocketCounter
+        inc endingRocketCounter
         lda endingRocketCounter
-        and #$1F
-        tax
-        lda shitSineWave, x
+        jsr sin_A
+        txa
+        cmp #$80 ; setup for ASR
+        ror ; A / 2
+        cmp #$80
+        ror ; A / 4
+        cmp #$80
+        ror ; A / 8
+        cmp #$80
+        ror ; A / 16
         adc #$78
 
         ; draw cathedral
@@ -3763,10 +3773,6 @@ endingLoop:
         cmp #$10
         bne endingLoop
         rts
-
-shitSineWave:
-    ; Array.from({length: 32 }, (_, i) => 4+Math.sin(i/5.2)*5|0).map(d=>'$'+d.toString(16)).join`, `
-        .byte $4, $4, $5, $6, $7, $8, $8, $8, $8, $8, $8, $8, $7, $6, $6, $5, $4, $3, $2, $1, $0, $0, $0, $0, $0, $0, $0, $0, $0, $0, $1, $2
 
 
 playState_checkForCompletedRows:
@@ -6622,6 +6628,77 @@ unsigned_div24:
         dex
 	bne @divloop
 	rts
+
+; from http://forum.6502.org/viewtopic.php?p=5789&sid=46a88a49579252ae3edcf53c0cd54f68#p5789
+;----------------------------------------------------------------
+;
+; SIN(A) COS(A) routines. a full circle is represented by $00 to
+; $00 in 256 1.40625 degree steps. returned value is signed 15
+; bit with X being the high byte and ranges over +/-0.99997
+
+;----------------------------------------------------------------
+;
+; get COS(A) in AX
+
+cos_A:
+      clc                     ; clear carry for add
+      adc   #$40              ; add 1/4 rotation
+
+;----------------------------------------------------------------
+;
+; get SIN(A) in AX. enter with flags reflecting the contents of A
+
+sin_A:
+      bpl   sin_cos           ; just get SIN/COS and return if +ve
+
+      and   #$7F              ; else make +ve
+      jsr   sin_cos           ; get SIN/COS
+                              ; now do twos complement
+      eor   #$FF              ; toggle low byte
+      clc                     ; clear carry for add
+      adc   #$01              ; add to low byte
+      pha                     ; save low byte
+      txa                     ; copy high byte
+      eor   #$FF              ; toggle high byte
+      adc   #$00              ; add carry from low byte
+      tax                     ; copy back to X
+      pla                     ; restore low byte
+      rts
+
+;----------------------------------------------------------------
+;
+; get AX from SIN/COS table
+
+sin_cos:
+      cmp   #$41              ; compare with max+1
+      bcc   quadrant          ; branch if less
+
+      eor   #$7F              ; wrap $41 to $7F ..
+      adc   #$00              ; .. to $3F to $00
+quadrant:
+      asl                     ; * 2 bytes per value
+      tax                     ; copy to index
+      lda   sintab,X          ; get SIN/COS table value low byte
+      pha                     ; save it
+      lda   sintab+1,X        ; get SIN/COS table value high byte
+      tax                     ; copy to X
+      pla                     ; restore low byte
+      rts
+
+;----------------------------------------------------------------
+;
+; SIN/COS table. returns values between $0000 and $7FFF
+
+sintab:
+      .word $0000,$0324,$0647,$096A,$0C8B,$0FAB,$12C8,$15E2
+      .word $18F8,$1C0B,$1F19,$2223,$2528,$2826,$2B1F,$2E11
+      .word $30FB,$33DE,$36BE,$398C,$3C56,$3F17,$41CE,$447A
+      .word $471C,$49B4,$4C3F,$4EBF,$5133,$539B,$55F5,$5842
+      .word $5A82,$5CB4,$5ED7,$60EC,$62F2,$64EB,$66CF,$68A6
+      .word $6A6D,$6C24,$6DC4,$6F5F,$70E2,$7255,$73B5,$7504
+      .word $7641,$776C,$7884,$798A,$7A7D,$7B5D,$7C2A,$7CE3
+      .word $7D8A,$7E1D,$7E9D,$7F09,$7F62,$7FA7,$7FD8,$7FF6
+      .word $7FFF
 
 
 ; End of "PRG_chunk1" segment
