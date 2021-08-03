@@ -174,6 +174,8 @@ musicType   := $00C2                        ; 0-3; 3 is off
 sleepCounter    := $00C3                    ;
 endingSleepCounter := $00C4                 ; 2 bytes
 endingRocketCounter := $00C6
+endingRocketX := $C7
+endingRocketY := $C8
 
 ; ... $00CD
 demo_heldButtons:= $00CE
@@ -3707,7 +3709,7 @@ endingAnimation:
 
 endingLoop:
         jsr updateAudioWaitForNmiAndResetOamStaging
-        jsr drawCathedral
+        jsr handleRocket
 
         lda screenStage
         bne @waitEnd
@@ -3733,7 +3735,30 @@ endingLoop:
         bne endingLoop
         rts
 
-drawCathedral:
+handleRocket:
+        ; controls
+        lda heldButtons_player1
+        and #BUTTON_UP
+        beq @notPressedUp
+        dec endingRocketY
+@notPressedUp:
+        lda heldButtons_player1
+        and #BUTTON_DOWN
+        beq @notPressedDown
+        inc endingRocketY
+@notPressedDown:
+        lda heldButtons_player1
+        and #BUTTON_LEFT
+        beq @notPressedLeft
+        dec endingRocketX
+@notPressedLeft:
+        lda heldButtons_player1
+        and #BUTTON_RIGHT
+        beq @notPressedRight
+        inc endingRocketX
+@notPressedRight:
+
+        ; render
         lda endingRocketCounter
         adc #2
         sta endingRocketCounter
@@ -3748,10 +3773,12 @@ drawCathedral:
         cmp #$80
         ror ; A / 16
         adc #$78
+        adc endingRocketY
 
         ; draw cathedral
         sta spriteYOffset
         lda #$68
+        adc endingRocketX
         sta spriteXOffset
         lda #<spriteCathedral
         sta $0
@@ -3763,6 +3790,7 @@ drawCathedral:
         adc spriteYOffset
         sta spriteYOffset
         lda #$78
+        adc endingRocketX
         sta spriteXOffset
         lda #<spriteCathedralFire0
         sta $0
