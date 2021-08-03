@@ -3654,9 +3654,9 @@ endingAnimation:
         .addr rocket_palette
 
         ; lines
-        lda #$20
+        lda #$21
         sta PPUADDR
-        lda #$73
+        lda #$98
         sta PPUADDR
         lda lines+1
         sta PPUDATA
@@ -3678,14 +3678,14 @@ endingAnimation:
         ; level
         lda #$22
         sta PPUADDR
-        lda #$b8
+        lda #$98
         sta PPUADDR
         ldx startLevel
         lda levelDisplayTable, x
         jsr twoDigsToPPU
         lda #$22
         sta PPUADDR
-        lda #$bb
+        lda #$18
         sta PPUADDR
         ldx levelNumber
         lda levelDisplayTable, x
@@ -3707,10 +3707,36 @@ endingAnimation:
 
 endingLoop:
         jsr updateAudioWaitForNmiAndResetOamStaging
+        jsr drawCathedral
 
-        inc endingRocketCounter
-        inc endingRocketCounter
+        lda screenStage
+        bne @waitEnd
+
+        ; rocket counter
+        lda endingSleepCounter+1
+        bne @notZero
+        lda endingSleepCounter
+        beq @counterEnd
+        dec endingSleepCounter
+@notZero:
+        dec endingSleepCounter+1
+        jmp endingLoop
+
+@counterEnd:
+        lda #1
+        sta screenStage
+        lda #0
+        sta endingRocketCounter
+@waitEnd:
+        lda newlyPressedButtons_player1
+        cmp #$10
+        bne endingLoop
+        rts
+
+drawCathedral:
         lda endingRocketCounter
+        adc #2
+        sta endingRocketCounter
         jsr sin_A
         txa
         cmp #$80 ; setup for ASR
@@ -3751,29 +3777,7 @@ endingLoop:
         sta $1
 @otherFrame:
         jsr loadRectIntoOamStaging
-
-        lda screenStage
-        bne @waitEnd
-
-        ; rocket counter
-        lda endingSleepCounter+1
-        bne @notZero
-        lda endingSleepCounter
-        beq @counterEnd
-        dec endingSleepCounter
-@notZero:
-        dec endingSleepCounter+1
-        jmp endingLoop
-
-@counterEnd:
-        lda #1
-        sta screenStage
-@waitEnd:
-        lda newlyPressedButtons_player1
-        cmp #$10
-        bne endingLoop
         rts
-
 
 playState_checkForCompletedRows:
         lda vramRow
