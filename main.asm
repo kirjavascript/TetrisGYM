@@ -2377,9 +2377,9 @@ orientationToSpriteTable:
         .byte   $00,$00,$0C
 
 spriteCathedral:
-        .byte $20, $0, $1, $1, $0, $30
-        .byte $8, $8, $7, $1, $0, $31
-        .byte $0, $10, $8, $6, $0, $40
+        .byte $20, $0, $1, $1, $20, $30
+        .byte $8, $8, $7, $1, $20, $31
+        .byte $0, $10, $8, $6, $20, $40
         .byte $FF
 
 spriteCathedralFire0:
