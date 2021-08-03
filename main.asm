@@ -12,7 +12,7 @@ NO_MUSIC := 1
 ALWAYS_NEXT_BOX := 1
 AUTO_WIN := 0
 NO_SCORING := 0
-DEV_MODE := 1
+DEV_MODE := 0
 
 BUTTON_DOWN := $4
 BUTTON_UP := $8
@@ -33,29 +33,30 @@ MODE_TYPEB := 6
 MODE_FLOOR := 7
 MODE_TAP := 8
 MODE_TRANSITION := 9
-MODE_INVISIBLE := 10
-MODE_HARDDROP := 11
-MODE_GARBAGE := 12
-MODE_DROUGHT := 13
-MODE_SPEED_TEST := 14
-MODE_HZ_DISPLAY := 15
-MODE_INPUT_DISPLAY := 16
-MODE_GOOFY := 17
-MODE_DEBUG := 18
-MODE_QUAL := 19
-MODE_PAL := 20
+MODE_GARBAGE := 10
+MODE_DROUGHT := 11
+MODE_DAS := 12
+MODE_INVISIBLE := 13
+MODE_HARDDROP := 14
+MODE_SPEED_TEST := 15
+MODE_HZ_DISPLAY := 16
+MODE_INPUT_DISPLAY := 17
+MODE_GOOFY := 18
+MODE_DEBUG := 19
+MODE_QUAL := 20
+MODE_PAL := 21
 
-MODE_QUANTITY := 21
-MODE_GAME_QUANTITY := 14
+MODE_QUANTITY := 22
+MODE_GAME_QUANTITY := 15
 
 MENU_SPRITE_Y_BASE := $47
-MENU_MAX_Y_SCROLL := $28
+MENU_MAX_Y_SCROLL := $30
 MENU_TOP_MARGIN_SCROLL := 7 ; blocks
 BLOCK_TILES := $7B
 INVISIBLE_TILE := $43
 
 ; menuConfigSizeLookup
-.define MENUSIZES $0, $0, $0, $0, $F, $7, $8, $C, $20, $10, $0, $0, $4, $12, $0, $1, $1, $1, $1, $1, $1
+.define MENUSIZES $0, $0, $0, $0, $F, $7, $8, $C, $20, $10, $4, $12, $10, $0, $0, $0, $1, $1, $1, $1, $1, $1
 
 .macro MODENAMES
     .byte   "TETRIS"
@@ -68,10 +69,11 @@ INVISIBLE_TILE := $43
     .byte   "FLOOR "
     .byte   "QCKTAP"
     .byte   "TRNSTN"
-    .byte   "INVZBL"
-    .byte   "HRDDRP"
     .byte   "GARBGE"
     .byte   "LOBARS"
+    .byte   " DAS  "
+    .byte   "INVZBL"
+    .byte   "HRDDRP"
 .endmacro
 
         .setcpu "6502"
@@ -218,8 +220,8 @@ playfield   := $0400
 
 practiseType := $600
 spawnDelay := $601
-dasValueHigh := $602
-dasValueLow := $603
+dasValueDelay := $602
+dasValuePeriod := $603
 tspinX := $604
 tspinY := $605
 tspinType := $606
@@ -324,12 +326,13 @@ tapModifier := menuVars+4
 transitionModifier := menuVars+5
 garbageModifier := menuVars+6
 droughtModifier := menuVars+7
-hzFlag := menuVars+8
-inputDisplayFlag := menuVars+9
-goofyFlag := menuVars+10
-debugFlag := menuVars+11
-qualFlag := menuVars+12
-palFlag := menuVars+13
+dasModifier := menuVars+8
+hzFlag := menuVars+9
+inputDisplayFlag := menuVars+10
+goofyFlag := menuVars+11
+debugFlag := menuVars+12
+qualFlag := menuVars+13
+palFlag := menuVars+14
 
 ; ... $7FF
 PPUCTRL     := $2000
@@ -609,7 +612,7 @@ gameModeState_updatePlayer1:
         inc gameModeState
         rts
 
-gameModeState_next:
+gameModeState_next: ; used to be updatePlater2
         inc gameModeState
         rts
 
@@ -698,6 +701,9 @@ gameMode_bootScreen: ; boot
         ; default pace to A
         lda #$A
         sta paceModifier
+
+        lda #$10
+        sta dasModifier
 
 .if DEV_MODE
         lda #1
@@ -2123,18 +2129,31 @@ framesPerDropTablePAL:
         .byte   $02,$02,$02,$01,$01,$01,$01,$01
         .byte   $01,$01,$01,$01,$01,$01
 shift_tetrimino:
+        lda practiseType
+        cmp #MODE_DAS
+        bne @normalDAS
+        lda dasModifier
+        sta dasValueDelay
+        lda palFlag
+        eor #1
+        asl
+        adc #$8
+        sta dasValuePeriod
+        jmp @shiftTetrimino
+@normalDAS:
+
         ; region stuff
         lda #$10
-        sta dasValueHigh
-        lda #$0A
-        sta dasValueLow
+        sta dasValueDelay
+        lda #$A
+        sta dasValuePeriod
         ldy palFlag
         cpy #0
         beq @shiftTetrimino
         lda #$0C
-        sta dasValueHigh
+        sta dasValueDelay
         lda #$08
-        sta dasValueLow
+        sta dasValuePeriod
 @shiftTetrimino:
 
         lda tetriminoX
@@ -2150,9 +2169,9 @@ shift_tetrimino:
         beq @ret
         inc autorepeatX
         lda autorepeatX
-        cmp dasValueHigh
+        cmp dasValueDelay
         bmi @ret
-        lda dasValueLow
+        lda dasValuePeriod
         sta autorepeatX
         jmp @buttonHeldDown
 
@@ -2184,7 +2203,7 @@ shift_tetrimino:
 @restoreX:
         lda originalY
         sta tetriminoX
-        lda dasValueHigh
+        lda dasValueDelay
         sta autorepeatX
 @ret:   rts
 
