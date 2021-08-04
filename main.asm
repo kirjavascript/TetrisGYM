@@ -852,7 +852,7 @@ gameTypeLoopContinue:
         lda practiseType
         cmp #MODE_SPEED_TEST
         bne @noHz
-        jsr hzControl
+        jsr menuHzControl
 @noHz:
         jsr menuConfigControls
         jsr practiseTypeMenuControls
@@ -875,6 +875,18 @@ gameTypeLoopNext:
         jsr renderMenuVars
         jsr updateAudioWaitForNmiAndResetOamStaging
         jmp gameTypeLoop
+
+menuHzControl:
+        ; add sfx
+        lda newlyPressedButtons_player1
+        and #BUTTON_LEFT+BUTTON_RIGHT
+        beq @notap
+        lda #$1
+        sta soundEffectSlot1Init
+@notap:
+        ; use normal controls
+        jsr hzControl
+        rts
 
 seedControls:
         lda practiseType
