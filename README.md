@@ -189,7 +189,7 @@ When paused
 
 * Select + Up  
         Increment save slot
-* Select + Up  
+* Select + Down  
         Decrement save slot
 * Select + A  
         Save state
