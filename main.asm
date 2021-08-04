@@ -71,7 +71,7 @@ INVISIBLE_TILE := $43
     .byte   "TRNSTN"
     .byte   "GARBGE"
     .byte   "LOBARS"
-    .byte   " DAS  "
+    .byte   "DASDLY"
     .byte   "INVZBL"
     .byte   "HRDDRP"
 .endmacro
