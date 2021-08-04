@@ -5,6 +5,7 @@
 - Transition Trainer
 - Invisible Trainer
 - Hard Drop Trainer
+- DAS Delay Modifier
 - Tap/Roll Speedtest
 - Hz Display
 - Goofyfoot support
@@ -18,7 +19,6 @@
 - Simplified Block Tool controls
 - Added DAS-like movement to main menu
 - Added DAS-like movement to Block Tool
-
 
 ## [v3.1]
 - Added new setup (L/J doubletuck)
