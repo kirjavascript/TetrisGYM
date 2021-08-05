@@ -15,14 +15,22 @@
     * [Stacking](#stacking)
     * [Pace](#pace)
     * [Setups](#setups)
+    * [B-Type](#b-type)
     * [Floor](#floor)
     * [(Quick)Tap](#quicktap)
+    * [Transition](#transition)
     * [Garbage](#garbage)
     * [Drought](#drought)
+    * [DAS Delay](#das-delay)
+    * [Invisible](#invisible) 
+    * [Hard Drop](#hard-drop) 
+* [Hz Display](#hz-display) 
 * [Input Display](#input-display)
-* [Debug Mode](#debug-mode)
+* [Goofy Foot](#goofy-foot)
+* [Block Tool](#block-tool)
     * [Level Editor](#level-editor)
     * [Savestates](#savestates)
+* [Qualifier Mode](#qual-mode)
 * [PAL Mode](#pal-mode)
 * [Bugfixes](#bugfixes)
 * [Resources](#resources)
@@ -47,7 +55,7 @@ Some trainers have additional configuration values; use left and right to change
 
 ![Tetris](/screens/levelselect.png)
 
-Same gameplay as Type-A, with some improvements: no score cap, no rocket, no curtain, always next box, better pause, extended level select.
+Same gameplay as A-Type, with some improvements: no score cap, no rocket, no curtain, always next box, better pause, extended level select.
 
 ### T-Spins
 
@@ -111,6 +119,10 @@ Several preset playfields for practising different types of tucks and spins.
 6. L / J Spintuck
 7. L / J Doubletuck
 
+### B-Type
+
+![B-Type](/screens/floor.png)
+
 ### Floor
 
 ![Floor](/screens/floor.png)
@@ -124,6 +136,10 @@ Setting the height to zero will result in a game mode with burns disabled.
 ![Tap](/screens/tap.png)
 
 For practising tapping and quicktapping pieces over towers. 0-G will have a tower on the left of the screen and H-W will have a tower to the right.
+
+### Transition
+
+![Transition](/screens/transition.png)
 
 ### Garbage
 
@@ -143,18 +159,27 @@ Create artificially inflated droughts. Increasing the value causes less I pieces
 
 0 = normal gameplay I = no line pieces
 
+### DAS Delay
+
+### Invisible
+
+![Invisible](/screens/invisible.png)
+
+### Hard Drop
+
+![Hard Drop](/screens/harddrop.png)
+
+### Hz Display
+
+![Hz Display](/screens/hz.png)
+
 ### Input Display
 
 ![Controller](/screens/controller.png)
 
-In debug mode
+## Block Tool
 
-* Select + Right  
-        Toggle controller input display
-
-## Debug Mode
-
-![Controller](/screens/debug.png)
+![Block](/screens/block.png)
 
 Allow more fine control over aspects of gameplay.
 
@@ -166,7 +191,7 @@ When enabled, press start to go into debug mode.
 
 * DPad  
         Move around  
-* Select + Left  
+* Select + Left/Right  
         Switch between piece and playfield editors
 
 In piece mode
@@ -206,6 +231,12 @@ Savestates allow you to save and reload playfields as many times as you want. Th
 Savestates require SRAM to work. Tested and working on Everdrive / Emulator / MiSTerFPGA.
 
 Combined with the level editor, savestates are effective for practising specific scenarios.
+
+## Qual Mode
+
+![Legal](/screens/legal.png)
+
+![Rocket](/screens/rocket.png)
 
 ## PAL Mode
 

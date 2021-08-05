@@ -5462,8 +5462,8 @@ title_nametable_patch: ; stripe
         .byte $21, $69, $5, $1D, $12, $1D, $15, $E
         .byte $FF
 rocket_nametable_patch: ; stripe
-        .byte $20, $63, 5, $19, $1B, $E, $1c, $1c
-        .byte $20, $83, 5, $1c, $1d, $a, $1b, $1d
+        .byte $20, $83, 5, $19, $1B, $E, $1c, $1c
+        .byte $20, $A3, 5, $1c, $1d, $a, $1b, $1d
         .byte $FF
 
 
