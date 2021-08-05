@@ -24,7 +24,6 @@
     * [DAS Delay](#das-delay)
     * [Invisible](#invisible) 
     * [Hard Drop](#hard-drop) 
-
 * [Tap/Roll Speed](#tap-roll-speed)
 * [Hz Display](#hz-display) 
 * [Input Display](#input-display)
@@ -125,6 +124,8 @@ Several preset playfields for practising different types of tucks and spins.
 
 ![B-Type](/screens/floor.png)
 
+Same gameplay as B-Type in the original, except heights up to 8 are supported.
+
 ### Floor
 
 ![Floor](/screens/floor.png)
@@ -142,6 +143,10 @@ For practising tapping and quicktapping pieces over towers. 0-G will have a towe
 ### Transition
 
 ![Transition](/screens/transition.png)
+
+Puts you ten lines before transition. The value given will be added to your score, so set this to 5 and start on level 18 for a 'maxout trainer' style mode.
+
+Setting the value to G causes the mode to act identical to the game genie code `SXTOKL`
 
 ### Garbage
 
@@ -163,6 +168,8 @@ Create artificially inflated droughts. Increasing the value causes less I pieces
 
 ### DAS Delay
 
+Allows you to change the auto-shift delay rate.
+
 ### Invisible
 
 ![Invisible](/screens/invisible.png)
@@ -173,15 +180,23 @@ Create artificially inflated droughts. Increasing the value causes less I pieces
 
 ## Tap/Roll Speed
 
+Practise tapping rate outside of gameplay 
+
 ## Hz Display
 
 ![Hz Display](/screens/hz.png)
+
+Shows the average tapping rate for each tap in a burst.
+
+Also shows frames between spawn and first tap, and current tap direction.
 
 ## Input Display
 
 ![Controller](/screens/controller.png)
 
 ## Goofy Foot
+
+Flips A/B, Start/Select, and inverts DPad directions like a Goofy Foot controller.
 
 ## Block Tool
 
@@ -243,6 +258,8 @@ Combined with the level editor, savestates are effective for practising specific
 ![Legal](/screens/legal.png)
 
 ![Rocket](/screens/rocket.png)
+
+Reintroduces the 'wait screens', intended for use in qualifiers where the the player would otherwise gain a time advantage skipping the rocket, legal and title screens.
 
 ## PAL Mode
 
