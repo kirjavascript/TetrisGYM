@@ -24,7 +24,7 @@
     * [DAS Delay](#das-delay)
     * [Invisible](#invisible) 
     * [Hard Drop](#hard-drop) 
-* [Tap/Roll Speed Tester](#tap-roll-speed-tester)
+* [Tap/Roll Speed Tester](#taproll-speed-tester)
 * [Hz Display](#hz-display) 
 * [Input Display](#input-display)
 * [Goofy Foot](#goofy-foot)
