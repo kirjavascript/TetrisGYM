@@ -12,7 +12,7 @@ NO_MUSIC := 1
 ALWAYS_NEXT_BOX := 1
 AUTO_WIN := 0
 NO_SCORING := 0
-DEV_MODE := 1
+DEV_MODE := 0
 
 BUTTON_DOWN := $4
 BUTTON_UP := $8
@@ -1875,6 +1875,14 @@ transitionModeSetup:
         sta score+2
 
         ; set lines
+
+        ; special case below level 10
+        lda levelNumber
+        cmp #$A
+        bpl @over9
+        adc #1
+        jmp @smaller
+@over9:
 
         ; level + 1
         lda levelNumber
