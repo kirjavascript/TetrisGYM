@@ -24,6 +24,8 @@
     * [DAS Delay](#das-delay)
     * [Invisible](#invisible) 
     * [Hard Drop](#hard-drop) 
+
+* [Tap/Roll Speed](#tap-roll-speed)
 * [Hz Display](#hz-display) 
 * [Input Display](#input-display)
 * [Goofy Foot](#goofy-foot)
@@ -169,13 +171,17 @@ Create artificially inflated droughts. Increasing the value causes less I pieces
 
 ![Hard Drop](/screens/harddrop.png)
 
-### Hz Display
+## Tap/Roll Speed
+
+## Hz Display
 
 ![Hz Display](/screens/hz.png)
 
-### Input Display
+## Input Display
 
 ![Controller](/screens/controller.png)
+
+## Goofy Foot
 
 ## Block Tool
 

@@ -17,10 +17,10 @@ XXX###qwwwwwwwwwwwwwwwwwwwwwwwwe###
 XXX###a                        d###
 XXX###a               qwwwwwwe d###
 XXX###a               a      d d###
-XXX###a    ╄╅╅╅╅╅╆    zxxxxxxc d###
+XXX###a               zxxxxxxc d###
+XXX###a    ╄╅╅╅╅╅╆             d###
 XXX###a    ╇LEVEL╈             d###
 XXX###a    ╉╊╊╊╊╊╋             d###
-XXX###a                        d###
 XXX###a  rtututututg           d###
 XXX###a  f0f1f2f3f4f           d###
 XXX###a  jbkbkbkbkbkb@         d###
