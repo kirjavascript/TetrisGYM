@@ -12,7 +12,7 @@ NO_MUSIC := 1
 ALWAYS_NEXT_BOX := 1
 AUTO_WIN := 0
 NO_SCORING := 0
-DEV_MODE := 1
+DEV_MODE := 0
 
 BUTTON_DOWN := $4
 BUTTON_UP := $8
@@ -6427,7 +6427,6 @@ hzTap:
         rts
 
 hzPaletteGradient: ; goes up to B
-	; .byte $16, $26, $27, $28, $29, $2a, $2c, $1c, $13, $24, $14, $15
         .byte $16, $26, $27, $28, $29, $2a, $2c, $22, $23, $24, $14, $15
 
 ; math routines
