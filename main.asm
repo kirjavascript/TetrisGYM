@@ -12,7 +12,7 @@ NO_MUSIC := 1
 ALWAYS_NEXT_BOX := 1
 AUTO_WIN := 0
 NO_SCORING := 0
-DEV_MODE := 0
+DEV_MODE := 1
 
 BUTTON_DOWN := $4
 BUTTON_UP := $8
@@ -806,9 +806,6 @@ waitLoopContinue:
         rts
 
 gameMode_gameTypeMenu:
-.if DEV_MODE
-        jsr endingAnimation
-.endif
         jsr hzStart
         jsr calc_menuScrollY
         sta menuScrollY
@@ -3647,11 +3644,9 @@ playState_checkStartGameOver:
 @ret:   rts
 
 @curtainFinished:
-.if !DEV_MODE
         lda score+2
         cmp #$03
         bcc @checkForStartButton
-.endif
 
         lda #$80
         ldx palFlag
@@ -6432,7 +6427,8 @@ hzTap:
         rts
 
 hzPaletteGradient: ; goes up to B
-	.byte $16, $26, $27, $28, $29, $2a, $2c, $13, $14, $15, $25, $24
+	; .byte $16, $26, $27, $28, $29, $2a, $2c, $1c, $13, $24, $14, $15
+        .byte $16, $26, $27, $28, $29, $2a, $2c, $22, $23, $24, $14, $15
 
 ; math routines
 
