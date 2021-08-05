@@ -24,7 +24,7 @@
     * [DAS Delay](#das-delay)
     * [Invisible](#invisible) 
     * [Hard Drop](#hard-drop) 
-* [Tap/Roll Speed](#tap-roll-speed)
+* [Tap/Roll Speed Tester](#tap-roll-speed-tester)
 * [Hz Display](#hz-display) 
 * [Input Display](#input-display)
 * [Goofy Foot](#goofy-foot)
@@ -72,7 +72,7 @@ Press `select` to generate a random seed.
 
 The seed trainer was improved in v3.1 to give a 'better' distribution of cases.
 
-Different versions of TetrisGYM can still share SPS by setting the fifth digit to `0`.
+Different versions of TetrisGYM can still share SPS by setting the fifth digit to 0.
 
 ### Stacking
 
@@ -168,19 +168,23 @@ Create artificially inflated droughts. Increasing the value causes less I pieces
 
 ### DAS Delay
 
-Allows you to change the auto-shift delay rate.
+Change the auto-shift delay rate.
 
 ### Invisible
 
 ![Invisible](/screens/invisible.png)
 
+Blocks are invisible until the end of the game.
+
 ### Hard Drop
 
 ![Hard Drop](/screens/harddrop.png)
 
-## Tap/Roll Speed
+Press `select` or `up` to hard drop.
 
-Practise tapping rate outside of gameplay 
+## Tap/Roll Speed Tester
+
+Practise tapping rate outside of gameplay.
 
 ## Hz Display
 
@@ -204,9 +208,9 @@ Flips A/B, Start/Select, and inverts DPad directions like a Goofy Foot controlle
 
 Allow more fine control over aspects of gameplay.
 
-This is a config option only, and will enable debug mode globally. 
+This is a config option only, and will enable the block tool globally. 
 
-When enabled, press start to go into debug mode.
+When enabled, press start to use the editors.
 
 ### Level Editor
 

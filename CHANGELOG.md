@@ -6,7 +6,7 @@
 - Invisible Trainer
 - Hard Drop Trainer
 - DAS Delay Modifier
-- Tap/Roll Speedtest
+- Tap/Roll Speed Tester
 - Hz Display
 - Goofyfoot support
 - Qual Mode (Legal, Title, Curtain, Rocket)
