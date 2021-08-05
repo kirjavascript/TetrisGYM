@@ -12,7 +12,7 @@ NO_MUSIC := 1
 ALWAYS_NEXT_BOX := 1
 AUTO_WIN := 0
 NO_SCORING := 0
-DEV_MODE := 0
+DEV_MODE := 1
 
 BUTTON_DOWN := $4
 BUTTON_UP := $8
@@ -795,13 +795,14 @@ waitLoopCheckStart:
         jsr updateAudioWaitForNmiAndResetOamStaging
         jmp waitLoopCheckStart
 waitLoopNext:
+        ldx #$02
         lda screenStage
         bne waitLoopContinue
+        stx soundEffectSlot1Init
         inc screenStage
         jmp waitScreenLoad
 waitLoopContinue:
-        lda #$02
-        sta soundEffectSlot1Init
+        stx soundEffectSlot1Init
         inc gameMode
         rts
 
