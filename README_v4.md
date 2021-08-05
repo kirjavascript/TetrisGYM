@@ -7,23 +7,33 @@
 </div>
 <br>
 
-* [Getting Started](#guide)
-* [Trainers](#modes)
+* [Getting Started](#getting-started)
+* [Trainers](#trainers)
     * [Tetris](#tetris)
     * [T-Spins](#t-spins)
     * [Seed](#seed)
     * [Stacking](#stacking)
     * [Pace](#pace)
     * [Setups](#setups)
+    * [B-Type](#b-type)
     * [Floor](#floor)
-    * [(Quick)Tap](#%28quick%29-tap)
+    * [(Quick)Tap](#quicktap)
+    * [Transition](#transition)
     * [Garbage](#garbage)
     * [Drought](#drought)
+    * [DAS Delay](#das-delay)
+    * [Invisible](#invisible) 
+    * [Hard Drop](#hard-drop) 
+* [Tap/Roll Speed](#tap-roll-speed)
+* [Hz Display](#hz-display) 
 * [Input Display](#input-display)
-* [Debug Mode](#debug-mode)
+* [Goofy Foot](#goofy-foot)
+* [Block Tool](#block-tool)
     * [Level Editor](#level-editor)
     * [Savestates](#savestates)
+* [Qualifier Mode](#qual-mode)
 * [PAL Mode](#pal-mode)
+* [Bugfixes](#bugfixes)
 * [Resources](#resources)
 
 ## Getting Started
@@ -32,7 +42,9 @@ TetrisGYM is a modification of NES Tetris.
 
 While originally based on the NTSC version of the game, the patched ROM supports PAL and NTSC gameplay types.
 
-TetrisGYM is distributed in the form of a BPS patch and can be applied to the USA version of the game with [Rom PatcherJS](https://www.romhacking.net/patch/) or similar.
+TetrisGYM is distributed in the form of a BPS patch and can be applied to the USA version of the game with [Rom PatcherJS](https://www.romhacking.net/patch/) or similar. 
+
+`Unpatched File SHA-1: 77747840541BFC62A28A5957692A98C550BD6B2B`
 
 A link to the BPS can be found on the [releases page](https://github.com/kirjavascript/TetrisGYM/releases).
 
@@ -44,7 +56,7 @@ Some trainers have additional configuration values; use left and right to change
 
 ![Tetris](/screens/levelselect.png)
 
-Same gameplay as Type-A, with some improvements: no score cap, no rocket, no curtain, always next box, better pause, extended level select.
+Same gameplay as A-Type, with some improvements: no score cap, no rocket, no curtain, always next box, better pause, extended level select.
 
 ### T-Spins
 
@@ -57,6 +69,10 @@ Spawn T-Spins in random positions. Additional entry delay on successful T-Spin t
 Provides same piece sets for VS battles (or practise).
 
 Press `select` to generate a random seed.
+
+The seed trainer was improved in v3.1 to give a 'better' distribution of cases.
+
+Different versions of TetrisGYM can still share SPS by setting the fifth digit to `0`.
 
 ### Stacking
 
@@ -101,7 +117,14 @@ Several preset playfields for practising different types of tucks and spins.
 3. I
 4. Buco
 5. Various
-6. L / J Double
+6. L / J Spintuck
+7. L / J Doubletuck
+
+### B-Type
+
+![B-Type](/screens/floor.png)
+
+Same gameplay as B-Type in the original, except heights up to 8 are supported.
 
 ### Floor
 
@@ -116,6 +139,14 @@ Setting the height to zero will result in a game mode with burns disabled.
 ![Tap](/screens/tap.png)
 
 For practising tapping and quicktapping pieces over towers. 0-G will have a tower on the left of the screen and H-W will have a tower to the right.
+
+### Transition
+
+![Transition](/screens/transition.png)
+
+Puts you ten lines before transition. The value given will be added to your score, so set this to 5 and start on level 18 for a 'maxout trainer' style mode.
+
+Setting the value to G causes the mode to act identical to the game genie code `SXTOKL`
 
 ### Garbage
 
@@ -135,18 +166,41 @@ Create artificially inflated droughts. Increasing the value causes less I pieces
 
 0 = normal gameplay I = no line pieces
 
-### Input Display
+### DAS Delay
+
+Allows you to change the auto-shift delay rate.
+
+### Invisible
+
+![Invisible](/screens/invisible.png)
+
+### Hard Drop
+
+![Hard Drop](/screens/harddrop.png)
+
+## Tap/Roll Speed
+
+Practise tapping rate outside of gameplay 
+
+## Hz Display
+
+![Hz Display](/screens/hz.png)
+
+Shows the average tapping rate for each tap in a burst.
+
+Also shows frames between spawn and first tap, and current tap direction.
+
+## Input Display
 
 ![Controller](/screens/controller.png)
 
-In debug mode
+## Goofy Foot
 
-* Select + Right  
-        Toggle controller input display
+Flips A/B, Start/Select, and inverts DPad directions like a Goofy Foot controller.
 
-## Debug Mode
+## Block Tool
 
-![Controller](/screens/debug.png)
+![Block](/screens/block.png)
 
 Allow more fine control over aspects of gameplay.
 
@@ -158,7 +212,7 @@ When enabled, press start to go into debug mode.
 
 * DPad  
         Move around  
-* Select + Left  
+* Select + Left/Right  
         Switch between piece and playfield editors
 
 In piece mode
@@ -181,7 +235,7 @@ When paused
 
 * Select + Up  
         Increment save slot
-* Select + Up  
+* Select + Down  
         Decrement save slot
 * Select + A  
         Save state
@@ -199,12 +253,28 @@ Savestates require SRAM to work. Tested and working on Everdrive / Emulator / Mi
 
 Combined with the level editor, savestates are effective for practising specific scenarios.
 
+## Qual Mode
+
+![Legal](/screens/legal.png)
+
+![Rocket](/screens/rocket.png)
+
+Reintroduces the 'wait screens', intended for use in qualifiers where the the player would otherwise gain a time advantage skipping the rocket, legal and title screens.
+
 ## PAL Mode
 
 Dictate if the NTSC or PAL gameplay mechanics should be used. Should automatically detect region, but can be manually overwritten otherwise.
 
+## Bugfixes
+
+TetrisGYM fixes some well known bugs in the original game;
+
+- Resetting during a tetris no longer creates an invalid state
+- Level numbers are correct past level 29
+- Tetrimino colours are correct past level 138
+- Game no longer crashes after ~1550 lines
+
 ## Resources
 
-base disassembly: [https://github.com/CelestialAmber/TetrisNESDisasm](https://github.com/CelestialAmber/TetrisNESDisasm)  
-disassembly information: [https://github.com/ejona86/taus](https://github.com/ejona86/taus)
-
+Tools and references: [https://github.com/ejona86/taus](https://github.com/ejona86/taus)  
+Disassembly, based on work from TAUS: [https://github.com/CelestialAmber/TetrisNESDisasm](https://github.com/CelestialAmber/TetrisNESDisasm)  
