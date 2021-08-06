@@ -122,7 +122,7 @@ Several preset playfields for practising different types of tucks and spins.
 
 ### B-Type
 
-![B-Type](/screens/floor.png)
+![B-Type](/screens/btype.png)
 
 Same gameplay as B-Type in the original, except heights up to 8 are supported.
 
