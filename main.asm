@@ -4350,9 +4350,9 @@ updateMusicSpeed:
 @ret:   rts
 
 pollControllerButtons:
-        lda gameMode
-        cmp #$05
-        beq @demoGameMode
+        ; lda gameMode
+        ; cmp #$05
+        ; beq @demoGameMode
         ; beq @recording
         jsr pollController
         rts

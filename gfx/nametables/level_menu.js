@@ -45,6 +45,12 @@ XXX##########################    ##
 XXX#000000##000000#########AAAAAAAA
 `;
 
+// heart
+
+// rtutututututy
+// f0f1f2f3f4f^h
+// jbkbkbkbkbkbl
+
 const practise = Buffer.from(buffer);
 [...tiles.trim().split('\n').join('')].forEach((d, i) => {
     if (d !== '#') {
