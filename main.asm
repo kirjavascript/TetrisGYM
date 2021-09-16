@@ -6005,8 +6005,8 @@ handleLevelEditor:
         dec tmp3
         rts
 
+; target = lines <= 110 ? scoreLookup : scoreLookup + ((lines - 110) / (230 - 110)) * 348
 ; pace = score - ((target / 230) * lines)
-; target = lines <= 110 ? 4000 : 4000 + ((lines - 110) / (230 - 110)) * 348
 
 ; rough guide: https://docs.google.com/spreadsheets/d/1FKUkx8borKvwwTFmFoM2j7FqMPFoJ4GkdFtO5JIekFE/edit#gid=465512309
 
