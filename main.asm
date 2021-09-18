@@ -2597,13 +2597,13 @@ sprite01GameTypeCursor:
 sprite02Blank:
         .byte   $00,$FF,$00,$00,$FF
 sprite03PausePalette6:
-        .byte   $00,$19,$00,$00,$00,$0A,$00,$08
-        .byte   $00,$1E,$00,$10,$00,$1C,$00,$18
-        .byte   $00,$0E,$00,$20,$FF
+        .byte   $00,'P',$00,$00,$00,'A',$00,$08
+        .byte   $00,'U',$00,$10,$00,'S',$00,$18
+        .byte   $00,'E',$00,$20,$FF
 sprite05DebugPalette4:
-        .byte   $00,$0b,$00,$00,$00,$15,$00,$08
-        .byte   $00,$18,$00,$10,$00,$0c,$00,$18
-        .byte   $00,$14,$00,$20
+        .byte   $00,'B',$00,$00,$00,'L',$00,$08
+        .byte   $00,'O',$00,$10,$00,'C',$00,$18
+        .byte   $00,'K',$00,$20
         .byte   $FF
 sprite06TPiece:
         .byte   $00,$7B,$02,$FC,$00,$7B,$02,$04
@@ -2636,24 +2636,24 @@ sprite0CIPiece:
 sprite0EHighScoreNameCursor:
         .byte   $00,$FD,$20,$00,$FF
 spriteDebugLevelEdit:
-        .byte   $00,$21,$00,$00
+        .byte   $00,'X',$00,$00
         .byte   $FF
 spriteStateLoad:
-        .byte   $00,$15,$03,$00,$00,$18,$03,$08
-        .byte   $00,$0A,$03,$10,$00,$0D,$03,$18
-        .byte   $00,$0E,$03,$20,$00,$0D,$03,$28
+        .byte   $00,'L',$03,$00,$00,'O',$03,$08
+        .byte   $00,'A',$03,$10,$00,'D',$03,$18
+        .byte   $00,'E',$03,$20,$00,'D',$03,$28
         .byte   $FF
 spriteStateSave:
-        .byte   $00,$1c,$03,$00,$00,$0a,$03,$08
-        .byte   $00,$1f,$03,$10,$00,$0e,$03,$18
-        .byte   $00,$0d,$03,$20
+        .byte   $00,'S',$03,$00,$00,'A',$03,$08
+        .byte   $00,'V',$03,$10,$00,'E',$03,$18
+        .byte   $00,'D',$03,$20
         .byte   $FF
 spriteOff:
-        .byte   $00,$18,$00,$00,$00,$0f,$00,$08
-        .byte   $00,$0f,$00,$10
+        .byte   $00,'O',$00,$00,$00,'F',$00,$08
+        .byte   $00,'F',$00,$10
         .byte   $FF
 spriteOn:
-        .byte   $00,$18,$00,$08,$00,$17,$00,$10
+        .byte   $00,'O',$00,$08,$00,'N',$00,$10
         .byte   $FF
 spriteSeedCursor:
         .byte   $00,$6B,$00,$00
