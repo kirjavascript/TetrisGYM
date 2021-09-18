@@ -4965,9 +4965,9 @@ gameModeState_startButtonHandling:
         ldy #$02
         jsr memset_page
 @pauseLoop:
-        lda #$74
+        lda #$C5
         sta spriteXOffset
-        lda #$58
+        lda #$16
         sta spriteYOffset
         ; put 3 or 5 in a
         lda debugFlag
