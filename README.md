@@ -265,6 +265,9 @@ Combined with the level editor, savestates are effective for practising specific
 
 Reintroduces the 'wait screens', intended for use in qualifiers where the the player would otherwise gain a time advantage skipping the rocket, legal and title screens.
 
+Qual mode additionally reintroduces the end-game curtain, and the black-screen pause. With that, qual mode makes TetrisGYM friendly to post processor tools like [NestrisChamps](https://github.com/timotheeg/nestrischamps), which are otherwise not able to determine game over events, and are confused by the pause text which they interpret as blocks on the field.
+
+
 ## PAL Mode
 
 Dictate if the NTSC or PAL gameplay mechanics should be used. Should automatically detect region, but can be manually overwritten otherwise.
