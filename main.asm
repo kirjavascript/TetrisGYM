@@ -9,7 +9,6 @@
 
 PRACTISE_MODE := 1
 NO_MUSIC := 1
-ALWAYS_NEXT_BOX := 1
 AUTO_WIN := 0
 NO_SCORING := 0
 DEV_MODE := 0
@@ -1047,7 +1046,7 @@ menuConfigControls:
         dec menuVars, x
         lda #$01
         sta soundEffectSlot1Init
-        jsr checkGoofy
+        jsr assertValues
 @skipLeftConfig:
 
         ; check if pressing right
@@ -1061,7 +1060,7 @@ menuConfigControls:
         inc menuVars, x
         lda #$01
         sta soundEffectSlot1Init
-        jsr checkGoofy
+        jsr assertValues
 @skipRightConfig:
 @configEnd:
         rts
@@ -1069,7 +1068,25 @@ menuConfigControls:
 menuConfigSizeLookup:
         .byte   MENUSIZES
 
-checkGoofy:
+assertValues:
+        ; make sure you can only have block or qual
+        lda practiseType
+        cmp #MODE_QUAL
+        bne @noQual
+        lda menuVars, x
+        beq @noQual
+        lda #0
+        sta debugFlag
+@noQual:
+        lda practiseType
+        cmp #MODE_DEBUG
+        bne @noDebug
+        lda menuVars, x
+        beq @noDebug
+        lda #0
+        sta qualFlag
+@noDebug:
+        ; goofy
         lda practiseType
         cmp #MODE_GOOFY
         bne @noFlip
@@ -2392,10 +2409,12 @@ orientationTable:
         .byte   $FF,$00,$00,$FF,$00,$00,$FF,$00
 
 stageSpriteForNextPiece:
-.if !ALWAYS_NEXT_BOX
+        lda qualFlag
+        beq @alwaysNextBox
         lda displayNextPiece
         bne @ret
-.endif
+
+@alwaysNextBox:
         lda #$C8
         sta spriteXOffset
         lda #$77
@@ -4949,26 +4968,55 @@ gameModeState_startButtonHandling:
         ; do nothing if curtain is being lowered
         lda playState
         cmp #$0A
-        bne @pause
-        jmp @ret
+        beq @ret
+        jsr pause
 
-@pause:
+@ret:   inc gameModeState
+        rts
+
+pause:
         lda #$05
         sta musicStagingNoiseHi
+
+        lda qualFlag
+        beq @pauseSetupNotClassic
+
+@pauseSetupClassic:
+        lda #$00
+        sta renderMode
+        lda #$16
+        sta PPUMASK
+        jmp @pauseSetupPart2
+
+@pauseSetupNotClassic:
         lda #$04 ; render_mode_pause
         sta renderMode
+
+@pauseSetupPart2:
         jsr updateAudioAndWaitForNmi
-        lda #$1E ; $16 for black
-        sta PPUMASK
         lda #$FF
         ldx #$02
         ldy #$02
         jsr memset_page
+
 @pauseLoop:
+        lda qualFlag
+        beq @pauseLoopNotClassic
+
+@pauseLoopClassic:
+        lda #$70
+        sta spriteXOffset
+        lda #$77
+        sta spriteYOffset
+        jmp @pauseLoopCommon
+
+@pauseLoopNotClassic:
         lda #$74
         sta spriteXOffset
         lda #$58
         sta spriteYOffset
+
+@pauseLoopCommon:
         ; put 3 or 5 in a
         lda debugFlag
         asl
@@ -4976,24 +5024,28 @@ gameModeState_startButtonHandling:
         sta spriteIndexInOamContentLookup
         jsr loadSpriteIntoOamStaging
 
+        lda qualFlag
+        bne @pauseCheckStart
+
         jsr practiseGameHUD
         jsr debugMode
         ; debugMode calls stageSpriteForNextPiece, stageSpriteForCurrentPiece
 
+@pauseCheckStart:
         lda newlyPressedButtons_player1
         cmp #$10
         beq @resume
         jsr updateAudioWaitForNmiAndResetOamStaging
         jmp @pauseLoop
 
-@resume:lda #$1E
+@resume:
+        lda #$1E
         sta PPUMASK
         lda #$00
         sta musicStagingNoiseHi
         sta vramRow
         lda #$03
         sta renderMode
-@ret:   inc gameModeState
         rts
 
 ; canon is waitForVerticalBlankingInterval

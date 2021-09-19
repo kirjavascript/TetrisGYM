@@ -265,6 +265,12 @@ Combined with the level editor, savestates are effective for practising specific
 
 Reintroduces the 'wait screens', intended for use in qualifiers where the the player would otherwise gain a time advantage skipping the rocket, legal and title screens.
 
+Also reintroduces other classic features like the end game curtain, standard pause, and no next box.
+
+These features make TetrisGYM work better with post processing tools like [NestrisChamps](https://github.com/timotheeg/nestrischamps) and [MaxoutClub](https://maxoutclub.com/).
+
+You cannot use the Block Tool and Qual mode at the same time.
+
 ## PAL Mode
 
 Dictate if the NTSC or PAL gameplay mechanics should be used. Should automatically detect region, but can be manually overwritten otherwise.
