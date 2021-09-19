@@ -1,7 +1,7 @@
 # Changelog
 ## [v4 classic]
-- Standard pause in Qual Mode
-
+- Standard Pause in Qual Mode
+- No Next Box allowed in Qual Mode
 
 ## [v4]
 - B-Type Trainer (height 0-8)

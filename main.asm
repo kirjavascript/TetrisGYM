@@ -9,7 +9,6 @@
 
 PRACTISE_MODE := 1
 NO_MUSIC := 1
-ALWAYS_NEXT_BOX := 1
 AUTO_WIN := 0
 NO_SCORING := 0
 DEV_MODE := 0
@@ -2392,10 +2391,12 @@ orientationTable:
         .byte   $FF,$00,$00,$FF,$00,$00,$FF,$00
 
 stageSpriteForNextPiece:
-.if !ALWAYS_NEXT_BOX
+        lda qualFlag
+        beq @alwaysNextBox
         lda displayNextPiece
         bne @ret
-.endif
+
+@alwaysNextBox:
         lda #$C8
         sta spriteXOffset
         lda #$77
