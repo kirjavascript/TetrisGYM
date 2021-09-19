@@ -4960,23 +4960,21 @@ pause:
         sta musicStagingNoiseHi
 
         lda qualFlag
-        beq @pauseSetupNotQual
+        beq @pauseSetupNotClassic
 
-@pauseSetupQual:
+@pauseSetupClassic:
         lda #$00
         sta renderMode
-        jsr updateAudioAndWaitForNmi
         lda #$16
+        sta PPUMASK
         jmp @pauseSetupPart2
 
-@pauseSetupNotQual:
+@pauseSetupNotClassic:
         lda #$04 ; render_mode_pause
         sta renderMode
-        jsr updateAudioAndWaitForNmi
-        lda #$1E ; $16 for black
 
 @pauseSetupPart2:
-        sta PPUMASK
+        jsr updateAudioAndWaitForNmi
         lda #$FF
         ldx #$02
         ldy #$02
@@ -4984,16 +4982,16 @@ pause:
 
 @pauseLoop:
         lda qualFlag
-        beq @pauseLoopNotQual
+        beq @pauseLoopNotClassic
 
-@pauseLoopQual:
+@pauseLoopClassic:
         lda #$70
         sta spriteXOffset
         lda #$77
         sta spriteYOffset
         jmp @pauseLoopCommon
 
-@pauseLoopNotQual:
+@pauseLoopNotClassic:
         lda #$74
         sta spriteXOffset
         lda #$58
