@@ -269,6 +269,8 @@ Also reintroduces other classic features like the end game curtain, standard pau
 
 These features make TetrisGYM work better with post processing tools like [NestrisChamps](https://github.com/timotheeg/nestrischamps) and [MaxoutClub](https://maxoutclub.com/).
 
+You cannot use the Block Tool and Qual mode at the same time.
+
 ## PAL Mode
 
 Dictate if the NTSC or PAL gameplay mechanics should be used. Should automatically detect region, but can be manually overwritten otherwise.

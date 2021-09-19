@@ -2,6 +2,7 @@
 ## [v4 classic]
 - Standard Pause in Qual Mode
 - No Next Box allowed in Qual Mode
+- Block Tool cannot be used in Qual Mode
 
 ## [v4]
 - B-Type Trainer (height 0-8)

@@ -1046,7 +1046,7 @@ menuConfigControls:
         dec menuVars, x
         lda #$01
         sta soundEffectSlot1Init
-        jsr checkGoofy
+        jsr assertValues
 @skipLeftConfig:
 
         ; check if pressing right
@@ -1060,7 +1060,7 @@ menuConfigControls:
         inc menuVars, x
         lda #$01
         sta soundEffectSlot1Init
-        jsr checkGoofy
+        jsr assertValues
 @skipRightConfig:
 @configEnd:
         rts
@@ -1068,7 +1068,25 @@ menuConfigControls:
 menuConfigSizeLookup:
         .byte   MENUSIZES
 
-checkGoofy:
+assertValues:
+        ; make sure you can only have block or qual
+        lda practiseType
+        cmp #MODE_QUAL
+        bne @noQual
+        lda menuVars, x
+        beq @noQual
+        lda #0
+        sta debugFlag
+@noQual:
+        lda practiseType
+        cmp #MODE_DEBUG
+        bne @noDebug
+        lda menuVars, x
+        beq @noDebug
+        lda #0
+        sta qualFlag
+@noDebug:
+        ; goofy
         lda practiseType
         cmp #MODE_GOOFY
         bne @noFlip
