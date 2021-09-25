@@ -4958,8 +4958,7 @@ gameModeState_startButtonHandling:
 
         lda newlyPressedButtons_player1
         and #$10
-        bne @startPressed
-        jmp @ret
+        beq @ret
 
 @startPressed:
         ; do nothing if curtain is being lowered
