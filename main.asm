@@ -3666,9 +3666,6 @@ playState_checkStartGameOver:
         sta vramRow
 @incrementCurtainRow:
         inc curtainRow
-        lda curtainRow
-        cmp #$14
-        bne @ret
 @ret:   rts
 
 @curtainFinished:
@@ -4961,8 +4958,7 @@ gameModeState_startButtonHandling:
 
         lda newlyPressedButtons_player1
         and #$10
-        bne @startPressed
-        jmp @ret
+        beq @ret
 
 @startPressed:
         ; do nothing if curtain is being lowered
