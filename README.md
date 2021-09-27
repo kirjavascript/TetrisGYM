@@ -50,7 +50,7 @@ A link to the BPS can be found on the [releases page](https://github.com/kirjava
 
 ## Trainers
 
-Some trainers have additional configuration values; use left and right to change them.
+Some trainers have additional configuration values; use left and right in the main menu to change them.
 
 ### Tetris
 
