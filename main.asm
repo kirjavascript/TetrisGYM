@@ -809,6 +809,8 @@ gameMode_gameTypeMenu:
         jsr hzStart
         jsr calc_menuScrollY
         sta menuScrollY
+        lda #0
+        sta displayNextPiece
 
         inc initRam
         ; switch to blank charmap
