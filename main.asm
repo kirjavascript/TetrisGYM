@@ -7,7 +7,7 @@
 
 .include "charmap.asm"
 
-INES_MAPPER := 3
+INES_MAPPER := 1
 ; 1 and 3 supported
 ; tetris.asm: update mapper, .cfg: CHR size to 8kb
 PRACTISE_MODE := 1
