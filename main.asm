@@ -7,6 +7,9 @@
 
 .include "charmap.asm"
 
+INES_MAPPER := 3
+; 1 and 3 supported
+; tetris.asm: update mapper, .cfg: CHR size to 8kb
 PRACTISE_MODE := 1
 NO_MUSIC := 1
 AUTO_WIN := 0
@@ -3043,10 +3046,13 @@ render_mode_play_and_demo:
         sta soundEffectSlot1Init
 @setPaletteColor:
         stx PPUDATA
-        ldy #$00
-        sty PPUSCROLL
-        ldy #$00
-        sty PPUSCROLL
+.if INES_MAPPER = 3
+        lda #%10000000
+        sta PPUCTRL
+.endif
+        lda #$0
+        sta PPUSCROLL
+        sta PPUSCROLL
         rts
 
 renderHz:
@@ -5400,6 +5406,7 @@ switch_s_plus_2a:
         rts
 
 setMMC1Control:
+.if INES_MAPPER = 1
         sta MMC1_Control
         lsr a
         sta MMC1_Control
@@ -5409,9 +5416,11 @@ setMMC1Control:
         sta MMC1_Control
         lsr a
         sta MMC1_Control
+.endif
         rts
 
 changeCHRBank0:
+.if INES_MAPPER = 1
         sta MMC1_CHR0
         lsr a
         sta MMC1_CHR0
@@ -5421,9 +5430,13 @@ changeCHRBank0:
         sta MMC1_CHR0
         lsr a
         sta MMC1_CHR0
+.elseif INES_MAPPER = 3
+        sta $8000
+.endif
         rts
 
 changeCHRBank1:
+.if INES_MAPPER = 1
         sta MMC1_CHR1
         lsr a
         sta MMC1_CHR1
@@ -5433,9 +5446,11 @@ changeCHRBank1:
         sta MMC1_CHR1
         lsr a
         sta MMC1_CHR1
+.endif
         rts
 
 changePRGBank:
+.if INES_MAPPER = 1
         sta MMC1_PRG
         lsr a
         sta MMC1_PRG
@@ -5445,6 +5460,7 @@ changePRGBank:
         sta MMC1_PRG
         lsr a
         sta MMC1_PRG
+.endif
         rts
 
 game_palette:
