@@ -368,6 +368,7 @@ JOY2_APUFC  := $4017                        ; read: bits 0-4 joy data lines (bit
 
 MMC1_CHR0   := $BFFF
 MMC1_CHR1   := $DFFF
+CNROM_CHR   := $8000
 
 .segment    "PRG_chunk1": absolute
 
@@ -834,7 +835,8 @@ gameMode_gameTypeMenu:
         lda #$00
         jsr changeCHRBank1
 .if INES_MAPPER = 3
-        lda #%10000000
+        lda currentPpuCtrl
+        and #%10000000
         sta PPUCTRL
         sta currentPpuCtrl
 .endif
@@ -1596,11 +1598,8 @@ gameModeState_initGameBackground:
         lda #$01
         jsr changeCHRBank1
 .elseif INES_MAPPER = 3
-        lda #$00
-        jsr changeCHRBank0
-        lda #%10011000
-        sta PPUCTRL
-        sta currentPpuCtrl
+        ; lda #$00
+        ; jsr changeCHRBank0
 .endif
         jsr bulkCopyToPpu
         .addr   game_palette
@@ -1783,7 +1782,13 @@ gameModeState_initGameBackground_finish:
         jsr waitForVBlankAndEnableNmi
         jsr updateAudioWaitForNmiAndResetOamStaging
         jsr updateAudioWaitForNmiAndEnablePpuRendering
+.if INES_MAPPER = 1
         jsr updateAudioWaitForNmiAndResetOamStaging
+.elseif INES_MAPPER = 3
+        lda #%10011000
+        sta PPUCTRL
+        sta currentPpuCtrl
+.endif
         lda #$01
         sta playState
         lda startLevel
@@ -2766,7 +2771,7 @@ render_mode_static:
         and #$FC
         sta currentPpuCtrl
 .if INES_MAPPER = 3
-        lda #%10000000
+        and #%10000000
         sta PPUCTRL
         sta currentPpuCtrl
 .endif
@@ -2791,9 +2796,8 @@ render_mode_scroll:
         lda currentPpuCtrl
         and #$FC
         sta currentPpuCtrl
-
 .if INES_MAPPER = 3
-        lda #%10000000
+        and #%10000000
         sta PPUCTRL
         sta currentPpuCtrl
 .endif
@@ -3073,6 +3077,7 @@ render_mode_play_and_demo:
 .if INES_MAPPER = 3
         lda #%10011000
         sta PPUCTRL
+        sta currentPpuCtrl
 .endif
         lda #$0
         sta PPUSCROLL
@@ -5465,7 +5470,7 @@ changeCHRBank0:
         lsr a
         sta MMC1_CHR0
 .elseif INES_MAPPER = 3
-        sta $8000
+        sta CNROM_CHR
 .endif
         rts
 
