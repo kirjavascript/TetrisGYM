@@ -7,9 +7,7 @@
 
 .include "charmap.asm"
 
-INES_MAPPER := 1
-; 1 and 3 supported
-; tetris.asm: update mapper, .cfg: CHR size to 8kb
+INES_MAPPER := 1 ; supports 1 and 3
 PRACTISE_MODE := 1
 NO_MUSIC := 1
 AUTO_WIN := 0
@@ -816,10 +814,12 @@ gameMode_gameTypeMenu:
         sta displayNextPiece
 
         inc initRam
+.if INES_MAPPER = 1
         ; switch to blank charmap
         ; (stops glitching when resetting)
         lda #$03
         jsr changeCHRBank1
+.endif
         lda #%10011 ; used to be $10 (enable horizontal mirroring)
         jsr setMMC1Control
         lda #$1
@@ -839,12 +839,17 @@ gameMode_gameTypeMenu:
         jsr changeCHRBank0
         lda #$00
         jsr changeCHRBank1
+.if INES_MAPPER = 3
+        lda #%10000000
+        sta PPUCTRL
+.endif
         jsr waitForVBlankAndEnableNmi
         jsr updateAudioWaitForNmiAndResetOamStaging
         jsr updateAudioWaitForNmiAndEnablePpuRendering
         jsr updateAudioWaitForNmiAndResetOamStaging
 
 gameTypeLoop:
+
         ; memset FF-02 used to happen every loop
         ; but it's done in ResetOamStaging anyway?
         jsr renderMenuHz
@@ -1586,10 +1591,17 @@ musicSelectionTable:
 gameModeState_initGameBackground:
         jsr updateAudioWaitForNmiAndDisablePpuRendering
         jsr disableNmi
+.if INES_MAPPER = 1
         lda #$01
         jsr changeCHRBank0
         lda #$01
         jsr changeCHRBank1
+.elseif INES_MAPPER = 3
+        lda #$00
+        jsr changeCHRBank0
+        lda #%10000000
+        sta PPUCTRL
+.endif
         jsr bulkCopyToPpu
         .addr   game_palette
         jsr copyRleNametableToPpu
@@ -2023,10 +2035,10 @@ rngTable:
         .byte $EF
 
 gameModeState_updateCountersAndNonPlayerState:
-        lda #$01
-        jsr changeCHRBank0
-        lda #$01
-        jsr changeCHRBank1
+        ; lda #$01
+        ; jsr changeCHRBank0
+        ; lda #$01
+        ; jsr changeCHRBank1
         lda #$00
         sta oamStagingLength
         inc fallTimer
@@ -2756,6 +2768,10 @@ render_mode_static:
         lda currentPpuCtrl
         and #$FC
         sta currentPpuCtrl
+.if INES_MAPPER = 3
+        lda #%10000000
+        sta PPUCTRL
+.endif
         lda #$00
         sta PPUSCROLL
         sta PPUSCROLL
@@ -2777,7 +2793,11 @@ render_mode_scroll:
         lda currentPpuCtrl
         and #$FC
         sta currentPpuCtrl
+
+.if INES_MAPPER = 3
+        lda #%10000000
         sta PPUCTRL
+.endif
         lda #0
         sta PPUSCROLL
 
@@ -3047,7 +3067,7 @@ render_mode_play_and_demo:
 @setPaletteColor:
         stx PPUDATA
 .if INES_MAPPER = 3
-        lda #%10000000
+        lda #%10011000
         sta PPUCTRL
 .endif
         lda #$0
