@@ -1,4 +1,6 @@
 *.nes
+*.bps
+*.ips
 *.o
 *.chr
 *.pyc
@@ -6,5 +8,3 @@ tetris.lst
 tetris.lbl
 tetris.map
 tetris.dbg
-tetris.bps
-tetris.ips
