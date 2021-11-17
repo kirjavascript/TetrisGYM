@@ -2035,10 +2035,7 @@ rngTable:
         .byte $EF
 
 gameModeState_updateCountersAndNonPlayerState:
-        ; lda #$01
-        ; jsr changeCHRBank0
-        ; lda #$01
-        ; jsr changeCHRBank1
+        ; CHR bank used to be reset to 0 here
         lda #$00
         sta oamStagingLength
         inc fallTimer
