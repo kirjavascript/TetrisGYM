@@ -7,7 +7,7 @@
 
 .include "charmap.asm"
 
-INES_MAPPER := 3 ; supports 1 and 3
+INES_MAPPER := 1 ; supports 1 and 3
 PRACTISE_MODE := 1
 NO_MUSIC := 1
 AUTO_WIN := 0
@@ -3740,8 +3740,8 @@ endingAnimation:
         lda #$02
         jsr changeCHRBank1
 .elseif INES_MAPPER = 3
-        lda #$01
-        jsr changeCHRBank0
+        lda #$0
+        sta CNROM_CHR
 .endif
         jsr copyRleNametableToPpu
         .addr rocket_nametable
@@ -3789,7 +3789,9 @@ endingAnimation:
         jsr waitForVBlankAndEnableNmi
         jsr updateAudioWaitForNmiAndResetOamStaging
         jsr updateAudioWaitForNmiAndEnablePpuRendering
+.if INES_MAPPER <> 3
         jsr updateAudioWaitForNmiAndResetOamStaging
+.endif
 
         lda #0
         sta screenStage
@@ -5469,8 +5471,6 @@ changeCHRBank0:
         sta MMC1_CHR0
         lsr a
         sta MMC1_CHR0
-.elseif INES_MAPPER = 3
-        sta CNROM_CHR
 .endif
         rts
 
