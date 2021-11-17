@@ -7,7 +7,7 @@
 
 .include "charmap.asm"
 
-INES_MAPPER := 1 ; supports 1 and 3
+INES_MAPPER := 3 ; supports 1 and 3
 PRACTISE_MODE := 1
 NO_MUSIC := 1
 AUTO_WIN := 0
@@ -705,12 +705,6 @@ gameMode_bootScreen: ; boot
         lda #$10
         sta dasModifier
 
-.if DEV_MODE
-        lda #1
-        sta qualFlag
-        sta hzFlag
-.endif
-
         ; detect region
         ; jsr updateAudioWaitForNmiAndDisablePpuRendering
         jsr checkRegion
@@ -842,6 +836,7 @@ gameMode_gameTypeMenu:
 .if INES_MAPPER = 3
         lda #%10000000
         sta PPUCTRL
+        sta currentPpuCtrl
 .endif
         jsr waitForVBlankAndEnableNmi
         jsr updateAudioWaitForNmiAndResetOamStaging
@@ -849,7 +844,6 @@ gameMode_gameTypeMenu:
         jsr updateAudioWaitForNmiAndResetOamStaging
 
 gameTypeLoop:
-
         ; memset FF-02 used to happen every loop
         ; but it's done in ResetOamStaging anyway?
         jsr renderMenuHz
@@ -1439,6 +1433,11 @@ gameMode_levelMenu:
         jsr showHighScores
         jsr waitForVBlankAndEnableNmi
         jsr updateAudioWaitForNmiAndResetOamStaging
+.if INES_MAPPER = 3
+        lda #%10000000
+        sta PPUCTRL
+        sta currentPpuCtrl
+.endif
         lda #$00
         sta PPUSCROLL
         lda #$00
@@ -1599,8 +1598,9 @@ gameModeState_initGameBackground:
 .elseif INES_MAPPER = 3
         lda #$00
         jsr changeCHRBank0
-        lda #%10000000
+        lda #%10011000
         sta PPUCTRL
+        sta currentPpuCtrl
 .endif
         jsr bulkCopyToPpu
         .addr   game_palette
@@ -2768,6 +2768,7 @@ render_mode_static:
 .if INES_MAPPER = 3
         lda #%10000000
         sta PPUCTRL
+        sta currentPpuCtrl
 .endif
         lda #$00
         sta PPUSCROLL
@@ -2794,6 +2795,7 @@ render_mode_scroll:
 .if INES_MAPPER = 3
         lda #%10000000
         sta PPUCTRL
+        sta currentPpuCtrl
 .endif
         lda #0
         sta PPUSCROLL
@@ -2852,6 +2854,11 @@ render_mode_rocket:
         .addr rocket_nametable_patch
 @stage2:
 @rocketEnd:
+.if INES_MAPPER = 3
+        lda #%10000000
+        sta PPUCTRL
+        sta currentPpuCtrl
+.endif
         lda #0
         sta PPUSCROLL
         sta PPUSCROLL
@@ -3722,10 +3729,15 @@ playState_checkStartGameOver:
 endingAnimation:
         jsr updateAudioWaitForNmiAndDisablePpuRendering
         jsr disableNmi
+.if INES_MAPPER = 1
         lda #$02
         jsr changeCHRBank0
         lda #$02
         jsr changeCHRBank1
+.elseif INES_MAPPER = 3
+        lda #$01
+        jsr changeCHRBank0
+.endif
         jsr copyRleNametableToPpu
         .addr rocket_nametable
         jsr bulkCopyToPpu
@@ -4785,6 +4797,11 @@ highScoreEntryScreen:
         jsr changeCHRBank0
         lda #$00
         jsr changeCHRBank1
+.if INES_MAPPER = 3
+        lda #%10000000
+        sta PPUCTRL
+        sta currentPpuCtrl
+.endif
         jsr bulkCopyToPpu
         .addr   menu_palette
         jsr copyRleNametableToPpu

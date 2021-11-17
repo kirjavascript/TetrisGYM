@@ -1,0 +1,60 @@
+[1mdiff --git a/main.asm b/main.asm[m
+[1mindex 9811b85..9d94040 100644[m
+[1m--- a/main.asm[m
+[1m+++ b/main.asm[m
+[36m@@ -7,7 +7,7 @@[m
+ [m
+ .include "charmap.asm"[m
+ [m
+[31m-INES_MAPPER := 1 ; supports 1 and 3[m
+[32m+[m[32mINES_MAPPER := 3 ; supports 1 and 3[m
+ PRACTISE_MODE := 1[m
+ NO_MUSIC := 1[m
+ AUTO_WIN := 0[m
+[36m@@ -1599,7 +1599,7 @@[m [mgameModeState_initGameBackground:[m
+ .elseif INES_MAPPER = 3[m
+         lda #$00[m
+         jsr changeCHRBank0[m
+[31m-        lda #%10000000[m
+[32m+[m[32m        lda #%10011000[m
+         sta PPUCTRL[m
+ .endif[m
+         jsr bulkCopyToPpu[m
+[36m@@ -3722,10 +3722,15 @@[m [mplayState_checkStartGameOver:[m
+ endingAnimation:[m
+         jsr updateAudioWaitForNmiAndDisablePpuRendering[m
+         jsr disableNmi[m
+[32m+[m[32m.if INES_MAPPER = 1[m
+         lda #$02[m
+         jsr changeCHRBank0[m
+         lda #$02[m
+         jsr changeCHRBank1[m
+[32m+[m[32m.elseif INES_MAPPER = 3[m
+[32m+[m[32m        lda #$01[m
+[32m+[m[32m        jsr changeCHRBank0[m
+[32m+[m[32m.endif[m
+         jsr copyRleNametableToPpu[m
+         .addr rocket_nametable[m
+         jsr bulkCopyToPpu[m
+[36m@@ -5114,7 +5119,7 @@[m [mwaitForVBlankAndEnableNmi:[m
+         and #$80[m
+         bne waitForVBlankAndEnableNmi[m
+         lda currentPpuCtrl[m
+[31m-        ora #$80[m
+[32m+[m[32m        ; ora #$80[m
+         bne _updatePpuCtrl[m
+ disableNmi:[m
+         lda currentPpuCtrl[m
+[1mdiff --git a/tetris.asm b/tetris.asm[m
+[1mindex d7c61f9..710a14f 100644[m
+[1m--- a/tetris.asm[m
+[1m+++ b/tetris.asm[m
+[36m@@ -7,7 +7,7 @@[m
+ [m
+ .segment "HEADER"[m
+ [m
+[31m-INES_MAPPER = 1 ; 0 = NROM[m
+[32m+[m[32mINES_MAPPER = 3 ; 0 = NROM[m
+ INES_MIRROR = 0 ; 0 = horizontal mirroring, 1 = vertical mirroring (ignored in MMC1)[m
+ INES_SRAM   = 1 ; 1 = battery backed SRAM at $6000-7FFF[m
+ [m
