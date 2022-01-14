@@ -3207,6 +3207,10 @@ copyPlayfieldRowToVRAM:
 @ret:   rts
 
 updateLineClearingAnimation:
+.if AUTO_WIN
+        inc playState
+        rts
+.endif
         lda frameCounter
         and #$03
         bne @ret
