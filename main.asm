@@ -5038,8 +5038,6 @@ pause:
         beq @pauseSetupNotClassic
 
 @pauseSetupClassic:
-        lda #$00
-        sta renderMode
         lda #$16
         sta PPUMASK
         jmp @pauseSetupPart2
