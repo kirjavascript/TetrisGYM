@@ -47,9 +47,9 @@ XXX#000000##000000#########AAAAAAAA
 
 // heart
 
-// rtutututututy
-// f0f1f2f3f4f^h
-// jbkbkbkbkbkbl
+// XXX###a  rtutututututy         d###
+// XXX###a  f0f1f2f3f4f^h         d###
+// XXX###a  jbkbkbkbkbkbl         d###
 
 const practise = Buffer.from(buffer);
 [...tiles.trim().split('\n').join('')].forEach((d, i) => {

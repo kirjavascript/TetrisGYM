@@ -368,7 +368,12 @@ JOY2_APUFC  := $4017                        ; read: bits 0-4 joy data lines (bit
 
 MMC1_CHR0   := $BFFF
 MMC1_CHR1   := $DFFF
-CNROM_CHR   := $8000
+
+.macro RESET_MMC1
+.if INES_MAPPER = 1
+        inc $8000 ; initRam
+.endif
+.endmacro
 
 .segment    "PRG_chunk1": absolute
 
@@ -529,8 +534,8 @@ initRamContinued:
         lda demoButtonsAddr+1
         cmp #$DF
         bne @continue
-        lda #$DD
-        sta demoButtonsAddr+1
+        ; lda #$DD
+        ; sta demoButtonsAddr+1
         lda #$00
         sta frameCounter+1
         lda #$01
@@ -807,8 +812,7 @@ gameMode_gameTypeMenu:
         sta menuScrollY
         lda #0
         sta displayNextPiece
-
-        inc initRam
+        RESET_MMC1
 .if INES_MAPPER = 1
         ; switch to blank charmap
         ; (stops glitching when resetting)
@@ -835,10 +839,9 @@ gameMode_gameTypeMenu:
         lda #$00
         jsr changeCHRBank1
 .if INES_MAPPER = 3
-        lda currentPpuCtrl
-        and #%10000000
-        sta PPUCTRL
-        sta currentPpuCtrl
+CNROM_CHR_MENU:
+        lda #1
+        sta CNROM_CHR_MENU+1
 .endif
         jsr waitForVBlankAndEnableNmi
         jsr updateAudioWaitForNmiAndResetOamStaging
@@ -1411,7 +1414,7 @@ menuSprite: ; a - value, xoff/yoff
         rts
 
 gameMode_levelMenu:
-        inc initRam
+        RESET_MMC1
         lda #$10
         jsr setMMC1Control
         jsr updateAudio2
@@ -1435,11 +1438,6 @@ gameMode_levelMenu:
         jsr showHighScores
         jsr waitForVBlankAndEnableNmi
         jsr updateAudioWaitForNmiAndResetOamStaging
-.if INES_MAPPER = 3
-        lda #%10000000
-        sta PPUCTRL
-        sta currentPpuCtrl
-.endif
         lda #$00
         sta PPUSCROLL
         lda #$00
@@ -3744,8 +3742,9 @@ endingAnimation:
         lda #$02
         jsr changeCHRBank1
 .elseif INES_MAPPER = 3
-        lda #$0
-        sta CNROM_CHR
+CNROM_CHR_ROCKET:
+        lda #0
+        sta CNROM_CHR_ROCKET+1
 .endif
         jsr copyRleNametableToPpu
         .addr rocket_nametable
@@ -4360,6 +4359,14 @@ gameModeState_handleGameOver:
 @gameOver:
         lda #$03
         sta renderMode
+.if INES_MAPPER = 3
+        lda qualFlag
+        beq @CNROM_CHR_HIGHSCORE_END
+@CNROM_CHR_HIGHSCORE:
+        lda #1
+        sta @CNROM_CHR_HIGHSCORE+1
+@CNROM_CHR_HIGHSCORE_END:
+.endif
         jsr handleHighScoreIfNecessary
         lda #$01
         sta playState
@@ -4795,7 +4802,7 @@ highScoreIndexToHighScoreNamesOffset:
 highScoreIndexToHighScoreScoresOffset:
         .byte   $00,$03,$06,$09,$0C,$0F,$12,$15
 highScoreEntryScreen:
-        inc initRam
+        RESET_MMC1
         lda #$10
         jsr setMMC1Control
         lda #$09
@@ -5445,7 +5452,7 @@ switch_s_plus_2a:
         jmp (tmp1)
 
         sei
-        inc initRam
+        RESET_MMC1
         lda #$1A
         jsr setMMC1Control
         rts
