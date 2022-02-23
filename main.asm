@@ -8433,7 +8433,10 @@ practiseAdvanceGame:
         rts
 
 practiseGameHUD:
+        lda inputDisplayFlag
+        beq @noInput
         jsr controllerInputDisplay
+@noInput:
 
         lda practiseType
         cmp #MODE_PACE
@@ -8443,8 +8446,6 @@ practiseGameHUD:
         rts
 
 controllerInputDisplay:
-        lda inputDisplayFlag
-        beq @noInput
         lda heldButtons_player1
         sta tmp1
         ldy #0
@@ -8479,7 +8480,6 @@ controllerInputDisplay:
         iny
         cpy #8
         bmi @inputLoop
-@noInput:
         rts
 
 
