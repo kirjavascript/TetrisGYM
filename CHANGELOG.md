@@ -1,4 +1,7 @@
 # Changelog
+## [unreleased]
+* Display all level numbers correctly in game
+
 ## [v4 classic]
 - Standard Pause in Qual Mode
 - No Next Box allowed in Qual Mode

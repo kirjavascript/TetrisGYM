@@ -10,7 +10,7 @@
 INES_MAPPER := 1 ; supports 1 and 3
 PRACTISE_MODE := 1
 NO_MUSIC := 1
-AUTO_WIN := 0
+AUTO_WIN := 1
 NO_SCORING := 0
 DEV_MODE := 0
 
@@ -2934,19 +2934,53 @@ render_mode_play_and_demo:
         and #$02
         beq @renderScore
 
-        ldx levelNumber
-        lda levelDisplayTable,x
-        sta generalCounter
-
         lda practiseType
         cmp #MODE_TYPEB
         beq @renderLevelTypeB
 
+        lda #0
+        sta tmp3
+        lda levelNumber
+@modLoop100:
+        cmp #100
+        bcc @modEnd100
+        sbc #100
+        inc tmp3
+        jmp @modLoop100
+@modEnd100:
+        sta tmp2
+
         lda #$22
         sta PPUADDR
-        lda #$BA
+        lda #$B9
         sta PPUADDR
-        lda generalCounter
+
+        lda tmp3
+        beq @notHundo
+        sta PPUDATA
+        jmp @hundo
+@notHundo:
+        lda #$EF
+        sta PPUDATA
+@hundo:
+
+        lda #0
+        sta tmp3
+        lda tmp2
+@modLoop10:
+        cmp #10
+        bcc @modEnd10
+        sbc #10
+        inc tmp3
+        jmp @modLoop10
+@modEnd10:
+        sta tmp2
+        lda tmp3
+        rol
+        rol
+        rol
+        rol
+        adc tmp2
         jsr twoDigsToPPU
         jmp @renderLevelEnd
 
@@ -2955,7 +2989,8 @@ render_mode_play_and_demo:
         sta PPUADDR
         lda #$B9
         sta PPUADDR
-        lda generalCounter
+        ldx levelNumber
+        lda levelDisplayTable,x ; only needs 0 - 19
         jsr twoDigsToPPU
         lda #$24
         sta PPUDATA
@@ -4654,16 +4689,15 @@ highScoreCharToTile:
         .byte   $21,$22,$23,$00,$01,$02,$03,$04
         .byte   $05,$06,$07,$08,$09,$25,$4F,$5E
         .byte   $5F,$6E,$6F,$FF
-levelDisplayTable:
-byteToBcdTable:
+levelDisplayTable: ; original goes to 29
+byteToBcdTable: ; original goes to 49
         .byte   $00,$01,$02,$03,$04,$05,$06,$07
         .byte   $08,$09,$10,$11,$12,$13,$14,$15
         .byte   $16,$17,$18,$19,$20,$21,$22,$23
         .byte   $24,$25,$26,$27,$28,$29,$30,$31
         .byte   $32,$33,$34,$35,$36,$37,$38,$39
         .byte   $40,$41,$42,$43,$44,$45,$46,$47
-        .byte   $48,$49,$50,$51,$52,$53,$54,$55
-        .byte   $56,$57,$58,$59,$60
+        .byte   $48,$49
 
 ; Adjusts high score table and handles data entry, if necessary
 handleHighScoreIfNecessary:
