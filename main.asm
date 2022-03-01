@@ -826,7 +826,7 @@ gameMode_gameTypeMenu:
         jsr updateAudioWaitForNmiAndDisablePpuRendering
         jsr disableNmi
         jsr blank_palette
-        lda #$3
+        lda #$4
         sta menuPaletteDelay ; title_palette loaded in render_mode_scroll
         jsr copyRleNametableToPpu
         .addr   game_type_menu_nametable
@@ -1860,8 +1860,12 @@ gameModeState_initGameState:
         sta demoButtonsAddr+1
         lda #$03
         sta renderMode
-        lda #$A0
-        sta autorepeatY
+        ldx #$A0
+        lda palFlag
+        beq @ntsc
+        ldx #$B4
+@ntsc:
+        stx autorepeatY
         jsr chooseNextTetrimino
         sta currentPiece
         jsr incrementPieceStat

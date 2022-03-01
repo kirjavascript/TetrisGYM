@@ -1,7 +1,7 @@
 # Changelog
 ## [unreleased]
 * Display all level numbers 0-255 correctly in game
-* Fixed cursor bug for level 29 on level select
+* Fixed cursor moving from level 29 to 0
 
 ## [v4 classic]
 - Standard Pause in Qual Mode
