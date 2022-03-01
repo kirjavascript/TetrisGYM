@@ -10,7 +10,7 @@
 INES_MAPPER := 1 ; supports 1 and 3
 PRACTISE_MODE := 1
 NO_MUSIC := 1
-AUTO_WIN := 1
+AUTO_WIN := 0
 NO_SCORING := 0
 DEV_MODE := 0
 
@@ -1451,17 +1451,20 @@ gameMode_levelMenu:
         ; account for level 29 when loading
         lda startLevel
         cmp #29
-        bne @not29
-        lda #$0A
-        sta startLevel
-        jmp gameMode_levelMenu_processPlayer1Navigation
-@not29:
+        beq @for29
+        cmp #$A
+        beq @for29
+
         cmp #$0A
         bcc gameMode_levelMenu_processPlayer1Navigation
         sec
         sbc #$0A
         sta startLevel
         jmp @forceStartLevelToRange
+
+@for29:
+        lda #$0A
+        sta startLevel
 
 gameMode_levelMenu_processPlayer1Navigation:
         lda newlyPressedButtons_player1
