@@ -1508,6 +1508,24 @@ gameMode_levelMenu_processPlayer1Navigation:
         rts
 
 @continue:
+        ; seed shredder
+@chooseRandomHole_player1:
+        ldx #$17
+        ldy #$02
+        jsr generateNextPseudorandomNumber
+        lda rng_seed
+        and #$0F
+        cmp #$0A
+        bpl @chooseRandomHole_player1
+@chooseRandomHole_player2:
+        ldx #$17
+        ldy #$02
+        jsr generateNextPseudorandomNumber
+        lda rng_seed
+        and #$0F
+        cmp #$0A
+        bpl @chooseRandomHole_player2
+
         jsr updateAudioWaitForNmiAndResetOamStaging
         jmp gameMode_levelMenu_processPlayer1Navigation
 
