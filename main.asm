@@ -3488,7 +3488,7 @@ pickTetriminoTap:
 pickTetriminoSeed:
         jsr setSeedNextRNG
 
-        ; SPSv2
+        ; SPSv3
 
         lda set_seed_input+2
         ror
@@ -3496,8 +3496,9 @@ pickTetriminoSeed:
         ror
         ror
         and #$F
-        cmp #0
-        beq @compatMode
+        bne @notZero
+        lda #$10
+@notZero:
 
         adc #1
         sta tmp3 ; step + 1 in tmp3
