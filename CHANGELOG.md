@@ -2,6 +2,7 @@
 ## [unreleased]
 * Display all level numbers 0-255 correctly in game
 * Fixed cursor moving from level 29 to 0
+* Backwards compatible seed trainer improvements
 * Restore seed shredding on level menu
 
 ## [v4 classic]

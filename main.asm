@@ -3507,7 +3507,7 @@ pickTetriminoSeed:
         dec tmp3
         lda tmp3
         bne @loop
-@compatMode:
+; @compatMode:
 
         inc set_seed+2 ; 'spawnCount'
         lda set_seed
