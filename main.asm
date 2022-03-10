@@ -8475,7 +8475,6 @@ practisePrepareNext:
         rts
 
 practiseAdvanceGame:
-
         lda practiseType
         cmp #MODE_TSPINS
         bne @skipTSpins
@@ -8558,15 +8557,28 @@ clearPlayfield:
         bne @loop
         rts
 
-; advanceGameTapQuantity:
+
+; ; TODO: move ram and cleanup
 ; tqtyCurrent := $8
 ; tqtyNext := $9
+
+; rowCompleteTapQuantity:
+;         lda completedLines
+;         beq @noCompleted
+;         lda tqtyNext
+;         sta tqtyCurrent
+; @noCompleted:
+;         rts
+
+; prepareTapQuantity:
+; @checkEqual:
 ;         lda tqtyNext
 ;         cmp tqtyCurrent
-;         bne @noEq
+;         bne @notEqual
 ;         jsr random10
 ;         sta tqtyNext
-; @noEq:
+;         jmp @checkEqual
+; @notEqual:
 
 ;         ; playfield
 ;         sec
@@ -8613,20 +8625,20 @@ clearPlayfield:
 ;         bcc @nextLoop
 
 ;         ; check correct
-;         lda currentPiece
-;         cmp #$11
-;         bne @incomplete
-;         lda tetriminoY
-;         cmp #$12
-;         bcc @incomplete
-;         lda playState
-;         cmp #$1
-;         bne @incomplete
-;         lda tqtyNext
-;         sta tqtyCurrent
-;         lda #$3
-;         sta playState
-; @incomplete:
+;         ; lda currentPiece
+;         ; cmp #$11
+;         ; bne @incomplete
+;         ; lda tetriminoY
+;         ; cmp #$12
+;         ; bcc @incomplete
+;         ; lda playState
+;         ; cmp #$1
+;         ; bne @incomplete
+;         ; lda tqtyNext
+;         ; sta tqtyCurrent
+;         ; lda #$3
+;         ; sta playState
+; ; @incomplete:
 ;         rts
 
 advanceGamePreset:
