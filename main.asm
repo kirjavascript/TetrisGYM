@@ -54,6 +54,7 @@ MENU_MAX_Y_SCROLL := $30
 MENU_TOP_MARGIN_SCROLL := 7 ; blocks
 BLOCK_TILES := $7B
 INVISIBLE_TILE := $43
+TETRIMINO_X_HIDE := $EF
 
 ; menuConfigSizeLookup
 .define MENUSIZES $0, $0, $0, $0, $F, $7, $8, $C, $20, $10, $4, $12, $10, $0, $0, $0, $1, $1, $1, $1, $1, $1
@@ -2342,7 +2343,7 @@ tileModifierForCurrentPiece:
 
 stageSpriteForCurrentPiece_actual:
         lda tetriminoX
-        cmp #$EF ; set in tspin code
+        cmp #TETRIMINO_X_HIDE
         beq stageSpriteForCurrentPiece_return
         asl a
         asl a
@@ -3461,26 +3462,30 @@ useNewSpawnID:
         rts
 
 pickTetriminoPre:
+        lda #$12
+        sta spawnID
+        rts
+
         lda practiseType
         cmp #MODE_TSPINS
-        beq pickTetriminoTSpin
+        beq pickTetriminoT
         lda practiseType
         cmp #MODE_SEED
         beq pickTetriminoSeed
         lda practiseType
         cmp #MODE_TAP
-        beq pickTetriminoTap
+        beq pickTetriminoLongbar
         lda practiseType
         cmp #MODE_PRESETS
         beq pickTetriminoPreset
         jmp pickRandomTetrimino
 
-pickTetriminoTSpin:
+pickTetriminoT:
         lda #$2
         sta spawnID
         rts
 
-pickTetriminoTap:
+pickTetriminoLongbar:
         lda #$12
         sta spawnID
         rts
@@ -8470,6 +8475,7 @@ practisePrepareNext:
         rts
 
 practiseAdvanceGame:
+
         lda practiseType
         cmp #MODE_TSPINS
         bne @skipTSpins
@@ -8551,6 +8557,77 @@ clearPlayfield:
         dex
         bne @loop
         rts
+
+; advanceGameTapQuantity:
+; tqtyCurrent := $8
+; tqtyNext := $9
+;         lda tqtyNext
+;         cmp tqtyCurrent
+;         bne @noEq
+;         jsr random10
+;         sta tqtyNext
+; @noEq:
+
+;         ; playfield
+;         sec
+;         ldx #4 ; height
+;         lda multBy10Table, x
+;         sta tmp1
+;         lda #$c8
+;         sbc tmp1
+;         sta tmp1 ; starting offset
+
+;         ldx #0
+; @drawLoop:
+;         lda #BLOCK_TILES
+;         cpx tmp1
+;         bcs @saveMino
+;         lda #$EF
+; @saveMino:
+;         sta playfield, x
+;         inx
+;         cpx #$c8
+;         bcc @drawLoop
+
+;         ; wells
+;         clc
+;         lda tmp1
+;         tax
+; @nextLoop:
+;         txa
+;         adc tqtyCurrent
+;         tay
+;         lda #$EF
+;         sta playfield, y
+
+;         txa
+;         adc tqtyNext
+;         tay
+;         lda #BLOCK_TILES+3
+;         sta playfield, y
+
+;         txa
+;         adc #10
+;         tax
+;         cpx #$c8
+;         bcc @nextLoop
+
+;         ; check correct
+;         lda currentPiece
+;         cmp #$11
+;         bne @incomplete
+;         lda tetriminoY
+;         cmp #$12
+;         bcc @incomplete
+;         lda playState
+;         cmp #$1
+;         bne @incomplete
+;         lda tqtyNext
+;         sta tqtyCurrent
+;         lda #$3
+;         sta playState
+; @incomplete:
+;         rts
 
 advanceGamePreset:
         jsr clearPlayfield
@@ -8650,7 +8727,7 @@ advanceGameTSpins_actual:
         ; TODO: copy score to top
         lda #$20
         sta spawnDelay
-        lda #$EF ; magic number in stageSpriteForCurrentPiece
+        lda #TETRIMINO_X_HIDE
         sta tetriminoX
 
 @notSuccessful:
