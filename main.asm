@@ -10,7 +10,7 @@
 INES_MAPPER := 1 ; supports 1 and 3
 PRACTISE_MODE := 1
 NO_MUSIC := 1
-AUTO_WIN := 0
+AUTO_WIN := 1
 NO_SCORING := 0
 DEV_MODE := 0
 
@@ -3462,10 +3462,6 @@ useNewSpawnID:
         rts
 
 pickTetriminoPre:
-        lda #$12
-        sta spawnID
-        rts
-
         lda practiseType
         cmp #MODE_TSPINS
         beq pickTetriminoT
