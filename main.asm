@@ -53,6 +53,7 @@ MENU_SPRITE_Y_BASE := $47
 MENU_MAX_Y_SCROLL := $30
 MENU_TOP_MARGIN_SCROLL := 7 ; blocks
 BLOCK_TILES := $7B
+EMPTY_TILE
 INVISIBLE_TILE := $43
 TETRIMINO_X_HIDE := $EF
 
@@ -704,7 +705,7 @@ harddrop_tetrimino:
         ldy #$0
 @minoLoop:
         lda playfield, x
-        cmp #$EF
+        cmp #EMPTY_TILE
         beq @nextLine
         inx
         iny
@@ -722,7 +723,7 @@ harddrop_tetrimino:
         bcs @shiftLoop
         ; clear top row
         ldx #0
-        lda #$EF
+        lda #EMPTY_TILE
 @topRowLoop:
         sta playfield, x
         inx
@@ -2105,7 +2106,7 @@ L8824:  ldx #$17
         clc
         adc generalCounter5
         tay
-        lda #$EF
+        lda #EMPTY_TILE
         sta playfield,y
         jsr updateAudioWaitForNmiAndResetOamStaging
         dec generalCounter
@@ -2114,7 +2115,7 @@ L884A:
         ldx typeBModifier
         lda typeBBlankInitCountByHeightTable,x
         tay
-        lda #$EF
+        lda #EMPTY_TILE
 L885D:  sta playfield,y
         dey
         cpy #$0
@@ -2127,8 +2128,8 @@ L885D:  sta playfield,y
 typeBBlankInitCountByHeightTable:
         .byte $C8,$AA,$96,$78,$64,$50,$3C,$28,$14
 rngTable:
-        .byte $EF,$7B,$EF,$7C,$7D,$7D,$EF
-        .byte $EF
+        .byte EMPTY_TILE,BLOCK_TILES,EMPTY_TILE,BLOCK_TILES+1,BLOCK_TILES+2,BLOCK_TILES+2,EMPTY_TILE
+        .byte EMPTY_TILE
 
 gameModeState_updateCountersAndNonPlayerState:
         ; CHR bank used to be reset to 0 here
@@ -2838,7 +2839,7 @@ isPositionValid:
         adc positionValidTmp
         tay
         lda (playfieldAddr),y
-        cmp #$EF
+        cmp #EMPTY_TILE
         bcc @invalid
         lda orientationTable,x
         clc
@@ -4069,7 +4070,7 @@ playState_checkForCompletedRows:
 
         ; replaces this one
         ; lda (playfieldAddr),y
-        ; cmp #$EF
+        ; cmp #EMTPY_TILE
         ; beq @rowNotComplete
 
         iny
@@ -4093,7 +4094,7 @@ playState_checkForCompletedRows:
         dey
         cpy #$FF
         bne @movePlayfieldDownOneRow
-        lda #$EF
+        lda #EMPTY_TILE
         ldy #$00
 @clearRowTopRow:
         sta (playfieldAddr),y
@@ -4240,7 +4241,7 @@ playState_receiveGarbage:
         lda #BLOCK_TILES + 3
         jmp @set
 @hole:
-        lda #$EF ; was $FF ?
+        lda #EMPTY_TILE ; was $FF ?
 @set:
         sta (playfieldAddr),y
         inx
@@ -4351,10 +4352,6 @@ L9BC7:  lda lines
         lda levelNumber
         cmp generalCounter
         bpl L9BFB
-
-        ; clamp levelNumber
-        ; cmp #$EF
-        ; beq L9BFB
 
 @nextLevel:
         inc levelNumber
@@ -4522,7 +4519,7 @@ updateMusicSpeed:
         ldx #$0A
 @checkForBlockInRow:
         lda (playfieldAddr),y
-        cmp #$EF
+        cmp #EMPTY_TILE
         bne @foundBlockInRow
         iny
         dex
@@ -6217,7 +6214,7 @@ handleLevelEditor:
         beq @notPressedB
         jsr @getPos
         ldx tmp3
-        lda #$EF
+        lda #EMPTY_TILE
         sta playfield, x
         jmp renderDebugPlayfield
 
@@ -8510,13 +8507,13 @@ practiseRowCompletePatch:
 
 @normal: ; normal behaviour
         lda (playfieldAddr),y ; patched command
-        cmp #$EF ; patched command
+        cmp #EMPTY_TILE ; patched command
         rts
 
 @skipCheck:
         ; jump to @rowNotComplete
-        lda #$EF
-        cmp #$EF
+        lda #EMPTY_TILE
+        cmp #EMPTY_TILE
         rts
 
 practisePrepareNext:
@@ -8612,7 +8609,7 @@ controllerInputDisplay:
 
 
 clearPlayfield:
-        lda #$EF
+        lda #EMPTY_TILE
         ldx #$C8
 @loop:
         sta $0400, x
@@ -8657,7 +8654,7 @@ clearPlayfield:
 ;         lda #BLOCK_TILES
 ;         cpx tmp1
 ;         bcs @saveMino
-;         lda #$EF
+;         lda #EMPTY_TILE
 ; @saveMino:
 ;         sta playfield, x
 ;         inx
@@ -8672,7 +8669,7 @@ clearPlayfield:
 ;         txa
 ;         adc tqtyCurrent
 ;         tay
-;         lda #$EF
+;         lda #EMPTY_TILE
 ;         sta playfield, y
 
 ;         txa
@@ -8853,7 +8850,7 @@ renderTSpin:
         sbc tmp1 ; sub Y
         tax
         ; draw tspin
-        lda #$EF
+        lda #EMPTY_TILE
         sta $03bc, x
         sta $03bd, x
         sta $03be, x
@@ -8938,7 +8935,7 @@ prepareNextParity:
         lda #$7B
 @loop:
         ldy playfield, x
-        cpy #$EF
+        cpy #EMPTY_TILE
         beq @empty
         sta playfield, x
 @empty:
@@ -8970,10 +8967,10 @@ highlightGaps:
 highlistGapsLeft:
         ; check first gap
         lda playfield, x
-        cmp #$EF
+        cmp #EMPTY_TILE
         bne @startGapEnd
         lda playfield+1, x
-        cmp #$EF
+        cmp #EMPTY_TILE
         beq @startGapEnd
         lda parityColor
         sta playfield+1, x
@@ -8984,10 +8981,10 @@ highlightGapsOverhang:
 
 @checkHang:
         lda playfield, x
-        cmp #$EF
+        cmp #EMPTY_TILE
         bne @checkGroup
         lda playfield-10, x
-        cmp #$EF
+        cmp #EMPTY_TILE
         beq @checkGroup
 
         ; draw in red
@@ -8999,13 +8996,13 @@ highlightGapsOverhang:
         bmi @groupNext
         ; horizontal
         lda playfield, x
-        cmp #$EF
+        cmp #EMPTY_TILE
         beq @groupNext
         lda playfield+1, x
-        cmp #$EF
+        cmp #EMPTY_TILE
         bne @groupNext
         lda playfield+2, x
-        cmp #$EF
+        cmp #EMPTY_TILE
         beq @groupNext
 
         ; draw in red
@@ -9029,7 +9026,7 @@ highlightOrphans:
 
 @checkString:
         lda playfield, x
-        cmp #$EF
+        cmp #EMPTY_TILE
         beq @stringEmpty
         inc parityCount
         jmp @stringNext
@@ -9093,7 +9090,7 @@ findTopBulky:
         ldy #9
 @loopLine:
         lda playfield, x
-        cmp #$EF
+        cmp #EMPTY_TILE
         beq @noBlock
         inc tmp2
 @noBlock:
@@ -9113,9 +9110,9 @@ findTopBulky:
         rts
 
 swapMino:
-        ldy #$ef
+        ldy #EMPTY_TILE
         lda playfield, x
-        cmp #$ef
+        cmp #EMPTY_TILE
         bne @full
         ldy #BLOCK_TILES+3
 @full:
@@ -9137,7 +9134,7 @@ findTop:
         ldx #$0
 @loop:
         lda playfield, x
-        cmp #$EF
+        cmp #EMPTY_TILE
         bne @done
         inx
         cpx #$b8
@@ -9183,7 +9180,7 @@ smartHole:
         ldx #199
 @loop:
         lda playfield, x
-        cmp #$EF
+        cmp #EMPTY_TILE
         beq @done
         dex
         cpx #190
@@ -9234,7 +9231,7 @@ checkTetrisReady:
         ldy #9
 @loop:
         lda playfield, x
-        cmp #$EF
+        cmp #EMPTY_TILE
         bne @filled
         inc tmp1 ; add garbage
         ldy #1
