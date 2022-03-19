@@ -10,7 +10,7 @@
 INES_MAPPER := 1 ; supports 1 and 3
 PRACTISE_MODE := 1
 NO_MUSIC := 1
-AUTO_WIN := 1
+AUTO_WIN := 0
 NO_SCORING := 0
 DEV_MODE := 0
 
@@ -677,8 +677,25 @@ harddrop_tetrimino:
         jsr isPositionValid
         beq @loop
         dec tetriminoY
+
+        ; sonic drop
+        lda newlyPressedButtons
+        and #BUTTON_SELECT
+        beq @noSonic
+        lda #0
+        sta vramRow
+        lda #$E0
+        sta autorepeatY
+        rts
+@noSonic:
+
+        ; hard drop
         lda #0
         sta autorepeatY
+        jsr playState_lockTetrimino
+        ; TODO: handle lines clearing and score
+        lda #8
+        sta playState
         lda dropSpeed
         sta fallTimer
 @noHard:
