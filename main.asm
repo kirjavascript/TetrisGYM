@@ -684,7 +684,7 @@ harddrop_tetrimino:
         beq @noSonic
         lda #0
         sta vramRow
-        lda #$E0
+        lda #$D0
         sta autorepeatY
         rts
 @noSonic:

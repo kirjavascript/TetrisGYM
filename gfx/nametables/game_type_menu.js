@@ -67,7 +67,7 @@ drawTiles(buffer, lookup, `
 #a    PAL MODE                d#
 #a                            d#
 #a                            d#
-#a V4                         d#
+#a V!                         d#
 #a                            d#
 #a                            d#
 #a                            d#
