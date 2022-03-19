@@ -718,16 +718,16 @@ harddrop_tetrimino:
         lda playfield-$A, x
         sta playfield, x
         dex
-        cpx #9
+        cpx #$A
         bcs @shiftLoop
         ; clear top row
-        ; ldx #0
-; @topRowLoop:
-        ; lda #BLOCK_TILES
-        ; sta playfield, x
-        ; inx
-        ; cpx #$A
-        ; beq @topRowLoop
+        ldx #0
+        lda #$EF
+@topRowLoop:
+        sta playfield, x
+        inx
+        cpx #$A
+        bne @topRowLoop
         inc completedLines
 @nextLine:
         inc tmpY
