@@ -692,9 +692,59 @@ harddrop_tetrimino:
         ; hard drop
         lda #0
         sta autorepeatY
+        sta completedLines
         jsr playState_lockTetrimino
-        ; TODO: handle lines clearing and score
-        lda #8
+
+        lda #0
+        sta tmpY
+@lineLoop:
+        ldx tmpY
+        lda multBy10Table, x
+        tax
+        ldy #$0
+@minoLoop:
+        lda playfield, x
+        cmp #$EF
+        beq @nextLine
+        inx
+        iny
+        cpy #$A
+        beq @lineClear
+        jmp @minoLoop
+
+@lineClear:
+        ; shift down
+@shiftLoop:
+        lda playfield-$A, x
+        sta playfield, x
+        dex
+        cpx #9
+        bcs @shiftLoop
+        ; clear top row
+        ; ldx #0
+; @topRowLoop:
+        ; lda #BLOCK_TILES
+        ; sta playfield, x
+        ; inx
+        ; cpx #$A
+        ; beq @topRowLoop
+        inc completedLines
+@nextLine:
+        inc tmpY
+        lda tmpY
+        cmp #20
+        beq @addScore
+        jmp @lineLoop
+
+@addScore:
+        lda completedLines
+        beq @noScore
+        lda #0
+        sta vramRow
+        jsr addLineClearPoints
+@noScore:
+
+        lda #8 ; jump straight to spawnTetrimino
         sta playState
         lda dropSpeed
         sta fallTimer
