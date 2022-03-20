@@ -818,7 +818,6 @@ gameMode_speedTest:
         jsr updateAudioWaitForNmiAndResetOamStaging
 
 @loop:
-
         lda newlyPressedButtons_player1
         cmp #BUTTON_B
         beq @back
@@ -2864,13 +2863,13 @@ isPositionValid:
         rts
 
 render_mode_speed_test:
-        jsr render_mode_static
         lda outOfDateRenderFlags
         beq @noUpdate
         jsr renderHz
         lda #0
         sta outOfDateRenderFlags
 @noUpdate:
+        jsr render_mode_static
         rts
 
 render_mode_static:
