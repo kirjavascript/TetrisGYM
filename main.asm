@@ -5203,7 +5203,7 @@ pause:
         sta spriteIndexInOamContentLookup
         jsr loadSpriteIntoOamStaging
 
-        ; block tool hud
+        ; block tool hud - X/Y/Piece
         lda debugFlag
         beq @noDebugHUD
         lda #$70
@@ -5220,8 +5220,6 @@ pause:
         sta byteSpriteLen
         jsr byteSprite
 @noDebugHUD:
-
-        ; show x/y
 
         lda qualFlag
         bne @pauseCheckStart
