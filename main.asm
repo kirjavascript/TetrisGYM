@@ -427,6 +427,7 @@ render: lda renderMode
         .addr   render_mode_play_and_demo
         .addr   render_mode_pause
         .addr   render_mode_rocket
+        .addr   render_mode_speed_test
 initRamContinued:
         ldy #$06
         sty tmp2
@@ -803,7 +804,7 @@ blank_palette:
         rts
 
 gameMode_speedTest:
-        lda #$0
+        lda #$6
         sta renderMode
         jsr hzStart
         jsr updateAudioWaitForNmiAndDisablePpuRendering
@@ -817,11 +818,11 @@ gameMode_speedTest:
         jsr updateAudioWaitForNmiAndResetOamStaging
 
 @loop:
+
         lda newlyPressedButtons_player1
         cmp #BUTTON_B
         beq @back
         jsr speedTestControl
-        jsr renderMenuHz ; TODO: replace with background tiles?
         jsr updateAudioWaitForNmiAndResetOamStaging
         jmp @loop
 
@@ -838,6 +839,8 @@ speedTestControl:
         beq @notap
         lda #$1
         sta soundEffectSlot1Init
+        lda #$10
+        sta outOfDateRenderFlags
 @notap:
         ; use normal controls
         jsr hzControl
@@ -988,17 +991,17 @@ gameTypeLoopCheckStart:
         inc gameMode
         rts
 
+gameTypeLoopNext:
+        jsr renderMenuVars
+        jsr updateAudioWaitForNmiAndResetOamStaging
+        jmp gameTypeLoop
+
 gameTypeSpeedTest:
         lda #$02
         sta soundEffectSlot1Init
         lda #7
         sta gameMode
         rts
-
-gameTypeLoopNext:
-        jsr renderMenuVars
-        jsr updateAudioWaitForNmiAndResetOamStaging
-        jmp gameTypeLoop
 
 seedControls:
         lda practiseType
@@ -1268,41 +1271,6 @@ menuThrottleNew:
 menuThrottleContinue:
         lda #$4
         sta menuMoveThrottle
-        rts
-
-renderMenuHz:
-MENU_HZ_Y_BASE := MENU_SPRITE_Y_BASE + (MODE_SPEED_TEST * 8) + 1
-        ; taps
-        lda #MENU_HZ_Y_BASE
-        sta byteSpriteYOffset
-        lda #$E0
-        sta byteSpriteXOffset
-        lda hzTapCounter
-        and #$F
-        jsr menuSprite
-        ; hz
-        lda #MENU_HZ_Y_BASE
-        sta byteSpriteYOffset
-        lda #$D0
-        sta byteSpriteXOffset
-        lda #$55
-        jsr menuSprite
-        ; hz 10s unit
-        ldx oamStagingLength
-        lda #MENU_HZ_Y_BASE
-        sbc menuScrollY
-        sta byteSpriteYOffset
-        lda #$C0
-        sta byteSpriteXOffset
-        lda #1
-        sta byteSpriteLen
-        lda #0
-        sta byteSpriteTile
-        lda #<hzResult
-        sta byteSpriteAddr
-        lda #>hzResult
-        sta byteSpriteAddr+1
-        jsr byteSprite
         rts
 
 renderMenuVars:
@@ -2893,6 +2861,16 @@ isPositionValid:
 @invalid:
         lda #$FF
         sta generalCounter
+        rts
+
+render_mode_speed_test:
+        jsr render_mode_static
+        lda outOfDateRenderFlags
+        beq @noUpdate
+        jsr renderHz
+        lda #0
+        sta outOfDateRenderFlags
+@noUpdate:
         rts
 
 render_mode_static:
