@@ -601,6 +601,7 @@ branchOnGameMode:
         .addr   gameMode_playAndEndingHighScore_jmp
         .addr   gameMode_playAndEndingHighScore_jmp
         .addr   gameMode_startDemo
+        .addr   gameMode_speedTest
 gameModeState_updatePlayer1:
         lda #$04
         sta playfieldAddr+1
@@ -801,6 +802,48 @@ blank_palette:
         bne @loadPaletteLoop
         rts
 
+gameMode_speedTest:
+        lda #$0
+        sta renderMode
+        jsr hzStart
+        jsr updateAudioWaitForNmiAndDisablePpuRendering
+        jsr disableNmi
+        jsr copyRleNametableToPpu
+        .addr legal_nametable
+
+        jsr waitForVBlankAndEnableNmi
+        jsr updateAudioWaitForNmiAndResetOamStaging
+        jsr updateAudioWaitForNmiAndEnablePpuRendering
+        jsr updateAudioWaitForNmiAndResetOamStaging
+
+@loop:
+        lda newlyPressedButtons_player1
+        cmp #BUTTON_B
+        beq @back
+        jsr speedTestControl
+        jsr renderMenuHz ; TODO: replace with background tiles?
+        jsr updateAudioWaitForNmiAndResetOamStaging
+        jmp @loop
+
+@back:
+        lda #$02
+        sta soundEffectSlot1Init
+        sta gameMode
+        rts
+
+speedTestControl:
+        ; add sfx
+        lda newlyPressedButtons_player1
+        and #BUTTON_LEFT+BUTTON_RIGHT
+        beq @notap
+        lda #$1
+        sta soundEffectSlot1Init
+@notap:
+        ; use normal controls
+        jsr hzControl
+        rts
+
+
 gameMode_waitScreen:
         lda #0
         sta screenStage
@@ -876,7 +919,6 @@ waitLoopContinue:
         rts
 
 gameMode_gameTypeMenu:
-        jsr hzStart
         jsr calc_menuScrollY
         sta menuScrollY
         lda #0
@@ -920,15 +962,9 @@ CNROM_CHR_MENU:
 gameTypeLoop:
         ; memset FF-02 used to happen every loop
         ; but it's done in ResetOamStaging anyway?
-        jsr renderMenuHz
         jmp seedControls
 
 gameTypeLoopContinue:
-        lda practiseType
-        cmp #MODE_SPEED_TEST
-        bne @noHz
-        jsr menuHzControl
-@noHz:
         jsr menuConfigControls
         jsr practiseTypeMenuControls
 
@@ -936,6 +972,12 @@ gameTypeLoopCheckStart:
         lda newlyPressedButtons_player1
         cmp #BUTTON_START
         bne gameTypeLoopNext
+
+        ; check if speed test mode
+        lda practiseType
+        cmp #MODE_SPEED_TEST
+        beq gameTypeSpeedTest
+
         ; check it's a selectable option
         lda practiseType
         cmp #MODE_GAME_QUANTITY
@@ -946,22 +988,17 @@ gameTypeLoopCheckStart:
         inc gameMode
         rts
 
+gameTypeSpeedTest:
+        lda #$02
+        sta soundEffectSlot1Init
+        lda #7
+        sta gameMode
+        rts
+
 gameTypeLoopNext:
         jsr renderMenuVars
         jsr updateAudioWaitForNmiAndResetOamStaging
         jmp gameTypeLoop
-
-menuHzControl:
-        ; add sfx
-        lda newlyPressedButtons_player1
-        and #BUTTON_LEFT+BUTTON_RIGHT
-        beq @notap
-        lda #$1
-        sta soundEffectSlot1Init
-@notap:
-        ; use normal controls
-        jsr hzControl
-        rts
 
 seedControls:
         lda practiseType
