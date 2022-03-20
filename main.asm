@@ -811,6 +811,12 @@ gameMode_speedTest:
         jsr disableNmi
         jsr copyRleNametableToPpu
         .addr legal_nametable
+.if INES_MAPPER = 1
+        lda #$01
+        jsr changeCHRBank0
+        lda #$01
+        jsr changeCHRBank1
+.endif
 
         jsr waitForVBlankAndEnableNmi
         jsr updateAudioWaitForNmiAndResetOamStaging
@@ -2865,11 +2871,14 @@ isPositionValid:
 render_mode_speed_test:
         lda outOfDateRenderFlags
         beq @noUpdate
-        jsr renderHz
+        jsr renderHzSpeedTest
         lda #0
         sta outOfDateRenderFlags
 @noUpdate:
-        jsr render_mode_static
+        lda #$A8
+        sta PPUSCROLL
+        lda #$00
+        sta PPUSCROLL
         rts
 
 render_mode_static:
@@ -3230,6 +3239,16 @@ renderHz:
         ; during which, no other tile updates are happening
         ; this is pretty expensive and uses up $7 PPU tile writes and 1 palette write
 
+        ; delay
+
+        lda #$22
+        sta PPUADDR
+        lda #$68
+        sta PPUADDR
+        lda hzSpawnDelay
+        sta PPUDATA
+
+renderHzSpeedTest:
         ; hz
 
         lda #$21
@@ -3273,15 +3292,6 @@ renderHz:
         lda hzTapDirection
         clc
         adc #$D6
-        sta PPUDATA
-
-        ; delay
-
-        lda #$22
-        sta PPUADDR
-        lda #$68
-        sta PPUADDR
-        lda hzSpawnDelay
         sta PPUDATA
 
         rts

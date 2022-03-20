@@ -4,6 +4,7 @@
 * Added Sonic Drop
 * Display all level numbers 0-255 correctly in game
 * Fixed cursor moving from level 29 to 0
+* Moved Speed Tester to separate screen
 * Backwards compatible seed trainer improvements
 * Restore seed shredding on level menu
 * Added Block Tool HUD for piece information
