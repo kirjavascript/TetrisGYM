@@ -53,7 +53,7 @@ MENU_SPRITE_Y_BASE := $47
 MENU_MAX_Y_SCROLL := $30
 MENU_TOP_MARGIN_SCROLL := 7 ; blocks
 BLOCK_TILES := $7B
-EMPTY_TILE
+EMPTY_TILE := $EF
 INVISIBLE_TILE := $43
 TETRIMINO_X_HIDE := $EF
 
@@ -5202,6 +5202,26 @@ pause:
         adc #3
         sta spriteIndexInOamContentLookup
         jsr loadSpriteIntoOamStaging
+
+        ; block tool hud
+        lda debugFlag
+        beq @noDebugHUD
+        lda #$70
+        sta byteSpriteXOffset
+        lda #$60
+        sta byteSpriteYOffset
+        lda #tetriminoX
+        sta byteSpriteAddr
+        lda #0
+        sta byteSpriteAddr+1
+        lda #0
+        sta byteSpriteTile
+        lda #3
+        sta byteSpriteLen
+        jsr byteSprite
+@noDebugHUD:
+
+        ; show x/y
 
         lda qualFlag
         bne @pauseCheckStart
