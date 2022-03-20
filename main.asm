@@ -810,7 +810,7 @@ gameMode_speedTest:
         jsr updateAudioWaitForNmiAndDisablePpuRendering
         jsr disableNmi
         jsr copyRleNametableToPpu
-        .addr legal_nametable
+        .addr speedtest_nametable
 .if INES_MAPPER = 1
         lda #$01
         jsr changeCHRBank0
@@ -5739,6 +5739,8 @@ rocket_nametable: ; RLE
         .incbin "gfx/nametables/rocket_nametable.bin"
 legal_nametable: ; RLE
         .incbin "gfx/nametables/legal_nametable.bin"
+speedtest_nametable: ; RLE
+        .incbin "gfx/nametables/speedtest_nametable.bin"
 title_nametable_patch: ; stripe
         .byte $21, $69, $5, $1D, $12, $1D, $15, $E
         .byte $FF
