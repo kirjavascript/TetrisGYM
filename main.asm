@@ -811,6 +811,8 @@ gameMode_speedTest:
         jsr disableNmi
         jsr copyRleNametableToPpu
         .addr speedtest_nametable
+        jsr bulkCopyToPpu
+        .addr game_palette
 .if INES_MAPPER = 1
         lda #$01
         jsr changeCHRBank0
@@ -2875,9 +2877,9 @@ render_mode_speed_test:
         lda #0
         sta outOfDateRenderFlags
 @noUpdate:
-        lda #$A8
+        lda #$B0
         sta PPUSCROLL
-        lda #$00
+        lda #$0
         sta PPUSCROLL
         rts
 
@@ -3248,7 +3250,16 @@ renderHz:
         lda hzSpawnDelay
         sta PPUDATA
 
-renderHzSpeedTest:
+        ; palette
+
+        lda #$3F
+        sta PPUADDR
+        lda #$07
+        sta PPUADDR
+        lda hzPalette
+        sta PPUDATA
+
+renderHzPartial:
         ; hz
 
         lda #$21
@@ -3263,15 +3274,6 @@ renderHzSpeedTest:
         sta PPUADDR
         lda hzResult+1
         jsr twoDigsToPPU
-
-        ; palette
-
-        lda #$3F
-        sta PPUADDR
-        lda #$07
-        sta PPUADDR
-        lda hzPalette
-        sta PPUDATA
 
         ; taps
 
@@ -3294,6 +3296,17 @@ renderHzSpeedTest:
         adc #$D6
         sta PPUDATA
 
+        rts
+
+renderHzSpeedTest:
+        jsr renderHzPartial
+        ; bg
+        ; lda #$3F
+        ; sta PPUADDR
+        ; lda #$00
+        ; sta PPUADDR
+        ; lda hzPalette
+        ; sta PPUDATA
         rts
 
 pieceToPpuStatAddr:
