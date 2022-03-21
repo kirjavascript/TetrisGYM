@@ -3250,6 +3250,8 @@ renderHz:
         lda hzSpawnDelay
         sta PPUDATA
 
+renderHzSpeedTest:
+
         ; palette
 
         lda #$3F
@@ -3259,7 +3261,6 @@ renderHz:
         lda hzPalette
         sta PPUDATA
 
-renderHzPartial:
         ; hz
 
         lda #$21
@@ -3295,18 +3296,6 @@ renderHzPartial:
         clc
         adc #$D6
         sta PPUDATA
-
-        rts
-
-renderHzSpeedTest:
-        jsr renderHzPartial
-        ; bg
-        ; lda #$3F
-        ; sta PPUADDR
-        ; lda #$00
-        ; sta PPUADDR
-        ; lda hzPalette
-        ; sta PPUDATA
         rts
 
 pieceToPpuStatAddr:
