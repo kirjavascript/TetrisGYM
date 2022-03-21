@@ -9321,7 +9321,6 @@ reset:  cld
         jsr changePRGBank
         jmp initRam
 
-.include "data/unreferenced_data5.asm"
 MMC1_PRG:
         .byte   $00,$00,$00,$00,$00,$00,$00,$00
         .byte   $00
