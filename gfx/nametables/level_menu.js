@@ -1,49 +1,36 @@
-const { readFileSync, writeFileSync } = require('fs');
+const {
+    readStripe,
+    writeRLE,
+    printNT,
+    drawTiles,
+    drawAttrs,
+    flatLookup,
+} = require('./nametables');
 
-const buffer = readFileSync(__dirname + '/level_menu_nametable.bin');
+const buffer = readStripe(__dirname + '/level_menu_nametable.bin');
 
-let lookup = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ-,\'>rtyfhvbn########qweadzxc############jkl/ui!###g@######()############^$#.############################################################################################################################################### ';
+let lookup = flatLookup(`
+0123456789ABCDEF
+GHIJKLMNOPQRSTUV
+WXYZ-,˙>rtyfhvbn
+########qweadzxc
+############jkl/
+ui!###g@######()
+############^$#.
+################
+################
+################
+################
+################
+################
+################
+################
+###############
+`);
 
-lookup = [...lookup].map((d, i) => d === '#' ? String.fromCharCode(9472 + i) : d).join``
+lookup = [...lookup].map((d, i) => d === '#' ? String.fromCharCode(9472 + i) : d).join``;
 
-const chars = [...buffer].map(value => lookup[value] || '__NOWAYNOWAY');
-
-console.log(chars.join('').match(/.{35}/g).join('\n'));
-
-const tiles = `
-XXX################################
-XXX################################
-XXX###qwwwwwwwwwwwwwwwwwwwwwwwwe###
-XXX###a                        d###
-XXX###a               qwwwwwwe d###
-XXX###a               a      d d###
-XXX###a               zxxxxxxc d###
-XXX###a    ╄╅╅╅╅╅╆             d###
-XXX###a    ╇LEVEL╈             d###
-XXX###a    ╉╊╊╊╊╊╋             d###
-XXX###a  rtututututg           d###
-XXX###a  f0f1f2f3f4f           d###
-XXX###a  jbkbkbkbkbkb@         d###
-XXX###a  f5f6f7f8f9f$h         d###
-XXX###a  vbibibibibibn         d###
-XXX###a                        d###
-XXX###a                        d###
-XXX###a ###################### d###
-XXX###a #    NAME  SCORE  LV # d###
-XXX###a ###################### d###
-XXX###a # 1                  # d###
-XXX###a #                    # d###
-XXX###a # 2                  # d###
-XXX###a #                    # d###
-XXX###a # 3                  # d###
-XXX###a ###################### d###
-XXX###a                        d###
-XXX###zxxxxxxxxxxxxxxxxxxxxxxxxc###
-XXX################################
-XXX################################
-XXX##########################    ##
-XXX#000000##000000#########AAAAAAAA
-`;
+printNT(buffer, lookup);
 
 // heart
 
@@ -51,46 +38,60 @@ XXX#000000##000000#########AAAAAAAA
 // XXX###a  f0f1f2f3f4f^h         d###
 // XXX###a  jbkbkbkbkbkbl         d###
 
-const practise = Buffer.from(buffer);
-[...tiles.trim().split('\n').join('')].forEach((d, i) => {
-    if (d !== '#') {
-        practise[i] = lookup.indexOf(d);
-    }
-});
+drawTiles(buffer, lookup, `
+################################
+################################
+###qwwwwwwwwwwwwwwwwwwwwwwwwe###
+###a                        d###
+###a               qwwwwwwe d###
+###a               a      d d###
+###a               zxxxxxxc d###
+###a    ╄╅╅╅╅╅╆             d###
+###a    ╇LEVEL╈             d###
+###a    ╉╊╊╊╊╊╋             d###
+###a  rtututututg           d###
+###a  f0f1f2f3f4f           d###
+###a  jbkbkbkbkbkb@         d###
+###a  f5f6f7f8f9f$h         d###
+###a  vbibibibibibn         d###
+###a                        d###
+###a                        d###
+###a ###################### d###
+###a #    NAME  SCORE  LV # d###
+###a ###################### d###
+###a # 1                  # d###
+###a #                    # d###
+###a # 2                  # d###
+###a #                    # d###
+###a # 3                  # d###
+###a ###################### d###
+###a                        d###
+###zxxxxxxxxxxxxxxxxxxxxxxxxc###
+################################
+################################
+`);
 
-// palettes
-// DR - DL - UR - UL
-const palettes = p => p.trim().match(/.+\n.+$/gm)
-    .flatMap(line=>(
-        [t,b]=line.split('\n'),
-        t.trim().match(r=/../g).map((d,i)=>d+b.trim().match(r)[i])
-    ))
-    .map(d=>+('0b'+[...d].reverse().map(d=>(+d).toString(2).padStart(2,0)).join``));
+drawAttrs(buffer, [`
+    2222222222222222
+    2222222222222222
+    2222222222222222
+    2222222222222222
+    2222222222222222
+    2223333333222222
+    2223333333222222
+    2223333333222222
+`,`
+    2222222222222222
+    2222222222222222
+    2222222222222222
+    2222222222222222
+    2222222222222222
+    2222222222222222
+    2222222222222222
+    2222222222222222
+`]);
 
-[
-    [1053, palettes(`
-        2222222222222222
-        2222222222222222
-        2222222222222222
-        2222222222222222
-        2222222222222222
-        2223333333222222
-        2223333333222222
-        2223333333222222
-    `)],
-    [1088, palettes(`
-        2222222222222222
-        2222222222222222
-        2222222222222222
-        2222222222222222
-        2222222222222222
-        2222222222222222
-        2222222222222222
-        2222222222222222
-    `)],
-].forEach(([index, attributes]) => attributes.forEach((byte, i) => { practise[i+index] = byte; }));
-
-writeFileSync(
+writeRLE(
     __dirname + '/level_menu_nametable_practise.bin',
-    require('./rle')(practise),
+    buffer,
 );
