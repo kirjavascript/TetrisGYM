@@ -622,7 +622,7 @@ gameModeState_updatePlayer1:
         inc gameModeState
         rts
 
-gameModeState_next: ; used to be updatePlater2
+gameModeState_next: ; used to be updatePlayer2
         inc gameModeState
         rts
 
@@ -826,10 +826,15 @@ gameMode_speedTest:
         jsr updateAudioWaitForNmiAndResetOamStaging
 
 @loop:
-        lda newlyPressedButtons_player1
-        cmp #BUTTON_B
+        lda heldButtons_player1
+        cmp #BUTTON_A+BUTTON_B+BUTTON_START+BUTTON_SELECT
         beq @back
+
+        lda #$50
+        sta tmp3
+        jsr controllerInputDisplayX
         jsr speedTestControl
+
         jsr updateAudioWaitForNmiAndResetOamStaging
         jmp @loop
 
@@ -3591,9 +3596,13 @@ pickTetriminoSeed:
         ror
         ror
         and #$F
+        ; v3
         bne @notZero
         lda #$10
 @notZero:
+        ; v2
+        ; cmp #0
+        ; beq @compatMode
 
         adc #1
         sta tmp3 ; step + 1 in tmp3
@@ -8617,6 +8626,9 @@ practiseGameHUD:
         rts
 
 controllerInputDisplay:
+        lda #0
+        sta tmp3
+controllerInputDisplayX:
         lda heldButtons_player1
         sta tmp1
         ldy #0
@@ -8637,6 +8649,7 @@ controllerInputDisplay:
         inx
         lda controllerInputX, y
         adc #$13
+        adc tmp3
         sta oamStaging, x
         inx
         ; increase OAM index
