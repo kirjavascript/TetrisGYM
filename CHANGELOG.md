@@ -5,7 +5,9 @@
 * Display all level numbers 0-255 correctly in game
 * Fixed cursor moving from level 29 to 0
 * Added new screen for Speed Tester
+* Hold `select` to start in Qual Mode
 * Backwards compatible Seed Trainer improvements
+* Tap counter wrapping improvement
 * Restore seed shredding on level menu
 * Added Block Tool HUD for piece information
 

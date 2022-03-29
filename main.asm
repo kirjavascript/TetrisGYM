@@ -786,6 +786,17 @@ gameMode_bootScreen: ; boot
         ; jsr updateAudioWaitForNmiAndDisablePpuRendering
         jsr checkRegion
 
+        ; hold select to start in qual mode
+        lda heldButtons_player1
+        and #BUTTON_SELECT
+        beq @normalBoot
+        lda #1
+        sta gameMode
+        lda #1
+        sta qualFlag
+        rts
+
+@normalBoot:
         lda #2
         sta gameMode
         rts
