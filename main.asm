@@ -3288,7 +3288,7 @@ renderHzSpeedTest:
         lda #$28
         sta PPUADDR
         lda hzTapCounter
-        and #$f
+        ; and #$f
         sta PPUDATA
 
         ; direction
