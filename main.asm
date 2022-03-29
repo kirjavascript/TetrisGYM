@@ -6641,6 +6641,7 @@ hzTap:
         bne @within
 @fresh:
         stx hzTapDirection
+@wrap:
         lda #0
         sta hzTapCounter
         sta hzFrameCounter+1
@@ -6650,6 +6651,9 @@ hzTap:
 
         ; increment taps, reset debounce
         inc hzTapCounter
+        lda hzTapCounter
+        cmp #$10
+        bcs @wrap
         lda #0
         sta hzDebounceCounter
 
