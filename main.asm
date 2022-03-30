@@ -762,10 +762,6 @@ gameMode_bootScreen: ; boot
         sta practiseType
         sta menuSeedCursorIndex
 
-        ; set start level to 8/18
-        lda #$8
-        sta startLevel
-
         ; zero out config memory
         lda #0
         ldx #$A0
@@ -794,9 +790,12 @@ gameMode_bootScreen: ; boot
         sta gameMode
         lda #1
         sta qualFlag
-        rts
+        jmp gameMode_waitScreen
 
 @normalBoot:
+        ; set start level to 8/18
+        lda #$8
+        sta startLevel
         lda #2
         sta gameMode
         rts
