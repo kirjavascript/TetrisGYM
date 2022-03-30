@@ -5045,9 +5045,13 @@ highScoreEntryScreen:
         jmp @ret
 
 @checkForAOrRightPressed:
-        lda newlyPressedButtons_player1
-        and #$81
+        lda #BUTTON_RIGHT
+        jsr menuThrottle
+        bne @nextTile
+        lda #BUTTON_A
+        jsr menuThrottle
         beq @checkForBOrLeftPressed
+@nextTile:
         lda #$01
         sta soundEffectSlot1Init
         inc highScoreEntryNameOffsetForLetter
@@ -5057,9 +5061,13 @@ highScoreEntryScreen:
         lda #$00
         sta highScoreEntryNameOffsetForLetter
 @checkForBOrLeftPressed:
-        lda newlyPressedButtons_player1
-        and #$42
+        lda #BUTTON_LEFT
+        jsr menuThrottle
+        bne @prevTile
+        lda #BUTTON_B
+        jsr menuThrottle
         beq @checkForDownPressed
+@prevTile:
         lda #$01
         sta soundEffectSlot1Init
         dec highScoreEntryNameOffsetForLetter
@@ -5068,12 +5076,9 @@ highScoreEntryScreen:
         lda #$05
         sta highScoreEntryNameOffsetForLetter
 @checkForDownPressed:
-        lda heldButtons_player1
-        and #$04
+        lda #BUTTON_DOWN
+        jsr menuThrottle
         beq @checkForUpPressed
-        lda frameCounter
-        and #$07
-        bne @checkForUpPressed
         lda #$01
         sta soundEffectSlot1Init
         lda highScoreEntryNameOffsetForRow
@@ -5093,12 +5098,9 @@ highScoreEntryScreen:
         lda generalCounter
         sta highScoreNames,x
 @checkForUpPressed:
-        lda heldButtons_player1
-        and #$08
+        lda #BUTTON_UP
+        jsr menuThrottle
         beq @waitForVBlank
-        lda frameCounter
-        and #$07
-        bne @waitForVBlank
         lda #$01
         sta soundEffectSlot1Init
         lda highScoreEntryNameOffsetForRow
