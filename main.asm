@@ -3615,6 +3615,7 @@ pickTetriminoSeed:
         ror
         and #$F
         ; v3
+        cmp #0
         bne @notZero
         lda #$10
 @notZero:
@@ -3629,7 +3630,7 @@ pickTetriminoSeed:
         dec tmp3
         lda tmp3
         bne @loop
-; @compatMode:
+@compatMode:
 
         inc set_seed+2 ; 'spawnCount'
         lda set_seed
