@@ -9,8 +9,10 @@
 * Backwards compatible Seed Trainer improvements
 * Tap counter wrapping improvement
 * Added Block Tool HUD for piece information
-* Restore seed shredding on level menu
-* Hold `select` to start in Qual Mode, allowing input replays to sync up with the original ROM
+* Changes made to make input replays sync up with the original ROM easier
+    * Restore seed shredding on level menu
+    * Hold `select` to start in Qual Mode and reset level cursor 
+    * Transition from Legal to Title screen after 512 frames
 
 ## [v4 classic]
 - Standard Pause in Qual Mode

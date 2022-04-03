@@ -895,7 +895,8 @@ waitScreenLoad:
         .addr legal_nametable
 
         lda screenStage
-        beq @justLegal
+        cmp #2
+        bne @justLegal
         jsr bulkCopyToPpu
         .addr title_nametable_patch
 @justLegal:
@@ -907,7 +908,8 @@ waitScreenLoad:
 
         ; if title, skip wait
         lda screenStage
-        bne waitLoopCheckStart
+        cmp #2
+        beq waitLoopCheckStart
 
         lda #$FF
         ldx palFlag
@@ -917,6 +919,11 @@ waitScreenLoad:
 @notPAL:
         sta sleepCounter
 @loop:
+        ; if second wait, skip render loop
+        lda screenStage
+        cmp #1
+        beq waitLoopCheckStart
+
         jsr updateAudioWaitForNmiAndResetOamStaging
         lda #$1A
         sta byteSpriteXOffset
@@ -932,8 +939,16 @@ waitScreenLoad:
         jsr byteSprite
         lda sleepCounter
         bne @loop
+        inc screenStage
+        jmp @justLegal
 
 waitLoopCheckStart:
+        lda screenStage
+        cmp #1
+        bne @title
+        lda sleepCounter
+        beq waitLoopNext
+@title:
         lda newlyPressedButtons_player1
         cmp #BUTTON_START
         beq waitLoopNext
@@ -942,7 +957,8 @@ waitLoopCheckStart:
 waitLoopNext:
         ldx #$02
         lda screenStage
-        bne waitLoopContinue
+        cmp #2
+        beq waitLoopContinue
         stx soundEffectSlot1Init
         inc screenStage
         jmp waitScreenLoad
