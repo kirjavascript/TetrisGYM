@@ -657,16 +657,22 @@ branchOnPlayStatePlayer1:
 playState_playerControlsActiveTetrimino:
         jsr shift_tetrimino
         jsr rotate_tetrimino
-        jsr drop_tetrimino
-        lda hzFlag
-        beq @noHz
-        jsr hzControl
-@noHz:
+
         lda practiseType
         cmp #MODE_HARDDROP
         bne @soft
         jsr harddrop_tetrimino
+        lda playState
+        cmp #8
+        beq @noDrop
 @soft:
+        jsr drop_tetrimino
+@noDrop:
+
+        lda hzFlag
+        beq @ret
+        jsr hzControl
+@ret:
         rts
 
 harddrop_tetrimino:
@@ -692,7 +698,11 @@ harddrop_tetrimino:
         rts
 @noSonic:
 
+        ; bug at $48 playState being 8
+
         ; hard drop
+        lda #1
+        sta playState
         lda #0
         sta autorepeatY
         sta completedLines
