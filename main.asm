@@ -698,8 +698,6 @@ harddrop_tetrimino:
         rts
 @noSonic:
 
-        ; bug at $48 playState being 8
-
         ; hard drop
         lda #1
         sta playState

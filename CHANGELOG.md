@@ -6,11 +6,11 @@
 * Fixed cursor moving from level 29 to 0
 * Added new screen for Speed Tester
 * Added DAS-like movement to high score entry screen
-* Hold `select` to start in Qual Mode
 * Backwards compatible Seed Trainer improvements
 * Tap counter wrapping improvement
-* Restore seed shredding on level menu
 * Added Block Tool HUD for piece information
+* Restore seed shredding on level menu
+* Hold `select` to start in Qual Mode, allowing input replays to sync up with the original ROM
 
 ## [v4 classic]
 - Standard Pause in Qual Mode
