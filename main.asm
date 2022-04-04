@@ -10,7 +10,7 @@
 INES_MAPPER := 1 ; supports 1 and 3
 PRACTISE_MODE := 1
 NO_MUSIC := 1
-AUTO_WIN := 1
+AUTO_WIN := 0
 NO_SCORING := 0
 DEV_MODE := 0
 
@@ -89,13 +89,21 @@ tmpX        := $0003
 tmpY        := $0004
 tmpZ        := $0005
 tmpBulkCopyToPpuReturnAddr:= $0006 ; 2 bytes
-patchToPpuAddr  := $0014 ; unused
+; ... $8
+binScore    := $8 ; 4 bytes
+score       := $C ; 4 bytes BCD
+ones := tmpX
+hundredths := tmpY
+low := tmpZ
+high := tmp3
+
 rng_seed    := $0017
 spawnID     := $0019
 spawnCount  := $001A
 verticalBlankingInterval:= $0033
 set_seed    := $0034 ; 3 bytes - rng_seed, rng_seed+1, spawnCount
 set_seed_input := $0037 ; copied to set_seed during gameModeState_initGameState
+; ... $003A
 
 ; ... $003F
 tetriminoX  := $0040                        ; Player data is $20 in size. It is copied here from $60 or $80, processed, then copied back
@@ -112,7 +120,7 @@ autorepeatY := $004E
 holdDownPoints  := $004F
 lines       := $0050
 rowY        := $0052
-score       := $0053
+; 53 - 53 free, used to be score
 completedLines  := $0056
 lineIndex   := $0057                        ; Iteration count of playState_checkForCompletedRows
 startHeight := $0058
@@ -1974,7 +1982,7 @@ gameModeState_initGameState:
         sta completedLines ; reset during tetris bugfix
         sta presetIndex ; actually for tspinQuantity
 
-        ; OEM stuff
+        ; OEM stuff (except score stuff now)
         sta tetriminoY
         sta vramRow
         sta fallTimer
@@ -1983,6 +1991,11 @@ gameModeState_initGameState:
         sta score
         sta score+1
         sta score+2
+        sta score+3
+        sta binScore
+        sta binScore+1
+        sta binScore+2
+        sta binScore+3
         sta lines
         sta lines+1
         sta lineClearStatsByType
@@ -4451,105 +4464,171 @@ checkLevelUp:  lda lines
         sta outOfDateRenderFlags
 @lineLoop:  dex
         bne incrementLines
+
+        ; TODO: no scoring, render flags
 addHoldDownPoints:
 .if NO_SCORING
-        jmp L9C27
+        rts
 .endif
         lda holdDownPoints
         cmp #$02
-        bmi addLineClearPoints
-        clc
-        dec score
-        adc score
-        sta score
-        and #$0F
-        cmp #$0A
-        bcc L9C18
-        lda score
-        clc
-        adc #$06
-        sta score
-L9C18:  lda score
-        and #$F0
-        cmp #$A0
-        bcc L9C27
-        clc
-        adc #$60
-        sta score
-        inc score+1
-L9C27:  lda outOfDateRenderFlags
-        ora #$04
-        sta outOfDateRenderFlags
-addLineClearPoints:
-.if NO_SCORING
-        jmp addLineClearPointsDone
-.endif
-        lda #$00
+        bmi @noPushDown
+        jsr addPushDownPoints
+@noPushDown:
+        lda #$0
         sta holdDownPoints
-        lda levelNumber
-        sta generalCounter
-        inc generalCounter
-L9C37:  lda completedLines
-        asl a
+        jsr addLineClearPoints
+        rts
+
+addPushDownPoints:
+        clc
+        lda score
+        and #$F
+        sta ones
+
+        lda score
+        jsr div16mul10
+        adc ones
+        sta hundredths
+
+        lda holdDownPoints
+        sbc #1
+        adc ones
+        sta holdDownPoints
+
+        and #$F
+        cmp #$A
+        bcc @pdp2
+        lda holdDownPoints
+        adc #5
+        sta holdDownPoints
+@pdp2:
+
+        lda holdDownPoints
+        and #$f
+        sta low
+
+        lda holdDownPoints
+        jsr div16mul10
+        sta high
+
+        lda hundredths
+        sbc ones
+        sec
+        adc high
+        sta holdDownPoints
+
+        clc
+        adc low
+        cmp #101
+        bcs @noLow
+        sta holdDownPoints
+@noLow:
+
+        sec
+        lda binScore
+        sbc hundredths
+        sta binScore
+        lda binScore+1
+        sbc #0
+        sta binScore+1
+        lda binScore+2
+        sbc #0
+        sta binScore+2
+        lda binScore+3
+        sbc #0
+        sta binScore+3
+
+        clc
+        lda binScore
+        adc holdDownPoints
+        sta binScore
+        lda binScore+1
+        adc #0
+        sta binScore+1
+        lda binScore+2
+        adc #0
+        sta binScore+2
+        lda binScore+3
+        adc #0
+        sta binScore+3
+        rts
+
+div16mul10:
+        and #$f0
+        ror
+        ror
+        ror
+        ror
         tax
-        lda pointsTable,x
+        lda multBy10Table,x
+        rts
+
+addLineClearPoints:
+        lda #0
+        sta factorA24+1
+        sta factorA24+2
+        lda levelNumber
+        adc #1
+        sta factorA24
+
+        lda completedLines
+        asl
+        tax
+        lda pointsTable, x
+        sta factorB24+0
+        lda pointsTable+1, x
+        sta factorB24+1
+        lda #0
+        sta factorB24+2
+
+        jsr unsigned_mul24 ; points to add in product24
+
         clc
-        adc score
+        lda binScore
+        adc product24
+        sta binScore
+        lda binScore+1
+        adc product24+1
+        sta binScore+1
+        lda binScore+2
+        adc product24+2
+        sta binScore+2
+        lda binScore+3
+        adc #0
+        sta binScore+3
+
+        lda     outOfDateRenderFlags
+        ora     #$04
+        sta     outOfDateRenderFlags
+        lda     #$00
+        sta     completedLines
+        inc     playState
+
+        lda binScore
+        sta binary32
+        lda binScore+1
+        sta binary32+1
+        lda binScore+2
+        sta binary32+2
+        lda binScore+3
+        sta binary32+3
+        jsr BIN_BCD
+
+        lda bcd32
         sta score
-        cmp #$A0
-        bcc L9C4E
-        clc
-        adc #$60
-        sta score
-        inc score+1
-L9C4E:
-        inx
-        lda pointsTable,x
-        clc
-        adc score+1
+        lda bcd32+1
         sta score+1
-        and #$0F
-        cmp #$0A
-        bcc L9C64
-        lda score+1
-        clc
-        adc #$06
-        sta score+1
-L9C64:
-        lda score+1
-        and #$F0
-        cmp #$A0
-        bcc L9C75
-        lda score+1
-        clc
-        adc #$60
-        sta score+1
-        inc score+2
-L9C75:
-        lda score+2
-        and #$0F
-        cmp #$0A
-        bcc L9C84
-        lda score+2
-        clc
-        adc #$06
+        lda bcd32+2
         sta score+2
-L9C84:
-        ; score limit used to live here
-        dec generalCounter
-        bne L9C37
-        lda outOfDateRenderFlags
-        ora #$04
-        sta outOfDateRenderFlags
-addLineClearPointsDone:
-        lda #$00
-        sta completedLines
-        inc playState
+        lda bcd32+3
+        sta score+3
         rts
 
 pointsTable:
-        .word   $0000,$0040,$0100,$0300,$1200
-        .word   $1000 ; used in b-type score
+        .word   $0000,$0028,$0064,$012C
+        .word   $04B0
+
 updatePlayfield:
         ldx tetriminoY
         dex
