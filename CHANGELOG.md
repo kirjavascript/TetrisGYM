@@ -9,6 +9,7 @@
 * Backwards compatible Seed Trainer improvements
 * Tap counter wrapping improvement
 * Added Block Tool HUD for piece information
+* Readded original broken colours from level 138+
 * Changes made to make input replays sync up with the original ROM easier
     * Restore seed shredding on level menu
     * Hold `select` to start in Qual Mode and reset level cursor 
