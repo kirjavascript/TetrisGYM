@@ -4405,21 +4405,21 @@ incrementLines:
         lda lines
         and #$0F
         cmp #$0A
-        bmi L9BC7
+        bmi checkLevelUp
         lda lines
         clc
         adc #$06
         sta lines
         and #$F0
         cmp #$A0
-        bcc L9BC7
+        bcc checkLevelUp
         lda lines
         and #$0F
         sta lines
         inc lines+1
-L9BC7:  lda lines
+checkLevelUp:  lda lines
         and #$0F
-        bne L9BFB
+        bne @lineLoop
 
         ; needed when mode is set to G (SXTOKL compat)
         lda practiseType
@@ -4440,7 +4440,7 @@ L9BC7:  lda lines
         ror generalCounter
         lda levelNumber
         cmp generalCounter
-        bpl L9BFB
+        bpl @lineLoop
 
 @nextLevel:
         inc levelNumber
@@ -4449,7 +4449,7 @@ L9BC7:  lda lines
         lda outOfDateRenderFlags
         ora #$02
         sta outOfDateRenderFlags
-L9BFB:  dex
+@lineLoop:  dex
         bne incrementLines
 addHoldDownPoints:
 .if NO_SCORING
