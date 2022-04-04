@@ -6,14 +6,17 @@
 * Fixed cursor moving from level 29 to 0
 * Added new screen for Speed Tester
 * Added DAS-like movement to high score entry screen
+* Readded original broken colours from level 138+
 * Backwards compatible Seed Trainer improvements
 * Tap counter wrapping improvement
 * Added Block Tool HUD for piece information
-* Readded original broken colours from level 138+
 * Changes made to make input replays sync up with the original ROM easier
     * Restore seed shredding on level menu
     * Hold `select` to start in Qual Mode and reset level cursor 
     * Transition from Legal to Title screen after 512 frames
+
+## [CNROM]
+* CNROM support
 
 ## [v4 classic]
 - Standard Pause in Qual Mode
