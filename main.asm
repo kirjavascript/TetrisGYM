@@ -10,7 +10,7 @@
 INES_MAPPER := 1 ; supports 1 and 3
 PRACTISE_MODE := 1
 NO_MUSIC := 1
-AUTO_WIN := 0
+AUTO_WIN := 1
 NO_SCORING := 0
 DEV_MODE := 0
 
@@ -3178,32 +3178,13 @@ render_mode_play_and_demo:
         sta PPUADDR
         lda #$18
         sta PPUADDR
-
-        lda score+2 ; patched
-
-        ; 7 digit score clamping
-        ; cmp #$A0
-        ; bcc @nomax
-        ; sbc #$A0
-; @nomax:
-
+        lda score+2
         jsr twoDigsToPPU
         lda score+1
         jsr twoDigsToPPU
         lda score
         jsr twoDigsToPPU
 
-        ; draw million digit
-        ; lda score+2
-        ; cmp #$A0
-        ; bcc @noExtraDigit
-        ; lda #$21
-        ; sta PPUADDR
-        ; lda #$17
-        ; sta PPUADDR
-        ; lda #$1
-        ; sta PPUDATA
-; @noExtraDigit:
 
         lda outOfDateRenderFlags
         and #$FB
