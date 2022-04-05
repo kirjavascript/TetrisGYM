@@ -89,13 +89,9 @@ tmpX        := $0003
 tmpY        := $0004
 tmpZ        := $0005
 tmpBulkCopyToPpuReturnAddr:= $0006 ; 2 bytes
-; ... $8
-binScore    := $8 ; 4 bytes
+binScore    := $8 ; 4 bytes binary
 score       := $C ; 4 bytes BCD
-ones := tmpX
-hundredths := tmpY
-low := tmpZ
-high := tmp3
+; ... $10
 
 rng_seed    := $0017
 spawnID     := $0019
@@ -4276,9 +4272,9 @@ playState_prepareNext:
         dec levelNumber
 
         ; patch some stuff
-        lda #$4
+        lda #$5
         sta completedLines
-        jsr addLineClearPoints
+        jsr addPointsRaw
 
         ; restore level
 @typeBScoreDone:
@@ -4483,6 +4479,11 @@ clearPoints:
         sta binScore+3
         rts
 
+ones := tmpX
+hundredths := tmpY
+low := tmpZ
+high := tmp3
+
 addPushDownPoints:
         clc
         lda score
@@ -4630,6 +4631,7 @@ addLineClearPoints:
 pointsTable:
         .word   $0000,$0028,$0064,$012C
         .word   $04B0
+        .word   $03E8 ; used in btype score calc
 
 updatePlayfield:
         ldx tetriminoY
