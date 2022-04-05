@@ -14,7 +14,7 @@
     * Restore seed shredding on level menu
     * Hold `select` to start in Qual Mode and reset level cursor 
     * Transition from Legal to Title screen after 512 frames
-    * Persist QUal Mode (and menu config) between reset button presses
+    * Persist Qual Mode (and menu config) between reset button presses
 
 ## [CNROM]
 * CNROM support

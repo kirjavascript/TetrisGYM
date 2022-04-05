@@ -4359,7 +4359,7 @@ playState_updateLinesAndStatistics:
         jsr updateMusicSpeed
         lda completedLines
         bne @linesCleared
-        jmp addHoldDownPoints
+        jmp addPoints
 
 @linesCleared:
         tax
@@ -4393,16 +4393,16 @@ playState_updateLinesAndStatistics:
         bpl @checkForBorrow
         lda #$00
         sta lines
-        jmp addHoldDownPoints
+        jmp addPoints
 @checkForBorrow:
         and #$0F
         cmp #$0A
-        bmi addHoldDownPoints
+        bmi addPoints
         lda lines
         sec
         sbc #$06
         sta lines
-        jmp addHoldDownPoints
+        jmp addPoints
 @notTypeB:
 
         ldx completedLines
@@ -4458,7 +4458,7 @@ checkLevelUp:  lda lines
 @lineLoop:  dex
         bne incrementLines
 
-addHoldDownPoints:
+addPoints:
 .if NO_SCORING
         rts
 .endif
@@ -4473,6 +4473,7 @@ addHoldDownPoints:
         beq @noPoints
         jsr addLineClearPoints
 @noPoints:
+        inc playState
         rts
 
 addPushDownPoints:
@@ -4602,7 +4603,6 @@ addLineClearPoints:
         sta     outOfDateRenderFlags
         lda     #$00
         sta     completedLines
-        inc     playState
 
         lda binScore
         sta binary32
