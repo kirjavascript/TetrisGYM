@@ -450,23 +450,44 @@ initRamContinued:
         bpl @zeroOutPages
         lda initMagic
         cmp #$54
-        bne @initHighScoreTable
+        bne @coldBoot
         lda initMagic+1
         cmp #$2D
-        bne @initHighScoreTable
+        bne @coldBoot
         lda initMagic+2
         cmp #$47
-        bne @initHighScoreTable
+        bne @coldBoot
         lda initMagic+3
         cmp #$59
-        bne @initHighScoreTable
+        bne @coldBoot
         lda initMagic+4
         cmp #$4D
-        bne @initHighScoreTable
+        bne @coldBoot
         jmp @continueWarmBootInit
 
+@coldBoot:
+        ; reset cursors (seems to cause problems on misterFPGA)
+        lda #$0
+        sta practiseType
+        sta menuSeedCursorIndex
+
+        ; zero out config memory
+        lda #0
+        ldx #$A0
+@loop:
+        dex
+        sta menuRAM, x
+        cpx #0
+        bne @loop
+
+        ; default pace to A
+        lda #$A
+        sta paceModifier
+
+        lda #$10
+        sta dasModifier
+
         ldx #$00
-; Only run on cold boot
 @initHighScoreTable:
         lda defaultHighScoresTable,x
         cmp #$FF
@@ -773,27 +794,6 @@ harddrop_tetrimino:
 gameMode_bootScreen: ; boot
         ; ABSS goes to gameTypeMenu instead of here
 
-        ; reset cursors (seems to cause problems on misterFPGA)
-        lda #$0
-        sta practiseType
-        sta menuSeedCursorIndex
-
-        ; zero out config memory
-        lda #0
-        ldx #$A0
-@loop:
-        dex
-        sta menuRAM, x
-        cpx #0
-        bne @loop
-
-        ; default pace to A
-        lda #$A
-        sta paceModifier
-
-        lda #$10
-        sta dasModifier
-
         ; detect region
         ; jsr updateAudioWaitForNmiAndDisablePpuRendering
         jsr checkRegion
@@ -801,14 +801,14 @@ gameMode_bootScreen: ; boot
         ; hold select to start in qual mode
         lda heldButtons_player1
         and #BUTTON_SELECT
-        beq @normalBoot
+        beq @nonQualBoot
         lda #1
         sta gameMode
         lda #1
         sta qualFlag
         jmp gameMode_waitScreen
 
-@normalBoot:
+@nonQualBoot:
         ; set start level to 8/18
         lda #$8
         sta startLevel
