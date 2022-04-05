@@ -466,11 +466,6 @@ initRamContinued:
         jmp @continueWarmBootInit
 
 @coldBoot:
-        ; reset cursors (seems to cause problems on misterFPGA)
-        lda #$0
-        sta practiseType
-        sta menuSeedCursorIndex
-
         ; zero out config memory
         lda #0
         ldx #$A0
@@ -779,7 +774,7 @@ harddrop_tetrimino:
 @addScore:
         lda completedLines
         beq @noScore
-        jsr addLineClearPoints
+        jsr addPointsRaw
         lda #0
         sta vramRow
 @noScore:
@@ -794,14 +789,23 @@ harddrop_tetrimino:
 gameMode_bootScreen: ; boot
         ; ABSS goes to gameTypeMenu instead of here
 
+        ; reset cursors
+        lda #$0
+        sta practiseType
+        sta menuSeedCursorIndex
+
         ; detect region
         ; jsr updateAudioWaitForNmiAndDisablePpuRendering
         jsr checkRegion
 
+        ; check if qualMode is alredy set
+        lda qualFlag
+        bne @qualBoot
         ; hold select to start in qual mode
         lda heldButtons_player1
         and #BUTTON_SELECT
         beq @nonQualBoot
+@qualBoot:
         lda #1
         sta gameMode
         lda #1
@@ -1982,20 +1986,14 @@ gameModeState_initGameState:
         sta completedLines ; reset during tetris bugfix
         sta presetIndex ; actually for tspinQuantity
 
+        jsr clearPoints
+
         ; OEM stuff (except score stuff now)
         sta tetriminoY
         sta vramRow
         sta fallTimer
         sta pendingGarbage
         sta pendingGarbageInactivePlayer
-        sta score
-        sta score+1
-        sta score+2
-        sta score+3
-        sta binScore
-        sta binScore+1
-        sta binScore+2
-        sta binScore+3
         sta lines
         sta lines+1
         sta lineClearStatsByType
@@ -4458,6 +4456,8 @@ checkLevelUp:  lda lines
         bne incrementLines
 
 addPoints:
+        inc playState
+addPointsRaw:
 .if NO_SCORING
         rts
 .endif
@@ -4469,7 +4469,18 @@ addPoints:
         lda #$0
         sta holdDownPoints
         jsr addLineClearPoints
-        inc playState
+        rts
+
+clearPoints:
+        lda #0
+        sta score
+        sta score+1
+        sta score+2
+        sta score+3
+        sta binScore
+        sta binScore+1
+        sta binScore+2
+        sta binScore+3
         rts
 
 addPushDownPoints:
@@ -8923,11 +8934,7 @@ advanceGameTSpins:
         cmp statsByType
         beq @continue
 
-        ; reset score
-        lda #0
-        sta score
-        sta score+1
-        sta score+2
+        jsr clearPoints
 
         lda outOfDateRenderFlags
         ora #$04
@@ -8959,7 +8966,7 @@ advanceGameTSpins_actual:
         ; add score
         lda #$2
         sta completedLines
-        jsr addLineClearPoints
+        jsr addPointsRaw
 
         ; TODO: copy score to top
         lda #$20
