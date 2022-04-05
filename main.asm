@@ -779,9 +779,9 @@ harddrop_tetrimino:
 @addScore:
         lda completedLines
         beq @noScore
+        jsr addLineClearPoints
         lda #0
         sta vramRow
-        jsr addLineClearPoints
 @noScore:
 
         lda #8 ; jump straight to spawnTetrimino
@@ -4281,7 +4281,6 @@ playState_prepareNext:
         lda #$4
         sta completedLines
         jsr addLineClearPoints
-        dec playState
 
         ; restore level
 @typeBScoreDone:
@@ -4469,10 +4468,7 @@ addPoints:
 @noPushDown:
         lda #$0
         sta holdDownPoints
-        lda completedLines
-        beq @noPoints
         jsr addLineClearPoints
-@noPoints:
         inc playState
         rts
 
@@ -4548,10 +4544,6 @@ addPushDownPoints:
         lda binScore+3
         adc #0
         sta binScore+3
-
-        lda outOfDateRenderFlags
-        ora #$04
-        sta outOfDateRenderFlags
         rts
 
 div16mul10:
@@ -8968,7 +8960,6 @@ advanceGameTSpins_actual:
         lda #$2
         sta completedLines
         jsr addLineClearPoints
-        dec playState
 
         ; TODO: copy score to top
         lda #$20
