@@ -10,7 +10,7 @@
 INES_MAPPER := 1 ; supports 1 and 3
 PRACTISE_MODE := 1
 NO_MUSIC := 1
-AUTO_WIN := 0
+AUTO_WIN := 1
 NO_SCORING := 0
 DEV_MODE := 0
 
@@ -3520,13 +3520,6 @@ updatePaletteForLevel:
 
 ; 4 bytes per level (bg, fg, c3, c4)
 colorTable:
-        ; .dbyt   $0F30,$2112,$0F30,$291A
-        ; .dbyt   $0F30,$2414,$0F30,$2A12
-        ; .dbyt   $0F30,$2B15,$0F30,$222B
-        ; .dbyt   $0F30,$0016,$0F30,$0513
-        ; .dbyt   $0F30,$1612,$0F30,$2716
-
-; originalColorTable:
         .dbyt   $0F30,$2112,$0F30,$291A,$0F30,$2414,$0F30,$2A12
         .dbyt   $0F30,$2B15,$0F30,$222B,$0F30,$0016,$0F30,$0513
         .dbyt   $0F30,$1612,$0F30,$2716,$60E6,$69A5,$69C9,$1430
@@ -6531,6 +6524,18 @@ prepareNextPace:
         lda binary32+2
         sbc product24+2
         sta binaryTemp+2
+
+
+        ; sec
+        ; lda binScore
+        ; sbc product24
+        ; sta binaryTemp
+        ; lda binScore+1
+        ; sbc product24+1
+        ; sta binaryTemp+1
+        ; lda binScore+2
+        ; sbc product24+2
+        ; sta binaryTemp+2
 
         ; convert to unsigned, extract sign
         lda #0
