@@ -6471,9 +6471,9 @@ prepareNextPace:
         bcc @lessThan230
 @moreThan230:
         lda #$AA
-        sta mathRAM
-        sta mathRAM+1
-        sta mathRAM+2
+        sta paceResult
+        sta paceResult+1
+        sta paceResult+2
         rts
 @lessThan230:
 
@@ -6490,52 +6490,17 @@ prepareNextPace:
         ; get actual score target in product24
         jsr unsigned_mul24
 
-        ; convert score to binary
-        lda score
-        sta bcd32
-        lda score+1
-        sta bcd32+1
-        lda score+2
-        sta bcd32+2
-        lda #0
-        sta bcd32+3
-
-        ; normalise score base to BCD
-        lda bcd32+2
-        cmp #$A0
-        bcc @noverflow
-        sbc #$A0
-        sta bcd32+2
-        lda #$1
-        sta bcd32+3
-@noverflow:
-        jsr BCD_BIN
-
-        ; score in binary32, target in product24
-
-        ; do subtraction
+        ; subtract target from score
         sec
-        lda binary32
+        lda binScore
         sbc product24
         sta binaryTemp
-        lda binary32+1
+        lda binScore+1
         sbc product24+1
         sta binaryTemp+1
-        lda binary32+2
+        lda binScore+2
         sbc product24+2
         sta binaryTemp+2
-
-
-        ; sec
-        ; lda binScore
-        ; sbc product24
-        ; sta binaryTemp
-        ; lda binScore+1
-        ; sbc product24+1
-        ; sta binaryTemp+1
-        ; lda binScore+2
-        ; sbc product24+2
-        ; sta binaryTemp+2
 
         ; convert to unsigned, extract sign
         lda #0
