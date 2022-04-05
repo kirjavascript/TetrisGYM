@@ -10,7 +10,7 @@
 INES_MAPPER := 1 ; supports 1 and 3
 PRACTISE_MODE := 1
 NO_MUSIC := 1
-AUTO_WIN := 1
+AUTO_WIN := 0
 NO_SCORING := 0
 DEV_MODE := 0
 
@@ -4278,7 +4278,7 @@ playState_prepareNext:
         dec levelNumber
 
         ; patch some stuff
-        lda #$5
+        lda #$4
         sta completedLines
         jsr addLineClearPoints
         dec playState
@@ -4458,7 +4458,6 @@ checkLevelUp:  lda lines
 @lineLoop:  dex
         bne incrementLines
 
-        ; TODO: no scoring, render flags
 addHoldDownPoints:
 .if NO_SCORING
         rts
@@ -4470,7 +4469,10 @@ addHoldDownPoints:
 @noPushDown:
         lda #$0
         sta holdDownPoints
+        lda completedLines
+        beq @noPoints
         jsr addLineClearPoints
+@noPoints:
         rts
 
 addPushDownPoints:
@@ -4545,6 +4547,10 @@ addPushDownPoints:
         lda binScore+3
         adc #0
         sta binScore+3
+
+        lda outOfDateRenderFlags
+        ora #$04
+        sta outOfDateRenderFlags
         rts
 
 div16mul10:
