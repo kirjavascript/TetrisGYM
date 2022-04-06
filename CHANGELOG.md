@@ -3,7 +3,7 @@
 * Complete rewrite of scoring code
     * Wraparound at 2 million with letters A-J
     * Fixed T-Spin scoring
-    * Efficient implementation, no chance of crashing
+    * Crash free with no 'long frames'
 * Made Hard Drop instant
 * Added Sonic Drop
 * Display all level numbers 0-255 correctly in game

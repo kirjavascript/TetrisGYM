@@ -11,7 +11,7 @@ const buffer = readStripe(__dirname + '/game_nametable.bin');
 const lookup = flatLookup(`
 0123456789ABCDEF
 GHIJKLMNOPQRSTUV
-WXYZ-.˙>!^()####
+WXYZ-+!>˙^()#.##
 ########qweadzxc
 ################
 ################

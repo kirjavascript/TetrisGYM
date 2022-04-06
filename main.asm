@@ -3176,14 +3176,20 @@ render_mode_play_and_demo:
         and #$04
         beq @renderHz
 
+        ; millions
         ; lda #$21
         ; sta PPUADDR
-        ; lda #$10
+        ; lda #$38
         ; sta PPUADDR
         ; lda score+3
         ; and #$F
         ; sta PPUDATA
 
+        ; lda #$21
+        ; sta PPUADDR
+        ; lda #$3A
+        ; sta PPUADDR
+        ; clc
         ; lda score+2
         ; and #$F0
         ; ror
@@ -3192,7 +3198,6 @@ render_mode_play_and_demo:
         ; ror
         ; sta PPUDATA
 
-
         ; classic scoring
         lda #$21
         sta PPUADDR
@@ -3200,7 +3205,7 @@ render_mode_play_and_demo:
         sta PPUADDR
         lda score+3
         and #1
-        beq @noExtra
+        beq @scoreFromBCD
 
         clc
         lda score+2
@@ -3216,14 +3221,11 @@ render_mode_play_and_demo:
         and #$F
         sta PPUDATA
 
-        jmp @others
-
-
-@noExtra:
+        jmp @scoreFromBCD1
+@scoreFromBCD:
         lda score+2
         jsr twoDigsToPPU
-@others:
-
+@scoreFromBCD1:
         lda score+1
         jsr twoDigsToPPU
         lda score
