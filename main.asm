@@ -372,6 +372,7 @@ SND_CHN     := $4015
 JOY1        := $4016
 JOY2_APUFC  := $4017                        ; read: bits 0-4 joy data lines (bit 0 being normal controller), bits 6-7 are FC inhibit and mode
 
+MMC1_Control := $8000
 MMC1_CHR0   := $BFFF
 MMC1_CHR1   := $DFFF
 
@@ -3174,6 +3175,25 @@ render_mode_play_and_demo:
         lda outOfDateRenderFlags
         and #$04
         beq @renderHz
+
+        ; lda #$21
+        ; sta PPUADDR
+        ; lda #$10
+        ; sta PPUADDR
+        ; lda score+3
+        ; and #$F
+        ; sta PPUDATA
+
+        ; lda score+2
+        ; and #$F0
+        ; ror
+        ; ror
+        ; ror
+        ; ror
+        ; sta PPUDATA
+
+
+        ; classic scoring
         lda #$21
         sta PPUADDR
         lda #$18
@@ -4633,6 +4653,7 @@ addLineClearPoints:
         sta score+3
         rts
 
+
 pointsTable:
         .word   $0000,$0028,$0064,$012C
         .word   $04B0
@@ -4879,7 +4900,6 @@ playState_noop:
 
 showHighScores:
         jsr bulkCopyToPpu      ;not using @-label due to MMC1_Control in PAL
-MMC1_Control    := * + 1
         .addr   high_scores_nametable
         lda #$00
         sta generalCounter2
