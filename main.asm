@@ -80,7 +80,7 @@ TETRIMINO_X_HIDE := $EF
 
         .setcpu "6502"
 
-SRAM        := $6000 ; 8 delicious kilobytes
+SRAM        := $6000 ; 8kb
 
 tmp1        := $0000
 tmp2        := $0001
@@ -3178,8 +3178,29 @@ render_mode_play_and_demo:
         sta PPUADDR
         lda #$18
         sta PPUADDR
+        lda score+3
+        beq @noExtra
+
+        lda score+2
+        and #$F0
+        ror
+        ror
+        ror
+        ror
+        adc #$a
+        sta PPUDATA
+
+        lda score+2
+        and #$F
+        sta PPUDATA
+
+        jmp @others
+
+@noExtra:
         lda score+2
         jsr twoDigsToPPU
+@others:
+
         lda score+1
         jsr twoDigsToPPU
         lda score
