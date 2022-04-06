@@ -51,7 +51,7 @@ MODE_GAME_QUANTITY := 15
 
 MENU_SPRITE_Y_BASE := $47
 MENU_MAX_Y_SCROLL := $30
-MENU_TOP_MARGIN_SCROLL := 7 ; blocks
+MENU_TOP_MARGIN_SCROLL := 7 ; in blocks
 BLOCK_TILES := $7B
 EMPTY_TILE := $EF
 INVISIBLE_TILE := $43
@@ -3179,8 +3179,10 @@ render_mode_play_and_demo:
         lda #$18
         sta PPUADDR
         lda score+3
+        and #1
         beq @noExtra
 
+        clc
         lda score+2
         and #$F0
         ror
