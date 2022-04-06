@@ -3179,8 +3179,13 @@ render_mode_play_and_demo:
         lda #$18
         sta PPUADDR
         lda score+3
-        and #1
+        and #3
         beq @noExtra
+
+        ; when anding higher than 1
+        tax
+        lda multBy10Table, x
+        sta tmpZ
 
         clc
         lda score+2
@@ -3189,7 +3194,7 @@ render_mode_play_and_demo:
         ror
         ror
         ror
-        adc #$a
+        adc tmpZ ; could just be $A with and 1
         sta PPUDATA
 
         lda score+2
@@ -3197,6 +3202,7 @@ render_mode_play_and_demo:
         sta PPUDATA
 
         jmp @others
+
 
 @noExtra:
         lda score+2
