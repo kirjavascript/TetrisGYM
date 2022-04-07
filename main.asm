@@ -51,6 +51,9 @@ MODE_PAL := 23
 MODE_QUANTITY := 24
 MODE_GAME_QUANTITY := 16
 
+SCORING_CLASSIC := 0 ; for scoringModifier
+SCORING_SCORECAP := 1
+
 MENU_SPRITE_Y_BASE := $47
 MENU_MAX_Y_SCROLL := $40
 MENU_TOP_MARGIN_SCROLL := 7 ; in blocks
@@ -337,7 +340,7 @@ tapqtyModifier := menuVars+6
 garbageModifier := menuVars+7
 droughtModifier := menuVars+8
 dasModifier := menuVars+9
-scoringType := menuVars+10
+scoringModifier := menuVars+10
 hzFlag := menuVars+11
 inputDisplayFlag := menuVars+12
 goofyFlag := menuVars+13
@@ -3181,21 +3184,24 @@ render_mode_play_and_demo:
         and #$04
         beq @renderHz
 
+        lda scoringModifier
+        cmp #SCORING_SCORECAP
+        beq @noScoreCap
         ; score cap
-        ; lda score+3
-        ; beq @noScoreCap
-        ; lda #$21
-        ; sta PPUADDR
-        ; lda #$18
-        ; sta PPUADDR
-        ; lda #$99
-        ; jsr twoDigsToPPU
-        ; lda #$99
-        ; jsr twoDigsToPPU
-        ; lda #$99
-        ; jsr twoDigsToPPU
-        ; jmp @scoreEnd
-; @noScoreCap:
+        lda score+3
+        beq @noScoreCap
+        lda #$21
+        sta PPUADDR
+        lda #$18
+        sta PPUADDR
+        lda #$99
+        jsr twoDigsToPPU
+        lda #$99
+        jsr twoDigsToPPU
+        lda #$99
+        jsr twoDigsToPPU
+        jmp @scoreEnd
+@noScoreCap:
 
         ; millions
         ; lda #$21
