@@ -33,24 +33,26 @@ MODE_TYPEB := 6
 MODE_FLOOR := 7
 MODE_TAP := 8
 MODE_TRANSITION := 9
-MODE_GARBAGE := 10
-MODE_DROUGHT := 11
-MODE_DAS := 12
-MODE_INVISIBLE := 13
-MODE_HARDDROP := 14
-MODE_SPEED_TEST := 15
-MODE_HZ_DISPLAY := 16
-MODE_INPUT_DISPLAY := 17
-MODE_GOOFY := 18
-MODE_DEBUG := 19
-MODE_QUAL := 20
-MODE_PAL := 21
+MODE_TAPQTY := 10
+MODE_GARBAGE := 11
+MODE_DROUGHT := 12
+MODE_DAS := 13
+MODE_INVISIBLE := 14
+MODE_HARDDROP := 15
+MODE_SPEED_TEST := 16
+MODE_SCORE_DISPLAY := 17
+MODE_HZ_DISPLAY := 18
+MODE_INPUT_DISPLAY := 19
+MODE_GOOFY := 20
+MODE_DEBUG := 21
+MODE_QUAL := 22
+MODE_PAL := 23
 
-MODE_QUANTITY := 22
-MODE_GAME_QUANTITY := 15
+MODE_QUANTITY := 24
+MODE_GAME_QUANTITY := 16
 
 MENU_SPRITE_Y_BASE := $47
-MENU_MAX_Y_SCROLL := $30
+MENU_MAX_Y_SCROLL := $40
 MENU_TOP_MARGIN_SCROLL := 7 ; in blocks
 BLOCK_TILES := $7B
 EMPTY_TILE := $EF
@@ -58,7 +60,7 @@ INVISIBLE_TILE := $43
 TETRIMINO_X_HIDE := $EF
 
 ; menuConfigSizeLookup
-.define MENUSIZES $0, $0, $0, $0, $F, $7, $8, $C, $20, $10, $4, $12, $10, $0, $0, $0, $1, $1, $1, $1, $1, $1
+.define MENUSIZES $0, $0, $0, $0, $F, $7, $8, $C, $20, $10, $10, $4, $12, $10, $0, $0, $0, $9, $1, $1, $1, $1, $1, $1
 
 .macro MODENAMES
     .byte   "TETRIS"
@@ -71,6 +73,7 @@ TETRIMINO_X_HIDE := $EF
     .byte   "FLOOR "
     .byte   "QCKTAP"
     .byte   "TRNSTN"
+    .byte   "TAPQTY"
     .byte   "GARBGE"
     .byte   "LOBARS"
     .byte   "DASDLY"
@@ -330,15 +333,17 @@ typeBModifier := menuVars+2
 floorModifier := menuVars+3
 tapModifier := menuVars+4
 transitionModifier := menuVars+5
-garbageModifier := menuVars+6
-droughtModifier := menuVars+7
-dasModifier := menuVars+8
-hzFlag := menuVars+9
-inputDisplayFlag := menuVars+10
-goofyFlag := menuVars+11
-debugFlag := menuVars+12
-qualFlag := menuVars+13
-palFlag := menuVars+14
+tapqtyModifier := menuVars+6
+garbageModifier := menuVars+7
+droughtModifier := menuVars+8
+dasModifier := menuVars+9
+scoringType := menuVars+10
+hzFlag := menuVars+11
+inputDisplayFlag := menuVars+12
+goofyFlag := menuVars+13
+debugFlag := menuVars+14
+qualFlag := menuVars+15
+palFlag := menuVars+16
 
 ; ... $7FF
 PPUCTRL     := $2000
@@ -3176,6 +3181,22 @@ render_mode_play_and_demo:
         and #$04
         beq @renderHz
 
+        ; score cap
+        ; lda score+3
+        ; beq @noScoreCap
+        ; lda #$21
+        ; sta PPUADDR
+        ; lda #$18
+        ; sta PPUADDR
+        ; lda #$99
+        ; jsr twoDigsToPPU
+        ; lda #$99
+        ; jsr twoDigsToPPU
+        ; lda #$99
+        ; jsr twoDigsToPPU
+        ; jmp @scoreEnd
+; @noScoreCap:
+
         ; millions
         ; lda #$21
         ; sta PPUADDR
@@ -3203,6 +3224,7 @@ render_mode_play_and_demo:
         sta PPUADDR
         lda #$18
         sta PPUADDR
+
         lda score+3
         and #1
         beq @scoreFromBCD
@@ -3230,7 +3252,7 @@ render_mode_play_and_demo:
         jsr twoDigsToPPU
         lda score
         jsr twoDigsToPPU
-
+@scoreEnd:
 
         lda outOfDateRenderFlags
         and #$FB

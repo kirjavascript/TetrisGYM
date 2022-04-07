@@ -52,9 +52,9 @@ drawTiles(buffer, lookup, `
 #a    FLOOR                   d#
 #a    (QUICK)TAP              d#
 #a    TRANSITION              d#
+#a    TAP QUANTITY            d#
 #a    GARBAGE                 d#
 #a    DROUGHT                 d#
-#a    TAP QUANTITY            d#
 #a    DAS DELAY               d#
 #a    INVISIBLE               d#
 #a    HARD DROP               d#
