@@ -1346,15 +1346,7 @@ renderMenuVars:
         lda practiseType
         jsr menuYInRange
         bne @cursorFinished
-
-        lda practiseType
-        asl a
-        asl a
-        asl a
-        clc
-        adc #MENU_SPRITE_Y_BASE + 1
-        sbc menuScrollY
-        sta spriteYOffset
+        stx spriteYOffset
         lda #$17
         sta spriteXOffset
         lda #$1D
@@ -1407,14 +1399,6 @@ menuYTmp := tmp2
         sta menuCounter
         sta menuRAMCounter
 @loop:
-        lda menuCounter
-        asl
-        asl
-        asl
-        adc #MENU_SPRITE_Y_BASE + 1
-        sbc menuScrollY
-        sta menuYTmp
-
         ldy menuRAMCounter ; gap support
 
         ; handle boolean
@@ -1432,9 +1416,14 @@ menuYTmp := tmp2
 @notBool:
 
         ldx oamStagingLength
-        lda menuYTmp
 
-
+        ; get Y offset
+        lda menuCounter
+        asl
+        asl
+        asl
+        adc #MENU_SPRITE_Y_BASE + 1
+        sbc menuScrollY
         sta oamStaging, x
         inx
         lda menuVars, y
@@ -1463,8 +1452,7 @@ menuYTmp := tmp2
         lda menuCounter
         jsr menuYInRange
         bne @boolOutOfRange
-        lda menuYTmp
-        sta spriteYOffset
+        stx spriteYOffset
         lda #$D0
         sta spriteXOffset
         lda menuVars, y
@@ -1505,9 +1493,11 @@ menuYInRange:
         lda tmpX
         sbc menuScrollY
         sta tmpX
+        tax
         lda tmpY
         sbc #0
         ; high byte of offset in A
+        ; low byte in X
         rts
 
 byteSprite:
