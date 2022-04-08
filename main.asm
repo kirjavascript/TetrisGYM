@@ -52,7 +52,9 @@ MODE_QUANTITY := 24
 MODE_GAME_QUANTITY := 16
 
 SCORING_CLASSIC := 0 ; for scoringModifier
-SCORING_SCORECAP := 1
+SCORING_FLOAT := 1
+SCORING_EXPAND := 2
+SCORING_SCORECAP := 3
 
 MENU_SPRITE_Y_BASE := $47
 MENU_MAX_Y_SCROLL := $40
@@ -63,7 +65,7 @@ INVISIBLE_TILE := $43
 TETRIMINO_X_HIDE := $EF
 
 ; menuConfigSizeLookup
-.define MENUSIZES $0, $0, $0, $0, $F, $7, $8, $C, $20, $10, $10, $4, $12, $10, $0, $0, $0, $9, $1, $1, $1, $1, $1, $1
+.define MENUSIZES $0, $0, $0, $0, $F, $7, $8, $C, $20, $10, $1, $4, $12, $10, $0, $0, $0, $3, $1, $1, $1, $1, $1, $1
 
 .macro MODENAMES
     .byte   "TETRIS"
@@ -3208,26 +3210,30 @@ render_mode_play_and_demo:
         jsr twoDigsToPPU
 
         ; millions
-        ; lda #$21
-        ; sta PPUADDR
-        ; lda #$38
-        ; sta PPUADDR
-        ; lda score+3
-        ; and #$F
-        ; sta PPUDATA
+        lda scoringModifier
+        cmp #SCORING_FLOAT
+        bne @noFloat
+        lda #$21
+        sta PPUADDR
+        lda #$38
+        sta PPUADDR
+        lda score+3
+        and #$F
+        sta PPUDATA
 
-        ; lda #$21
-        ; sta PPUADDR
-        ; lda #$3A
-        ; sta PPUADDR
-        ; clc
-        ; lda score+2
-        ; and #$F0
-        ; ror
-        ; ror
-        ; ror
-        ; ror
-        ; sta PPUDATA
+        lda #$21
+        sta PPUADDR
+        lda #$3A
+        sta PPUADDR
+        clc
+        lda score+2
+        and #$F0
+        ror
+        ror
+        ror
+        ror
+        sta PPUDATA
+@noFloat:
 
         lda outOfDateRenderFlags
         and #$FB
@@ -4671,12 +4677,18 @@ addLineClearPoints:
         rts
 @noScoreCap:
 
+        ; lda scoringModifier
+        cmp #SCORING_FLOAT
+        bne @noFloat
+        rts
+@noFloat:
+
 
         ; classic score
         lda #0
         sta tmpZ
         lda score+3
-        and #1
+        and #$1
         beq @bitParity
         lda #$A
         sta tmpZ

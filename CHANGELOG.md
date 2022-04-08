@@ -2,6 +2,7 @@
 ## [unreleased]
 * Complete rewrite of scoring code
     * Wraparound at 2 million with letters A-J
+    * Optional scorecap at 999999
     * Fixed T-Spin scoring
     * Crash free with no 'long frames'
 * Made Hard Drop instant
