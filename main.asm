@@ -3198,31 +3198,14 @@ render_mode_play_and_demo:
         sta PPUADDR
         lda #$18
         sta PPUADDR
+        lda score+3
+        sta PPUDATA
         lda score+2
-        jsr twoDigsToPPU
+        sta PPUDATA
         lda score+1
         jsr twoDigsToPPU
         lda score
         jsr twoDigsToPPU
-
-        ; lda scoringModifier
-        ; cmp #SCORING_SCORECAP
-        ; bne @noScoreCap
-        ; ; score cap
-        ; lda score+3
-        ; beq @noScoreCap
-        ; lda #$21
-        ; sta PPUADDR
-        ; lda #$18
-        ; sta PPUADDR
-        ; lda #$99
-        ; jsr twoDigsToPPU
-        ; lda #$99
-        ; jsr twoDigsToPPU
-        ; lda #$99
-        ; jsr twoDigsToPPU
-        ; jmp @scoreEnd
-; @noScoreCap:
 
         ; millions
         ; lda #$21
@@ -3245,41 +3228,6 @@ render_mode_play_and_demo:
         ; ror
         ; ror
         ; sta PPUDATA
-
-        ; classic scoring
-        ; lda #$21
-        ; sta PPUADDR
-        ; lda #$18
-        ; sta PPUADDR
-
-        ; lda score+3
-        ; and #1
-        ; beq @scoreFromBCD
-
-        ; clc
-        ; lda score+2
-        ; and #$F0
-        ; ror
-        ; ror
-        ; ror
-        ; ror
-        ; adc #$A
-        ; sta PPUDATA
-
-        ; lda score+2
-        ; and #$F
-        ; sta PPUDATA
-
-        ; jmp @scoreFromBCD1
-; @scoreFromBCD:
-        ; lda score+2
-        ; jsr twoDigsToPPU
-; @scoreFromBCD1:
-        ; lda score+1
-        ; jsr twoDigsToPPU
-        ; lda score
-        ; jsr twoDigsToPPU
-; @scoreEnd:
 
         lda outOfDateRenderFlags
         and #$FB
@@ -4705,20 +4653,48 @@ addLineClearPoints:
         lda bcd32+3
         sta score+3
 
-        ; classic
-        lda score+3
-        and #1
-        beq @noOverflow
 
+        ; scorecap
+
+        lda scoringModifier
+        cmp #SCORING_SCORECAP
+        bne @noScoreCap
+        lda score+3
+        beq @noScoreCap
         lda #$99
         sta score+0
         sta score+1
+        lda #9
         sta score+2
+        lda #9
+        sta score+3
+        rts
+@noScoreCap:
+
+
+        ; classic score
         lda #0
+        sta tmpZ
+        lda score+3
+        and #1
+        beq @bitParity
+        lda #$A
+        sta tmpZ
+@bitParity:
+
+        clc
+        lda score+2
+        and #$F0
+        ror
+        ror
+        ror
+        ror
+        adc tmpZ
         sta score+3
 
-@noOverflow:
-
+        lda score+2
+        and #$F
+        sta score+2
         rts
 
 
