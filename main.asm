@@ -1344,7 +1344,7 @@ renderMenuVars:
         bne @seedCursor
 
         lda practiseType
-        jsr menuYInRange
+        jsr menuItemY16Offset
         bne @cursorFinished
         stx spriteYOffset
         lda #$17
@@ -1450,7 +1450,7 @@ menuYTmp := tmp2
 
 @renderBool:
         lda menuCounter
-        jsr menuYInRange
+        jsr menuItemY16Offset
         bne @boolOutOfRange
         stx spriteYOffset
         lda #$D0
@@ -1462,7 +1462,10 @@ menuYTmp := tmp2
 @boolOutOfRange:
         rts
 
-menuYInRange:
+; <- menu item index in A
+; -> high byte of offset in A
+; -> low byte in X
+menuItemY16Offset:
         sta tmpY
         lda #8
         sta tmpX
@@ -1496,8 +1499,6 @@ menuYInRange:
         tax
         lda tmpY
         sbc #0
-        ; high byte of offset in A
-        ; low byte in X
         rts
 
 byteSprite:
