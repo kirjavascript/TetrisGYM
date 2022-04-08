@@ -3194,6 +3194,17 @@ render_mode_play_and_demo:
         and #$04
         beq @renderHz
 
+        lda #$21
+        sta PPUADDR
+        lda #$18
+        sta PPUADDR
+        lda score+2
+        jsr twoDigsToPPU
+        lda score+1
+        jsr twoDigsToPPU
+        lda score
+        jsr twoDigsToPPU
+
         ; lda scoringModifier
         ; cmp #SCORING_SCORECAP
         ; bne @noScoreCap
@@ -3236,39 +3247,39 @@ render_mode_play_and_demo:
         ; sta PPUDATA
 
         ; classic scoring
-        lda #$21
-        sta PPUADDR
-        lda #$18
-        sta PPUADDR
+        ; lda #$21
+        ; sta PPUADDR
+        ; lda #$18
+        ; sta PPUADDR
 
-        lda score+3
-        and #1
-        beq @scoreFromBCD
+        ; lda score+3
+        ; and #1
+        ; beq @scoreFromBCD
 
-        clc
-        lda score+2
-        and #$F0
-        ror
-        ror
-        ror
-        ror
-        adc #$A
-        sta PPUDATA
+        ; clc
+        ; lda score+2
+        ; and #$F0
+        ; ror
+        ; ror
+        ; ror
+        ; ror
+        ; adc #$A
+        ; sta PPUDATA
 
-        lda score+2
-        and #$F
-        sta PPUDATA
+        ; lda score+2
+        ; and #$F
+        ; sta PPUDATA
 
-        jmp @scoreFromBCD1
-@scoreFromBCD:
-        lda score+2
-        jsr twoDigsToPPU
-@scoreFromBCD1:
-        lda score+1
-        jsr twoDigsToPPU
-        lda score
-        jsr twoDigsToPPU
-@scoreEnd:
+        ; jmp @scoreFromBCD1
+; @scoreFromBCD:
+        ; lda score+2
+        ; jsr twoDigsToPPU
+; @scoreFromBCD1:
+        ; lda score+1
+        ; jsr twoDigsToPPU
+        ; lda score
+        ; jsr twoDigsToPPU
+; @scoreEnd:
 
         lda outOfDateRenderFlags
         and #$FB
@@ -4683,6 +4694,8 @@ addLineClearPoints:
         sta binary32+3
         jsr BIN_BCD
 
+        ; copy bcd32 to score for display
+
         lda bcd32
         sta score
         lda bcd32+1
@@ -4691,6 +4704,21 @@ addLineClearPoints:
         sta score+2
         lda bcd32+3
         sta score+3
+
+        ; classic
+        lda score+3
+        and #1
+        beq @noOverflow
+
+        lda #$99
+        sta score+0
+        sta score+1
+        sta score+2
+        lda #0
+        sta score+3
+
+@noOverflow:
+
         rts
 
 
