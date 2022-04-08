@@ -3238,6 +3238,7 @@ render_mode_play_and_demo:
         lda outOfDateRenderFlags
         and #$FB
         sta outOfDateRenderFlags
+
 @renderHz:
         lda hzFlag
         beq @renderStats
@@ -4659,7 +4660,6 @@ addLineClearPoints:
         lda bcd32+3
         sta score+3
 
-
         ; scorecap
 
         lda scoringModifier
@@ -4682,7 +4682,6 @@ addLineClearPoints:
         bne @noFloat
         rts
 @noFloat:
-
 
         ; classic score
         lda #0
