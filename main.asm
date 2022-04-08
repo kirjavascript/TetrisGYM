@@ -1561,28 +1561,6 @@ menuXTmp := tmp2
 
         rts
 
-menuSprite: ; a - value, xoff/yoff
-        tay
-        lda byteSpriteYOffset
-        sbc menuScrollY
-        sta oamStaging, x
-        inx
-        tya
-        sta oamStaging, x
-        inx
-        lda #$00
-        sta oamStaging, x
-        inx
-        lda byteSpriteXOffset
-        sta oamStaging, x
-        inx
-        ; increase OAM index
-        lda #$04
-        clc
-        adc oamStagingLength
-        sta oamStagingLength
-        rts
-
 gameMode_levelMenu:
         RESET_MMC1
         lda #$10
