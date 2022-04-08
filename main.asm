@@ -1344,6 +1344,10 @@ renderMenuVars:
         bne @seedCursor
 
         lda practiseType
+        jsr menuYInRange
+        bne @cursorFinished
+
+        lda practiseType
         asl a
         asl a
         asl a
@@ -1397,7 +1401,6 @@ menuYTmp := tmp2
         jsr byteSprite
 
         ; render config vars
-
 
         ; YTAX
         lda #0
@@ -1457,7 +1460,9 @@ menuYTmp := tmp2
         rts
 
 @renderBool:
-
+        lda menuCounter
+        jsr menuYInRange
+        bne @boolOutOfRange
         lda menuYTmp
         sta spriteYOffset
         lda #$D0
@@ -1466,8 +1471,44 @@ menuYTmp := tmp2
         adc #$18
         sta spriteIndexInOamContentLookup
         jsr loadSpriteIntoOamStaging
+@boolOutOfRange:
         rts
 
+menuYInRange:
+        sta tmpY
+        lda #8
+        sta tmpX
+        ; get 16bit menuitem * 8 in tmpX/tmpY
+        lda #$0
+        ldx #$8
+        clc
+@mulLoop:
+        bcc @mulLoop1
+        clc
+        adc tmpY
+@mulLoop1:
+        ror
+        ror tmpX
+        dex
+        bpl @mulLoop
+        sta tmpY
+        ; add offset
+        clc
+        lda tmpX
+        adc #MENU_SPRITE_Y_BASE + 1
+        sta tmpX
+        lda tmpY
+        adc #0
+        sta tmpY
+        ; remove menuscroll
+        sec
+        lda tmpX
+        sbc menuScrollY
+        sta tmpX
+        lda tmpY
+        sbc #0
+        ; high byte of offset in A
+        rts
 
 byteSprite:
 menuXTmp := tmp2
@@ -3184,24 +3225,24 @@ render_mode_play_and_demo:
         and #$04
         beq @renderHz
 
-        lda scoringModifier
-        cmp #SCORING_SCORECAP
-        beq @noScoreCap
-        ; score cap
-        lda score+3
-        beq @noScoreCap
-        lda #$21
-        sta PPUADDR
-        lda #$18
-        sta PPUADDR
-        lda #$99
-        jsr twoDigsToPPU
-        lda #$99
-        jsr twoDigsToPPU
-        lda #$99
-        jsr twoDigsToPPU
-        jmp @scoreEnd
-@noScoreCap:
+        ; lda scoringModifier
+        ; cmp #SCORING_SCORECAP
+        ; bne @noScoreCap
+        ; ; score cap
+        ; lda score+3
+        ; beq @noScoreCap
+        ; lda #$21
+        ; sta PPUADDR
+        ; lda #$18
+        ; sta PPUADDR
+        ; lda #$99
+        ; jsr twoDigsToPPU
+        ; lda #$99
+        ; jsr twoDigsToPPU
+        ; lda #$99
+        ; jsr twoDigsToPPU
+        ; jmp @scoreEnd
+; @noScoreCap:
 
         ; millions
         ; lda #$21
