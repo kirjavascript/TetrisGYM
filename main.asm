@@ -124,7 +124,8 @@ autorepeatY := $004E
 holdDownPoints  := $004F
 lines       := $0050
 rowY        := $0052
-; 53 - 53 free, used to be score
+linesBCDHigh := $53
+; 54, 55 free
 completedLines  := $0056
 lineIndex   := $0057                        ; Iteration count of playState_checkForCompletedRows
 startHeight := $0058
@@ -3132,10 +3133,13 @@ render_mode_play_and_demo:
         sta PPUADDR
         lda #$73
         sta PPUADDR
-        lda lines+1
-        sta PPUDATA
+        ; lda lines+1
+        ; sta PPUDATA
+        lda linesBCDHigh
+        jsr twoDigsToPPU
         lda lines
         jsr twoDigsToPPU
+
         lda outOfDateRenderFlags
         and #$FE
         sta outOfDateRenderFlags
@@ -3223,29 +3227,27 @@ render_mode_play_and_demo:
         ; 8 safe tile writes freed from stats / hz
         ; (lazy render hz for 10 more)
         ; 1 added in level
+        ; 1 added in lines
 
         ; millions
         lda scoringModifier
         cmp #SCORING_FLOAT
         bne @noFloat
-        ; 3/4 added in float
+        ; 3 added in float
 
-        lda score+3
-        cmp #$A
-        bcc @notTen
         lda #$20
         sta PPUADDR
         lda #$B8
         sta PPUADDR
         lda score+3
+        cmp #$A
+        bcc @notTen
+        lda score+3
         jsr twoDigsToPPU
         jmp @hundredThousands
 @notTen:
-
-        lda #$20
-        sta PPUADDR
-        lda #$B9
-        sta PPUADDR
+        lda #$FF
+        sta PPUDATA
         lda score+3
         and #$F
         sta PPUDATA
@@ -4506,7 +4508,11 @@ incrementLines:
         and #$0F
         sta lines
         inc lines+1
-checkLevelUp:  lda lines
+
+checkLevelUp:
+        jsr calcBCDLines
+
+        lda lines
         and #$0F
         bne @lineLoop
 
@@ -4772,6 +4778,28 @@ pointsTable:
         .word   $0000,$0028,$0064,$012C
         .word   $04B0
         .word   $03E8 ; used in btype score calc
+
+calcBCDLines:
+        lda #0
+        sta tmp3
+        lda lines+1
+@modLoop:
+        cmp #10
+        bcc @modEnd
+        sbc #10
+        inc tmp3
+        jmp @modLoop
+@modEnd:
+        sta linesBCDHigh
+
+        lda tmp3
+        rol
+        rol
+        rol
+        rol
+        adc linesBCDHigh
+        sta linesBCDHigh
+        rts
 
 updatePlayfield:
         ldx tetriminoY

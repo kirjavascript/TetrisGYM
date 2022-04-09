@@ -1,7 +1,7 @@
 # Changelog
 ## [unreleased]
 * Complete rewrite of scoring code
-    * 'Classic' Scoring; Wraparound at 2 million with letters A-J
+    * Classic scoring; Wraparound at 2 million with letters A-J
     * Millions counter
     * 999999 scorecap mode
     * Fixed T-Spin scoring
