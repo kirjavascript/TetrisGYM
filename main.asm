@@ -1766,14 +1766,38 @@ gameModeState_initGameBackground:
         jsr changeCHRBank0
         lda #$01
         jsr changeCHRBank1
-.elseif INES_MAPPER = 3
-        ; lda #$00
-        ; jsr changeCHRBank0
 .endif
         jsr bulkCopyToPpu
         .addr   game_palette
         jsr copyRleNametableToPpu
         .addr   game_nametable
+
+        lda scoringModifier
+        cmp #SCORING_FLOAT
+        bne @noFloat
+        lda #$20
+        sta PPUADDR
+        lda #$98
+        sta PPUADDR
+        lda #$FF
+        sta PPUDATA
+        sta PPUDATA
+        sta PPUDATA
+        lda #$20
+        sta PPUADDR
+        lda #$BA
+        sta PPUADDR
+        lda #$2D
+        sta PPUDATA
+        lda #$20
+        sta PPUADDR
+        lda #$BC
+        sta PPUADDR
+        lda #$16
+        sta PPUDATA
+        jmp @skipTop
+@noFloat:
+
 
         jsr showPaceDiffText
         beq @skipTop
@@ -3196,34 +3220,51 @@ render_mode_play_and_demo:
         and #$04
         beq @renderHz
 
+        jmp @codegap
+@setupPPU:
         lda #$21
         sta PPUADDR
         lda #$18
         sta PPUADDR
+        rts
+@renderBCDScore:
+        lda score+2
+        jsr twoDigsToPPU
+        jmp @renderLowScore
+@renderSplitScore:
         lda score+3
         sta PPUDATA
         lda score+2
         sta PPUDATA
+@renderLowScore:
         lda score+1
         jsr twoDigsToPPU
         lda score
         jsr twoDigsToPPU
+        rts
+@codegap:
+
+        ; 8 safe tile writes freed from stats / hz
+        ; (lazy render for more)
+        ; 1 added in level
 
         ; millions
         lda scoringModifier
         cmp #SCORING_FLOAT
         bne @noFloat
-        lda #$21
+        ; 3 added in float
+
+        lda #$20
         sta PPUADDR
-        lda #$38
+        lda #$B9
         sta PPUADDR
         lda score+3
         and #$F
         sta PPUDATA
 
-        lda #$21
+        lda #$20
         sta PPUADDR
-        lda #$3A
+        lda #$BB
         sta PPUADDR
         clc
         lda score+2
@@ -3233,8 +3274,16 @@ render_mode_play_and_demo:
         ror
         ror
         sta PPUDATA
-@noFloat:
 
+        jsr @setupPPU
+        jsr @renderBCDScore
+
+        jmp @clearScoreRenderFlags
+@noFloat:
+        jsr @setupPPU
+        jsr @renderSplitScore
+
+@clearScoreRenderFlags:
         lda outOfDateRenderFlags
         and #$FB
         sta outOfDateRenderFlags
