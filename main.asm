@@ -3220,39 +3220,27 @@ render_mode_play_and_demo:
         and #$04
         beq @renderHz
 
-        jmp @codegap
-@setupPPU:
-        lda #$21
-        sta PPUADDR
-        lda #$18
-        sta PPUADDR
-        rts
-@renderBCDScore:
-        lda score+2
-        jsr twoDigsToPPU
-        jmp @renderLowScore
-@renderSplitScore:
-        lda score+3
-        sta PPUDATA
-        lda score+2
-        sta PPUDATA
-@renderLowScore:
-        lda score+1
-        jsr twoDigsToPPU
-        lda score
-        jsr twoDigsToPPU
-        rts
-@codegap:
-
         ; 8 safe tile writes freed from stats / hz
-        ; (lazy render for more)
+        ; (lazy render hz for 10 more)
         ; 1 added in level
 
         ; millions
         lda scoringModifier
         cmp #SCORING_FLOAT
         bne @noFloat
-        ; 3 added in float
+        ; 3/4 added in float
+
+        lda score+3
+        cmp #$A
+        bcc @notTen
+        lda #$20
+        sta PPUADDR
+        lda #$B8
+        sta PPUADDR
+        lda score+3
+        jsr twoDigsToPPU
+        jmp @hundredThousands
+@notTen:
 
         lda #$20
         sta PPUADDR
@@ -3261,6 +3249,7 @@ render_mode_play_and_demo:
         lda score+3
         and #$F
         sta PPUDATA
+@hundredThousands:
 
         lda #$20
         sta PPUADDR
@@ -3298,6 +3287,30 @@ render_mode_play_and_demo:
         lda outOfDateRenderFlags
         and #$EF
         sta outOfDateRenderFlags
+
+        jmp @codegap
+@setupPPU:
+        lda #$21
+        sta PPUADDR
+        lda #$18
+        sta PPUADDR
+        rts
+@renderBCDScore:
+        lda score+2
+        jsr twoDigsToPPU
+        jmp @renderLowScore
+@renderSplitScore:
+        lda score+3
+        sta PPUDATA
+        lda score+2
+        sta PPUDATA
+@renderLowScore:
+        lda score+1
+        jsr twoDigsToPPU
+        lda score
+        jsr twoDigsToPPU
+        rts
+@codegap:
 
         ; run a patched version of the stats
 @renderStatsHz:
