@@ -3266,7 +3266,9 @@ render_mode_play_and_demo:
         lda scoringModifier
         cmp #SCORING_EXPAND
         bne @noExpand
-
+        jsr @renderExpand
+        jsr @setupPPU
+        jsr @renderBCDScore
         jmp @clearScoreRenderFlags
 @noExpand:
 
@@ -3312,6 +3314,7 @@ render_mode_play_and_demo:
         jmp @clearScoreRenderFlags
 @noFloat:
 
+@renderClassicScore:
         jsr @setupPPU
         jsr @renderSplitScore
 
@@ -3331,7 +3334,9 @@ render_mode_play_and_demo:
         and #$EF
         sta outOfDateRenderFlags
 
+; some extra routines live hear to make jumps short enough
         jmp @codegap
+; util functions
 @setupPPU:
         lda #$21
         sta PPUADDR
@@ -3352,6 +3357,27 @@ render_mode_play_and_demo:
         jsr twoDigsToPPU
         lda score
         jsr twoDigsToPPU
+        rts
+; actual renderers
+@renderExpand:
+        lda score+3
+        beq @renderClassicScore
+        cmp #$A
+        bcc @oneExtraDigit
+        lda #$21
+        sta PPUADDR
+        lda #$16
+        sta PPUADDR
+        lda score+3
+        jsr twoDigsToPPU
+        jmp @renderClassicScore
+@oneExtraDigit:
+        lda #$21
+        sta PPUADDR
+        lda #$17
+        sta PPUADDR
+        lda score+3
+        sta PPUDATA
         rts
 @codegap:
 
@@ -4790,6 +4816,8 @@ addLineClearPoints:
 @noFloat:
 
         ; classic score
+        cmp #SCORING_CLASSIC
+        bne @ret
         lda #0
         sta tmpZ
         lda score+3
@@ -4812,6 +4840,7 @@ addLineClearPoints:
         lda score+2
         and #$F
         sta score+2
+@ret:
         rts
 
 
