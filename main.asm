@@ -1776,27 +1776,26 @@ gameModeState_initGameBackground:
         lda scoringModifier
         cmp #SCORING_FLOAT
         bne @noFloat
-        lda #$20
+        ; lda #$20
+        ; sta PPUADDR
+        ; lda #$98
+        ; sta PPUADDR
+        ; lda #$FF
+        ; sta PPUDATA
+        ; sta PPUDATA
+        ; sta PPUDATA
+        lda #$21
         sta PPUADDR
-        lda #$98
-        sta PPUADDR
-        lda #$FF
-        sta PPUDATA
-        sta PPUDATA
-        sta PPUDATA
-        lda #$20
-        sta PPUADDR
-        lda #$BA
+        lda #$3b
         sta PPUADDR
         lda #$2D
         sta PPUDATA
-        lda #$20
+        lda #$21
         sta PPUADDR
-        lda #$BC
+        lda #$3D
         sta PPUADDR
         lda #$16
         sta PPUDATA
-        jmp @skipTop
 @noFloat:
 
 
@@ -3247,9 +3246,9 @@ render_mode_play_and_demo:
         bne @noFloat
         ; 3 added in float
 
-        lda #$20
+        lda #$21
         sta PPUADDR
-        lda #$B8
+        lda #$39
         sta PPUADDR
         lda score+3
         cmp #$A
@@ -3265,9 +3264,9 @@ render_mode_play_and_demo:
         sta PPUDATA
 @hundredThousands:
 
-        lda #$20
+        lda #$21
         sta PPUADDR
-        lda #$BB
+        lda #$3c
         sta PPUADDR
         clc
         lda score+2
