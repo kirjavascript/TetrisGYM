@@ -6,9 +6,10 @@
     * 999999 scorecap mode
     * Fixed T-Spin scoring
     * Crash free with no 'long frames'
+* 3 digit level counter for levels over 99
+* 4 digit line counter for lines over 999
 * Made Hard Drop instant
 * Added Sonic Drop
-* Display all level numbers 0-255 correctly in game
 * Fixed cursor moving from level 29 to 0
 * Added new screen for Speed Tester
 * Added DAS-like movement to high score entry screen

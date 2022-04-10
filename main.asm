@@ -3129,17 +3129,29 @@ render_mode_play_and_demo:
         lda outOfDateRenderFlags
         and #$01
         beq @renderLevel
+
+        lda linesBCDHigh
+        cmp #$A
+        bcs @extraLines
         lda #$20
         sta PPUADDR
         lda #$73
         sta PPUADDR
-        ; lda lines+1
-        ; sta PPUDATA
+        lda lines+1
+        sta PPUDATA
+        lda lines
+        jsr twoDigsToPPU
+        jmp @doneRenderLines
+@extraLines:
+        lda #$20
+        sta PPUADDR
+        lda #$72
+        sta PPUADDR
         lda linesBCDHigh
         jsr twoDigsToPPU
         lda lines
         jsr twoDigsToPPU
-
+@doneRenderLines:
         lda outOfDateRenderFlags
         and #$FE
         sta outOfDateRenderFlags
