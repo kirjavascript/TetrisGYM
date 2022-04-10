@@ -2021,6 +2021,7 @@ gameModeState_initGameState:
         sta completedLines ; reset during tetris bugfix
         sta presetIndex ; actually for tspinQuantity
         sta linesTileQueue
+        sta linesBCDHigh
 
         jsr clearPoints
 
@@ -3124,7 +3125,7 @@ render_mode_play_and_demo:
         jsr render_playfield
 @renderLines:
         ; 'lines-' tile queue
-        ; tile queue doesnt happen at the same frame as lines, making it free
+        ; could lazy render this to make it 'free'
         lda linesTileQueue
         beq @endLinesTileQueue
         cmp #$86
@@ -3140,7 +3141,6 @@ render_mode_play_and_demo:
         lda linesDash, x
         sta PPUDATA
         inc linesTileQueue
-        ; jmp @renderLevel
 @endLinesTileQueue:
 
         ; check if we should actually update lines
@@ -3259,12 +3259,21 @@ render_mode_play_and_demo:
         ; (lazy render hz for 10 more)
         ; 1 added in level (3 total)
         ; 2 added in lines (5 total)
+        ; independent writes;
+        ; 2 added in expand
+        ; 3 added in float
+
+        lda scoringModifier
+        cmp #SCORING_EXPAND
+        bne @noExpand
+
+        jmp @clearScoreRenderFlags
+@noExpand:
 
         ; millions
         lda scoringModifier
         cmp #SCORING_FLOAT
         bne @noFloat
-        ; 3 added in float
 
         lda #$21
         sta PPUADDR
@@ -3302,6 +3311,7 @@ render_mode_play_and_demo:
 
         jmp @clearScoreRenderFlags
 @noFloat:
+
         jsr @setupPPU
         jsr @renderSplitScore
 
