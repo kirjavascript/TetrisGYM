@@ -125,7 +125,8 @@ holdDownPoints  := $004F
 lines       := $0050
 rowY        := $0052
 linesBCDHigh := $53
-; 54, 55 free
+linesTileQueue := $54
+; 55 free
 completedLines  := $0056
 lineIndex   := $0057                        ; Iteration count of playState_checkForCompletedRows
 startHeight := $0058
@@ -1773,17 +1774,10 @@ gameModeState_initGameBackground:
         jsr copyRleNametableToPpu
         .addr   game_nametable
 
+        ; draw dot and M
         lda scoringModifier
         cmp #SCORING_FLOAT
         bne @noFloat
-        ; lda #$20
-        ; sta PPUADDR
-        ; lda #$98
-        ; sta PPUADDR
-        ; lda #$FF
-        ; sta PPUDATA
-        ; sta PPUDATA
-        ; sta PPUDATA
         lda #$21
         sta PPUADDR
         lda #$3b
@@ -2026,6 +2020,7 @@ gameModeState_initGameState:
         sta saveStateDirty
         sta completedLines ; reset during tetris bugfix
         sta presetIndex ; actually for tspinQuantity
+        sta linesTileQueue
 
         jsr clearPoints
 
@@ -3111,6 +3106,9 @@ render_playfield:
         jsr copyPlayfieldRowToVRAM
         rts
 
+linesDash:
+        .byte $15, $12, $17, $E, $1C, $24
+
 render_mode_play_and_demo:
         lda playState
         cmp #$04
@@ -3125,10 +3123,32 @@ render_mode_play_and_demo:
 @playStateNotDisplayLineClearingAnimation:
         jsr render_playfield
 @renderLines:
+        ; 'lines-' tile queue
+        ; tile queue doesnt happen at the same frame as lines, making it free
+        lda linesTileQueue
+        beq @endLinesTileQueue
+        cmp #$86
+        beq @endLinesTileQueue
+        lda #$20
+        sta PPUADDR
+        lda linesTileQueue
+        and #$F
+        sta tmpZ
+        adc #$6C
+        sta PPUADDR
+        ldx tmpZ
+        lda linesDash, x
+        sta PPUDATA
+        inc linesTileQueue
+        ; jmp @renderLevel
+@endLinesTileQueue:
+
+        ; check if we should actually update lines
         lda outOfDateRenderFlags
         and #$01
         beq @renderLevel
 
+        ; 'normal' line drawing
         lda linesBCDHigh
         cmp #$A
         bcs @extraLines
@@ -3237,8 +3257,8 @@ render_mode_play_and_demo:
 
         ; 8 safe tile writes freed from stats / hz
         ; (lazy render hz for 10 more)
-        ; 1 added in level
-        ; 1 added in lines
+        ; 1 added in level (3 total)
+        ; 2 added in lines (5 total)
 
         ; millions
         lda scoringModifier
@@ -4521,7 +4541,7 @@ incrementLines:
         inc lines+1
 
 checkLevelUp:
-        jsr calcBCDLines
+        jsr calcBCDLinesAndTileQueue
 
         lda lines
         and #$0F
@@ -4790,7 +4810,7 @@ pointsTable:
         .word   $04B0
         .word   $03E8 ; used in btype score calc
 
-calcBCDLines:
+calcBCDLinesAndTileQueue:
         lda #0
         sta tmp3
         lda lines+1
@@ -4810,6 +4830,16 @@ calcBCDLines:
         rol
         adc linesBCDHigh
         sta linesBCDHigh
+
+        ; setup tile queue
+        lda linesBCDHigh
+        cmp #$A
+        bcc @ret
+        lda linesTileQueue
+        bne @ret
+        lda #$80
+        sta linesTileQueue
+@ret:
         rts
 
 updatePlayfield:
