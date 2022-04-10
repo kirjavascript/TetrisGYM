@@ -1414,10 +1414,11 @@ menuYTmp := tmp2
         inc menuRAMCounter ; only increment RAM when config size isnt zero
 
         cmp #1
-        bne @notBool
-        jsr @renderBool
-        jmp @loopNext
-@notBool:
+        beq @renderBool
+
+        lda menuCounter
+        cmp #MODE_SCORE_DISPLAY
+        beq @renderScoreName
 
         ldx oamStagingLength
 
@@ -1464,7 +1465,64 @@ menuYTmp := tmp2
         sta spriteIndexInOamContentLookup
         jsr loadSpriteIntoOamStaging
 @boolOutOfRange:
-        rts
+        jmp @loopNext
+
+@renderScoreName:
+        ldx scoringModifier
+        lda scoreNameLookup, x
+        tax
+        lda scoreNameLookup, x
+        inx
+        sta tmpZ
+        lda tmpZ
+        asl
+        asl
+        asl
+        sta tmpX
+        lda #$E1
+        sbc tmpX
+        sta tmpX
+@scoreNameLoop:
+        ldy oamStagingLength
+        sec
+        lda #(MODE_SCORE_DISPLAY*8) + MENU_SPRITE_Y_BASE + 1
+        sbc menuScrollY
+        sta oamStaging, y
+        lda scoreNameLookup, x
+        inx
+        sta oamStaging+1, y
+        lda #$00
+        sta oamStaging+2, y
+        lda tmpX
+        clc
+        adc #$8
+        sta tmpX
+        sta oamStaging+3, y
+        ; increase OAM index
+        lda #$04
+        clc
+        adc oamStagingLength
+        sta oamStagingLength
+
+        dec tmpZ
+        lda tmpZ
+        bne @scoreNameLoop
+
+        jmp @loopNext
+
+scoreNameLookup:
+        .byte scoreNameClassic-scoreNameLookup
+        .byte scoreNameFloat-scoreNameLookup
+        .byte scoreNameExpand-scoreNameLookup
+        .byte scoreNameScorecap-scoreNameLookup
+scoreNameClassic:
+        .byte $7,'C','L','A','S','S','I','C'
+scoreNameFloat:
+        .byte $8,'M','I','L','L','I','O','N','S'
+scoreNameExpand:
+        .byte $6,'E','X','P','A','N','D'
+scoreNameScorecap:
+        .byte $6,'C','A','P','P','E','D'
 
 ; <- menu item index in A
 ; -> high byte of offset in A
