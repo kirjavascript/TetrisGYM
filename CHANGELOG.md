@@ -2,8 +2,9 @@
 ## [unreleased]
 * Complete rewrite of scoring code
     * Classic scoring; Wraparound at 2 million with letters A-J
-    * Millions counter
-    * 999999 scorecap mode
+    * Millions counter 
+    * Expanding score 
+    * 999999 scorecap 
     * Fixed T-Spin scoring
     * Crash free with no 'long frames'
 * 3 digit level counter for levels over 99
