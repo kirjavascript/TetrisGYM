@@ -65,7 +65,7 @@ INVISIBLE_TILE := $43
 TETRIMINO_X_HIDE := $EF
 
 ; menuConfigSizeLookup
-.define MENUSIZES $0, $0, $0, $0, $F, $7, $8, $C, $20, $10, $14, $4, $12, $10, $0, $0, $0, $3, $1, $1, $1, $1, $1, $1
+.define MENUSIZES $0, $0, $0, $0, $F, $7, $8, $C, $20, $10, $10, $4, $12, $10, $0, $0, $0, $3, $1, $1, $1, $1, $1, $1
 
 .macro MODENAMES
     .byte   "TETRIS"
@@ -9082,6 +9082,14 @@ practiseGameHUD:
         sta oamStaging, x
         inx
         lda tqtyCurrent, y
+        cmp #5
+        bmi @left0
+        sbc #5
+        jmp @right0
+@left0:
+        lda #6
+        sbc tqtyCurrent, y
+@right0:
         sta oamStaging, x
         inx
         lda #$02
@@ -9192,6 +9200,10 @@ prepareNextTapQuantity:
         ; playfield
         sec
         ldx tapqtyModifier
+        cpx #0
+        bne @notZero
+        ldx #4 ; default to four
+@notZero:
         lda multBy10Table, x
         sta tmp1
         lda #$c8
