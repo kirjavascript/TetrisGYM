@@ -9064,6 +9064,42 @@ practiseGameHUD:
         bne @skipPace
         jsr gameHUDPace
 @skipPace:
+
+        lda practiseType
+        cmp #MODE_TAPQTY
+        bne @skipTapQuantity
+
+        ldy #0
+        ldx oamStagingLength
+@drawQTY:
+        tya
+        asl
+        asl
+        asl
+        adc #$38
+        sta oamStaging, x
+        inx
+        lda tqtyCurrent, y
+        sta oamStaging, x
+        inx
+        lda #$02
+        sta oamStaging, x
+        inx
+        lda #$60
+        sta oamStaging, x
+        inx
+        ; increase OAM index
+        lda #$04
+        clc
+        adc oamStagingLength
+        sta oamStagingLength
+        iny
+        cpy #2
+        bmi @drawQTY
+
+
+        ; jsr gameHUDTapQuantity
+@skipTapQuantity:
         rts
 
 controllerInputDisplay:
