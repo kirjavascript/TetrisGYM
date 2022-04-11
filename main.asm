@@ -9072,11 +9072,13 @@ practiseGameHUD:
         ldy #0
         ldx oamStagingLength
 @drawQTY:
+        ; taps
         tya
         asl
         asl
         asl
-        adc #$38
+        adc #$34
+        sta tmpY
         sta oamStaging, x
         inx
         lda tqtyCurrent, y
@@ -9085,11 +9087,35 @@ practiseGameHUD:
         lda #$02
         sta oamStaging, x
         inx
-        lda #$60
+        lda #$64
         sta oamStaging, x
         inx
+
+        ; direction
+        lda tmpY
+        sta oamStaging, x
+        inx
+
+        lda tqtyCurrent, y
+        cmp #6
+        bmi @left
+        lda #$D6
+        jmp @right
+@left:
+        lda #$D7
+@right:
+        sta oamStaging, x
+        inx
+        lda #$02
+        sta oamStaging, x
+        inx
+        lda #$6E
+        sta oamStaging, x
+        inx
+
+        ; $D6 / D7 for direction
         ; increase OAM index
-        lda #$04
+        lda #$08
         clc
         adc oamStagingLength
         sta oamStagingLength
