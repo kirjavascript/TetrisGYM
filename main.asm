@@ -2082,6 +2082,8 @@ gameModeState_initGameState:
         sta presetIndex ; actually for tspinQuantity
         sta linesTileQueue
         sta linesBCDHigh
+        sta tqtyNext
+        sta tqtyCurrent
 
         jsr clearPoints
 
