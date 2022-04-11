@@ -59,7 +59,7 @@ drawTiles(buffer, lookup, `
 #a    INVISIBLE               d#
 #a    HARD DROP               d#
 #a    TAP/ROLL SPEED          d#
-#a    SCORE DISPLAY           d#
+#a    SCORING                 d#
 #a    HZ DISPLAY              d#
 #a    INPUT DISPLAY           d#
 #a    GOOFY FOOT              d#

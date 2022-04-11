@@ -10,7 +10,7 @@
 INES_MAPPER := 1 ; supports 1 and 3
 PRACTISE_MODE := 1
 NO_MUSIC := 1
-AUTO_WIN := 1
+AUTO_WIN := 0
 NO_SCORING := 0
 DEV_MODE := 0
 
@@ -65,7 +65,7 @@ INVISIBLE_TILE := $43
 TETRIMINO_X_HIDE := $EF
 
 ; menuConfigSizeLookup
-.define MENUSIZES $0, $0, $0, $0, $F, $7, $8, $C, $20, $10, $1, $4, $12, $10, $0, $0, $0, $3, $1, $1, $1, $1, $1, $1
+.define MENUSIZES $0, $0, $0, $0, $F, $7, $8, $C, $20, $10, $14, $4, $12, $10, $0, $0, $0, $3, $1, $1, $1, $1, $1, $1
 
 .macro MODENAMES
     .byte   "TETRIS"
@@ -263,6 +263,8 @@ hzTapDirection := hzRAM+4 ; 1 byte
 hzResult := hzRAM+5 ; 2 byte
 hzSpawnDelay := hzRAM+7 ; 2 byte
 hzPalette := hzRAM+8 ; 1 byte
+tqtyCurrent := $621
+tqtyNext := $622
 
 ; ... $67F
 musicStagingSq1Lo:= $0680
@@ -1518,7 +1520,7 @@ scoreNameLookup:
 scoreNameClassic:
         .byte $7,'C','L','A','S','S','I','C'
 scoreNameFloat:
-        .byte $8,'M','I','L','L','I','O','N','S'
+        .byte $1,'M'
 scoreNameExpand:
         .byte $6,'E','X','P','A','N','D'
 scoreNameScorecap:
@@ -3838,6 +3840,9 @@ pickTetriminoPre:
         cmp #MODE_SEED
         beq pickTetriminoSeed
         lda practiseType
+        cmp #MODE_TAPQTY
+        beq pickTetriminoLongbar
+        lda practiseType
         cmp #MODE_TAP
         beq pickTetriminoLongbar
         lda practiseType
@@ -4589,6 +4594,10 @@ playState_updateLinesAndStatistics:
         lda outOfDateRenderFlags
         ora #$01
         sta outOfDateRenderFlags
+
+; patch tapquantity data
+        lda tqtyNext
+        sta tqtyCurrent
 
 ; type-b lines decrement
         lda practiseType
@@ -8998,6 +9007,11 @@ practiseRowCompletePatch:
 
 practisePrepareNext:
         lda practiseType
+        cmp #MODE_TAPQTY
+        bne @skipTapQuantity
+        jsr prepareNextTapQuantity
+@skipTapQuantity:
+        lda practiseType
         cmp #MODE_PACE
         bne @skipPace
         jsr prepareNextPace
@@ -9091,7 +9105,6 @@ controllerInputDisplayX:
         bmi @inputLoop
         rts
 
-
 clearPlayfield:
         lda #EMPTY_TILE
         ldx #$C8
@@ -9101,89 +9114,77 @@ clearPlayfield:
         bne @loop
         rts
 
+prepareNextTapQuantity:
+; patch in @linesCleared
+@checkEqual:
+        lda tqtyNext
+        cmp tqtyCurrent
+        bne @notEqual
+        jsr random10
+        sta tqtyNext
+        jmp @checkEqual
+@notEqual:
 
-; ; TODO: move ram and cleanup
-; tqtyCurrent := $8
-; tqtyNext := $9
+        ; playfield
+        sec
+        ldx tapqtyModifier
+        lda multBy10Table, x
+        sta tmp1
+        lda #$c8
+        sbc tmp1
+        sta tmp1 ; starting offset
 
-; rowCompleteTapQuantity:
-;         lda completedLines
-;         beq @noCompleted
-;         lda tqtyNext
-;         sta tqtyCurrent
-; @noCompleted:
-;         rts
+        ldx #0
+@drawLoop:
+        lda #BLOCK_TILES
+        cpx tmp1
+        bcs @saveMino
+        lda #EMPTY_TILE
+@saveMino:
+        sta playfield, x
+        inx
+        cpx #$c8
+        bcc @drawLoop
 
-; prepareTapQuantity:
-; @checkEqual:
-;         lda tqtyNext
-;         cmp tqtyCurrent
-;         bne @notEqual
-;         jsr random10
-;         sta tqtyNext
-;         jmp @checkEqual
-; @notEqual:
+        ; wells
+        clc
+        lda tmp1
+        tax
+@nextLoop:
+        txa
+        adc tqtyCurrent
+        tay
+        lda #EMPTY_TILE
+        sta playfield, y
 
-;         ; playfield
-;         sec
-;         ldx #4 ; height
-;         lda multBy10Table, x
-;         sta tmp1
-;         lda #$c8
-;         sbc tmp1
-;         sta tmp1 ; starting offset
+        txa
+        adc tqtyNext
+        tay
+        lda #BLOCK_TILES+1
+        sta playfield, y
 
-;         ldx #0
-; @drawLoop:
-;         lda #BLOCK_TILES
-;         cpx tmp1
-;         bcs @saveMino
-;         lda #EMPTY_TILE
-; @saveMino:
-;         sta playfield, x
-;         inx
-;         cpx #$c8
-;         bcc @drawLoop
+        txa
+        adc #10
+        tax
+        cpx #$c8
+        bcc @nextLoop
 
-;         ; wells
-;         clc
-;         lda tmp1
-;         tax
-; @nextLoop:
-;         txa
-;         adc tqtyCurrent
-;         tay
-;         lda #EMPTY_TILE
-;         sta playfield, y
-
-;         txa
-;         adc tqtyNext
-;         tay
-;         lda #BLOCK_TILES+3
-;         sta playfield, y
-
-;         txa
-;         adc #10
-;         tax
-;         cpx #$c8
-;         bcc @nextLoop
-
-;         ; check correct
-;         ; lda currentPiece
-;         ; cmp #$11
-;         ; bne @incomplete
-;         ; lda tetriminoY
-;         ; cmp #$12
-;         ; bcc @incomplete
-;         ; lda playState
-;         ; cmp #$1
-;         ; bne @incomplete
-;         ; lda tqtyNext
-;         ; sta tqtyCurrent
-;         ; lda #$3
-;         ; sta playState
-; ; @incomplete:
-;         rts
+        ; check correct
+        lda currentPiece
+        cmp #$11
+        bne @incomplete
+        lda tetriminoY
+        cmp #$12
+        bcc @incomplete
+        lda playState
+        cmp #$1
+        bne @incomplete
+        lda tqtyNext
+        sta tqtyCurrent
+        lda #$3
+        sta playState
+@incomplete:
+        rts
 
 advanceGamePreset:
         jsr clearPlayfield
