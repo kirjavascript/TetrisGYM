@@ -1,6 +1,6 @@
 # Changelog
 ## [unreleased]
-* Complete rewrite of scoring code
+* Complete rewrite of all scoring code
     * Classic scoring; Wraparound at 2 million with letters A-J
     * Millions counter 
     * Expanding score 

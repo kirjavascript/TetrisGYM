@@ -4885,6 +4885,7 @@ addLineClearPoints:
 @noFloat:
 
         ; classic score
+        ; lda scoringModifier
         cmp #SCORING_CLASSIC
         bne @ret
         lda #0
@@ -4914,8 +4915,7 @@ addLineClearPoints:
 
 
 pointsTable:
-        .word   $0000,$0028,$0064,$012C
-        .word   $04B0
+        .word   $0000,$0028,$0064,$012C,$04B0
         .word   $03E8 ; used in btype score calc
 
 calcBCDLinesAndTileQueue:
@@ -9083,13 +9083,13 @@ practiseGameHUD:
         inx
         lda tqtyCurrent, y
         cmp #5
-        bmi @left0
+        bmi @right0
         sbc #5
-        jmp @right0
-@left0:
+        jmp @left0
+@right0:
         lda #6
         sbc tqtyCurrent, y
-@right0:
+@left0:
         sta oamStaging, x
         inx
         lda #$02
@@ -9106,12 +9106,12 @@ practiseGameHUD:
 
         lda tqtyCurrent, y
         cmp #6
-        bmi @left
+        bmi @right
         lda #$D6
-        jmp @right
-@left:
-        lda #$D7
+        jmp @left
 @right:
+        lda #$D7
+@left:
         sta oamStaging, x
         inx
         lda #$02
