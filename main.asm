@@ -9763,11 +9763,13 @@ random10:
         ldx #rng_seed
         ldy #$02
         jsr generateNextPseudorandomNumber
+        ldx #rng_seed
+        ldy #$02
+        jsr generateNextPseudorandomNumber
+        ldx #rng_seed
+        ldy #$02
+        jsr generateNextPseudorandomNumber
         lda rng_seed
-        ror
-        ror
-        ror
-        ror
         and #$0F
         cmp #$0A
         bpl random10
