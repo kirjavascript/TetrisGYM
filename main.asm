@@ -9764,6 +9764,10 @@ random10:
         ldy #$02
         jsr generateNextPseudorandomNumber
         lda rng_seed
+        ror
+        ror
+        ror
+        ror
         and #$0F
         cmp #$0A
         bpl random10
