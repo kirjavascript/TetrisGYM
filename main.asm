@@ -3873,6 +3873,19 @@ pickTetriminoSeed:
 
         ; SPSv3
 
+        ; v3: check for 0000 and do something special
+        lda set_seed_input
+        bne @normalRNG
+        lda set_seed_input+1
+        bne @normalRNG
+        lda set_seed_input+2
+        and #7
+        tax
+        lda spawnTable, x
+        sta spawnID
+        rts
+@normalRNG:
+
         lda set_seed_input+2
         ror
         ror
