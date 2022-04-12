@@ -1852,7 +1852,6 @@ gameModeState_initGameBackground:
         sta PPUDATA
 @noFloat:
 
-
         jsr showPaceDiffText
         beq @skipTop
         lda #$20
@@ -2082,8 +2081,14 @@ gameModeState_initGameState:
         sta presetIndex ; actually for tspinQuantity
         sta linesTileQueue
         sta linesBCDHigh
+
+        lda practiseType
+        cmp #MODE_TAPQTY
+        bne @noTapQty
+        jsr random10
         sta tqtyNext
         sta tqtyCurrent
+@noTapQty:
 
         jsr clearPoints
 
@@ -2148,6 +2153,7 @@ gameModeState_initGameState:
 @noTypeBPlayfield:
 
         jsr hzStart
+        jsr practiseInitGameState
 
         ldx musicType
         lda musicSelectionTable,x
@@ -9009,11 +9015,6 @@ practiseRowCompletePatch:
 
 practisePrepareNext:
         lda practiseType
-        cmp #MODE_TAPQTY
-        bne @skipTapQuantity
-        jsr prepareNextTapQuantity
-@skipTapQuantity:
-        lda practiseType
         cmp #MODE_PACE
         bne @skipPace
         jsr prepareNextPace
@@ -9028,6 +9029,12 @@ practisePrepareNext:
         bne @skipParity
         jsr prepareNextParity
 @skipParity:
+practiseInitGameState:
+        lda practiseType
+        cmp #MODE_TAPQTY
+        bne @skipTapQuantity
+        jsr prepareNextTapQuantity
+@skipTapQuantity:
         rts
 
 practiseAdvanceGame:
