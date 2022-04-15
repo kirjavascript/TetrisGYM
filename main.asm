@@ -9782,6 +9782,9 @@ random10:
         ldx #rng_seed
         ldy #$02
         jsr generateNextPseudorandomNumber
+        ldx #rng_seed
+        ldy #$02
+        jsr generateNextPseudorandomNumber
         lda rng_seed
         and #$0F
         cmp #$0A
