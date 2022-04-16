@@ -126,7 +126,7 @@ lines       := $0050
 rowY        := $0052
 linesBCDHigh := $53
 linesTileQueue := $54
-; 55 free
+; $55 free
 completedLines  := $0056
 lineIndex   := $0057                        ; Iteration count of playState_checkForCompletedRows
 startHeight := $0058
@@ -335,7 +335,10 @@ menuScrollY := menuRAM+1
 menuMoveThrottle := menuRAM+2
 menuThrottleTmp := menuRAM+3
 menuPaletteDelay := menuRAM+4
-menuVars := $765
+levelControlMode  := menuRAM+5
+customLevel := menuRAM+6
+heartsAndReady := menuRAM+7
+menuVars := $768
 paceModifier := menuVars+0
 presetModifier := menuVars+1
 typeBModifier := menuVars+2
@@ -805,11 +808,16 @@ gameMode_bootScreen: ; boot
         sta practiseType
         sta menuSeedCursorIndex
 
+        ; levelMenu stuff
+        sta levelControlMode
+        lda #29
+        sta customLevel
+
         ; detect region
         ; jsr updateAudioWaitForNmiAndDisablePpuRendering
         jsr checkRegion
 
-        ; check if qualMode is alredy set
+        ; check if qualMode is already set
         lda qualFlag
         bne @qualBoot
         ; hold select to start in qual mode
@@ -1660,13 +1668,7 @@ gameMode_levelMenu:
         sta originalY
         sta dropSpeed
 @forceStartLevelToRange:
-        ; account for level 29 when loading
         lda startLevel
-        cmp #29
-        beq @for29
-        cmp #$A
-        beq @for29
-
         cmp #$0A
         bcc gameMode_levelMenu_processPlayer1Navigation
         sec
@@ -1674,35 +1676,51 @@ gameMode_levelMenu:
         sta startLevel
         jmp @forceStartLevelToRange
 
-@for29:
-        lda #$0A
-        sta startLevel
-
 gameMode_levelMenu_processPlayer1Navigation:
+        ; customlevel
+
+; levelControlMode  := menuRAM+5
+; customLevel := menuRAM+6
+; heartsAndReady := menuRAM+7
+        ldx oamStagingLength
+        lda #$4C
+        sta oamStaging, x
+        lda customLevel
+        sta oamStaging+1, x
+        lda #$01
+        sta oamStaging+2, x
+        lda #$8c
+        sta oamStaging+3, x
+        ; increase OAM index
+        lda #$04
+        clc
+        adc oamStagingLength
+        sta oamStagingLength
+
+        ; this copying is an artefact of the original
         lda newlyPressedButtons_player1
         sta newlyPressedButtons
-        jsr gameMode_levelMenu_handleLevelNavigation
+        jsr levelControl
+
         lda newlyPressedButtons_player1
         cmp #BUTTON_START
         bne @checkBPressed
-
-        ; checks for level29
-        lda startLevel
-        cmp #$A
-        bne @skip29
-        lda #29
-        sta startLevel
-        jmp @startAndANotPressed
-@skip29:
-
+        lda levelControlMode
+        cmp #1 ; custom
+        bne @normalLevel
+        lda customLevel
+        sta levelNumber
+        jmp @startGame
+@normalLevel:
         lda heldButtons_player1
         cmp #BUTTON_START+BUTTON_A
-        bne @startAndANotPressed
+        bne @startGame
         lda startLevel
         clc
         adc #$0A
         sta startLevel
-@startAndANotPressed:
+        sta levelNumber
+@startGame:
         lda #$00
         sta gameModeState
         lda #$02
@@ -1741,16 +1759,68 @@ gameMode_levelMenu_processPlayer1Navigation:
         jsr updateAudioWaitForNmiAndResetOamStaging
         jmp gameMode_levelMenu_processPlayer1Navigation
 
-; Starts by checking if right pressed
-gameMode_levelMenu_handleLevelNavigation:
+levelControl:
+        lda levelControlMode
+        jsr switch_s_plus_2a
+        .addr   levelControlNormal
+        .addr   levelControlCustomLevel
+        .addr   levelControlHearts
+
+levelControlCustomLevel:
+        lda #$80
+        sta spriteYOffset
+        lda #$00
+        sta spriteIndexInOamContentLookup
+        lda #$80
+        sta spriteXOffset
+        jsr loadSpriteIntoOamStaging
+
+        lda #BUTTON_UP
+        jsr menuThrottle
+        beq @checkDownPressed
+        lda #$01
+        sta soundEffectSlot1Init
+        inc customLevel
+@checkDownPressed:
+        lda #BUTTON_DOWN
+        jsr menuThrottle
+        beq @checkLeftPressed
+        lda #$01
+        sta soundEffectSlot1Init
+        dec customLevel
+@checkLeftPressed:
+
+        lda newlyPressedButtons
+        cmp #BUTTON_LEFT
+        bne @ret
+        lda #$01
+        sta soundEffectSlot1Init
+        lda #$0
+        sta levelControlMode
+@ret:
+        rts
+
+levelControlHearts:
+        ; TODO: flickering heart and red heart after going right
+        lda #$a0
+        sta spriteYOffset
+        lda #$00
+        sta spriteIndexInOamContentLookup
+        lda #$a0
+        sta spriteXOffset
+        jsr loadSpriteIntoOamStaging
+        rts
+
+levelControlNormal:
+        ; Starts by checking if right pressed
         lda newlyPressedButtons
         cmp #BUTTON_RIGHT
         bne @checkLeftPressed
         lda #$01
         sta soundEffectSlot1Init
         lda startLevel
-        cmp #$A ; used to be 9
-        beq @checkLeftPressed
+        cmp #$9
+        beq @toCustomLevel
         inc startLevel
 @checkLeftPressed:
         lda newlyPressedButtons
@@ -1775,6 +1845,11 @@ gameMode_levelMenu_handleLevelNavigation:
         sta startLevel
         jmp @checkUpPressed
 
+@toCustomLevel:
+        lda #1
+        sta levelControlMode
+        rts
+
 @checkUpPressed:
         lda newlyPressedButtons
         cmp #BUTTON_UP
@@ -1782,8 +1857,6 @@ gameMode_levelMenu_handleLevelNavigation:
         lda #$01
         sta soundEffectSlot1Init
         lda startLevel
-        cmp #$0A
-        beq @checkAPressed ; dont do anything on 29
         cmp #$05
         bmi @checkAPressed
         sec
@@ -1795,7 +1868,7 @@ gameMode_levelMenu_handleLevelNavigation:
         lda frameCounter
         and #$03
         beq @ret
-@showSelectionLevel:
+; @showSelectionLevel:
         ldx startLevel
         lda levelToSpriteYOffset,x
         sta spriteYOffset
@@ -1805,14 +1878,15 @@ gameMode_levelMenu_handleLevelNavigation:
         lda levelToSpriteXOffset,x
         sta spriteXOffset
         jsr loadSpriteIntoOamStaging
-@ret:   rts
+@ret:
+        rts
 
 levelToSpriteYOffset:
         .byte   $53,$53,$53,$53,$53,$63,$63,$63
-        .byte   $63,$63,$63
+        .byte   $63,$63
 levelToSpriteXOffset:
         .byte   $34,$44,$54,$64,$74,$34,$44,$54
-        .byte   $64,$74,$84
+        .byte   $64,$74
 heightToPpuHighAddr:
         .byte   $53,$53,$53,$63,$63,$63
 heightToPpuLowAddr:
@@ -2037,10 +2111,9 @@ gameModeState_initGameBackground_finish:
 .endif
         lda #$01
         sta playState
-        lda startLevel
-        sta levelNumber
         inc gameModeState
         rts
+
 
 gameModeState_initGameState:
         lda #$EF
@@ -9773,6 +9846,9 @@ randomHole:
         rts
 
 random10:
+        ldx #rng_seed
+        ldy #$02
+        jsr generateNextPseudorandomNumber
         ldx #rng_seed
         ldy #$02
         jsr generateNextPseudorandomNumber

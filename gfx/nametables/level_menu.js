@@ -34,9 +34,17 @@ printNT(buffer, lookup);
 
 // heart
 
-// XXX###a  rtutututututy         d###
-// XXX###a  f0f1f2f3f4f^h         d###
-// XXX###a  jbkbkbkbkbkbl         d###
+// ###a  rtutututututy         d###
+// ###a  f0f1f2f3f4f^h         d###
+// ###a  jbkbkbkbkbkbl         d###
+//
+// v4
+//
+// ###a  rtututututg           d###
+// ###a  f0f1f2f3f4f           d###
+// ###a  jbkbkbkbkbkb@         d###
+// ###a  f5f6f7f8f9f$h         d###
+// ###a  vbibibibibibn         d###
 
 drawTiles(buffer, lookup, `
 ################################
@@ -49,11 +57,11 @@ drawTiles(buffer, lookup, `
 ###a    ╄╅╅╅╅╅╆             d###
 ###a    ╇LEVEL╈             d###
 ###a    ╉╊╊╊╊╊╋             d###
-###a  rtututututg           d###
-###a  f0f1f2f3f4f           d###
-###a  jbkbkbkbkbkb@         d###
-###a  f5f6f7f8f9f$h         d###
-###a  vbibibibibibn         d###
+###a  rtututututy           d###
+###a  f0f1f2f3f4h           d###
+###a  jbkbkbkbkbl           d###
+###a  f5f6f7f8f9h           d###
+###a  vbibibibibn           d###
 ###a                        d###
 ###a                        d###
 ###a ###################### d###
