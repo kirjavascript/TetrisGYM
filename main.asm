@@ -1677,11 +1677,6 @@ gameMode_levelMenu:
         jmp @forceStartLevelToRange
 
 gameMode_levelMenu_processPlayer1Navigation:
-        ; customlevel
-
-; levelControlMode  := menuRAM+5
-; customLevel := menuRAM+6
-; heartsAndReady := menuRAM+7
         ldx oamStagingLength
         lda #$4C
         sta oamStaging, x
@@ -1805,14 +1800,41 @@ levelControlCustomLevel:
         rts
 
 levelControlHearts:
-        ; TODO: flickering heart and red heart after going right
-        lda #$a0
+; @blep
+    ; reuse outOfDateRenderFlags
+
+        lda #BUTTON_LEFT
+        jsr menuThrottle
+        beq @checkRightPressed
+        lda #$01
+        sta soundEffectSlot1Init
+        dec heartsAndReady
+@checkRightPressed:
+        lda #BUTTON_RIGHT
+        jsr menuThrottle
+        beq @checkLeftPressed
+        lda #$01
+        sta soundEffectSlot1Init
+        inc heartsAndReady
+@checkLeftPressed:
+
+        ; TODO: red heart after going right
+        lda frameCounter
+        and #$03
+        beq @heartEnd
+        lda #$7A
         sta spriteYOffset
-        lda #$00
-        sta spriteIndexInOamContentLookup
-        lda #$a0
+        lda heartsAndReady
+        asl
+        asl
+        asl
+        adc #$38
+        ; lda #$38
         sta spriteXOffset
+        lda #$1E
+        sta spriteIndexInOamContentLookup
         jsr loadSpriteIntoOamStaging
+@heartEnd:
 
         lda newlyPressedButtons
         cmp #BUTTON_UP
@@ -2178,6 +2200,7 @@ gameModeState_initGameState:
 @noTapQty:
 
         jsr clearPoints
+        ; 0 in A
 
         ; OEM stuff (except score stuff now)
         sta tetriminoY
@@ -2969,6 +2992,7 @@ oamContentLookup:
         .addr   spriteSeedCursor ; $1B
         .addr   sprite02Blank
         .addr   spritePractiseTypeCursor ; $1D
+        .addr   spriteHeart ; $1E
 ; Sprites are sets of 4 bytes in the OAM format, terminated by FF. byte0=y, byte1=tile, byte2=attrs, byte3=x
 ; YY AA II XX
 sprite00LevelSelectCursor:
@@ -3046,7 +3070,8 @@ spriteSeedCursor:
 spritePractiseTypeCursor:
         .byte   $00,$27,$00,$00
         .byte   $FF
-
+spriteHeart:
+        .byte   $00,$6e,$00,$00,$FF
 isPositionValid:
         lda tetriminoY
         asl a
