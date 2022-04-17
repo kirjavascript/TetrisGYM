@@ -1683,7 +1683,7 @@ gameMode_levelMenu:
         sta startLevel
         jmp @forceStartLevelToRange
 
-        lda #0
+        lda #$3
         sta outOfDateRenderFlags
 
 gameMode_levelMenu_processPlayer1Navigation:
@@ -1793,7 +1793,7 @@ levelControlCustomLevel:
         rts
 
 @changeLevel:
-        lda #$01
+        lda #$1
         sta soundEffectSlot1Init
         lda outOfDateRenderFlags
         ora #$1
@@ -1801,20 +1801,19 @@ levelControlCustomLevel:
         rts
 
 levelControlHearts:
-; @blep
-    ; reuse outOfDateRenderFlags
-
         lda #BUTTON_LEFT
         jsr menuThrottle
         beq @checkRightPressed
         lda #$01
         sta soundEffectSlot1Init
         dec heartsAndReady
+        jsr @changeHearts
 @checkRightPressed:
         lda #BUTTON_RIGHT
         jsr menuThrottle
         beq @checkLeftPressed
         inc heartsAndReady
+        jsr @changeHearts
 @checkLeftPressed:
 
         ; TODO: red heart after going right
@@ -1828,7 +1827,6 @@ levelControlHearts:
         asl
         asl
         adc #$38
-        ; lda #$38
         sta spriteXOffset
         lda #$1E
         sta spriteIndexInOamContentLookup
@@ -3164,6 +3162,29 @@ render_mode_level_menu:
         beq @noCustomLevel
 
 @noCustomLevel:
+
+        lda outOfDateRenderFlags
+        and #2
+        beq @endHearts
+        lda #$21
+        sta PPUADDR
+        clc
+        lda #$E6
+        adc heartsAndReady
+        sta PPUADDR
+        lda heartsAndReady
+        beq @wipeHeart
+        lda #$6C
+        sta PPUDATA
+        lda #$FF
+        sta PPUDATA
+        jmp @endHearts
+@wipeHeart:
+        lda #$FF
+        sta PPUDATA
+        lda #$FF
+        sta PPUDATA
+@endHearts:
 
         lda #0
         sta outOfDateRenderFlags

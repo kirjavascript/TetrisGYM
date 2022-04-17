@@ -58,9 +58,9 @@ drawTiles(buffer, lookup, `
 ###a    ╇LEVEL╈             d###
 ###a    ╉╊╊╊╊╊╋             d###
 ###a  rtututututy           d###
-###a  f0f1f2f3f4h           d###
-###a  jbkbkbkbkbl           d###
-###a  f5f6f7f8f9h           d###
+###a  f0f1f2f3f4h   rttty   d###
+###a  jbkbkbkbkbl   f   h   d###
+###a  f5f6f7f8f9h   vbbbn   d###
 ###a  vbibibibibn           d###
 ###a                        d###
 ###a                        d###
@@ -85,9 +85,9 @@ drawAttrs(buffer, [`
     2222222222222222
     2222222222222222
     2222222222222222
-    2223333333222222
-    2223333333222222
-    2223333333222222
+    2223333333333222
+    2223333333333222
+    2223333333333222
 `,`
     2222222222222222
     2222222222222222
