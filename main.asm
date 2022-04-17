@@ -1714,11 +1714,13 @@ gameMode_levelMenu_processPlayer1Navigation:
 @normalLevel:
         lda heldButtons_player1
         cmp #BUTTON_START+BUTTON_A
-        bne @startGame
+        bne @noA
         lda startLevel
         clc
         adc #$0A
         sta startLevel
+@noA:
+        lda startLevel
         sta levelNumber
 @startGame:
         lda #$00
@@ -1775,6 +1777,8 @@ levelControlCustomLevel:
         sta spriteXOffset
         jsr loadSpriteIntoOamStaging
 
+        ; TODO: A/B +/-10
+
         lda #BUTTON_UP
         jsr menuThrottle
         beq @checkDownPressed
@@ -1809,6 +1813,15 @@ levelControlHearts:
         lda #$a0
         sta spriteXOffset
         jsr loadSpriteIntoOamStaging
+
+        lda newlyPressedButtons
+        cmp #BUTTON_UP
+        bne @ret
+        lda #$01
+        sta soundEffectSlot1Init
+        lda #$0
+        sta levelControlMode
+@ret:
         rts
 
 levelControlNormal:
@@ -1839,15 +1852,16 @@ levelControlNormal:
         sta soundEffectSlot1Init
         lda startLevel
         cmp #$05
-        bpl @checkUpPressed
+        bpl @toHearts
         clc
         adc #$05
         sta startLevel
         jmp @checkUpPressed
 
+@toHearts:
+        inc levelControlMode
 @toCustomLevel:
-        lda #1
-        sta levelControlMode
+        inc levelControlMode
         rts
 
 @checkUpPressed:
