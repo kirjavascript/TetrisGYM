@@ -3161,6 +3161,54 @@ render_mode_level_menu:
         and #1
         beq @noCustomLevel
 
+        ; dedupe renderLevel
+        ; BIN_BCD
+        ; lda
+
+        lda #0
+        sta tmp3
+        lda customLevel
+@modLoop100:
+        cmp #100
+        bcc @modEnd100
+        sbc #100
+        inc tmp3
+        jmp @modLoop100
+@modEnd100:
+        sta tmp2
+
+        lda #$21
+        sta PPUADDR
+        lda #$95
+        sta PPUADDR
+
+        lda tmp3
+        beq @notHundo
+        sta PPUDATA
+        jmp @hundo
+@notHundo:
+        lda #$EF
+        sta PPUDATA
+@hundo:
+
+        lda #0
+        sta tmp3
+        lda tmp2
+@modLoop10:
+        cmp #10
+        bcc @modEnd10
+        sbc #10
+        inc tmp3
+        jmp @modLoop10
+@modEnd10:
+        sta tmp2
+        lda tmp3
+        rol
+        rol
+        rol
+        rol
+        adc tmp2
+        jsr twoDigsToPPU
 @noCustomLevel:
 
         lda outOfDateRenderFlags
@@ -4974,8 +5022,17 @@ addLineClearPoints:
         sta factorA24+1
         sta factorA24+2
         lda levelNumber
+        cmp #$FF
+        bne @noverflow
+        lda #1
+        sta factorA24+1
+        lda #0
+        sta factorA24+0
+        jmp @multSetupEnd
+@noverflow:
         adc #1
         sta factorA24
+@multSetupEnd:
 
         lda completedLines
         asl
