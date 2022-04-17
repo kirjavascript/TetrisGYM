@@ -161,7 +161,13 @@ byteSpriteLen := byteSpriteRAM+5
 spriteXOffset   := $00A0
 spriteYOffset   := $00A1
 spriteIndexInOamContentLookup:= $00A2
-outOfDateRenderFlags:= $00A3                ; Bit 0-lines 1-level 2-score 4-hz 6-stats 7-high score entry letter
+outOfDateRenderFlags:= $00A3
+; play/demo
+; Bit 0-lines 1-level 2-score 4-hz 6-stats 7-high score entry letter
+; speedtest
+; 0 - hz
+; level menu
+; 0-customLevel 1-hearts 2-ready
 
 ; ... $00A6
 gameModeState   := $00A7                    ; For values, see playState_checkForCompletedRows
@@ -450,6 +456,7 @@ render: lda renderMode
         .addr   render_mode_pause
         .addr   render_mode_rocket
         .addr   render_mode_speed_test
+        .addr   render_mode_level_menu
 initRamContinued:
         ldy #$06
         sty tmp2
@@ -1638,7 +1645,7 @@ gameMode_levelMenu:
         lda #$10
         jsr setMMC1Control
         jsr updateAudio2
-        lda #$0
+        lda #$7
         sta renderMode
         jsr updateAudioWaitForNmiAndDisablePpuRendering
         jsr disableNmi
@@ -1676,22 +1683,10 @@ gameMode_levelMenu:
         sta startLevel
         jmp @forceStartLevelToRange
 
-gameMode_levelMenu_processPlayer1Navigation:
-        ldx oamStagingLength
-        lda #$4C
-        sta oamStaging, x
-        lda customLevel
-        sta oamStaging+1, x
-        lda #$01
-        sta oamStaging+2, x
-        lda #$8c
-        sta oamStaging+3, x
-        ; increase OAM index
-        lda #$04
-        clc
-        adc oamStagingLength
-        sta oamStagingLength
+        lda #0
+        sta outOfDateRenderFlags
 
+gameMode_levelMenu_processPlayer1Navigation:
         ; this copying is an artefact of the original
         lda newlyPressedButtons_player1
         sta newlyPressedButtons
@@ -1777,16 +1772,14 @@ levelControlCustomLevel:
         lda #BUTTON_UP
         jsr menuThrottle
         beq @checkDownPressed
-        lda #$01
-        sta soundEffectSlot1Init
         inc customLevel
+        jsr @changeLevel
 @checkDownPressed:
         lda #BUTTON_DOWN
         jsr menuThrottle
         beq @checkLeftPressed
-        lda #$01
-        sta soundEffectSlot1Init
         dec customLevel
+        jsr @changeLevel
 @checkLeftPressed:
 
         lda newlyPressedButtons
@@ -1797,6 +1790,14 @@ levelControlCustomLevel:
         lda #$0
         sta levelControlMode
 @ret:
+        rts
+
+@changeLevel:
+        lda #$01
+        sta soundEffectSlot1Init
+        lda outOfDateRenderFlags
+        ora #$1
+        sta outOfDateRenderFlags
         rts
 
 levelControlHearts:
@@ -1813,8 +1814,6 @@ levelControlHearts:
         lda #BUTTON_RIGHT
         jsr menuThrottle
         beq @checkLeftPressed
-        lda #$01
-        sta soundEffectSlot1Init
         inc heartsAndReady
 @checkLeftPressed:
 
@@ -1844,6 +1843,14 @@ levelControlHearts:
         lda #$0
         sta levelControlMode
 @ret:
+        rts
+
+@changeHearts:
+        lda #$01
+        sta soundEffectSlot1Init
+        lda outOfDateRenderFlags
+        ora #$2
+        sta outOfDateRenderFlags
         rts
 
 levelControlNormal:
@@ -3150,6 +3157,16 @@ render_mode_speed_test:
         lda #$0
         sta PPUSCROLL
         rts
+
+render_mode_level_menu:
+        lda outOfDateRenderFlags
+        and #1
+        beq @noCustomLevel
+
+@noCustomLevel:
+
+        lda #0
+        sta outOfDateRenderFlags
 
 render_mode_static:
         lda currentPpuCtrl
