@@ -12,7 +12,6 @@
     * Crash free with no 'long frames'
 * 3 digit level counter for levels over 99
 * 4 digit line counter for lines over 999
-* Fixed cursor moving from level 29 to 0
 * Added new screen for Speed Tester
 * Added DAS-like movement to high score entry screen
 * Readded original broken colours from level 138+

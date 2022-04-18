@@ -1691,6 +1691,7 @@ gameMode_levelMenu_processPlayer1Navigation:
         lda newlyPressedButtons_player1
         sta newlyPressedButtons
         jsr levelControl
+        jsr levelMenuRenderHearts
 
         lda newlyPressedButtons_player1
         cmp #BUTTON_START
@@ -1829,23 +1830,6 @@ levelControlHearts:
         jsr @changeHearts
 @checkLeftPressed:
 
-        ; TODO: red heart after going right
-        lda frameCounter
-        and #$03
-        beq @heartEnd
-        lda #$7A
-        sta spriteYOffset
-        lda heartsAndReady
-        asl
-        asl
-        asl
-        adc #$38
-        sta spriteXOffset
-        lda #$1E
-        sta spriteIndexInOamContentLookup
-        jsr loadSpriteIntoOamStaging
-@heartEnd:
-
         lda newlyPressedButtons
         cmp #BUTTON_UP
         bne @ret
@@ -1859,9 +1843,6 @@ levelControlHearts:
 @changeHearts:
         lda #$01
         sta soundEffectSlot1Init
-        lda outOfDateRenderFlags
-        ora #$2
-        sta outOfDateRenderFlags
         rts
 
 levelControlNormal:
@@ -1935,6 +1916,38 @@ levelControlNormal:
 @ret:
         rts
 
+levelMenuRenderHearts:
+        ; render
+        lda #$1E
+        sta spriteIndexInOamContentLookup
+        lda #$7A
+        sta spriteYOffset
+        lda #$38
+        sta spriteXOffset
+        lda heartsAndReady
+        sta tmpZ
+@heartLoop:
+        lda tmpZ
+        beq @heartEnd
+        jsr loadSpriteIntoOamStaging
+        lda spriteXOffset
+        adc #$A
+        sta spriteXOffset
+        dec tmpZ
+        bcc @heartLoop
+@heartEnd:
+
+        lda levelControlMode
+        cmp #2
+        bne @skipCursor
+        lda frameCounter
+        and #$03
+        beq @skipCursor
+        lda #$1F
+        sta spriteIndexInOamContentLookup
+        jsr loadSpriteIntoOamStaging
+@skipCursor:
+        rts
 levelToSpriteYOffset:
         .byte   $53,$53,$53,$53,$53,$63,$63,$63
         .byte   $63,$63
@@ -3010,7 +3023,8 @@ oamContentLookup:
         .addr   spriteSeedCursor ; $1B
         .addr   sprite02Blank
         .addr   spritePractiseTypeCursor ; $1D
-        .addr   spriteHeart ; $1E
+        .addr   spriteHeartCursor ; $1E
+        .addr   spriteHeart ; $1F
 ; Sprites are sets of 4 bytes in the OAM format, terminated by FF. byte0=y, byte1=tile, byte2=attrs, byte3=x
 ; YY AA II XX
 sprite00LevelSelectCursor:
@@ -3088,6 +3102,8 @@ spriteSeedCursor:
 spritePractiseTypeCursor:
         .byte   $00,$27,$00,$00
         .byte   $FF
+spriteHeartCursor:
+        .byte   $00,$6c,$00,$00,$FF
 spriteHeart:
         .byte   $00,$6e,$00,$00,$FF
 isPositionValid:
@@ -3179,33 +3195,9 @@ render_mode_level_menu:
         sta PPUADDR
         lda customLevel
         jsr renderByteBCD
-@noCustomLevel:
-
-        lda outOfDateRenderFlags
-        and #2
-        beq @endHearts
-        lda #$21
-        sta PPUADDR
-        clc
-        lda #$E6
-        adc heartsAndReady
-        sta PPUADDR
-        lda heartsAndReady
-        beq @wipeHeart
-        lda #$6C
-        sta PPUDATA
-        lda #$FF
-        sta PPUDATA
-        jmp @endHearts
-@wipeHeart:
-        lda #$FF
-        sta PPUDATA
-        lda #$FF
-        sta PPUDATA
-@endHearts:
-
         lda #0
         sta outOfDateRenderFlags
+@noCustomLevel:
 
 render_mode_static:
         lda currentPpuCtrl
@@ -6344,7 +6336,7 @@ title_palette:
 menu_palette:
         .byte   $3F,$00,$14,$0F,$30,$38,$26,$0F
         .byte   $17,$27,$37,$0F,$30,$12,$00,$0F
-        .byte   $16,$2A,$28,$0F,$30,$26,$27,$FF
+        .byte   $16,$2A,$28,$0F,$16,$26,$27,$FF
 rocket_palette:
         .byte   $3F,$11,$7, $16,$2A,$28,$0f,$37,$18,$38 ; sprite
         .byte   $3F,$00,$8, $0f,$3C,$38,$00,$0F,$20,$12,$15 ; bg
