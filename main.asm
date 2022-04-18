@@ -3156,18 +3156,9 @@ render_mode_speed_test:
         sta PPUSCROLL
         rts
 
-render_mode_level_menu:
-        lda outOfDateRenderFlags
-        and #1
-        beq @noCustomLevel
-
-        ; dedupe renderLevel
-        ; BIN_BCD
-        ; lda
-
-        lda #0
-        sta tmp3
-        lda customLevel
+byte_bcd:
+        ldx #0
+        stx tmp3
 @modLoop100:
         cmp #100
         bcc @modEnd100
@@ -3176,11 +3167,6 @@ render_mode_level_menu:
         jmp @modLoop100
 @modEnd100:
         sta tmp2
-
-        lda #$21
-        sta PPUADDR
-        lda #$95
-        sta PPUADDR
 
         lda tmp3
         beq @notHundo
@@ -3203,12 +3189,21 @@ render_mode_level_menu:
 @modEnd10:
         sta tmp2
         lda tmp3
-        rol
-        rol
-        rol
-        rol
-        adc tmp2
-        jsr twoDigsToPPU
+        sta PPUDATA
+        lda tmp2
+        sta PPUDATA
+        rts
+
+render_mode_level_menu:
+        lda outOfDateRenderFlags
+        and #1
+        beq @noCustomLevel
+        lda #$21
+        sta PPUADDR
+        lda #$95
+        sta PPUADDR
+        lda customLevel
+        jsr byte_bcd
 @noCustomLevel:
 
         lda outOfDateRenderFlags
@@ -3450,50 +3445,12 @@ render_mode_play_and_demo:
         cmp #MODE_TYPEB
         beq @renderLevelTypeB
 
-        lda #0
-        sta tmp3
-        lda levelNumber
-@modLoop100:
-        cmp #100
-        bcc @modEnd100
-        sbc #100
-        inc tmp3
-        jmp @modLoop100
-@modEnd100:
-        sta tmp2
-
         lda #$22
         sta PPUADDR
         lda #$B9
         sta PPUADDR
-
-        lda tmp3
-        beq @notHundo
-        sta PPUDATA
-        jmp @hundo
-@notHundo:
-        lda #$EF
-        sta PPUDATA
-@hundo:
-
-        lda #0
-        sta tmp3
-        lda tmp2
-@modLoop10:
-        cmp #10
-        bcc @modEnd10
-        sbc #10
-        inc tmp3
-        jmp @modLoop10
-@modEnd10:
-        sta tmp2
-        lda tmp3
-        rol
-        rol
-        rol
-        rol
-        adc tmp2
-        jsr twoDigsToPPU
+        lda levelNumber
+        jsr byte_bcd
         jmp @renderLevelEnd
 
 @renderLevelTypeB:
