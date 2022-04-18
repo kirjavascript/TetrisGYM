@@ -3156,44 +3156,6 @@ render_mode_speed_test:
         sta PPUSCROLL
         rts
 
-byte_bcd:
-        ldx #0
-        stx tmp3
-@modLoop100:
-        cmp #100
-        bcc @modEnd100
-        sbc #100
-        inc tmp3
-        jmp @modLoop100
-@modEnd100:
-        sta tmp2
-
-        lda tmp3
-        beq @notHundo
-        sta PPUDATA
-        jmp @hundo
-@notHundo:
-        lda #$EF
-        sta PPUDATA
-@hundo:
-
-        lda #0
-        sta tmp3
-        lda tmp2
-@modLoop10:
-        cmp #10
-        bcc @modEnd10
-        sbc #10
-        inc tmp3
-        jmp @modLoop10
-@modEnd10:
-        sta tmp2
-        lda tmp3
-        sta PPUDATA
-        lda tmp2
-        sta PPUDATA
-        rts
-
 render_mode_level_menu:
         lda outOfDateRenderFlags
         and #1
@@ -3203,7 +3165,7 @@ render_mode_level_menu:
         lda #$95
         sta PPUADDR
         lda customLevel
-        jsr byte_bcd
+        jsr renderByteBCD
 @noCustomLevel:
 
         lda outOfDateRenderFlags
@@ -3450,7 +3412,7 @@ render_mode_play_and_demo:
         lda #$B9
         sta PPUADDR
         lda levelNumber
-        jsr byte_bcd
+        jsr renderByteBCD
         jmp @renderLevelEnd
 
 @renderLevelTypeB:
@@ -3752,6 +3714,37 @@ twoDigsToPPU:
         lda generalCounter
         and #$0F
         sta PPUDATA
+        rts
+
+renderByteBCD:
+        sta tmpZ
+        cmp #200
+        bcc @maybe100
+        lda #2
+        sta PPUDATA
+        lda tmpZ
+        sbc #200
+        jmp @byte
+
+@maybe100:
+        cmp #100
+        bcc @not100
+        lda #1
+        sta PPUDATA
+        lda tmpZ
+        sbc #100
+        jmp @byte
+
+@not100:
+        lda #$EF
+        sta PPUDATA
+        lda tmpZ
+        jmp @byte
+
+@byte:
+        tax
+        lda byteToBcdTable, x
+        jsr twoDigsToPPU
         rts
 
 copyPlayfieldRowToVRAM:
@@ -5460,6 +5453,10 @@ byteToBcdTable: ; original goes to 49
         .byte   $32,$33,$34,$35,$36,$37,$38,$39
         .byte   $40,$41,$42,$43,$44,$45,$46,$47
         .byte   $48,$49
+        ; 50 extra bytes is shorter than a conversion routine
+        ; (used in renderByteBCD
+        .byte   $50, $51, $52, $53, $54, $55, $56, $57, $58, $59, $60, $61, $62, $63, $64, $65, $66, $67, $68, $69, $70, $71, $72, $73, $74, $75, $76, $77, $78, $79, $80, $81, $82, $83, $84, $85, $86, $87, $88, $89, $90, $91, $92, $93, $94, $95, $96, $97, $98, $99
+
 
 ; Adjusts high score table and handles data entry, if necessary
 handleHighScoreIfNecessary:
