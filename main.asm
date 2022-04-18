@@ -1774,8 +1774,14 @@ levelControlCustomLevel:
         jsr loadSpriteIntoOamStaging
 @indicatorEnd:
 
-        ; TODO: A/B +/-10
-
+        lda #BUTTON_A
+        jsr menuThrottle
+        beq @checkUpPressed
+        lda customLevel
+        adc #$A
+        sta customLevel
+        jsr @changeLevel
+@checkUpPressed:
         lda #BUTTON_UP
         jsr menuThrottle
         beq @checkDownPressed
@@ -3425,11 +3431,10 @@ render_mode_play_and_demo:
 @renderLevelTypeB:
         lda #$22
         sta PPUADDR
-        lda #$B9
+        lda #$B8
         sta PPUADDR
-        ldx levelNumber
-        lda levelDisplayTable,x ; only needs 0 - 19
-        jsr twoDigsToPPU
+        lda levelNumber
+        jsr renderByteBCD
         lda #$24
         sta PPUDATA
         lda typeBModifier
