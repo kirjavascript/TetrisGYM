@@ -10,7 +10,7 @@
 INES_MAPPER := 1 ; supports 1 and 3
 PRACTISE_MODE := 1
 NO_MUSIC := 1
-AUTO_WIN := 0
+AUTO_WIN := 1
 NO_SCORING := 0
 DEV_MODE := 0
 
@@ -3452,12 +3452,18 @@ render_mode_play_and_demo:
         ; 2 added in expand
         ; 3 added in float
 
+        ; scorecap
+        lda scoringModifier
+        cmp #SCORING_SCORECAP
+        bne @noScoreCap
+        jsr renderScoreCap
+        jmp @clearScoreRenderFlags
+@noScoreCap:
+
         lda scoringModifier
         cmp #SCORING_EXPAND
         bne @noExpand
-        jsr @renderExpand
-        jsr @setupPPU
-        jsr @renderBCDScore
+        jsr renderExpand
         jmp @clearScoreRenderFlags
 @noExpand:
 
@@ -3465,47 +3471,11 @@ render_mode_play_and_demo:
         lda scoringModifier
         cmp #SCORING_FLOAT
         bne @noFloat
-
-        lda #$21
-        sta PPUADDR
-        lda #$39
-        sta PPUADDR
-        lda score+3
-        cmp #$A
-        bcc @notTen
-        lda score+3
-        jsr twoDigsToPPU
-        jmp @hundredThousands
-@notTen:
-        lda #$FF
-        sta PPUDATA
-        lda score+3
-        and #$F
-        sta PPUDATA
-@hundredThousands:
-
-        lda #$21
-        sta PPUADDR
-        lda #$3c
-        sta PPUADDR
-        clc
-        lda score+2
-        and #$F0
-        ror
-        ror
-        ror
-        ror
-        sta PPUDATA
-
-        jsr @setupPPU
-        jsr @renderBCDScore
-
+        jsr renderFloat
         jmp @clearScoreRenderFlags
 @noFloat:
 
-@renderClassicScore:
-        jsr @setupPPU
-        jsr @renderSplitScore
+        jsr renderClassicScore
 
 @clearScoreRenderFlags:
         lda outOfDateRenderFlags
@@ -3522,53 +3492,6 @@ render_mode_play_and_demo:
         lda outOfDateRenderFlags
         and #$EF
         sta outOfDateRenderFlags
-
-; some extra routines live hear to make jumps short enough
-        jmp @codegap
-; util functions
-@setupPPU:
-        lda #$21
-        sta PPUADDR
-        lda #$18
-        sta PPUADDR
-        rts
-@renderBCDScore:
-        lda score+2
-        jsr twoDigsToPPU
-        jmp @renderLowScore
-@renderSplitScore:
-        lda score+3
-        sta PPUDATA
-        lda score+2
-        sta PPUDATA
-@renderLowScore:
-        lda score+1
-        jsr twoDigsToPPU
-        lda score
-        jsr twoDigsToPPU
-        rts
-; actual renderers
-@renderExpand:
-        lda score+3
-        beq @renderClassicScore
-        cmp #$A
-        bcc @oneExtraDigit
-        lda #$21
-        sta PPUADDR
-        lda #$16
-        sta PPUADDR
-        lda score+3
-        jsr twoDigsToPPU
-        jmp @renderClassicScore
-@oneExtraDigit:
-        lda #$21
-        sta PPUADDR
-        lda #$17
-        sta PPUADDR
-        lda score+3
-        sta PPUDATA
-        rts
-@codegap:
 
         ; run a patched version of the stats
 @renderStatsHz:
@@ -3700,6 +3623,99 @@ multBy10Table:
         .byte   $00,$0A,$14,$1E,$28,$32,$3C,$46
         .byte   $50,$5A,$64,$6E,$78,$82,$8C,$96
         .byte   $A0,$AA,$B4,$BE
+
+scoreSetupPPU:
+        lda #$21
+        sta PPUADDR
+        lda #$18
+        sta PPUADDR
+        rts
+renderBCDScore:
+        jsr scoreSetupPPU
+        lda score+2
+        jsr twoDigsToPPU
+        jmp renderLowScore
+renderClassicScore:
+        jsr scoreSetupPPU
+        lda score+3
+        sta PPUDATA
+        lda score+2
+        sta PPUDATA
+renderLowScore:
+        lda score+1
+        jsr twoDigsToPPU
+        lda score
+        jsr twoDigsToPPU
+        rts
+
+renderScoreCap:
+        lda score+3
+        beq renderBCDScore
+        jsr scoreSetupPPU
+        lda #$99
+        jsr twoDigsToPPU
+        lda #$99
+        jsr twoDigsToPPU
+        lda #$99
+        jsr twoDigsToPPU
+        rts
+
+renderExpand:
+        lda score+3
+        beq renderClassicScore
+        cmp #$A
+        bcc @oneExtraDigit
+        lda #$21
+        sta PPUADDR
+        lda #$16
+        sta PPUADDR
+        lda score+3
+        jsr twoDigsToPPU
+        jmp renderClassicScore
+@oneExtraDigit:
+        lda #$21
+        sta PPUADDR
+        lda #$17
+        sta PPUADDR
+        lda score+3
+        sta PPUDATA
+        jsr renderBCDScore
+        rts
+
+renderFloat:
+        lda #$21
+        sta PPUADDR
+        lda #$39
+        sta PPUADDR
+        lda score+3
+        cmp #$A
+        bcc @notTen
+        lda score+3
+        jsr twoDigsToPPU
+        jmp @hundredThousands
+@notTen:
+        lda #$FF
+        sta PPUDATA
+        lda score+3
+        and #$F
+        sta PPUDATA
+@hundredThousands:
+
+        lda #$21
+        sta PPUADDR
+        lda #$3c
+        sta PPUADDR
+        clc
+        lda score+2
+        and #$F0
+        ror
+        ror
+        ror
+        ror
+        sta PPUDATA
+        jsr renderBCDScore
+        rts
+
 ; addresses
 vramPlayfieldRows:
         .word   $20C6,$20E6,$2106,$2126
@@ -5036,24 +5052,9 @@ addLineClearPoints:
         lda bcd32+3
         sta score+3
 
-        ; scorecap
+        ; dont break score+0, pushDownPoints uses it
 
         lda scoringModifier
-        cmp #SCORING_SCORECAP
-        bne @noScoreCap
-        lda score+3
-        beq @noScoreCap
-        lda #$99
-        sta score+0
-        sta score+1
-        lda #9
-        sta score+2
-        lda #9
-        sta score+3
-        rts
-@noScoreCap:
-
-        ; lda scoringModifier
         cmp #SCORING_FLOAT
         bne @noFloat
         rts
