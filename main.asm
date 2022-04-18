@@ -328,10 +328,13 @@ soundEffectSlot3Playing:= $06FB
 soundEffectSlot4Playing:= $06FC
 currentlyPlayingMusicTrack:= $06FD          ; Copied from musicTrack
 unreferenced_soundRngTmp:= $06FF
-highScoreNames  := $0700
-highScoreScoresA:= $0730
+highscores := $700
+highScoreNames  := highscores
+highScoreNamesLength := 6 * 3
+highScoreScoresA:= highscores+highScoreNamesLength
+highScoreScoresALength := 9
 ; highScoreScoresB:= $073C
-highScoreLevels := $0748
+highScoreLevels := highscores+highScoreNamesLength+highScoreScoresALength
 ; .. bunch of unused stuff: highScoreNames sized
 initMagic   := $0750                        ; Initialized to a hard-coded number. When resetting, if not correct number then it knows this is a cold boot
 
@@ -5366,7 +5369,7 @@ playState_noop:
         rts
 
 showHighScores:
-        jsr bulkCopyToPpu      ;not using @-label due to MMC1_Control in PAL
+        jsr bulkCopyToPpu
         .addr   high_scores_nametable
         lda #$00
         sta generalCounter2
@@ -5429,8 +5432,6 @@ showHighScores:
         lda generalCounter2
         cmp #$03
         beq showHighScores_ret
-        cmp #$07
-        beq showHighScores_ret
         jmp @copyEntry
 
 showHighScores_ret:  rts
@@ -5455,7 +5456,7 @@ byteToBcdTable: ; original goes to 49
         .byte   $48,$49
         ; 50 extra bytes is shorter than a conversion routine
         ; (used in renderByteBCD)
-        .byte   $50, $51, $52, $53, $54, $55, $56, $57, $58, $59, $60, $61, $62, $63, $64, $65, $66, $67, $68, $69, $70, $71, $72, $73, $74, $75, $76, $77, $78, $79, $80, $81, $82, $83, $84, $85, $86, $87, $88, $89, $90, $91, $92, $93, $94, $95, $96, $97, $98, $99
+        .byte   $50,$51,$52,$53,$54,$55,$56,$57,$58,$59,$60,$61,$62,$63,$64,$65,$66,$67,$68,$69,$70,$71,$72,$73,$74,$75,$76,$77,$78,$79,$80,$81,$82,$83,$84,$85,$86,$87,$88,$89,$90,$91,$92,$93,$94,$95,$96,$97,$98,$99
 
 
 ; Adjusts high score table and handles data entry, if necessary
@@ -6339,35 +6340,18 @@ menu_palette:
         .byte   $17,$27,$37,$0F,$30,$12,$00,$0F
         .byte   $16,$2A,$28,$0F,$16,$26,$27,$FF
 rocket_palette:
-        .byte   $3F,$11,$7, $16,$2A,$28,$0f,$37,$18,$38 ; sprite
-        .byte   $3F,$00,$8, $0f,$3C,$38,$00,$0F,$20,$12,$15 ; bg
+        .byte   $3F,$11,$7,$16,$2A,$28,$0f,$37,$18,$38 ; sprite
+        .byte   $3F,$00,$8,$0f,$3C,$38,$00,$0F,$20,$12,$15 ; bg
         .byte   $FF
 defaultHighScoresTable:
         .byte   $2B,$2B,$2B,$2B,$2B,$2B ; HOWARD
         .byte   $2B,$2B,$2B,$2B,$2B,$2B ; OTASAN
         .byte   $2B,$2B,$2B,$2B,$2B,$2B ; LANCE
-        .byte   $00,$00,$00,$00,$00,$00 ;unknown
-        .byte   $2B,$2B,$2B,$2B,$2B,$2B ; ALEX
-        .byte   $2B,$2B,$2B,$2B,$2B,$2B ; TONY
-        .byte   $2B,$2B,$2B,$2B,$2B,$2B ; NINTEN
-        .byte   $00,$00,$00,$00,$00,$00 ;unknown
         ;High Scores are stored in BCD
         .byte   $00,$00,$00
         .byte   $00,$00,$00
         .byte   $00,$00,$00
-        .byte   $00,$00,$00 ;unknown
-        .byte   $00,$20,$00 ;Game B 1st Entry Score, 2000
-        .byte   $00,$10,$00 ;Game B 2nd Entry Score, 1000
-        .byte   $00,$05,$00 ;Game B 3rd Entry Score, 500
-        .byte   $00,$00,$00 ;unknown
-        .byte   $00 ;Game A 1st Entry Level
-        .byte   $00 ;Game A 2nd Entry Level
-        .byte   $00 ;Game A 3nd Entry Level
-        .byte   $00 ;unknown
-        .byte   $09 ;Game B 1st Entry Level
-        .byte   $05 ;Game B 2nd Entry Level
-        .byte   $00 ;Game B 3rd Entry Level
-        .byte   $00 ;unknown
+        .byte   $00,$00,$00 ; levels
         .byte   $FF
 game_type_menu_nametable: ; RLE
         .incbin "gfx/nametables/game_type_menu_nametable_practise.bin"
