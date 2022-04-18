@@ -1663,6 +1663,9 @@ gameMode_levelMenu:
         sta tmp2
         jsr displayModeText
         jsr showHighScores
+        ; render level when loading screen
+        lda #$1
+        sta outOfDateRenderFlags
         jsr waitForVBlankAndEnableNmi
         jsr updateAudioWaitForNmiAndResetOamStaging
         lda #$00
@@ -1682,9 +1685,6 @@ gameMode_levelMenu:
         sbc #$0A
         sta startLevel
         jmp @forceStartLevelToRange
-
-        lda #$3
-        sta outOfDateRenderFlags
 
 gameMode_levelMenu_processPlayer1Navigation:
         ; this copying is an artefact of the original
@@ -1759,13 +1759,20 @@ levelControl:
         .addr   levelControlHearts
 
 levelControlCustomLevel:
-        lda #$80
-        sta spriteYOffset
+        lda frameCounter
+        and #$03
+        beq @indicatorEnd
         lda #$00
         sta spriteIndexInOamContentLookup
-        lda #$80
+        lda #$5B
+        sta spriteYOffset
+        lda #$A4
         sta spriteXOffset
         jsr loadSpriteIntoOamStaging
+        lda #$B4
+        sta spriteXOffset
+        jsr loadSpriteIntoOamStaging
+@indicatorEnd:
 
         ; TODO: A/B +/-10
 
@@ -3703,6 +3710,32 @@ vramPlayfieldRows:
         .word   $21C6,$21E6,$2206,$2226
         .word   $2246,$2266,$2286,$22A6
         .word   $22C6,$22E6,$2306,$2326
+
+renderByteBCD:
+        sta tmpZ
+        cmp #200
+        bcc @maybe100
+        lda #2
+        sta PPUDATA
+        lda tmpZ
+        sbc #200
+        jmp @byte
+@maybe100:
+        cmp #100
+        bcc @not100
+        lda #1
+        sta PPUDATA
+        lda tmpZ
+        sbc #100
+        jmp @byte
+@not100:
+        lda #$EF
+        sta PPUDATA
+        lda tmpZ
+@byte:
+        tax
+        lda byteToBcdTable, x
+
 twoDigsToPPU:
         sta generalCounter
         and #$F0
@@ -3714,37 +3747,6 @@ twoDigsToPPU:
         lda generalCounter
         and #$0F
         sta PPUDATA
-        rts
-
-renderByteBCD:
-        sta tmpZ
-        cmp #200
-        bcc @maybe100
-        lda #2
-        sta PPUDATA
-        lda tmpZ
-        sbc #200
-        jmp @byte
-
-@maybe100:
-        cmp #100
-        bcc @not100
-        lda #1
-        sta PPUDATA
-        lda tmpZ
-        sbc #100
-        jmp @byte
-
-@not100:
-        lda #$EF
-        sta PPUDATA
-        lda tmpZ
-        jmp @byte
-
-@byte:
-        tax
-        lda byteToBcdTable, x
-        jsr twoDigsToPPU
         rts
 
 copyPlayfieldRowToVRAM:
@@ -5454,7 +5456,7 @@ byteToBcdTable: ; original goes to 49
         .byte   $40,$41,$42,$43,$44,$45,$46,$47
         .byte   $48,$49
         ; 50 extra bytes is shorter than a conversion routine
-        ; (used in renderByteBCD
+        ; (used in renderByteBCD)
         .byte   $50, $51, $52, $53, $54, $55, $56, $57, $58, $59, $60, $61, $62, $63, $64, $65, $66, $67, $68, $69, $70, $71, $72, $73, $74, $75, $76, $77, $78, $79, $80, $81, $82, $83, $84, $85, $86, $87, $88, $89, $90, $91, $92, $93, $94, $95, $96, $97, $98, $99
 
 
