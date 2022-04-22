@@ -11,8 +11,9 @@ INES_MAPPER := 1 ; supports 1 and 3
 PRACTISE_MODE := 1
 NO_MUSIC := 1
 AUTO_WIN := 1
-NO_SCORING := 0
 DEV_MODE := 0
+INITIAL_CUSTOM_LEVEL := 157
+NO_SCORING := 0
 
 BUTTON_DOWN := $4
 BUTTON_UP := $8
@@ -331,12 +332,12 @@ unreferenced_soundRngTmp:= $06FF
 highscores := $700
 highScoreNames  := highscores
 highScoreNamesLength := 6 * 3
-highScoreScoresA:= highscores+highScoreNamesLength
-highScoreScoresALength := 9
-; highScoreScoresB:= $073C
-highScoreLevels := highscores+highScoreNamesLength+highScoreScoresALength
-; .. bunch of unused stuff: highScoreNames sized
-initMagic   := $0750                        ; Initialized to a hard-coded number. When resetting, if not correct number then it knows this is a cold boot
+highScoreScores:= highscores+highScoreNamesLength
+highScoreScoresLength := 9
+highScoreLevels := highScoreScores+highScoreScoresLength
+; 27/91 bytes ^
+; .. bunch of unused stuff
+initMagic   := $075B                        ; Initialized to a hard-coded number. When resetting, if not correct number then it knows this is a cold boot
 
 menuRAM := $760
 menuSeedCursorIndex := menuRAM+0
@@ -820,7 +821,7 @@ gameMode_bootScreen: ; boot
 
         ; levelMenu stuff
         sta levelControlMode
-        lda #29
+        lda #INITIAL_CUSTOM_LEVEL
         sta customLevel
 
         ; detect region
@@ -2002,11 +2003,11 @@ gameModeState_initGameBackground:
         sta PPUADDR
         lda #$B8
         sta PPUADDR
-        lda highScoreScoresA
+        lda highScoreScores
         jsr twoDigsToPPU
-        lda highScoreScoresA+1
+        lda highScoreScores+1
         jsr twoDigsToPPU
-        lda highScoreScoresA+2
+        lda highScoreScores+2
         jsr twoDigsToPPU
 @skipTop:
 
@@ -5413,13 +5414,13 @@ showHighScores:
         clc
         adc generalCounter
         tay
-        lda highScoreScoresA,y
+        lda highScoreScores,y
         jsr twoDigsToPPU
         iny
-        lda highScoreScoresA,y
+        lda highScoreScores,y
         jsr twoDigsToPPU
         iny
-        lda highScoreScoresA,y
+        lda highScoreScores,y
         jsr twoDigsToPPU
         lda #$FF
         sta PPUDATA
@@ -5454,7 +5455,7 @@ byteToBcdTable: ; original goes to 49
         .byte   $32,$33,$34,$35,$36,$37,$38,$39
         .byte   $40,$41,$42,$43,$44,$45,$46,$47
         .byte   $48,$49
-        ; 50 extra bytes is shorter than a conversion routine
+        ; 50 extra bytes is shorter than a conversion routine (and super fast)
         ; (used in renderByteBCD)
         .byte   $50,$51,$52,$53,$54,$55,$56,$57,$58,$59,$60,$61,$62,$63,$64,$65,$66,$67,$68,$69,$70,$71,$72,$73,$74,$75,$76,$77,$78,$79,$80,$81,$82,$83,$84,$85,$86,$87,$88,$89,$90,$91,$92,$93,$94,$95,$96,$97,$98,$99
 
@@ -5470,14 +5471,14 @@ handleHighScoreIfNecessary:
         clc
         adc generalCounter2
         tay
-        lda highScoreScoresA,y
+        lda highScoreScores,y
         cmp score+2
         beq @checkHundredsByte
         bcs @tooSmall
         bcc adjustHighScores
 @checkHundredsByte:
         iny
-        lda highScoreScoresA,y
+        lda highScoreScores,y
         cmp score+1
         beq @checkOnesByte
         bcs @tooSmall
@@ -5485,7 +5486,7 @@ handleHighScoreIfNecessary:
 ; This breaks ties by prefering the new score
 @checkOnesByte:
         iny
-        lda highScoreScoresA,y
+        lda highScoreScores,y
         cmp score
         beq adjustHighScores
         bcc adjustHighScores
@@ -5535,13 +5536,13 @@ adjustHighScores:
         lda highScoreIndexToHighScoreScoresOffset,x
         tax
         lda score+2
-        sta highScoreScoresA,x
+        sta highScoreScores,x
         inx
         lda score+1
-        sta highScoreScoresA,x
+        sta highScoreScores,x
         inx
         lda score
-        sta highScoreScoresA,x
+        sta highScoreScores,x
         ldx highScoreEntryRawPos
         lda levelNumber
         sta highScoreLevels,x
@@ -5574,14 +5575,14 @@ copyHighScoreNameToNextIndex:
 ; reg a: start byte to copy
 copyHighScoreScoreToNextIndex:
         tax
-        lda highScoreScoresA,x
-        sta highScoreScoresA+3,x
+        lda highScoreScores,x
+        sta highScoreScores+3,x
         inx
-        lda highScoreScoresA,x
-        sta highScoreScoresA+3,x
+        lda highScoreScores,x
+        sta highScoreScores+3,x
         inx
-        lda highScoreScoresA,x
-        sta highScoreScoresA+3,x
+        lda highScoreScores,x
+        sta highScoreScores+3,x
         rts
 
 ; reg a: start byte to copy
