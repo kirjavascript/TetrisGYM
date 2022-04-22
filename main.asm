@@ -10,8 +10,7 @@
 INES_MAPPER := 1 ; supports 1 and 3
 PRACTISE_MODE := 1
 NO_MUSIC := 1
-AUTO_WIN := 1
-DEV_MODE := 0
+AUTO_WIN := 0
 INITIAL_CUSTOM_LEVEL := 157
 NO_SCORING := 0
 
@@ -331,9 +330,9 @@ currentlyPlayingMusicTrack:= $06FD          ; Copied from musicTrack
 unreferenced_soundRngTmp:= $06FF
 highscores := $700
 highScoreNames  := highscores
-highScoreNamesLength := 6 * 3
+highScoreNamesLength := 8 * 3
 highScoreScores:= highscores+highScoreNamesLength
-highScoreScoresLength := 9
+highScoreScoresLength := 4 * 3
 highScoreLevels := highScoreScores+highScoreScoresLength
 ; 27/91 bytes ^
 ; .. bunch of unused stuff
@@ -5371,7 +5370,7 @@ playState_noop:
 
 showHighScores:
         jsr bulkCopyToPpu
-        .addr   high_scores_nametable
+        .addr high_scores_nametable
         lda #$00
         sta generalCounter2
 @copyEntry:
@@ -5395,7 +5394,7 @@ showHighScores:
         clc
         adc generalCounter
         tay
-        ldx #$06
+        ldx #$08
 @copyChar:
         lda highScoreNames,y
         sty generalCounter
@@ -5422,6 +5421,9 @@ showHighScores:
         iny
         lda highScoreScores,y
         jsr twoDigsToPPU
+        iny
+        lda highScoreScores,y
+        jsr twoDigsToPPU
         lda #$FF
         sta PPUDATA
         ldy generalCounter2
@@ -5438,7 +5440,7 @@ showHighScores:
 showHighScores_ret:  rts
 
 highScorePpuAddrTable:
-        .dbyt   $2289,$22C9,$2309
+        .dbyt   $2286,$22C6,$2306
 highScoreCharToTile:
         .byte   $24,$0A,$0B,$0C,$0D,$0E,$0F,$10
         .byte   $11,$12,$13,$14,$15,$16,$17,$18
@@ -6345,13 +6347,13 @@ rocket_palette:
         .byte   $3F,$00,$8,$0f,$3C,$38,$00,$0F,$20,$12,$15 ; bg
         .byte   $FF
 defaultHighScoresTable:
-        .byte   $2B,$2B,$2B,$2B,$2B,$2B ; HOWARD
-        .byte   $2B,$2B,$2B,$2B,$2B,$2B ; OTASAN
-        .byte   $2B,$2B,$2B,$2B,$2B,$2B ; LANCE
+        .byte   $2B,$2B,$2B,$2B,$2B,$2B,$2b,$2b ; HOWARD
+        .byte   $2B,$2B,$2B,$2B,$2B,$2B,$2b,$2b ; OTASAN
+        .byte   $2B,$2B,$2B,$2B,$2B,$2B,$2b,$2b ; LANCE
         ;High Scores are stored in BCD
-        .byte   $00,$00,$00
-        .byte   $00,$00,$00
-        .byte   $00,$00,$00
+        .byte   $00,$00,$00,$00
+        .byte   $00,$00,$00,$00
+        .byte   $00,$00,$00,$00
         .byte   $00,$00,$00 ; levels
         .byte   $FF
 game_type_menu_nametable: ; RLE
