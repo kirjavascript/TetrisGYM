@@ -329,10 +329,12 @@ soundEffectSlot4Playing:= $06FC
 currentlyPlayingMusicTrack:= $06FD          ; Copied from musicTrack
 unreferenced_soundRngTmp:= $06FF
 highscores := $700
+highScoreQuantity := 3
 highScoreNames  := highscores
-highScoreNamesLength := 8 * 3
+highScoreNameLength := 8
+highScoreNamesLength := highScoreNameLength * highScoreQuantity
 highScoreScores:= highscores+highScoreNamesLength
-highScoreScoresLength := 4 * 3
+highScoreScoresLength := 4 * highScoreQuantity
 highScoreLevels := highScoreScores+highScoreScoresLength
 ; 27/91 bytes ^
 ; .. bunch of unused stuff
@@ -5371,32 +5373,28 @@ playState_noop:
 showHighScores:
         jsr bulkCopyToPpu
         .addr high_scores_nametable
+        ldy #0
+
         lda #$00
         sta generalCounter2
 @copyEntry:
         lda generalCounter2
-        and #$03
+        ; and #$03
         asl a
         tax
         lda highScorePpuAddrTable,x
         sta PPUADDR
-        lda generalCounter2
-        and #$03
-        asl a
-        tax
+        ; lda generalCounter2
+        ; and #$03
+        ; asl a
+        ; tax
         inx
         lda highScorePpuAddrTable,x
         sta PPUADDR
-        lda generalCounter2
-        asl a
-        sta generalCounter
-        asl a
-        clc
-        adc generalCounter
-        tay
-        ldx #$08
+
+        ldx #highScoreNameLength
 @copyChar:
-        lda highScoreNames,y
+        lda highscores,y
         sty generalCounter
         tay
         lda highScoreCharToTile,y
@@ -5405,42 +5403,87 @@ showHighScores:
         iny
         dex
         bne @copyChar
+
         lda #$FF
         sta PPUDATA
-        lda generalCounter2
-        sta generalCounter
-        asl a
-        clc
-        adc generalCounter
-        tay
-        lda highScoreScores,y
+
+        lda highscores,y
         jsr twoDigsToPPU
         iny
-        lda highScoreScores,y
+        lda highscores,y
         jsr twoDigsToPPU
         iny
-        lda highScoreScores,y
+        lda highscores,y
         jsr twoDigsToPPU
         iny
-        lda highScoreScores,y
+        lda highscores,y
         jsr twoDigsToPPU
+        iny
+
         lda #$FF
         sta PPUDATA
-        ldy generalCounter2
-        lda highScoreLevels,y
-        tax
-        lda byteToBcdTable,x
-        jsr twoDigsToPPU
+
+        lda highscores,y
+        jsr renderByteBCD
+        iny
+        lda highscores,y
+        jsr renderByteBCD
+        iny
+
+        ; lda generalCounter2
+        ; asl a
+        ; sta generalCounter
+        ; asl a
+        ; clc
+        ; adc generalCounter
+        ; tay
+        ; ldx #$08
+; @copyChar:
+        ; lda highScoreNames,y
+        ; sty generalCounter
+        ; tay
+        ; lda highScoreCharToTile,y
+        ; ldy generalCounter
+        ; sta PPUDATA
+        ; iny
+        ; dex
+        ; bne @copyChar
+        ; lda #$FF
+        ; sta PPUDATA
+        ; lda generalCounter2
+        ; sta generalCounter
+        ; asl a
+        ; clc
+        ; adc generalCounter
+        ; tay
+        ; lda highScoreScores,y
+        ; jsr twoDigsToPPU
+        ; iny
+        ; lda highScoreScores,y
+        ; jsr twoDigsToPPU
+        ; iny
+        ; lda highScoreScores,y
+        ; jsr twoDigsToPPU
+        ; iny
+        ; lda highScoreScores,y
+        ; jsr twoDigsToPPU
+        ; lda #$FF
+        ; sta PPUDATA
+        ; ldy generalCounter2
+        ; lda highScoreLevels,y
+        ; tax
+        ; lda byteToBcdTable,x
+        ; jsr twoDigsToPPU
         inc generalCounter2
         lda generalCounter2
-        cmp #$03
+        cmp #highScoreQuantity
         beq showHighScores_ret
         jmp @copyEntry
 
 showHighScores_ret:  rts
 
 highScorePpuAddrTable:
-        .dbyt   $2286,$22C6,$2306
+        .dbyt   $2284,$22C4,$2304
 highScoreCharToTile:
         .byte   $24,$0A,$0B,$0C,$0D,$0E,$0F,$10
         .byte   $11,$12,$13,$14,$15,$16,$17,$18
@@ -5682,7 +5725,7 @@ highScoreEntryScreen:
         sta soundEffectSlot1Init
         inc highScoreEntryNameOffsetForLetter
         lda highScoreEntryNameOffsetForLetter
-        cmp #$06
+        cmp #$08
         bmi @checkForBOrLeftPressed
         lda #$00
         sta highScoreEntryNameOffsetForLetter
@@ -6347,14 +6390,26 @@ rocket_palette:
         .byte   $3F,$00,$8,$0f,$3C,$38,$00,$0F,$20,$12,$15 ; bg
         .byte   $FF
 defaultHighScoresTable:
-        .byte   $2B,$2B,$2B,$2B,$2B,$2B,$2b,$2b ; HOWARD
-        .byte   $2B,$2B,$2B,$2B,$2B,$2B,$2b,$2b ; OTASAN
-        .byte   $2B,$2B,$2B,$2B,$2B,$2B,$2b,$2b ; LANCE
+        .byte   $0A,$0b,$0a,$0c,$0a,$0d,$0a,$0e
+        .byte   $01,$02,$03,$04
+        .byte   $0d
+        .byte   $0d
+        .byte   $1A,$1b,$1a,$1c,$1a,$1d,$1a,$1e
+        .byte   $05,$06,$07,$08
+        .byte   $0e
+        .byte   $0e
+        .byte   $2A,$2b,$2a,$2c,$2a,$2d,$2a,$2e
+        .byte   $09,$0a,$0b,$0c
+        .byte   $0f
+        .byte   $0f
+        ; .byte   $2B,$2B,$2B,$2B,$2B,$2B,$2b,$2b ; HOWARD
+        ; .byte   $2B,$2B,$2B,$2B,$2B,$2B,$2b,$2b ; OTASAN
+        ; .byte   $2B,$2B,$2B,$2B,$2B,$2B,$2b,$2b ; LANCE
         ;High Scores are stored in BCD
-        .byte   $00,$00,$00,$00
-        .byte   $00,$00,$00,$00
-        .byte   $00,$00,$00,$00
-        .byte   $00,$00,$00 ; levels
+        ; .byte   $00,$00,$00,$00
+        ; .byte   $00,$00,$00,$00
+        ; .byte   $00,$00,$00,$00
+        ; .byte   $00,$00,$00 ; levels
         .byte   $FF
 game_type_menu_nametable: ; RLE
         .incbin "gfx/nametables/game_type_menu_nametable_practise.bin"
