@@ -329,18 +329,13 @@ soundEffectSlot4Playing:= $06FC
 currentlyPlayingMusicTrack:= $06FD          ; Copied from musicTrack
 unreferenced_soundRngTmp:= $06FF
 highscores := $700
+; see defaultHighScoresTable for data layout
 highScoreQuantity := 3
 highScoreNameLength := 8
 highScoreScoreLength := 4
 highScoreLength := highScoreNameLength + highScoreScoreLength + 2
 ; highScoreTotalLength := highScoreLength * highScoreQuantity
-; TODO: remove following RAM
-highScoreNames  := highscores
-highScoreNamesLength := highScoreNameLength * highScoreQuantity
-highScoreScores:= highscores+highScoreNamesLength
-highScoreScoresLength := 4 * highScoreQuantity
-highScoreLevels := highScoreScores+highScoreScoresLength
-; 27/91 bytes ^
+; 42/91 bytes ^
 ; .. bunch of unused stuff
 initMagic   := $075B                        ; Initialized to a hard-coded number. When resetting, if not correct number then it knows this is a cold boot
 
@@ -518,7 +513,7 @@ initRamContinued:
         lda defaultHighScoresTable,x
         cmp #$FF
         beq @continueColdBootInit
-        sta highScoreNames,x
+        sta highscores,x
         inx
         jmp @initHighScoreTable
 
@@ -2011,11 +2006,12 @@ gameModeState_initGameBackground:
         sta PPUADDR
         lda #$B8
         sta PPUADDR
-        lda highScoreScores
+        ; TODO: handle top byte
+        lda highscores+highScoreNameLength+1
         jsr twoDigsToPPU
-        lda highScoreScores+1
+        lda highscores+highScoreNameLength+2
         jsr twoDigsToPPU
-        lda highScoreScores+2
+        lda highscores+highScoreNameLength+3
         jsr twoDigsToPPU
 @skipTop:
 
@@ -5487,7 +5483,7 @@ handleHighScoreIfNecessary:
         bcs @tooSmall
         bcc adjustHighScores
 @checkHighByte:
-        lda highScoreScores,y
+        ; lda highScoreScores,y
         lda highscores+highScoreNameLength +1,y
         cmp score+2
         beq @checkHundredsByte
@@ -5524,32 +5520,22 @@ handleHighScoreIfNecessary:
 
 adjustHighScores:
         lda highScoreEntryRawPos
-        and #$03
         cmp #$02
         bpl @doneMovingOldScores
-        lda #$06
-        jsr copyHighScoreNameToNextIndex
-        lda #$03
-        jsr copyHighScoreScoreToNextIndex
-        lda #$01
-        jsr copyHighScoreLevelToNextIndex
+
+        ldx #highScoreLength
+        jsr copyHighscore
+
         lda highScoreEntryRawPos
-        and #$03
         bne @doneMovingOldScores
-        lda #$00
-        jsr copyHighScoreNameToNextIndex
-        lda #$00
-        jsr copyHighScoreScoreToNextIndex
-        lda #$00
-        jsr copyHighScoreLevelToNextIndex
+
+        ldx #0
+        jsr copyHighscore
+
 @doneMovingOldScores:
 
         ldx highScoreEntryRawPos
         lda highScoreEntryRowOffsetLookup, x
-
-; add new score
-        ; ldx highScoreEntryRawPos
-        ; lda highScoreIndexToHighScoreNamesOffset,x
         tax
         ldy #highScoreNameLength
         lda #$00
@@ -5558,9 +5544,6 @@ adjustHighScores:
         inx
         dey
         bne @clearNameLetter
-        ; ldx highScoreEntryRawPos
-        ; lda highScoreIndexToHighScoreScoresOffset,x
-        ; tax
         lda score+3
         sta highscores,x
         inx
@@ -5578,61 +5561,17 @@ adjustHighScores:
         inx
         lda startLevel
         sta highscores,x
-        ; TODO: customLevel
-
-        ; ldx highScoreEntryRawPos
-        ; lda levelNumber
-        ; sta highScoreLevels,x
         jmp highScoreEntryScreen
 
-; reg a: start byte to copy
-copyHighScoreNameToNextIndex:
-        sta generalCounter
-        lda #$05
-        sta generalCounter2
-@copyLetter:
-        lda generalCounter
-        clc
-        adc generalCounter2
-        tax
-        lda highScoreNames,x
-        sta generalCounter3
-        txa
-        clc
-        adc #$06
-        tax
-        lda generalCounter3
-        sta highScoreNames,x
-        dec generalCounter2
-        lda generalCounter2
-        cmp #$FF
-        bne @copyLetter
-        rts
-
-; reg a: start byte to copy
-copyHighScoreScoreToNextIndex:
-        tax
-        lda highScoreScores,x
-        sta highScoreScores+3,x
+copyHighscore:
+        ldy #highScoreLength
+@tmpHighScoreCopy:
+        lda highscores,x
+        sta highscores+highScoreLength,x
         inx
-        lda highScoreScores,x
-        sta highScoreScores+3,x
-        inx
-        lda highScoreScores,x
-        sta highScoreScores+3,x
+        dey
+        bne @tmpHighScoreCopy
         rts
-
-; reg a: start byte to copy
-copyHighScoreLevelToNextIndex:
-        tax
-        lda highScoreLevels,x
-        sta highScoreLevels+1,x
-        rts
-
-highScoreIndexToHighScoreNamesOffset:
-        .byte   $00,$06,$0C,$12,$18,$1E,$24,$2A
-highScoreIndexToHighScoreScoresOffset:
-        .byte   $00,$03,$06,$09,$0C,$0F,$12,$15
 
 highScoreEntryScreen:
         RESET_MMC1
@@ -6387,10 +6326,8 @@ defaultHighScoresTable:
 .repeat highScoreQuantity
         .byte   $2B,$2B,$2B,$2B,$2B,$2B,$2b,$2b ; name
         .byte   $00,$00,$00,$00 ; score
-        ; .byte   $0A,$0b,$0a,$0c,$0a,$0d,$0a,$0e ; name
-        ; .byte   $01,$02,$03,$04 ; score
-        .byte   $01 ; level
-        .byte   $02 ; start level
+        .byte   $00 ; level
+        .byte   $00 ; start level
 .endrepeat
         .byte   $FF
 game_type_menu_nametable: ; RLE
