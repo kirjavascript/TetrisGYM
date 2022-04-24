@@ -334,7 +334,6 @@ highScoreQuantity := 3
 highScoreNameLength := 8
 highScoreScoreLength := 4
 highScoreLength := highScoreNameLength + highScoreScoreLength + 2
-; highScoreTotalLength := highScoreLength * highScoreQuantity
 ; 42/91 bytes ^
 ; .. bunch of unused stuff
 initMagic   := $075B                        ; Initialized to a hard-coded number. When resetting, if not correct number then it knows this is a cold boot
@@ -5461,21 +5460,12 @@ byteToBcdTable: ; original goes to 49
 
 ; Adjusts high score table and handles data entry, if necessary
 handleHighScoreIfNecessary:
-        ; jmp adjustHighScores
-
         jsr copyBinaryScoreToBCD ; only needed if score is mangled in points routine
 
         ldy #0
         lda #$00
         sta highScoreEntryRawPos
 @compareWithPos:
-        ; lda highScoreEntryRawPos
-        ; sta generalCounter2
-        ; asl a
-        ; clc
-        ; adc generalCounter2
-        ; tay
-
 
         lda highscores+highScoreNameLength,y
         cmp score+3
@@ -5483,15 +5473,12 @@ handleHighScoreIfNecessary:
         bcs @tooSmall
         bcc adjustHighScores
 @checkHighByte:
-        ; lda highScoreScores,y
         lda highscores+highScoreNameLength +1,y
         cmp score+2
         beq @checkHundredsByte
         bcs @tooSmall
         bcc adjustHighScores
 @checkHundredsByte:
-        ; iny
-        ; lda highScoreScores,y
         lda highscores+highScoreNameLength +2,y
         cmp score+1
         beq @checkOnesByte
@@ -5499,8 +5486,6 @@ handleHighScoreIfNecessary:
         bcc adjustHighScores
 ; This breaks ties by prefering the new score
 @checkOnesByte:
-        ; iny
-        ; lda highScoreScores,y
         lda highscores+highScoreNameLength +3,y
         cmp score
         beq adjustHighScores
