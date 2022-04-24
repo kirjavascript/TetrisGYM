@@ -4,7 +4,7 @@
 * Made Hard Drop instant
 * Added Sonic Drop
 * Rewrite of all scoring code
-    * Classic scoring; Wraparound at 2 million with letters A-J
+    * Classic scoring
     * Millions counter 
     * Expanding score 
     * 999999 scorecap 

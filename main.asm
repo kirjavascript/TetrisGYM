@@ -330,8 +330,12 @@ currentlyPlayingMusicTrack:= $06FD          ; Copied from musicTrack
 unreferenced_soundRngTmp:= $06FF
 highscores := $700
 highScoreQuantity := 3
-highScoreNames  := highscores
 highScoreNameLength := 8
+highScoreScoreLength := 4
+highScoreLength := highScoreNameLength + highScoreScoreLength + 2
+; highScoreTotalLength := highScoreLength * highScoreQuantity
+; TODO: remove following RAM
+highScoreNames  := highscores
 highScoreNamesLength := highScoreNameLength * highScoreQuantity
 highScoreScores:= highscores+highScoreNamesLength
 highScoreScoresLength := 4 * highScoreQuantity
@@ -5373,7 +5377,7 @@ playState_noop:
 showHighScores:
         jsr bulkCopyToPpu
         .addr high_scores_nametable
-        ldy #0
+        ldy #0 ; TODO: remove this comment
 
         lda #$00
         sta generalCounter2
@@ -5424,7 +5428,7 @@ showHighScores:
         sta PPUDATA
 
         lda highscores,y
-        jsr renderByteBCD
+        jsr renderByteBCD ; TODO: dont render blank tile?
         iny
         lda highscores,y
         jsr renderByteBCD
@@ -5507,42 +5511,48 @@ byteToBcdTable: ; original goes to 49
 
 ; Adjusts high score table and handles data entry, if necessary
 handleHighScoreIfNecessary:
+        ldy #0
+        jmp adjustHighScores
+
         lda #$00
         sta highScoreEntryRawPos
 @compareWithPos:
-        lda highScoreEntryRawPos
-        sta generalCounter2
-        asl a
-        clc
-        adc generalCounter2
-        tay
-        lda highScoreScores,y
-        cmp score+2
-        beq @checkHundredsByte
-        bcs @tooSmall
-        bcc adjustHighScores
-@checkHundredsByte:
-        iny
-        lda highScoreScores,y
-        cmp score+1
-        beq @checkOnesByte
-        bcs @tooSmall
-        bcc adjustHighScores
-; This breaks ties by prefering the new score
-@checkOnesByte:
-        iny
-        lda highScoreScores,y
-        cmp score
-        beq adjustHighScores
-        bcc adjustHighScores
-@tooSmall:
-        inc highScoreEntryRawPos
-        lda highScoreEntryRawPos
-        cmp #$03
-        beq @ret
-        cmp #$07
-        beq @ret
-        jmp @compareWithPos
+        ; lda highScoreEntryRawPos
+        ; sta generalCounter2
+        ; asl a
+        ; clc
+        ; adc generalCounter2
+        ; tay
+
+
+        ; lda highScoreScores,y
+        ; cmp score+2
+        ; beq @checkHundredsByte
+        ; bcs @tooSmall
+        ; bcc adjustHighScores
+; @checkHundredsByte:
+        ; iny
+        ; lda highScoreScores,y
+        ; cmp score+1
+        ; beq @checkOnesByte
+        ; bcs @tooSmall
+        ; bcc adjustHighScores
+; ; This breaks ties by prefering the new score
+; @checkOnesByte:
+        ; iny
+        ; lda highScoreScores,y
+        ; cmp score
+        ; beq adjustHighScores
+        ; bcc adjustHighScores
+; @tooSmall:
+        ; inc highScoreEntryRawPos
+        ; lda highScoreEntryRawPos
+        ; cmp #highScoreQuantity
+        ; beq @ret
+
+        ; cmp #$07
+        ; beq @ret
+        ; jmp @compareWithPos
 
 @ret:   rts
 
@@ -5641,6 +5651,7 @@ highScoreIndexToHighScoreNamesOffset:
         .byte   $00,$06,$0C,$12,$18,$1E,$24,$2A
 highScoreIndexToHighScoreScoresOffset:
         .byte   $00,$03,$06,$09,$0C,$0F,$12,$15
+
 highScoreEntryScreen:
         RESET_MMC1
         lda #$10
@@ -5676,13 +5687,11 @@ highScoreEntryScreen:
         jsr updateAudioWaitForNmiAndResetOamStaging
         jsr updateAudioWaitForNmiAndEnablePpuRendering
         jsr updateAudioWaitForNmiAndResetOamStaging
-        lda highScoreEntryRawPos
-        asl a
-        sta generalCounter
-        asl a
-        clc
-        adc generalCounter
+
+        ldx highScoreEntryRawPos
+        lda highScoreEntryRowOffsetLookup, x
         sta highScoreEntryNameOffsetForRow
+
         lda #$00
         sta highScoreEntryNameOffsetForLetter
         sta oamStaging
@@ -5694,8 +5703,11 @@ highScoreEntryScreen:
 @renderFrame:
         lda #$00
         sta oamStaging
-        ldx highScoreEntryNameOffsetForLetter
-        lda highScoreNamePosToX,x
+        lda highScoreEntryNameOffsetForLetter
+        asl
+        asl
+        asl
+        adc #$20
         sta spriteXOffset
         lda #$0E
         sta spriteIndexInOamContentLookup
@@ -5725,7 +5737,7 @@ highScoreEntryScreen:
         sta soundEffectSlot1Init
         inc highScoreEntryNameOffsetForLetter
         lda highScoreEntryNameOffsetForLetter
-        cmp #$08
+        cmp #highScoreNameLength
         bmi @checkForBOrLeftPressed
         lda #$00
         sta highScoreEntryNameOffsetForLetter
@@ -5742,7 +5754,7 @@ highScoreEntryScreen:
         dec highScoreEntryNameOffsetForLetter
         lda highScoreEntryNameOffsetForLetter
         bpl @checkForDownPressed
-        lda #$05
+        lda #highScoreNameLength-1
         sta highScoreEntryNameOffsetForLetter
 @checkForDownPressed:
         lda #BUTTON_DOWN
@@ -5755,7 +5767,7 @@ highScoreEntryScreen:
         clc
         adc highScoreEntryNameOffsetForLetter
         tax
-        lda highScoreNames,x
+        lda highscores,x
         sta generalCounter
         dec generalCounter
         lda generalCounter
@@ -5765,7 +5777,7 @@ highScoreEntryScreen:
         sta generalCounter
 @letterDoesNotUnderflow:
         lda generalCounter
-        sta highScoreNames,x
+        sta highscores,x
 @checkForUpPressed:
         lda #BUTTON_UP
         jsr menuThrottle
@@ -5777,7 +5789,7 @@ highScoreEntryScreen:
         clc
         adc highScoreEntryNameOffsetForLetter
         tax
-        lda highScoreNames,x
+        lda highscores,x
         sta generalCounter
         inc generalCounter
         lda generalCounter
@@ -5788,13 +5800,13 @@ highScoreEntryScreen:
         sta generalCounter
 @letterDoesNotOverflow:
         lda generalCounter
-        sta highScoreNames,x
+        sta highscores,x
 @waitForVBlank:
         lda highScoreEntryNameOffsetForRow
         clc
         adc highScoreEntryNameOffsetForLetter
         tax
-        lda highScoreNames,x
+        lda highscores,x
         sta highScoreEntryCurrentLetter
         lda #$80
         sta outOfDateRenderFlags
@@ -5806,8 +5818,9 @@ highScoreEntryScreen:
 
 highScorePosToY:
         .byte   $9F,$AF,$BF
-highScoreNamePosToX:
-        .byte   $48,$50,$58,$60,$68,$70
+highScoreEntryRowOffsetLookup:
+        .byte $0, highScoreLength, highScoreLength*2
+
 render_mode_congratulations_screen:
         lda #$00
         sta PPUSCROLL
@@ -6390,18 +6403,14 @@ rocket_palette:
         .byte   $3F,$00,$8,$0f,$3C,$38,$00,$0F,$20,$12,$15 ; bg
         .byte   $FF
 defaultHighScoresTable:
-        .byte   $0A,$0b,$0a,$0c,$0a,$0d,$0a,$0e
-        .byte   $01,$02,$03,$04
-        .byte   $0d
-        .byte   $0d
-        .byte   $1A,$1b,$1a,$1c,$1a,$1d,$1a,$1e
-        .byte   $05,$06,$07,$08
-        .byte   $0e
-        .byte   $0e
-        .byte   $2A,$2b,$2a,$2c,$2a,$2d,$2a,$2e
-        .byte   $09,$0a,$0b,$0c
-        .byte   $0f
-        .byte   $0f
+.repeat highScoreQuantity
+        .byte   $2B,$2B,$2B,$2B,$2B,$2B,$2b,$2b ; name
+        .byte   $00,$00,$00,$00 ; score
+        ; .byte   $0A,$0b,$0a,$0c,$0a,$0d,$0a,$0e ; name
+        ; .byte   $01,$02,$03,$04 ; score
+        .byte   $0d ; level
+        .byte   $0d ; start level
+.endrepeat
         ; .byte   $2B,$2B,$2B,$2B,$2B,$2B,$2b,$2b ; HOWARD
         ; .byte   $2B,$2B,$2B,$2B,$2B,$2B,$2b,$2b ; OTASAN
         ; .byte   $2B,$2B,$2B,$2B,$2B,$2B,$2b,$2b ; LANCE
