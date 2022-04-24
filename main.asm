@@ -329,7 +329,7 @@ soundEffectSlot4Playing:= $06FC
 currentlyPlayingMusicTrack:= $06FD          ; Copied from musicTrack
 unreferenced_soundRngTmp:= $06FF
 highscores := $700
-; see defaultHighScoresTable for data layout
+; scores are name - score - level - startlevel
 highScoreQuantity := 3
 highScoreNameLength := 8
 highScoreScoreLength := 4
@@ -507,10 +507,10 @@ initRamContinued:
         lda #$10
         sta dasModifier
 
-        ldx #$00
+        ldx #$0
+        lda #$0
 @initHighScoreTable:
-        lda defaultHighScoresTable,x
-        cmp #$FF
+        cpx #highScoreLength * highScoreQuantity
         beq @continueColdBootInit
         sta highscores,x
         inx
@@ -5438,12 +5438,13 @@ showHighScores_ret:  rts
 highScorePpuAddrTable:
         .dbyt   $2284,$22C4,$2304
 highScoreCharToTile:
-        .byte   $24,$0A,$0B,$0C,$0D,$0E,$0F,$10
+        .byte   $FF,$0A,$0B,$0C,$0D,$0E,$0F,$10
         .byte   $11,$12,$13,$14,$15,$16,$17,$18
         .byte   $19,$1A,$1B,$1C,$1D,$1E,$1F,$20
         .byte   $21,$22,$23,$00,$01,$02,$03,$04
         .byte   $05,$06,$07,$08,$09,$25,$4F,$5E
-        .byte   $5F,$6E,$6F,$FF
+        .byte   $5F,$6E,$6F,$52,$24
+highScoreCharSize := $2D
 levelDisplayTable: ; original goes to 29
 byteToBcdTable: ; original goes to 49
         .byte   $00,$01,$02,$03,$04,$05,$06,$07
@@ -5463,8 +5464,7 @@ handleHighScoreIfNecessary:
         jsr copyBinaryScoreToBCD ; only needed if score is mangled in points routine
 
         ldy #0
-        lda #$00
-        sta highScoreEntryRawPos
+        sty highScoreEntryRawPos
 @compareWithPos:
 
         lda highscores+highScoreNameLength,y
@@ -5678,7 +5678,7 @@ highScoreEntryScreen:
         lda generalCounter
         bpl @letterDoesNotUnderflow
         clc
-        adc #$2C
+        adc #highScoreCharSize
         sta generalCounter
 @letterDoesNotUnderflow:
         lda generalCounter
@@ -5698,10 +5698,10 @@ highScoreEntryScreen:
         sta generalCounter
         inc generalCounter
         lda generalCounter
-        cmp #$2C
+        cmp #highScoreCharSize
         bmi @letterDoesNotOverflow
         sec
-        sbc #$2C
+        sbc #highScoreCharSize
         sta generalCounter
 @letterDoesNotOverflow:
         lda generalCounter
@@ -6306,14 +6306,6 @@ menu_palette:
 rocket_palette:
         .byte   $3F,$11,$7,$16,$2A,$28,$0f,$37,$18,$38 ; sprite
         .byte   $3F,$00,$8,$0f,$3C,$38,$00,$0F,$20,$12,$15 ; bg
-        .byte   $FF
-defaultHighScoresTable:
-.repeat highScoreQuantity
-        .byte   $2B,$2B,$2B,$2B,$2B,$2B,$2b,$2b ; name
-        .byte   $00,$00,$00,$00 ; score
-        .byte   $00 ; level
-        .byte   $00 ; start level
-.endrepeat
         .byte   $FF
 game_type_menu_nametable: ; RLE
         .incbin "gfx/nametables/game_type_menu_nametable_practise.bin"
