@@ -5373,8 +5373,6 @@ playState_noop:
         rts
 
 showHighScores:
-        jsr bulkCopyToPpu
-        .addr high_scores_nametable
         ldy #0
 
         lda #$00
@@ -6317,8 +6315,6 @@ game_nametable: ; RLE
         .incbin "gfx/nametables/game_nametable_practise.bin"
 enter_high_score_nametable: ; RLE
         .incbin "gfx/nametables/enter_high_score_nametable_practise.bin"
-high_scores_nametable: ; stripe
-        .incbin "gfx/nametables/high_scores_nametable.bin"
 rocket_nametable: ; RLE
         .incbin "gfx/nametables/rocket_nametable.bin"
 legal_nametable: ; RLE
