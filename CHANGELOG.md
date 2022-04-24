@@ -3,6 +3,7 @@
 * Tap Quantity Trainer
 * Made Hard Drop instant
 * Added Sonic Drop
+* Start on any level
 * Rewrite of all scoring code
     * Classic scoring
     * Millions counter 
@@ -12,7 +13,6 @@
     * Crash free with no 'long frames'
 * 3 digit level counter for levels over 99
 * 4 digit line counter for lines over 999
-* Start on any level
 * Added new screen for Speed Tester
 * Added DAS-like movement to high score entry screen
 * Readded original broken colours from level 138+

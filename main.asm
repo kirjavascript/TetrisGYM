@@ -352,8 +352,9 @@ menuThrottleTmp := menuRAM+3
 menuPaletteDelay := menuRAM+4
 levelControlMode  := menuRAM+5
 customLevel := menuRAM+6
-heartsAndReady := menuRAM+7
-menuVars := $768
+classicLevel := menuRAM+7
+heartsAndReady := menuRAM+8
+menuVars := $769
 paceModifier := menuVars+0
 presetModifier := menuVars+1
 typeBModifier := menuVars+2
@@ -850,7 +851,7 @@ gameMode_bootScreen: ; boot
 @nonQualBoot:
         ; set start level to 8/18
         lda #$8
-        sta startLevel
+        sta classicLevel
         lda #2
         sta gameMode
         rts
@@ -1687,12 +1688,12 @@ gameMode_levelMenu:
         sta originalY
         sta dropSpeed
 @forceStartLevelToRange:
-        lda startLevel
+        lda classicLevel
         cmp #$0A
         bcc gameMode_levelMenu_processPlayer1Navigation
         sec
         sbc #$0A
-        sta startLevel
+        sta classicLevel
         jmp @forceStartLevelToRange
 
 gameMode_levelMenu_processPlayer1Navigation:
@@ -1709,20 +1710,22 @@ gameMode_levelMenu_processPlayer1Navigation:
         cmp #1 ; custom
         bne @normalLevel
         lda customLevel
-        sta levelNumber
+        sta startLevel
         jmp @startGame
 @normalLevel:
         lda heldButtons_player1
         cmp #BUTTON_START+BUTTON_A
         bne @noA
-        lda startLevel
+        lda classicLevel
         clc
         adc #$0A
-        sta startLevel
+        sta classicLevel
 @noA:
-        lda startLevel
-        sta levelNumber
+        lda classicLevel
+        sta startLevel
 @startGame:
+        ; lda startLevel
+        sta levelNumber
         lda #$00
         sta gameModeState
         lda #$02
@@ -1861,31 +1864,31 @@ levelControlNormal:
         bne @checkLeftPressed
         lda #$01
         sta soundEffectSlot1Init
-        lda startLevel
+        lda classicLevel
         cmp #$9
         beq @toCustomLevel
-        inc startLevel
+        inc classicLevel
 @checkLeftPressed:
         lda newlyPressedButtons
         cmp #BUTTON_LEFT
         bne @checkDownPressed
         lda #$01
         sta soundEffectSlot1Init
-        lda startLevel
+        lda classicLevel
         beq @checkDownPressed
-        dec startLevel
+        dec classicLevel
 @checkDownPressed:
         lda newlyPressedButtons
         cmp #BUTTON_DOWN
         bne @checkUpPressed
         lda #$01
         sta soundEffectSlot1Init
-        lda startLevel
+        lda classicLevel
         cmp #$05
         bpl @toHearts
         clc
         adc #$05
-        sta startLevel
+        sta classicLevel
         jmp @checkUpPressed
 
 @toHearts:
@@ -1900,12 +1903,12 @@ levelControlNormal:
         bne @checkAPressed
         lda #$01
         sta soundEffectSlot1Init
-        lda startLevel
+        lda classicLevel
         cmp #$05
         bmi @checkAPressed
         sec
         sbc #$05
-        sta startLevel
+        sta classicLevel
         jmp @checkAPressed
 
 @checkAPressed:
@@ -1913,12 +1916,12 @@ levelControlNormal:
         and #$03
         beq @ret
 ; @showSelectionLevel:
-        ldx startLevel
+        ldx classicLevel
         lda levelToSpriteYOffset,x
         sta spriteYOffset
         lda #$00
         sta spriteIndexInOamContentLookup
-        ldx startLevel
+        ldx classicLevel
         lda levelToSpriteXOffset,x
         sta spriteXOffset
         jsr loadSpriteIntoOamStaging
@@ -5034,32 +5037,13 @@ addLineClearPoints:
         adc #0
         sta binScore+3
 
-        lda     outOfDateRenderFlags
-        ora     #$04
-        sta     outOfDateRenderFlags
-        lda     #$00
-        sta     completedLines
+        lda outOfDateRenderFlags
+        ora #$04
+        sta outOfDateRenderFlags
+        lda #$00
+        sta completedLines
 
-        lda binScore
-        sta binary32
-        lda binScore+1
-        sta binary32+1
-        lda binScore+2
-        sta binary32+2
-        lda binScore+3
-        sta binary32+3
-        jsr BIN_BCD
-
-        ; copy bcd32 to score for display
-
-        lda bcd32
-        sta score
-        lda bcd32+1
-        sta score+1
-        lda bcd32+2
-        sta score+2
-        lda bcd32+3
-        sta score+3
+        jsr copyBinaryScoreToBCD
 
         ; dont break score+0, pushDownPoints uses it
 
@@ -5098,6 +5082,25 @@ addLineClearPoints:
 @ret:
         rts
 
+copyBinaryScoreToBCD:
+        lda binScore
+        sta binary32
+        lda binScore+1
+        sta binary32+1
+        lda binScore+2
+        sta binary32+2
+        lda binScore+3
+        sta binary32+3
+        jsr BIN_BCD
+        lda bcd32
+        sta score
+        lda bcd32+1
+        sta score+1
+        lda bcd32+2
+        sta score+2
+        lda bcd32+3
+        sta score+3
+        rts
 
 pointsTable:
         .word   $0000,$0028,$0064,$012C,$04B0
@@ -5377,21 +5380,16 @@ playState_noop:
 showHighScores:
         jsr bulkCopyToPpu
         .addr high_scores_nametable
-        ldy #0 ; TODO: remove this comment
+        ldy #0
 
         lda #$00
         sta generalCounter2
 @copyEntry:
         lda generalCounter2
-        ; and #$03
         asl a
         tax
         lda highScorePpuAddrTable,x
         sta PPUADDR
-        ; lda generalCounter2
-        ; and #$03
-        ; asl a
-        ; tax
         inx
         lda highScorePpuAddrTable,x
         sta PPUADDR
@@ -5434,50 +5432,6 @@ showHighScores:
         jsr renderByteBCD
         iny
 
-        ; lda generalCounter2
-        ; asl a
-        ; sta generalCounter
-        ; asl a
-        ; clc
-        ; adc generalCounter
-        ; tay
-        ; ldx #$08
-; @copyChar:
-        ; lda highScoreNames,y
-        ; sty generalCounter
-        ; tay
-        ; lda highScoreCharToTile,y
-        ; ldy generalCounter
-        ; sta PPUDATA
-        ; iny
-        ; dex
-        ; bne @copyChar
-        ; lda #$FF
-        ; sta PPUDATA
-        ; lda generalCounter2
-        ; sta generalCounter
-        ; asl a
-        ; clc
-        ; adc generalCounter
-        ; tay
-        ; lda highScoreScores,y
-        ; jsr twoDigsToPPU
-        ; iny
-        ; lda highScoreScores,y
-        ; jsr twoDigsToPPU
-        ; iny
-        ; lda highScoreScores,y
-        ; jsr twoDigsToPPU
-        ; iny
-        ; lda highScoreScores,y
-        ; jsr twoDigsToPPU
-        ; lda #$FF
-        ; sta PPUDATA
-        ; ldy generalCounter2
-        ; lda highScoreLevels,y
-        ; tax
-        ; lda byteToBcdTable,x
-        ; jsr twoDigsToPPU
         inc generalCounter2
         lda generalCounter2
         cmp #highScoreQuantity
@@ -5511,9 +5465,11 @@ byteToBcdTable: ; original goes to 49
 
 ; Adjusts high score table and handles data entry, if necessary
 handleHighScoreIfNecessary:
-        ldy #0
-        jmp adjustHighScores
+        ; jmp adjustHighScores
 
+        jsr copyBinaryScoreToBCD ; only needed if score is mangled in points routine
+
+        ldy #0
         lda #$00
         sta highScoreEntryRawPos
 @compareWithPos:
@@ -5525,34 +5481,44 @@ handleHighScoreIfNecessary:
         ; tay
 
 
-        ; lda highScoreScores,y
-        ; cmp score+2
-        ; beq @checkHundredsByte
-        ; bcs @tooSmall
-        ; bcc adjustHighScores
-; @checkHundredsByte:
+        lda highscores+highScoreNameLength,y
+        cmp score+3
+        beq @checkHighByte
+        bcs @tooSmall
+        bcc adjustHighScores
+@checkHighByte:
+        lda highScoreScores,y
+        lda highscores+highScoreNameLength +1,y
+        cmp score+2
+        beq @checkHundredsByte
+        bcs @tooSmall
+        bcc adjustHighScores
+@checkHundredsByte:
         ; iny
         ; lda highScoreScores,y
-        ; cmp score+1
-        ; beq @checkOnesByte
-        ; bcs @tooSmall
-        ; bcc adjustHighScores
-; ; This breaks ties by prefering the new score
-; @checkOnesByte:
+        lda highscores+highScoreNameLength +2,y
+        cmp score+1
+        beq @checkOnesByte
+        bcs @tooSmall
+        bcc adjustHighScores
+; This breaks ties by prefering the new score
+@checkOnesByte:
         ; iny
         ; lda highScoreScores,y
-        ; cmp score
-        ; beq adjustHighScores
-        ; bcc adjustHighScores
-; @tooSmall:
-        ; inc highScoreEntryRawPos
-        ; lda highScoreEntryRawPos
-        ; cmp #highScoreQuantity
-        ; beq @ret
+        lda highscores+highScoreNameLength +3,y
+        cmp score
+        beq adjustHighScores
+        bcc adjustHighScores
+@tooSmall:
 
-        ; cmp #$07
-        ; beq @ret
-        ; jmp @compareWithPos
+        tya
+        adc #highScoreLength
+        tay
+        inc highScoreEntryRawPos
+        lda highScoreEntryRawPos
+        cmp #highScoreQuantity
+        beq @ret
+        jmp @compareWithPos
 
 @ret:   rts
 
@@ -5577,30 +5543,46 @@ adjustHighScores:
         lda #$00
         jsr copyHighScoreLevelToNextIndex
 @doneMovingOldScores:
+
         ldx highScoreEntryRawPos
-        lda highScoreIndexToHighScoreNamesOffset,x
+        lda highScoreEntryRowOffsetLookup, x
+
+; add new score
+        ; ldx highScoreEntryRawPos
+        ; lda highScoreIndexToHighScoreNamesOffset,x
         tax
-        ldy #$06
+        ldy #highScoreNameLength
         lda #$00
 @clearNameLetter:
-        sta highScoreNames,x
+        sta highscores,x
         inx
         dey
         bne @clearNameLetter
-        ldx highScoreEntryRawPos
-        lda highScoreIndexToHighScoreScoresOffset,x
-        tax
+        ; ldx highScoreEntryRawPos
+        ; lda highScoreIndexToHighScoreScoresOffset,x
+        ; tax
+        lda score+3
+        sta highscores,x
+        inx
         lda score+2
-        sta highScoreScores,x
+        sta highscores,x
         inx
         lda score+1
-        sta highScoreScores,x
+        sta highscores,x
         inx
         lda score
-        sta highScoreScores,x
-        ldx highScoreEntryRawPos
+        sta highscores,x
+        inx
         lda levelNumber
-        sta highScoreLevels,x
+        sta highscores,x
+        inx
+        lda startLevel
+        sta highscores,x
+        ; TODO: customLevel
+
+        ; ldx highScoreEntryRawPos
+        ; lda levelNumber
+        ; sta highScoreLevels,x
         jmp highScoreEntryScreen
 
 ; reg a: start byte to copy
@@ -5696,7 +5678,6 @@ highScoreEntryScreen:
         sta highScoreEntryNameOffsetForLetter
         sta oamStaging
         lda highScoreEntryRawPos
-        and #$03
         tax
         lda highScorePosToY,x
         sta spriteYOffset
@@ -5819,7 +5800,7 @@ highScoreEntryScreen:
 highScorePosToY:
         .byte   $9F,$AF,$BF
 highScoreEntryRowOffsetLookup:
-        .byte $0, highScoreLength, highScoreLength*2
+        .byte   $0, highScoreLength, highScoreLength*2
 
 render_mode_congratulations_screen:
         lda #$00
@@ -6408,17 +6389,9 @@ defaultHighScoresTable:
         .byte   $00,$00,$00,$00 ; score
         ; .byte   $0A,$0b,$0a,$0c,$0a,$0d,$0a,$0e ; name
         ; .byte   $01,$02,$03,$04 ; score
-        .byte   $0d ; level
-        .byte   $0d ; start level
+        .byte   $01 ; level
+        .byte   $02 ; start level
 .endrepeat
-        ; .byte   $2B,$2B,$2B,$2B,$2B,$2B,$2b,$2b ; HOWARD
-        ; .byte   $2B,$2B,$2B,$2B,$2B,$2B,$2b,$2b ; OTASAN
-        ; .byte   $2B,$2B,$2B,$2B,$2B,$2B,$2b,$2b ; LANCE
-        ;High Scores are stored in BCD
-        ; .byte   $00,$00,$00,$00
-        ; .byte   $00,$00,$00,$00
-        ; .byte   $00,$00,$00,$00
-        ; .byte   $00,$00,$00 ; levels
         .byte   $FF
 game_type_menu_nametable: ; RLE
         .incbin "gfx/nametables/game_type_menu_nametable_practise.bin"
