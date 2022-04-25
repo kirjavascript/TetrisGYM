@@ -45,37 +45,47 @@ printNT(buffer, lookup);
 // ###a  jbkbkbkbkbkb@         d###
 // ###a  f5f6f7f8f9f$h         d###
 // ###a  vbibibibibibn         d###
+//
+// ##a  ######################  d##
+// ##a  #    NAME  SCORE  LV #  d##
+// ##a  ######################  d##
+// ##a  # 1                  #  d##
+// ##a  #                    #  d##
+// ##a  # 2                  #  d##
+// ##a  #                    #  d##
+// ##a  # 3                  #  d##
+// ##a  ######################  d##
 
 drawTiles(buffer, lookup, `
 ################################
-################################
-##qwwwwwwwwwwwwwwwwwwwwwwwwwwe##
-##a                          d##
-##a                qwwwwwwe  d##
-##a                a      d  d##
-##a                zxxxxxxc  d##
-##a     ╄╅╅╅╅╅╆              d##
-##a     ╇LEVEL╈              d##
-##a     ╉╊╊╊╊╊╋              d##
-##a   rtututututy            d##
-##a   f0f1f2f3f4h   rttty    d##
-##a   jbkbkbkbkbl   f   h    d##
-##a   f5f6f7f8f9h   vbbbn    d##
-##a   vbibibibibn            d##
-##a                          d##
-##a                          d##
-##a  ######################  d##
-##a  #    NAME  SCORE  LV #  d##
-##a  ######################  d##
-##a  # 1                  #  d##
-##a  #                    #  d##
-##a  # 2                  #  d##
-##a  #                    #  d##
-##a  # 3                  #  d##
-##a  ######################  d##
-##a                          d##
-##zxxxxxxxxxxxxxxxxxxxxxxxxxxc##
-################################
+#qwwwwwwwwwwwwwwwwwwwwwwwwwwwwe#
+#a                            d#
+#a                            d#
+#a                 qwwwwwwe   d#
+#a                 a      d   d#
+#a                 zxxxxxxc   d#
+#a      ╄╅╅╅╅╅╆               d#
+#a      ╇LEVEL╈               d#
+#a      ╉╊╊╊╊╊╋               d#
+#a    rtututututy             d#
+#a    f0f1f2f3f4h   rttty     d#
+#a    jbkbkbkbkbl   f   h     d#
+#a    f5f6f7f8f9h   vbbbn     d#
+#a    vbibibibibn             d#
+#a                            d#
+#a                            d#
+#a rtttttttttttttttttttttttty d#
+#a fNAME    SCORE    LNS  LVh d#
+#a jbbbbbbbbbbbbbbbbbbbbbbbbl d#
+#a f                        h d#
+#a f                        h d#
+#a f                        h d#
+#a f                        h d#
+#a f                        h d#
+#a f                        h d#
+#a vbbbbbbbbbbbbbbbbbbbbbbbbn d#
+#a                            d#
+#zxxxxxxxxxxxxxxxxxxxxxxxxxxxxc#
 ################################
 `);
 
@@ -89,12 +99,12 @@ drawAttrs(buffer, [`
     2223333333333222
     2223333333333222
 `,`
-    2200000000000022
-    2200000000000022
-    2200000000000022
-    2200000000000022
-    2200000000000022
-    2222222222222222
+    2000000000000002
+    2000000000000002
+    2000000000000002
+    2000000000000002
+    2000000000000002
+    2000000000000002
     2222222222222222
     2222222222222222
 `]);
