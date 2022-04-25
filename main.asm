@@ -5406,13 +5406,10 @@ showHighScores:
 
         ; score
         lda highscores,y
-        ; beq @noMax
         cmp #$A
         bmi @scoreHighWrite
         jsr twoDigsToPPU
         jmp @scoreEnd
-; @noMax:
-;         lda #$FF
 @scoreHighWrite:
         sta PPUDATA
 @scoreEnd:

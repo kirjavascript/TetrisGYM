@@ -1,55 +1,92 @@
-const { readFileSync, writeFileSync } = require('fs');
+const {
+    readStripe,
+    writeRLE,
+    printNT,
+    drawTiles,
+    drawAttrs,
+    flatLookup,
+} = require('./nametables');
 
-const buffer = readFileSync(__dirname + '/enter_high_score_nametable.bin');
 
-const lookup = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ-.\'>################qweadzxc###############/##!###########()############################################################################################################################################################### ';
+const buffer = readStripe(__dirname + '/enter_high_score_nametable.bin');
 
-const chars = [...buffer].map(value => lookup[value] || '__NOWAYNOWAY');
+let lookup = flatLookup(`
+0123456789ABCDEF
+GHIJKLMNOPQRSTUV
+WXYZ-,˙>rtyfhvbn
+########qweadzxc
+############jkl/
+ui!###g@######()
+############^$#.
+################
+################
+################
+################
+################
+################
+################
+################
+###############
+`);
 
-console.log(chars.join('').match(/.{35}/g).join('\n'));
+lookup = [...lookup].map((d, i) => d === '#' ? String.fromCharCode(9472 + i) : d).join``;
 
-const tiles = `
-W0W################################
-WWW################################
-W#W###qwwwwwwwwwwwwwwwwwwwwwwwwe###
-W#W###a                        d###
-W#W###a                        d###
-W#W###a                        d###
-W#W###a       GOOD GAME        d###
-W#W###a                        d###
-X0W###a                        d###
-XWW###a                        d###
-X#W###a       YOU ARE A        d###
-X#W###a                        d###
-X#W###a     TETRIS MASTER#     d###
-X#W###a                        d###
-X#W###a                        d###
-X#W###a PLEASE ENTER YOUR NAME d###
-Y0W###a                        d###
-YWW###a ###################### d###
-Y#W###a #    NAME  SCORE  LV # d###
-Y#W###a ###################### d###
-Y#W###a # 1                  # d###
-Y#W###a #                    # d###
-Y#W###a # 2                  # d###
-Y#W###a #                    # d###
-Z0W###a # 3                  # d###
-ZWW###a ###################### d###
-Z#W###a                        d###
-Z#W###zxxxxxxxxxxxxxxxxxxxxxxxxc###
-Z#W################################
-Z#W################################
-Z#W#########A####A##000000##000000#
-Z#W#000000##000000#########AAAAAAAA
-`;
-const practise = Buffer.from(buffer);
-[...tiles.trim().split('\n').join('')].forEach((d, i) => {
-    if (d !== '#') {
-        practise[i] = lookup.indexOf(d);
-    }
-});
+printNT(buffer, lookup);
 
-writeFileSync(
+drawTiles(buffer, lookup, `
+################################
+#qwwwwwwwwwwwwwwwwwwwwwwwwwwwwe#
+#a                            d#
+#a                            d#
+#a                            d#
+#a                            d#
+#a         GOOD GAME          d#
+#a                            d#
+#a                            d#
+#a                            d#
+#a         YOU ARE A          d#
+#a                            d#
+#a       TETRIS MASTER#       d#
+#a                            d#
+#a                            d#
+#a   PLEASE ENTER YOUR NAME   d#
+#a                            d#
+#a rtttttttttttttttttttttttty d#
+#a fNAME     SCORE   LNS  LVh d#
+#a jbbbbbbbbbbbbbbbbbbbbbbbbl d#
+#a f                        h d#
+#a f                        h d#
+#a f                        h d#
+#a f                        h d#
+#a f                        h d#
+#a f                        h d#
+#a vbbbbbbbbbbbbbbbbbbbbbbbbn d#
+#a                            d#
+#zxxxxxxxxxxxxxxxxxxxxxxxxxxxxc#
+################################
+`);
+
+drawAttrs(buffer, [`
+    2222222222222222
+    2222222222222222
+    2222222222222222
+    2222233333322222
+    2222222222222222
+    2222222222222222
+    2222222222222222
+    2222222222222222
+`,`
+    2000000000000002
+    2000000000000002
+    2000000000000002
+    2000000000000002
+    2000000000000002
+    2000000000000002
+    2222222222222222
+    2222222222222222
+`]);
+
+writeRLE(
     __dirname + '/enter_high_score_nametable_practise.bin',
-    require('./rle')(practise),
+    buffer,
 );
