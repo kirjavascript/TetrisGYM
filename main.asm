@@ -329,7 +329,7 @@ soundEffectSlot4Playing:= $06FC
 currentlyPlayingMusicTrack:= $06FD          ; Copied from musicTrack
 unreferenced_soundRngTmp:= $06FF
 highscores := $700
-; scores are name - score - lines - level - startlevel
+; scores are name - score - lines - startlevel - level
 highScoreQuantity := 3
 highScoreNameLength := 8
 highScoreScoreLength := 4
@@ -5439,7 +5439,7 @@ showHighScores:
         sta PPUDATA
 
         ; levels
-        lda highscores,y
+        lda highscores,y ; startlevel
         jsr renderByteBCD
         iny
 
@@ -5454,7 +5454,7 @@ showHighScores:
         adc #$35
         sta PPUADDR
 
-        ; start level
+        ; level
         lda highscores,y
         jsr renderByteBCD
         iny
@@ -5579,10 +5579,10 @@ adjustHighScores:
         lda lines
         sta highscores,x
         inx
-        lda levelNumber
+        lda startLevel
         sta highscores,x
         inx
-        lda startLevel
+        lda levelNumber
         sta highscores,x
         jmp highScoreEntryScreen
 
