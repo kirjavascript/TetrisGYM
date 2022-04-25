@@ -20,6 +20,7 @@
     * Added exclamation mark to name entry
 * 3 digit level counter for levels over 99
 * 4 digit line counter for lines over 999
+* Add hearts on Level Menu
 * Added new screen for Speed Tester
 * Readded original broken colours from level 138+
 * Backwards compatible Seed Trainer improvements

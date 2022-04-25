@@ -1824,8 +1824,11 @@ levelControlCustomLevel:
         rts
 
 levelControlHearts:
+MAX_HEARTS := 7
         lda #BUTTON_LEFT
         jsr menuThrottle
+        beq @checkRightPressed
+        lda heartsAndReady
         beq @checkRightPressed
         lda #$01
         sta soundEffectSlot1Init
@@ -1834,10 +1837,13 @@ levelControlHearts:
 @checkRightPressed:
         lda #BUTTON_RIGHT
         jsr menuThrottle
-        beq @checkLeftPressed
+        beq @checkUpPressed
+        lda heartsAndReady
+        cmp #MAX_HEARTS
+        bpl @checkUpPressed
         inc heartsAndReady
         jsr @changeHearts
-@checkLeftPressed:
+@checkUpPressed:
 
         lda newlyPressedButtons
         cmp #BUTTON_UP
