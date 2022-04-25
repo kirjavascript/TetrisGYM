@@ -1780,15 +1780,22 @@ levelControlCustomLevel:
         lda frameCounter
         and #$03
         beq @indicatorEnd
-        lda #$00
-        sta spriteIndexInOamContentLookup
-        lda #$5B
+        ; lda #$00
+        ; sta spriteIndexInOamContentLookup
+        ; lda #$5B
+        ; sta spriteYOffset
+        ; lda #$A4
+        ; sta spriteXOffset
+        ; jsr loadSpriteIntoOamStaging
+        ; lda #$B4
+        ; sta spriteXOffset
+        ; jsr loadSpriteIntoOamStaging
+        lda #$4E
         sta spriteYOffset
-        lda #$A4
+        lda #$B0
         sta spriteXOffset
-        jsr loadSpriteIntoOamStaging
-        lda #$B4
-        sta spriteXOffset
+        lda #$21
+        sta spriteIndexInOamContentLookup
         jsr loadSpriteIntoOamStaging
 @indicatorEnd:
 
@@ -3078,7 +3085,8 @@ oamContentLookup:
         .addr   spritePractiseTypeCursor ; $1D
         .addr   spriteHeartCursor ; $1E
         .addr   spriteHeart ; $1F
-        .addr   spriteReady ; $2F
+        .addr   spriteReady ; $20
+        .addr   spriteCustomLevelCursor ; $21
 ; Sprites are sets of 4 bytes in the OAM format, terminated by FF. byte0=y, byte1=tile, byte2=attrs, byte3=x
 ; YY AA II XX
 sprite00LevelSelectCursor:
@@ -3164,6 +3172,10 @@ spriteReady:
         .byte   $00,'R',$00,$00,$08,'E',$00,$00
         .byte   $10,'A',$00,$00,$18,'D',$00,$00
         .byte   $20,'Y',$00,$FF
+        .byte   $FF
+
+spriteCustomLevelCursor:
+        .byte   $00,$6A,$00,$00,$21,$6A,$80,$00
         .byte   $FF
 isPositionValid:
         lda tetriminoY
