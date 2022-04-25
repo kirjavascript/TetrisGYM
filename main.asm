@@ -1783,9 +1783,10 @@ levelControlCustomLevel:
         jsr loadSpriteIntoOamStaging
 @indicatorEnd:
 
-        lda #BUTTON_A
+        lda #BUTTON_RIGHT
         jsr menuThrottle
         beq @checkUpPressed
+        clc
         lda customLevel
         adc #$A
         sta customLevel
@@ -5100,8 +5101,8 @@ copyBinaryScoreToBCD:
         rts
 
 pointsTable:
-        .word   $0000,$0028,$0064,$012C,$04B0
-        .word   $03E8 ; used in btype score calc
+        .word   0,40,100,300,1200
+        .word   1000 ; used in btype score calc
 
 calcBCDLinesAndTileQueue:
         lda #0

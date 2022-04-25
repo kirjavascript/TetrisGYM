@@ -14,9 +14,10 @@
 * Rewrite of all highscore code
     * 8 digit name entry
     * 8 digit scores
-    * Lines added to highscores
-    * Start Level added to highscores
+    * Added lines to highscores
+    * Added start level to highscores
     * DAS-like movement for name entry
+    * Added exclamation mark to name entry
 * 3 digit level counter for levels over 99
 * 4 digit line counter for lines over 999
 * Added new screen for Speed Tester

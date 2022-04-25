@@ -15,8 +15,8 @@ GHIJKLMNOPQRSTUV
 WXYZ-,˙>rtyfhvbn
 ########qweadzxc
 ############jkl/
-ui!###g@######()
-############^$#.
+ui!###g@ß#####()
+###########æ^$#.
 ################
 ################
 ################
@@ -45,6 +45,13 @@ printNT(buffer, lookup);
 // ###a  jbkbkbkbkbkb@         d###
 // ###a  f5f6f7f8f9f$h         d###
 // ###a  vbibibibibibn         d###
+
+// v5-proto1
+// #a    rtututututy             d#
+// #a    f0f1f2f3f4ßbbb@         d#
+// #a    jbkbkbkbkbl   h         d#
+// #a    f5f6f7f8f9ßbbbn         d#
+// #a    vbibibibibn             d#
 
 drawTiles(buffer, lookup, `
 ################################
