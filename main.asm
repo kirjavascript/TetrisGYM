@@ -329,12 +329,14 @@ soundEffectSlot4Playing:= $06FC
 currentlyPlayingMusicTrack:= $06FD          ; Copied from musicTrack
 unreferenced_soundRngTmp:= $06FF
 highscores := $700
-; scores are name - score - level - startlevel
+; scores are name - score - lines - level - startlevel
 highScoreQuantity := 3
 highScoreNameLength := 8
 highScoreScoreLength := 4
-highScoreLength := highScoreNameLength + highScoreScoreLength + 2
-; 42/91 bytes ^
+highScoreLinesLength := 2
+highScoreLevelsLength := 2
+highScoreLength := highScoreNameLength + highScoreScoreLength + highScoreLinesLength + highScoreLevelsLength
+; 48/91 bytes ^
 ; .. bunch of unused stuff
 initMagic   := $075B                        ; Initialized to a hard-coded number. When resetting, if not correct number then it knows this is a cold boot
 
@@ -5386,6 +5388,7 @@ showHighScores:
         lda highScorePpuAddrTable,x
         sta PPUADDR
 
+        ; name
         ldx #highScoreNameLength
 @copyChar:
         lda highscores,y
@@ -5401,6 +5404,7 @@ showHighScores:
         lda #$FF
         sta PPUDATA
 
+        ; score
         lda highscores,y
         jsr twoDigsToPPU
         iny
@@ -5417,9 +5421,31 @@ showHighScores:
         lda #$FF
         sta PPUDATA
 
+        ; lines
+        lda highscores,y
+        sta PPUDATA
+        iny
+        lda highscores,y
+        jsr twoDigsToPPU
+        iny
+
+        ; levels
         lda highscores,y
         jsr renderByteBCD ; TODO: dont render blank tile?
         iny
+
+        ; update PPUADDR for start level
+        lda generalCounter2
+        asl a
+        tax
+        lda highScorePpuAddrTable,x
+        sta PPUADDR
+        inx
+        lda highScorePpuAddrTable,x
+        adc #$36
+        sta PPUADDR
+
+        ; start level
         lda highscores,y
         jsr renderByteBCD
         iny
@@ -5536,6 +5562,12 @@ adjustHighScores:
         sta highscores,x
         inx
         lda score
+        sta highscores,x
+        inx
+        lda lines+1
+        sta highscores,x
+        inx
+        lda lines
         sta highscores,x
         inx
         lda levelNumber
