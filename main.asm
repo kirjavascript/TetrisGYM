@@ -5374,8 +5374,7 @@ playState_noop:
 
 showHighScores:
         ldy #0
-
-        lda #$00
+        lda #0
         sta generalCounter2
 @copyEntry:
         lda generalCounter2

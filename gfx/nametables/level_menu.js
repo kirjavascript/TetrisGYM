@@ -49,32 +49,32 @@ printNT(buffer, lookup);
 drawTiles(buffer, lookup, `
 ################################
 ################################
-###qwwwwwwwwwwwwwwwwwwwwwwwwe###
-###a                        d###
-###a               qwwwwwwe d###
-###a               a      d d###
-###a               zxxxxxxc d###
-###a    ╄╅╅╅╅╅╆             d###
-###a    ╇LEVEL╈             d###
-###a    ╉╊╊╊╊╊╋             d###
-###a  rtututututy           d###
-###a  f0f1f2f3f4h   rttty   d###
-###a  jbkbkbkbkbl   f   h   d###
-###a  f5f6f7f8f9h   vbbbn   d###
-###a  vbibibibibn           d###
-###a                        d###
-###a                        d###
-###a ###################### d###
-###a #    NAME  SCORE  LV # d###
-###a ###################### d###
-###a # 1                  # d###
-###a #                    # d###
-###a # 2                  # d###
-###a #                    # d###
-###a # 3                  # d###
-###a ###################### d###
-###a                        d###
-###zxxxxxxxxxxxxxxxxxxxxxxxxc###
+##qwwwwwwwwwwwwwwwwwwwwwwwwwwe##
+##a                          d##
+##a                qwwwwwwe  d##
+##a                a      d  d##
+##a                zxxxxxxc  d##
+##a     ╄╅╅╅╅╅╆              d##
+##a     ╇LEVEL╈              d##
+##a     ╉╊╊╊╊╊╋              d##
+##a   rtututututy            d##
+##a   f0f1f2f3f4h   rttty    d##
+##a   jbkbkbkbkbl   f   h    d##
+##a   f5f6f7f8f9h   vbbbn    d##
+##a   vbibibibibn            d##
+##a                          d##
+##a                          d##
+##a  ######################  d##
+##a  #    NAME  SCORE  LV #  d##
+##a  ######################  d##
+##a  # 1                  #  d##
+##a  #                    #  d##
+##a  # 2                  #  d##
+##a  #                    #  d##
+##a  # 3                  #  d##
+##a  ######################  d##
+##a                          d##
+##zxxxxxxxxxxxxxxxxxxxxxxxxxxc##
 ################################
 ################################
 `);
