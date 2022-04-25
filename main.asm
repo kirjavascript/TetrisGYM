@@ -5401,9 +5401,6 @@ showHighScores:
         dex
         bne @copyChar
 
-        lda #$FF
-        sta PPUDATA
-
         ; score
         lda highscores,y
         jsr twoDigsToPPU
@@ -5429,6 +5426,9 @@ showHighScores:
         jsr twoDigsToPPU
         iny
 
+        lda #$FF
+        sta PPUDATA
+
         ; levels
         lda highscores,y
         jsr renderByteBCD ; TODO: dont render blank tile?
@@ -5442,7 +5442,7 @@ showHighScores:
         sta PPUADDR
         inx
         lda highScorePpuAddrTable,x
-        adc #$36
+        adc #$35
         sta PPUADDR
 
         ; start level
