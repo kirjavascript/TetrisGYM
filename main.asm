@@ -349,7 +349,7 @@ menuPaletteDelay := menuRAM+4
 levelControlMode  := menuRAM+5
 customLevel := menuRAM+6
 classicLevel := menuRAM+7
-heartsAndReady := menuRAM+8
+heartsAndReady := menuRAM+8 ; high nybble used for ready
 menuVars := $769
 paceModifier := menuVars+0
 presetModifier := menuVars+1
@@ -1698,14 +1698,7 @@ gameMode_levelMenu_processPlayer1Navigation:
         sta newlyPressedButtons
         jsr levelControl
         jsr levelMenuRenderHearts
-
-        lda #$4f
-        sta spriteYOffset
-        lda #$88
-        sta spriteXOffset
-        lda #$20
-        sta spriteIndexInOamContentLookup
-        jsr loadSpriteIntoOamStaging
+        jsr levelMenuHandleReady
 
         lda newlyPressedButtons_player1
         cmp #BUTTON_START
@@ -1734,6 +1727,7 @@ gameMode_levelMenu_processPlayer1Navigation:
         sta gameModeState
         lda #$02
         sta soundEffectSlot1Init
+        jsr makeNotReady
         inc gameMode
         rts
 
@@ -1743,6 +1737,7 @@ gameMode_levelMenu_processPlayer1Navigation:
         bne @continue
         lda #$02
         sta soundEffectSlot1Init
+        jsr makeNotReady
         dec gameMode
         rts
 
@@ -1767,6 +1762,12 @@ gameMode_levelMenu_processPlayer1Navigation:
 
         jsr updateAudioWaitForNmiAndResetOamStaging
         jmp gameMode_levelMenu_processPlayer1Navigation
+
+makeNotReady:
+        lda heartsAndReady
+        and #$F
+        sta heartsAndReady
+        rts
 
 levelControl:
         lda levelControlMode
@@ -1837,6 +1838,7 @@ MAX_HEARTS := 7
         jsr menuThrottle
         beq @checkRightPressed
         lda heartsAndReady
+        and #$F
         beq @checkRightPressed
         lda #$01
         sta soundEffectSlot1Init
@@ -1847,6 +1849,7 @@ MAX_HEARTS := 7
         jsr menuThrottle
         beq @checkUpPressed
         lda heartsAndReady
+        and #$F
         cmp #MAX_HEARTS
         bpl @checkUpPressed
         inc heartsAndReady
@@ -1948,6 +1951,7 @@ levelMenuRenderHearts:
         lda #$38
         sta spriteXOffset
         lda heartsAndReady
+        and #$F
         sta tmpZ
 @heartLoop:
         lda tmpZ
@@ -1971,6 +1975,31 @@ levelMenuRenderHearts:
         jsr loadSpriteIntoOamStaging
 @skipCursor:
         rts
+
+levelMenuHandleReady:
+        lda heartsAndReady
+        and #$F0
+        beq @notReady
+        lda #$4f
+        sta spriteYOffset
+        lda #$88
+        sta spriteXOffset
+        lda #$20
+        sta spriteIndexInOamContentLookup
+        jsr loadSpriteIntoOamStaging
+@notReady:
+
+        lda newlyPressedButtons
+        cmp #BUTTON_SELECT
+        bne @notSelect
+        lda #$01
+        sta soundEffectSlot1Init
+        lda heartsAndReady
+        eor #$80
+        sta heartsAndReady
+@notSelect:
+        rts
+
 levelToSpriteYOffset:
         .byte   $53,$53,$53,$53,$53,$63,$63,$63
         .byte   $63,$63

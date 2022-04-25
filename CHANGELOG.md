@@ -21,6 +21,7 @@
 * 3 digit level counter for levels over 99
 * 4 digit line counter for lines over 999
 * Added hearts to level menu
+* Added ready indicator to level menu
 * Added new screen for Speed Tester
 * Readded original broken colours from level 138+
 * Backwards compatible Seed Trainer improvements
