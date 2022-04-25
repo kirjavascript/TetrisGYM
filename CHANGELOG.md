@@ -11,10 +11,15 @@
     * 999999 scorecap 
     * Fixed T-Spin scoring
     * Crash free with no 'long frames'
+* Rewrite of all highscore code
+    * 8 digit name entry
+    * 8 digit scores
+    * Lines added to highscores
+    * Start Level added to highscores
+    * DAS-like movement for name entry
 * 3 digit level counter for levels over 99
 * 4 digit line counter for lines over 999
 * Added new screen for Speed Tester
-* Added DAS-like movement to high score entry screen
 * Readded original broken colours from level 138+
 * Backwards compatible Seed Trainer improvements
 * Tap counter wrapping improvement
