@@ -5401,9 +5401,21 @@ showHighScores:
         dex
         bne @copyChar
 
+        lda #$FF
+        sta PPUDATA
+
         ; score
         lda highscores,y
+        ; beq @noMax
+        cmp #$A
+        bmi @scoreHighWrite
         jsr twoDigsToPPU
+        jmp @scoreEnd
+; @noMax:
+;         lda #$FF
+@scoreHighWrite:
+        sta PPUDATA
+@scoreEnd:
         iny
         lda highscores,y
         jsr twoDigsToPPU
@@ -5431,7 +5443,7 @@ showHighScores:
 
         ; levels
         lda highscores,y
-        jsr renderByteBCD ; TODO: dont render blank tile?
+        jsr renderByteBCD
         iny
 
         ; update PPUADDR for start level

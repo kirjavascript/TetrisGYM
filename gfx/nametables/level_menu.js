@@ -45,16 +45,6 @@ printNT(buffer, lookup);
 // ###a  jbkbkbkbkbkb@         d###
 // ###a  f5f6f7f8f9f$h         d###
 // ###a  vbibibibibibn         d###
-//
-// ##a  ######################  d##
-// ##a  #    NAME  SCORE  LV #  d##
-// ##a  ######################  d##
-// ##a  # 1                  #  d##
-// ##a  #                    #  d##
-// ##a  # 2                  #  d##
-// ##a  #                    #  d##
-// ##a  # 3                  #  d##
-// ##a  ######################  d##
 
 drawTiles(buffer, lookup, `
 ################################
@@ -75,7 +65,7 @@ drawTiles(buffer, lookup, `
 #a                            d#
 #a                            d#
 #a rtttttttttttttttttttttttty d#
-#a fNAME    SCORE    LNS  LVh d#
+#a fNAME     SCORE   LNS  LVh d#
 #a jbbbbbbbbbbbbbbbbbbbbbbbbl d#
 #a f                        h d#
 #a f                        h d#
