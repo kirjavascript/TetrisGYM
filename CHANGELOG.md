@@ -20,13 +20,13 @@
     * Added exclamation mark to name entry
 * 3 digit level counter for levels over 99
 * 4 digit line counter for lines over 999
-* Add hearts on Level Menu
+* Added hearts to level menu
 * Added new screen for Speed Tester
 * Readded original broken colours from level 138+
 * Backwards compatible Seed Trainer improvements
 * Tap counter wrapping improvement
 * Added Block Tool HUD for piece information
-* Changes made to make input replays sync up with the original ROM easier
+* Changes made to more closely match the original ROM
     * Restore seed shredding on level menu
     * Hold `select` to start in Qual Mode and reset level cursor 
     * Transition from Legal to Title screen after 512 frames

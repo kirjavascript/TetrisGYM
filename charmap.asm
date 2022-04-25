@@ -37,7 +37,7 @@
 .charmap '-', $24
 .charmap '.', $25
 .charmap '>', $27
-.charmap '!', $28
+.charmap '!', $52
 .charmap '^', $29
 .charmap '(', $2a
 .charmap ')', $2b

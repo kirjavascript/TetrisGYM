@@ -1699,6 +1699,14 @@ gameMode_levelMenu_processPlayer1Navigation:
         jsr levelControl
         jsr levelMenuRenderHearts
 
+        lda #$4f
+        sta spriteYOffset
+        lda #$88
+        sta spriteXOffset
+        lda #$20
+        sta spriteIndexInOamContentLookup
+        jsr loadSpriteIntoOamStaging
+
         lda newlyPressedButtons_player1
         cmp #BUTTON_START
         bne @checkBPressed
@@ -3041,6 +3049,7 @@ oamContentLookup:
         .addr   spritePractiseTypeCursor ; $1D
         .addr   spriteHeartCursor ; $1E
         .addr   spriteHeart ; $1F
+        .addr   spriteReady ; $2F
 ; Sprites are sets of 4 bytes in the OAM format, terminated by FF. byte0=y, byte1=tile, byte2=attrs, byte3=x
 ; YY AA II XX
 sprite00LevelSelectCursor:
@@ -3122,6 +3131,11 @@ spriteHeartCursor:
         .byte   $00,$6c,$00,$00,$FF
 spriteHeart:
         .byte   $00,$6e,$00,$00,$FF
+spriteReady:
+        .byte   $00,'R',$00,$00,$08,'E',$00,$00
+        .byte   $10,'A',$00,$00,$18,'D',$00,$00
+        .byte   $20,'Y',$00,$FF
+        .byte   $FF
 isPositionValid:
         lda tetriminoY
         asl a
