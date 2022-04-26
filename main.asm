@@ -10,9 +10,9 @@
 INES_MAPPER := 1 ; supports 1 and 3
 PRACTISE_MODE := 1
 NO_MUSIC := 1
-AUTO_WIN := 1 ; press select to end game
+AUTO_WIN := 0 ; press select to end game
 INITIAL_CUSTOM_LEVEL := 157
-NO_SCORING := 0
+NO_SCORING := 0 ; breaks pace
 
 BUTTON_DOWN := $4
 BUTTON_UP := $8
@@ -2384,7 +2384,21 @@ transitionModeSetup:
         rol
         rol
         rol
-        sta score+2
+        sta bcd32+2
+        lda #0
+        sta bcd32
+        sta bcd32+1
+        sta bcd32+3
+        jsr BCD_BIN
+        lda binary32
+        sta binScore
+        lda binary32+1
+        sta binScore+1
+        lda binary32+2
+        sta binScore+2
+        lda binary32+3
+        sta binScore+3
+        jsr setupScoreForRender
 
         ; set lines
 
@@ -5113,6 +5127,7 @@ addLineClearPoints:
         lda #$00
         sta completedLines
 
+setupScoreForRender:
         jsr copyBinaryScoreToBCD
 
         ; dont break score+0, pushDownPoints uses it
