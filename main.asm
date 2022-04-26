@@ -10,7 +10,7 @@
 INES_MAPPER := 1 ; supports 1 and 3
 PRACTISE_MODE := 1
 NO_MUSIC := 1
-AUTO_WIN := 0 ; press select to end game
+AUTO_WIN := 1 ; press select to end game
 INITIAL_CUSTOM_LEVEL := 157
 NO_SCORING := 0 ; breaks pace
 
@@ -2376,6 +2376,9 @@ gameModeState_initGameState:
 
 transitionModeSetup:
         ; set score
+        lda levelNumber
+        cmp #128
+        bpl @ret
 
         lda transitionModifier
         cmp #$10 ; (SXTOKL compat)
@@ -2396,8 +2399,6 @@ transitionModeSetup:
         sta binScore+1
         lda binary32+2
         sta binScore+2
-        lda binary32+3
-        sta binScore+3
         jsr setupScoreForRender
 
         ; set lines
@@ -4930,10 +4931,14 @@ checkLevelUp:
         and #$0F
         bne @lineLoop
 
-        ; needed when mode is set to G (SXTOKL compat)
         lda practiseType
         cmp #MODE_TRANSITION
-        beq @nextLevel
+        bne @notSXTOKL
+        lda transitionModifier
+        cmp #$10
+        bne @notSXTOKL
+        jmp @nextLevel
+@notSXTOKL:
 
         lda lines+1
         sta generalCounter2
