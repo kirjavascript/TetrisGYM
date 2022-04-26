@@ -2376,10 +2376,6 @@ initGameState_return:
         rts
 
 transitionModeSetup:
-        lda levelNumber
-        cmp #129 ; everything after 128 transitions immediately
-        bpl initGameState_return
-
         lda transitionModifier
         cmp #$10 ; (SXTOKL compat)
         beq initGameState_return
@@ -2402,6 +2398,10 @@ transitionModeSetup:
         sta binScore+2
         jsr setupScoreForRender
 
+        lda levelNumber
+        cmp #129 ; everything after 128 transitions immediately
+        bpl initGameState_return
+
 @addLinesLoop:
         ldx #$A
         lda lines
@@ -2413,20 +2413,20 @@ transitionModeSetup:
         lda lines
         and #$0F
         cmp #$0A
-        bmi @checkLevelUp
+        bmi @checkTransition
         lda lines
         clc
         adc #$06
         sta lines
         and #$F0
         cmp #$A0
-        bcc @checkLevelUp
+        bcc @checkTransition
         lda lines
         and #$0F
         sta lines
         inc lines+1
 
-@checkLevelUp:
+@checkTransition:
         lda lines
         and #$0F
         bne @lineLoop
