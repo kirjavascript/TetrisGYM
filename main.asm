@@ -1780,16 +1780,6 @@ levelControlCustomLevel:
         lda frameCounter
         and #$03
         beq @indicatorEnd
-        ; lda #$00
-        ; sta spriteIndexInOamContentLookup
-        ; lda #$5B
-        ; sta spriteYOffset
-        ; lda #$A4
-        ; sta spriteXOffset
-        ; jsr loadSpriteIntoOamStaging
-        ; lda #$B4
-        ; sta spriteXOffset
-        ; jsr loadSpriteIntoOamStaging
         lda #$4E
         sta spriteYOffset
         lda #$B0
@@ -1799,15 +1789,15 @@ levelControlCustomLevel:
         jsr loadSpriteIntoOamStaging
 @indicatorEnd:
 
-        lda #BUTTON_RIGHT
-        jsr menuThrottle
-        beq @checkUpPressed
-        clc
-        lda customLevel
-        adc #$A
-        sta customLevel
-        jsr @changeLevel
-@checkUpPressed:
+        ; lda #BUTTON_RIGHT
+        ; jsr menuThrottle
+        ; beq @checkUpPressed
+        ; clc
+        ; lda customLevel
+        ; adc #$A
+        ; sta customLevel
+        ; jsr @changeLevel
+; @checkUpPressed:
         lda #BUTTON_UP
         jsr menuThrottle
         beq @checkDownPressed
@@ -2033,6 +2023,24 @@ gameModeState_initGameBackground:
         .addr   game_palette
         jsr copyRleNametableToPpu
         .addr   game_nametable
+
+        ; lda heartsAndReady
+        ; and #$F
+        ; beq @noHearts
+        ; tax
+        ; lda #$2B
+        ; sta PPUADDR
+        ; lda #$23
+        ; sta PPUADDR
+        ; lda heartsAndReady
+        ; and #$F
+        ; tax
+        ; lda #$2c
+; @heartLoop:
+        ; sta PPUDATA
+        ; dex
+        ; bne @heartLoop
+; @noHearts:
 
         ; draw dot and M
         lda scoringModifier
@@ -3173,7 +3181,6 @@ spriteReady:
         .byte   $10,'A',$00,$00,$18,'D',$00,$00
         .byte   $20,'Y',$00,$FF
         .byte   $FF
-
 spriteCustomLevelCursor:
         .byte   $00,$6A,$00,$00,$21,$6A,$80,$00
         .byte   $FF
@@ -5587,6 +5594,7 @@ handleHighScoreIfNecessary:
 @tooSmall:
 
         tya
+        clc
         adc #highScoreLength
         tay
         inc highScoreEntryRawPos
