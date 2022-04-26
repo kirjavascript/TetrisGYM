@@ -11,8 +11,8 @@ INES_MAPPER := 1 ; supports 1 and 3
 PRACTISE_MODE := 1
 NO_MUSIC := 1
 AUTO_WIN := 1 ; press select to end game
-INITIAL_CUSTOM_LEVEL := 157
 NO_SCORING := 0 ; breaks pace
+INITIAL_CUSTOM_LEVEL := 29
 
 BUTTON_DOWN := $4
 BUTTON_UP := $8
@@ -2372,17 +2372,18 @@ gameModeState_initGameState:
         lda musicSelectionTable,x
         jsr setMusicTrack
         inc gameModeState
+initGameState_return:
         rts
 
 transitionModeSetup:
-        ; set score
         lda levelNumber
-        cmp #128
-        bpl @ret
+        cmp #129 ; everything after 128 transitions immediately
+        bpl initGameState_return
 
         lda transitionModifier
         cmp #$10 ; (SXTOKL compat)
-        beq @ret
+        beq initGameState_return
+        ; set score
         rol
         rol
         rol
@@ -2401,51 +2402,60 @@ transitionModeSetup:
         sta binScore+2
         jsr setupScoreForRender
 
-        ; set lines
-
-        ; special case below level 10
-        lda levelNumber
-        cmp #$A
-        bpl @over9
-        adc #1
-        jmp @smaller
-@over9:
-
-        ; level + 1
-        lda levelNumber
+@addLinesLoop:
+        ldx #$A
+        lda lines
+        sta tmpX
+        lda lines+1
+        sta tmpY
+@incrementLines:
+        inc lines
+        lda lines
+        and #$0F
+        cmp #$0A
+        bmi @checkLevelUp
+        lda lines
         clc
-        adc #1
-        sta tmp1
-        ; max(10, level - 4)
-        sbc #$5
-        cmp #10
-        bpl @noMin
-        lda #10
-@noMin:
-        ; smallest
-        cmp tmp1
-        bmi @smaller
-        lda tmp1
-@smaller:
-        ; render from A
-        tax
-        dex ; 10 lines before transition
-        lda byteToBcdTable, x
-        and #$F
-        rol
-        rol
-        rol
-        rol
+        adc #$06
         sta lines
-        lda byteToBcdTable, x
         and #$F0
-        lsr
-        lsr
-        lsr
-        lsr
+        cmp #$A0
+        bcc @checkLevelUp
+        lda lines
+        and #$0F
+        sta lines
+        inc lines+1
+
+@checkLevelUp:
+        lda lines
+        and #$0F
+        bne @lineLoop
+
+        lda lines+1
+        sta generalCounter2
+        lda lines
+        sta generalCounter
+        lsr generalCounter2
+        ror generalCounter
+        lsr generalCounter2
+        ror generalCounter
+        lsr generalCounter2
+        ror generalCounter
+        lsr generalCounter2
+        ror generalCounter
+        lda levelNumber
+        cmp generalCounter
+        bpl @lineLoop
+
+@nextLevel:
+        lda tmpX
+        sta lines
+        lda tmpY
         sta lines+1
-@ret:
         rts
+@lineLoop:  dex
+        bne @incrementLines
+        jmp @addLinesLoop
 
 initPlayfieldForTypeB:
         lda typeBModifier
