@@ -1665,7 +1665,7 @@ gameMode_levelMenu:
         .addr   level_menu_nametable
         lda #$20
         sta tmp1
-        lda #$B4 ; $6D is OEM position
+        lda #$96 ; $6D is OEM position
         sta tmp2
         jsr displayModeText
         jsr showHighScores
@@ -1974,6 +1974,10 @@ levelMenuRenderHearts:
         rts
 
 levelMenuHandleReady:
+        lda frameCounter
+        eor #1
+        and #$03
+        beq @notReady
         lda heartsAndReady
         and #$F0
         beq @notReady
@@ -5843,13 +5847,11 @@ render_mode_congratulations_screen:
         and #$80
         beq @ret
         lda highScoreEntryRawPos
-        and #$03
         asl a
         tax
         lda highScorePpuAddrTable,x
         sta PPUADDR
         lda highScoreEntryRawPos
-        and #$03
         asl a
         tax
         inx

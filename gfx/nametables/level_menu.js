@@ -57,10 +57,10 @@ drawTiles(buffer, lookup, `
 ################################
 #qwwwwwwwwwwwwwwwwwwwwwwwwwwwwe#
 #a                            d#
+#a                   qwwwwwwe d#
+#a                   a      d d#
+#a                   zxxxxxxc d#
 #a                            d#
-#a                 qwwwwwwe   d#
-#a                 a      d   d#
-#a                 zxxxxxxc   d#
 #a      ╄╅╅╅╅╅╆               d#
 #a      ╇LEVEL╈               d#
 #a      ╉╊╊╊╊╊╋               d#
