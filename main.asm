@@ -10,7 +10,7 @@
 INES_MAPPER := 1 ; supports 1 and 3
 PRACTISE_MODE := 1
 NO_MUSIC := 1
-AUTO_WIN := 0
+AUTO_WIN := 1 ; press select to end game
 INITIAL_CUSTOM_LEVEL := 157
 NO_SCORING := 0
 
@@ -5222,6 +5222,11 @@ updatePlayfield:
 @ret:   rts
 
 gameModeState_handleGameOver:
+.if AUTO_WIN
+        lda newlyPressedButtons_player1
+        and #BUTTON_SELECT
+        bne @gameOver
+.endif
         lda #$05
         sta generalCounter2
         lda playState
