@@ -12,11 +12,11 @@
     * Fixed T-Spin scoring
     * Crash free with no long frames
 * Rewrite of all highscore code
-    * Saved to SRAM, if available
+    * Store highscores in save RAM
     * 8 digit name entry
     * 8 digit scores
-    * Added lines to highscores
-    * Added start level to highscores
+    * Added lines
+    * Added start level
     * DAS-like movement for name entry
     * Added ! and ? to name entry
 * 3 digit level counter for levels over 99

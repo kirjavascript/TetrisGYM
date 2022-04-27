@@ -8,10 +8,10 @@
 .include "charmap.asm"
 
 INES_MAPPER := 1 ; supports 1 and 3
-SAVE_HIGHSCORES := 1
 PRACTISE_MODE := 1
 NO_MUSIC := 1
-AUTO_WIN := 1 ; press select to end game
+SAVE_HIGHSCORES := 1
+AUTO_WIN := 0 ; press select to end game
 NO_SCORING := 0 ; breaks pace
 INITIAL_CUSTOM_LEVEL := 29
 
