@@ -1818,6 +1818,25 @@ gameMode_levelMenu_processPlayer1Navigation:
         ; this copying is an artefact of the original
         lda newlyPressedButtons_player1
         sta newlyPressedButtons
+
+.if SAVE_HIGHSCORES
+        lda levelControlMode
+        cmp #4
+        bne @notClearingHighscores
+        lda newlyPressedButtons_player1
+        cmp #BUTTON_START
+        bne @notClearingHighscores
+        lda #$01
+        sta soundEffectSlot1Init
+        lda #0
+        sta levelControlMode
+        jsr resetScores
+        jsr resetSavedScores
+        jsr updateAudioWaitForNmiAndResetOamStaging
+        jmp gameMode_levelMenu
+@notClearingHighscores:
+.endif
+
         jsr levelControl
         jsr levelMenuRenderHearts
         jsr levelMenuHandleReady
@@ -1918,41 +1937,25 @@ levelControlClearHighScores:
 
         jsr highScoreClearUpOrLeave
 
-        ; lda newlyPressedButtons_player1
-        ; cmp #BUTTON_START
-        ; bne @notStart
-        ; lda #$01
-        ; sta soundEffectSlot1Init
-        ; inc levelControlMode
-; @notStart:
+        lda newlyPressedButtons_player1
+        cmp #BUTTON_START
+        bne @notStart
+        lda #$01
+        sta soundEffectSlot1Init
+        lda #4
+        sta levelControlMode
+@notStart:
         rts
 
 levelControlClearHighScoresConfirm:
-        ; lda #$20
-        ; sta spriteXOffset
-        ; lda #$C8
-        ; sta spriteYOffset
-        ; lda #$D
-        ; sta spriteIndexInOamContentLookup
-        ; jsr stringSprite
+        lda #$20
+        sta spriteXOffset
+        lda #$C8
+        sta spriteYOffset
+        lda #$D
+        sta spriteIndexInOamContentLookup
+        jsr stringSprite
 
-        ; jsr highScoreClearUpOrLeave
-
-        ; lda newlyPressedButtons_player1
-        ; cmp #BUTTON_START
-        ; bne @notStart
-        ; lda #$01
-        ; sta soundEffectSlot1Init
-        ; lda #0
-        ; sta levelControlMode
-        ; jsr resetScores
-        ; jsr resetSavedScores
-        ; ; jsr updateAudioWaitForNmiAndResetOamStaging
-        ; ; jmp gameMode_levelMenu
-        ; jmp shredSeedAndContinue
-; @notStart:
-
-        rts
 highScoreClearUpOrLeave:
         lda newlyPressedButtons_player1
         cmp #BUTTON_B
@@ -2062,7 +2065,9 @@ MAX_HEARTS := 7
         cmp #BUTTON_DOWN
         bne @notClearMode
         lda #$01
-        inc levelControlMode
+        sta soundEffectSlot1Init
+        lda #$3
+        sta levelControlMode
 @notClearMode:
 .endif
 
