@@ -38,6 +38,7 @@
 .charmap '.', $25
 .charmap '>', $27
 .charmap '!', $52
+.charmap '?', $55
 .charmap '^', $29
 .charmap '(', $2a
 .charmap ')', $2b

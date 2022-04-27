@@ -154,12 +154,10 @@ remainder := mathRAM+$A
 pztemp := mathRAM+$D
 
 byteSpriteRAM := $72
-byteSpriteXOffset := byteSpriteRAM
-byteSpriteYOffset := byteSpriteRAM+1
-byteSpriteAddr := byteSpriteRAM+2
-byteSpriteTile := byteSpriteRAM+4
-byteSpriteLen := byteSpriteRAM+5
-; ... $0078
+byteSpriteAddr := byteSpriteRAM+0
+byteSpriteTile := byteSpriteRAM+2
+byteSpriteLen := byteSpriteRAM+3
+; ... $0076
 
 ; ... $009A
 spriteXOffset   := $00A0
@@ -1043,9 +1041,9 @@ waitScreenLoad:
 
         jsr updateAudioWaitForNmiAndResetOamStaging
         lda #$1A
-        sta byteSpriteXOffset
+        sta spriteXOffset
         lda #$20
-        sta byteSpriteYOffset
+        sta spriteYOffset
         lda #sleepCounter
         sta byteSpriteAddr
         lda #0
@@ -1478,10 +1476,10 @@ menuYTmp := tmp2
         ; render seed
 
         lda #$b8
-        sta byteSpriteXOffset
+        sta spriteXOffset
         lda #MENU_SPRITE_Y_BASE + $10
         sbc menuScrollY
-        sta byteSpriteYOffset
+        sta spriteYOffset
         lda #set_seed_input
         sta byteSpriteAddr
         lda #0
@@ -1575,6 +1573,105 @@ menuYTmp := tmp2
         jsr stringSpriteAlignRight
         jmp @loopNext
 
+; <- menu item index in A
+; -> high byte of offset in A
+; -> low byte in X
+menuItemY16Offset:
+        sta tmpY
+        lda #8
+        sta tmpX
+        ; get 16bit menuitem * 8 in tmpX/tmpY
+        lda #$0
+        ldx #$8
+        clc
+@mulLoop:
+        bcc @mulLoop1
+        clc
+        adc tmpY
+@mulLoop1:
+        ror
+        ror tmpX
+        dex
+        bpl @mulLoop
+        sta tmpY
+        ; add offset
+        clc
+        lda tmpX
+        adc #MENU_SPRITE_Y_BASE + 1
+        sta tmpX
+        lda tmpY
+        adc #0
+        sta tmpY
+        ; remove menuscroll
+        sec
+        lda tmpX
+        sbc menuScrollY
+        sta tmpX
+        tax
+        lda tmpY
+        sbc #0
+        rts
+
+byteSprite:
+menuXTmp := tmp2
+        ldy #0
+@loop:
+        tya
+        asl
+        asl
+        asl
+        asl
+        adc spriteXOffset
+        sta menuXTmp
+
+        ldx oamStagingLength
+        lda spriteYOffset
+        sta oamStaging, x
+        inx
+        lda (byteSpriteAddr), y
+        and #$F0
+        lsr a
+        lsr a
+        lsr a
+        lsr a
+        adc byteSpriteTile
+        sta oamStaging, x
+        inx
+        lda #$00
+        sta oamStaging, x
+        inx
+        lda menuXTmp
+        sta oamStaging, x
+        inx
+
+        lda spriteYOffset
+        sta oamStaging, x
+        inx
+        lda (byteSpriteAddr), y
+        and #$F
+        adc byteSpriteTile
+        sta oamStaging, x
+        inx
+        lda #$00
+        sta oamStaging, x
+        inx
+        lda menuXTmp
+        adc #$8
+        sta oamStaging, x
+        inx
+
+        ; increase OAM index
+        lda #$08
+        clc
+        adc oamStagingLength
+        sta oamStagingLength
+
+        iny
+        cpy byteSpriteLen
+        bne @loop
+
+        rts
+
 stringSprite:
         ldx spriteIndexInOamContentLookup
         lda stringLookup, x
@@ -1642,6 +1739,8 @@ stringLookup:
         .byte stringOn-stringLookup
         .byte stringPause-stringLookup
         .byte stringDebug-stringLookup
+        .byte stringClear-stringLookup
+        .byte stringConfirm-stringLookup
 stringClassic:
         .byte $7,'C','L','A','S','S','I','C'
 stringFloat:
@@ -1658,107 +1757,16 @@ stringPause:
         .byte $5,'P','A','U','S','E'
 stringDebug:
         .byte $5,'B','L','O','C','K'
+stringClear:
+.if SAVE_HIGHSCORES
+        .byte $6,'C','L','E','A','R','?'
+.endif
+stringConfirm:
+.if SAVE_HIGHSCORES
+        .byte $6,'S','U','R','E','?','!'
+.endif
 stringNull:
         .byte $0
-
-; <- menu item index in A
-; -> high byte of offset in A
-; -> low byte in X
-menuItemY16Offset:
-        sta tmpY
-        lda #8
-        sta tmpX
-        ; get 16bit menuitem * 8 in tmpX/tmpY
-        lda #$0
-        ldx #$8
-        clc
-@mulLoop:
-        bcc @mulLoop1
-        clc
-        adc tmpY
-@mulLoop1:
-        ror
-        ror tmpX
-        dex
-        bpl @mulLoop
-        sta tmpY
-        ; add offset
-        clc
-        lda tmpX
-        adc #MENU_SPRITE_Y_BASE + 1
-        sta tmpX
-        lda tmpY
-        adc #0
-        sta tmpY
-        ; remove menuscroll
-        sec
-        lda tmpX
-        sbc menuScrollY
-        sta tmpX
-        tax
-        lda tmpY
-        sbc #0
-        rts
-
-byteSprite:
-menuXTmp := tmp2
-        ldy #0
-@loop:
-        tya
-        asl
-        asl
-        asl
-        asl
-        adc byteSpriteXOffset
-        sta menuXTmp
-
-        ldx oamStagingLength
-        lda byteSpriteYOffset
-        sta oamStaging, x
-        inx
-        lda (byteSpriteAddr), y
-        and #$F0
-        lsr a
-        lsr a
-        lsr a
-        lsr a
-        adc byteSpriteTile
-        sta oamStaging, x
-        inx
-        lda #$00
-        sta oamStaging, x
-        inx
-        lda menuXTmp
-        sta oamStaging, x
-        inx
-
-        lda byteSpriteYOffset
-        sta oamStaging, x
-        inx
-        lda (byteSpriteAddr), y
-        and #$F
-        adc byteSpriteTile
-        sta oamStaging, x
-        inx
-        lda #$00
-        sta oamStaging, x
-        inx
-        lda menuXTmp
-        adc #$8
-        sta oamStaging, x
-        inx
-
-        ; increase OAM index
-        lda #$08
-        clc
-        adc oamStagingLength
-        sta oamStagingLength
-
-        iny
-        cpy byteSpriteLen
-        bne @loop
-
-        rts
 
 gameMode_levelMenu:
         RESET_MMC1
@@ -1854,8 +1862,9 @@ gameMode_levelMenu_processPlayer1Navigation:
         jsr makeNotReady
         dec gameMode
         rts
-
 @continue:
+
+shredSeedAndContinue:
         ; seed shredder
 @chooseRandomHole_player1:
         ldx #$17
@@ -1889,6 +1898,73 @@ levelControl:
         .addr   levelControlNormal
         .addr   levelControlCustomLevel
         .addr   levelControlHearts
+        .addr   levelControlClearHighScores
+        .addr   levelControlClearHighScoresConfirm
+
+.if SAVE_HIGHSCORES
+levelControlClearHighScores:
+        lda #$20
+        sta spriteXOffset
+        lda #$C8
+        sta spriteYOffset
+        lda #$C
+        sta spriteIndexInOamContentLookup
+        jsr stringSprite
+
+        jsr levelControlClearCheckUp
+
+        lda newlyPressedButtons_player1
+        cmp #BUTTON_START
+        bne @notStart
+        lda #$01
+        sta soundEffectSlot1Init
+        inc levelControlMode
+        jmp shredSeedAndContinue
+@notStart:
+        rts
+
+levelControlClearHighScoresConfirm:
+        lda #$20
+        sta spriteXOffset
+        lda #$C8
+        sta spriteYOffset
+        lda #$D
+        sta spriteIndexInOamContentLookup
+        jsr stringSprite
+
+        jsr levelControlClearCheckUp
+
+        lda newlyPressedButtons_player1
+        cmp #BUTTON_START
+        bne @notStart
+        lda #$01
+        sta soundEffectSlot1Init
+        lda #0
+        sta levelControlMode
+        jsr resetScores
+        jsr resetSavedScores
+        ; jsr updateAudioWaitForNmiAndResetOamStaging
+        ; jmp gameMode_levelMenu
+@notStart:
+
+        rts
+levelControlClearCheckUp:
+        lda newlyPressedButtons
+        cmp #BUTTON_UP
+        bne @ret
+        lda #$01
+        sta soundEffectSlot1Init
+        lda #$2
+        sta levelControlMode
+@ret:
+        rts
+.else
+levelControlClearHighScores:
+levelControlClearHighScoresConfirm:
+        lda #0
+        sta levelControlNormal
+        rts
+.endif
 
 levelControlCustomLevel:
         lda frameCounter
@@ -1967,6 +2043,19 @@ MAX_HEARTS := 7
         jsr @changeHearts
 @checkUpPressed:
 
+.if SAVE_HIGHSCORES
+        ; to clear mode
+        jsr detectSRAM
+        beq @notClearMode
+        lda newlyPressedButtons
+        cmp #BUTTON_DOWN
+        bne @notClearMode
+        lda #$01
+        inc levelControlMode
+@notClearMode:
+.endif
+
+        ; to normal mode
         lda newlyPressedButtons
         cmp #BUTTON_UP
         bne @ret
@@ -5681,8 +5770,8 @@ highScoreCharToTile:
         .byte   $19,$1A,$1B,$1C,$1D,$1E,$1F,$20
         .byte   $21,$22,$23,$00,$01,$02,$03,$04
         .byte   $05,$06,$07,$08,$09,$25,$4F,$5E
-        .byte   $5F,$6E,$6F,$52,$24
-highScoreCharSize := $2D
+        .byte   $5F,$6E,$6F,$52,$55,$24
+highScoreCharSize := $2E
 levelDisplayTable: ; original goes to 29
 byteToBcdTable: ; original goes to 49
         .byte   $00,$01,$02,$03,$04,$05,$06,$07
@@ -6106,9 +6195,9 @@ pause:
         lda debugFlag
         beq @noDebugHUD
         lda #$70
-        sta byteSpriteXOffset
+        sta spriteXOffset
         lda #$60
-        sta byteSpriteYOffset
+        sta spriteYOffset
         lda #tetriminoX
         sta byteSpriteAddr
         lda #0
@@ -7368,9 +7457,9 @@ paceTargetOffset:
 
 gameHUDPace:
         lda #$C0
-        sta byteSpriteXOffset
+        sta spriteXOffset
         lda #$27
-        sta byteSpriteYOffset
+        sta spriteYOffset
         lda #<paceResult
         sta byteSpriteAddr
         lda #>paceResult

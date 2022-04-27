@@ -18,7 +18,7 @@
     * Added lines to highscores
     * Added start level to highscores
     * DAS-like movement for name entry
-    * Added exclamation mark to name entry
+    * Added ! and ? to name entry
 * 3 digit level counter for levels over 99
 * 4 digit line counter for lines over 999
 * Added hearts to level menu
