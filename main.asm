@@ -1822,9 +1822,14 @@ gameMode_levelMenu_processPlayer1Navigation:
         jsr levelMenuRenderHearts
         jsr levelMenuHandleReady
 
+        lda levelControlMode
+        cmp #2
+        bcs levelMenuCheckGoBack
+
+levelMenuCheckStartGame:
         lda newlyPressedButtons_player1
         cmp #BUTTON_START
-        bne @checkBPressed
+        bne levelMenuCheckGoBack
         lda levelControlMode
         cmp #1 ; custom
         bne @normalLevel
@@ -1853,7 +1858,7 @@ gameMode_levelMenu_processPlayer1Navigation:
         inc gameMode
         rts
 
-@checkBPressed:
+levelMenuCheckGoBack:
         lda newlyPressedButtons_player1
         cmp #BUTTON_B
         bne @continue
@@ -1913,40 +1918,39 @@ levelControlClearHighScores:
 
         jsr highScoreClearUpOrLeave
 
-        lda newlyPressedButtons_player1
-        cmp #BUTTON_START
-        bne @notStart
-        lda #$01
-        sta soundEffectSlot1Init
-        inc levelControlMode
-        jmp shredSeedAndContinue
-@notStart:
+        ; lda newlyPressedButtons_player1
+        ; cmp #BUTTON_START
+        ; bne @notStart
+        ; lda #$01
+        ; sta soundEffectSlot1Init
+        ; inc levelControlMode
+; @notStart:
         rts
 
 levelControlClearHighScoresConfirm:
-        lda #$20
-        sta spriteXOffset
-        lda #$C8
-        sta spriteYOffset
-        lda #$D
-        sta spriteIndexInOamContentLookup
-        jsr stringSprite
+        ; lda #$20
+        ; sta spriteXOffset
+        ; lda #$C8
+        ; sta spriteYOffset
+        ; lda #$D
+        ; sta spriteIndexInOamContentLookup
+        ; jsr stringSprite
 
-        jsr highScoreClearUpOrLeave
+        ; jsr highScoreClearUpOrLeave
 
-        lda newlyPressedButtons_player1
-        cmp #BUTTON_START
-        bne @notStart
-        lda #$01
-        sta soundEffectSlot1Init
-        lda #0
-        sta levelControlMode
-        jsr resetScores
-        jsr resetSavedScores
-        ; jsr updateAudioWaitForNmiAndResetOamStaging
-        ; jmp gameMode_levelMenu
-        jmp shredSeedAndContinue
-@notStart:
+        ; lda newlyPressedButtons_player1
+        ; cmp #BUTTON_START
+        ; bne @notStart
+        ; lda #$01
+        ; sta soundEffectSlot1Init
+        ; lda #0
+        ; sta levelControlMode
+        ; jsr resetScores
+        ; jsr resetSavedScores
+        ; ; jsr updateAudioWaitForNmiAndResetOamStaging
+        ; ; jmp gameMode_levelMenu
+        ; jmp shredSeedAndContinue
+; @notStart:
 
         rts
 highScoreClearUpOrLeave:
@@ -2079,6 +2083,7 @@ MAX_HEARTS := 7
         rts
 
 levelControlNormal:
+
         ; Starts by checking if right pressed
         lda newlyPressedButtons
         cmp #BUTTON_RIGHT
