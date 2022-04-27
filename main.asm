@@ -1911,7 +1911,7 @@ levelControlClearHighScores:
         sta spriteIndexInOamContentLookup
         jsr stringSprite
 
-        jsr levelControlClearCheckUp
+        jsr highScoreClearUpOrLeave
 
         lda newlyPressedButtons_player1
         cmp #BUTTON_START
@@ -1932,7 +1932,7 @@ levelControlClearHighScoresConfirm:
         sta spriteIndexInOamContentLookup
         jsr stringSprite
 
-        jsr levelControlClearCheckUp
+        jsr highScoreClearUpOrLeave
 
         lda newlyPressedButtons_player1
         cmp #BUTTON_START
@@ -1945,10 +1945,17 @@ levelControlClearHighScoresConfirm:
         jsr resetSavedScores
         ; jsr updateAudioWaitForNmiAndResetOamStaging
         ; jmp gameMode_levelMenu
+        jmp shredSeedAndContinue
 @notStart:
 
         rts
-levelControlClearCheckUp:
+highScoreClearUpOrLeave:
+        lda newlyPressedButtons_player1
+        cmp #BUTTON_B
+        bne @notB
+        lda #$0
+        sta levelControlMode
+@notB:
         lda newlyPressedButtons
         cmp #BUTTON_UP
         bne @ret
