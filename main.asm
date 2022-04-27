@@ -1467,16 +1467,15 @@ renderMenuVars:
         sta spriteIndexInOamContentLookup
         jsr loadSpriteIntoOamStaging
 
+        ; indicator
         ldx #$E
         lda set_seed_input+2
         and #$F0
         beq @v5
-
         lda set_seed_input
         bne @v4
         lda set_seed_input+1
         beq @v5
-
         jmp @v4
 @v5:
         ldx #$F
@@ -2277,24 +2276,6 @@ gameModeState_initGameBackground:
         .addr   game_palette
         jsr copyRleNametableToPpu
         .addr   game_nametable
-
-        ; lda heartsAndReady
-        ; and #$F
-        ; beq @noHearts
-        ; tax
-        ; lda #$2B
-        ; sta PPUADDR
-        ; lda #$23
-        ; sta PPUADDR
-        ; lda heartsAndReady
-        ; and #$F
-        ; tax
-        ; lda #$2c
-; @heartLoop:
-        ; sta PPUDATA
-        ; dex
-        ; bne @heartLoop
-; @noHearts:
 
         ; draw dot and M
         lda scoringModifier
@@ -3978,9 +3959,27 @@ renderBCDScore:
         jmp renderLowScore
 renderClassicScore:
         jsr scoreSetupPPU
+        lda #0
+        sta tmpZ
         lda score+3
-        sta PPUDATA
+        and #$1
+        beq @bitParity
+        lda #$A
+        sta tmpZ
+@bitParity:
+
+        clc
         lda score+2
+        and #$F0
+        ror
+        ror
+        ror
+        ror
+        adc tmpZ
+        sta PPUDATA
+
+        lda score+2
+        and #$F
         sta PPUDATA
 renderLowScore:
         lda score+1
@@ -5377,46 +5376,6 @@ addLineClearPoints:
         sta completedLines
 
 setupScoreForRender:
-        jsr copyBinaryScoreToBCD
-
-        ; dont break score+0, pushDownPoints uses it
-
-        lda scoringModifier
-        cmp #SCORING_FLOAT
-        bne @noFloat
-        rts
-@noFloat:
-
-        ; classic score
-        ; lda scoringModifier
-        cmp #SCORING_CLASSIC
-        bne @ret
-        lda #0
-        sta tmpZ
-        lda score+3
-        and #$1
-        beq @bitParity
-        lda #$A
-        sta tmpZ
-@bitParity:
-
-        clc
-        lda score+2
-        and #$F0
-        ror
-        ror
-        ror
-        ror
-        adc tmpZ
-        sta score+3
-
-        lda score+2
-        and #$F
-        sta score+2
-@ret:
-        rts
-
-copyBinaryScoreToBCD:
         lda binScore
         sta binary32
         lda binScore+1
@@ -5835,8 +5794,6 @@ byteToBcdTable: ; original goes to 49
 
 ; Adjusts high score table and handles data entry, if necessary
 handleHighScoreIfNecessary:
-        jsr copyBinaryScoreToBCD ; only needed if score is mangled in points routine
-
         ldy #0
         sty highScoreEntryRawPos
 @compareWithPos:
