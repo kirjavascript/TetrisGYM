@@ -513,15 +513,7 @@ initRamContinued:
         lda #$10
         sta dasModifier
 
-        ldx #$0
-        lda #$0
-@initHighScoreTable:
-        cpx #highScoreLength * highScoreQuantity
-        beq @continueColdBootInit
-        sta highscores,x
-        inx
-        jmp @initHighScoreTable
-@continueColdBootInit:
+        jsr resetScores
 
 .if SAVE_HIGHSCORES
         jsr detectSRAM
@@ -596,6 +588,18 @@ initRamContinued:
 @continue:
         jmp @mainLoop
 
+resetScores:
+        ldx #$0
+        lda #$0
+@initHighScoreTable:
+        cpx #highScoreLength * highScoreQuantity
+        beq @continue
+        sta highscores,x
+        inx
+        jmp @initHighScoreTable
+@continue:
+        rts
+
 .if SAVE_HIGHSCORES
 detectSRAM:
         lda #$37
@@ -621,6 +625,18 @@ checkSavedInit:
         lda SRAM_hsMagic+3
         cmp #$D2
         bne resetSavedScores
+        rts
+
+resetScores:
+        ldx #$0
+        lda #$0
+@initHighScoreTable:
+        cpx #highScoreLength * highScoreQuantity
+        beq @continueColdBootInit
+        sta highscores,x
+        inx
+        jmp @initHighScoreTable
+@continueColdBootInit:
         rts
 
 resetSavedScores:

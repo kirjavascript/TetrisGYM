@@ -10,8 +10,9 @@
     * Expanding score 
     * 999999 scorecap 
     * Fixed T-Spin scoring
-    * Crash free with no 'long frames'
+    * Crash free with no long frames
 * Rewrite of all highscore code
+    * Saved to SRAM, if available
     * 8 digit name entry
     * 8 digit scores
     * Added lines to highscores
