@@ -8,6 +8,7 @@
 .include "charmap.asm"
 
 INES_MAPPER := 1 ; supports 1 and 3
+SAVE_HIGHSCORES := 1
 PRACTISE_MODE := 1
 NO_MUSIC := 1
 AUTO_WIN := 1 ; press select to end game
@@ -89,6 +90,9 @@ TETRIMINO_X_HIDE := $EF
         .setcpu "6502"
 
 SRAM        := $6000 ; 8kb
+SRAM_states := SRAM
+SRAM_hsMagic := SRAM+$A00
+SRAM_highscores := SRAM_hsMagic+$4
 
 tmp1        := $0000
 tmp2        := $0001
@@ -167,7 +171,7 @@ outOfDateRenderFlags:= $00A3
 ; speedtest
 ; 0 - hz
 ; level menu
-; 0-customLevel 1-hearts 2-ready
+; 0-customLevel
 
 ; ... $00A6
 gameModeState   := $00A7                    ; For values, see playState_checkForCompletedRows
@@ -517,8 +521,16 @@ initRamContinued:
         sta highscores,x
         inx
         jmp @initHighScoreTable
-
 @continueColdBootInit:
+
+.if SAVE_HIGHSCORES
+        jsr detectSRAM
+        beq @noSRAM
+        jsr checkSavedInit
+        jsr copyScoresFromSRAM
+@noSRAM:
+.endif
+
         lda #$54
         sta initMagic
         lda #$2D
@@ -579,23 +591,80 @@ initRamContinued:
 @mainLoop:
         jsr branchOnGameMode
         cmp gameModeState
-        bne @checkForDemoDataExhaustion
+        bne @continue
         jsr updateAudioWaitForNmiAndResetOamStaging
-@checkForDemoDataExhaustion:
-        lda gameMode
-        cmp #$05
-        bne @continue
-        lda demoButtonsAddr+1
-        cmp #$DF
-        bne @continue
-        ; lda #$DD
-        ; sta demoButtonsAddr+1
-        lda #$00
-        sta frameCounter+1
-        lda #$01
-        sta gameMode
 @continue:
         jmp @mainLoop
+
+.if SAVE_HIGHSCORES
+detectSRAM:
+        lda #$37
+        sta SRAM_hsMagic
+        lda #$64
+        sta SRAM_hsMagic+1
+        lda SRAM_hsMagic
+        cmp #$37
+        bne @noSRAM
+        lda SRAM_hsMagic+1
+        cmp #$64
+        bne @noSRAM
+        lda #1
+        rts
+@noSRAM:
+        lda #0
+        rts
+
+checkSavedInit:
+        lda SRAM_hsMagic+2
+        cmp #$4B
+        bne resetSavedScores
+        lda SRAM_hsMagic+3
+        cmp #$D2
+        bne resetSavedScores
+        rts
+
+resetSavedScores:
+        lda #$4B
+        sta SRAM_hsMagic+2
+        lda #$D2
+        sta SRAM_hsMagic+3
+
+        ldx #$0
+        lda #$0
+@copyLoop:
+        cpx #highScoreLength * highScoreQuantity
+        beq @continue
+        sta SRAM_highscores,x
+        inx
+        jmp @copyLoop
+@continue:
+        rts
+
+copyScoresFromSRAM:
+        ldx #$0
+@copyLoop:
+        cpx #highScoreLength * highScoreQuantity
+        beq @continue
+        lda SRAM_highscores,x
+        sta highscores,x
+        inx
+        jmp @copyLoop
+@continue:
+        rts
+
+copyScoresToSRAM:
+        ldx #$0
+@copyLoop:
+        cpx #highScoreLength * highScoreQuantity
+        beq @continue
+        lda highscores,x
+        sta SRAM_highscores,x
+        inx
+        jmp @copyLoop
+@continue:
+        rts
+
+.endif
 
 checkRegion:
 ; region detection via http://forums.nesdev.com/viewtopic.php?p=163258#p163258
@@ -5693,6 +5762,12 @@ adjustHighScores:
         inx
         lda levelNumber
         sta highscores,x
+.if SAVE_HIGHSCORES
+        jsr detectSRAM
+        beq @noSRAM
+        jsr copyScoresToSRAM
+@noSRAM:
+.endif
         jmp highScoreEntryScreen
 
 copyHighscore:
@@ -5830,6 +5905,14 @@ highScoreEntryScreen:
 @letterDoesNotUnderflow:
         lda generalCounter
         sta highscores,x
+.if SAVE_HIGHSCORES
+        tay
+        jsr detectSRAM
+        beq @noSRAMDown
+        tya
+        sta SRAM_highscores, x
+@noSRAMDown:
+.endif
 @checkForUpPressed:
         lda #BUTTON_UP
         jsr menuThrottle
@@ -5853,6 +5936,14 @@ highScoreEntryScreen:
 @letterDoesNotOverflow:
         lda generalCounter
         sta highscores,x
+.if SAVE_HIGHSCORES
+        tay
+        jsr detectSRAM
+        beq @noSRAMUp
+        tya
+        sta SRAM_highscores, x
+@noSRAMUp:
+.endif
 @waitForVBlank:
         lda highScoreEntryNameOffsetForRow
         clc
