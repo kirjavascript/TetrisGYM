@@ -2302,8 +2302,11 @@ gameModeState_initGameBackground:
         lda #$B8
         sta PPUADDR
         ; TODO: handle top byte
+        lda highscores+highScoreNameLength
+        sta tmpX
         lda highscores+highScoreNameLength+1
-        jsr twoDigsToPPU
+        sta tmpY
+        jsr renderClassicHighByte
         lda highscores+highScoreNameLength+2
         jsr twoDigsToPPU
         lda highscores+highScoreNameLength+3
@@ -3959,9 +3962,22 @@ renderBCDScore:
         jmp renderLowScore
 renderClassicScore:
         jsr scoreSetupPPU
+        lda score+3
+        sta tmpX
+        lda score+2
+        sta tmpY
+        jsr renderClassicHighByte
+renderLowScore:
+        lda score+1
+        jsr twoDigsToPPU
+        lda score
+        jsr twoDigsToPPU
+        rts
+
+renderClassicHighByte:
         lda #0
         sta tmpZ
-        lda score+3
+        lda tmpX
         and #$1
         beq @bitParity
         lda #$A
@@ -3969,7 +3985,7 @@ renderClassicScore:
 @bitParity:
 
         clc
-        lda score+2
+        lda tmpY
         and #$F0
         ror
         ror
@@ -3978,14 +3994,9 @@ renderClassicScore:
         adc tmpZ
         sta PPUDATA
 
-        lda score+2
+        lda tmpY
         and #$F
         sta PPUDATA
-renderLowScore:
-        lda score+1
-        jsr twoDigsToPPU
-        lda score
-        jsr twoDigsToPPU
         rts
 
 renderScoreCap:
