@@ -1467,6 +1467,29 @@ renderMenuVars:
         sta spriteIndexInOamContentLookup
         jsr loadSpriteIntoOamStaging
 
+        ldx #$E
+        lda set_seed_input+2
+        and #$F0
+        beq @v5
+
+        lda set_seed_input
+        bne @v4
+        lda set_seed_input+1
+        beq @v5
+
+        jmp @v4
+@v5:
+        ldx #$F
+@v4:
+        stx spriteIndexInOamContentLookup
+        clc
+        lda #(MODE_SEED*8) + MENU_SPRITE_Y_BASE
+        sbc menuScrollY
+        sta spriteYOffset
+        lda #$A0
+        sta spriteXOffset
+        jsr stringSprite
+
 @cursorFinished:
 
 menuCounter := tmp1
@@ -1477,6 +1500,7 @@ menuYTmp := tmp2
 
         lda #$b8
         sta spriteXOffset
+        clc
         lda #MENU_SPRITE_Y_BASE + $10
         sbc menuScrollY
         sta spriteYOffset
@@ -1735,12 +1759,14 @@ stringLookup:
         .byte stringNull-stringLookup
         .byte stringNull-stringLookup
         .byte stringNull-stringLookup
-        .byte stringOff-stringLookup
+        .byte stringOff-stringLookup ; 8
         .byte stringOn-stringLookup
         .byte stringPause-stringLookup
         .byte stringDebug-stringLookup
         .byte stringClear-stringLookup
         .byte stringConfirm-stringLookup
+        .byte stringV4-stringLookup
+        .byte stringV5-stringLookup ; F
 stringClassic:
         .byte $7,'C','L','A','S','S','I','C'
 stringFloat:
@@ -1765,6 +1791,10 @@ stringConfirm:
 .if SAVE_HIGHSCORES
         .byte $6,'S','U','R','E','?','!'
 .endif
+stringV4:
+        .byte $2,'V','4'
+stringV5:
+        .byte $2,'V','5'
 stringNull:
         .byte $0
 
