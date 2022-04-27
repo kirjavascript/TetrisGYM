@@ -627,18 +627,6 @@ checkSavedInit:
         bne resetSavedScores
         rts
 
-resetScores:
-        ldx #$0
-        lda #$0
-@initHighScoreTable:
-        cpx #highScoreLength * highScoreQuantity
-        beq @continueColdBootInit
-        sta highscores,x
-        inx
-        jmp @initHighScoreTable
-@continueColdBootInit:
-        rts
-
 resetSavedScores:
         lda #$4B
         sta SRAM_hsMagic+2
@@ -1566,20 +1554,43 @@ menuYTmp := tmp2
         jsr menuItemY16Offset
         bne @boolOutOfRange
         stx spriteYOffset
-        lda #$D0
+        lda #$E9
         sta spriteXOffset
+        clc
         lda menuVars, y
-        adc #$18
+        adc #$8
         sta spriteIndexInOamContentLookup
-        jsr loadSpriteIntoOamStaging
+        jsr stringSpriteAlignRight
 @boolOutOfRange:
         jmp @loopNext
 
 @renderScoreName:
-        ldx scoringModifier
-        lda scoreNameLookup, x
+        lda scoringModifier
+        sta spriteIndexInOamContentLookup
+        lda #(MODE_SCORE_DISPLAY*8) + MENU_SPRITE_Y_BASE + 1
+        sbc menuScrollY
+        sta spriteYOffset
+        lda #$e9
+        sta spriteXOffset
+        jsr stringSpriteAlignRight
+        jmp @loopNext
+
+stringSprite:
+        ldx spriteIndexInOamContentLookup
+        lda stringLookup, x
         tax
-        lda scoreNameLookup, x
+        lda stringLookup, x
+        sta tmpZ
+        inx
+        lda spriteXOffset
+        sta tmpX
+        jmp stringSpriteLoop
+
+stringSpriteAlignRight:
+        ldx spriteIndexInOamContentLookup
+        lda stringLookup, x
+        tax
+        lda stringLookup, x
         inx
         sta tmpZ
         lda tmpZ
@@ -1587,25 +1598,26 @@ menuYTmp := tmp2
         asl
         asl
         sta tmpX
-        lda #$E1
+        clc
+        lda spriteXOffset
         sbc tmpX
         sta tmpX
-@scoreNameLoop:
+
+stringSpriteLoop:
         ldy oamStagingLength
         sec
-        lda #(MODE_SCORE_DISPLAY*8) + MENU_SPRITE_Y_BASE + 1
-        sbc menuScrollY
+        lda spriteYOffset
         sta oamStaging, y
-        lda scoreNameLookup, x
+        lda stringLookup, x
         inx
         sta oamStaging+1, y
         lda #$00
         sta oamStaging+2, y
         lda tmpX
+        sta oamStaging+3, y
         clc
         adc #$8
         sta tmpX
-        sta oamStaging+3, y
         ; increase OAM index
         lda #$04
         clc
@@ -1614,23 +1626,40 @@ menuYTmp := tmp2
 
         dec tmpZ
         lda tmpZ
-        bne @scoreNameLoop
+        bne stringSpriteLoop
+        rts
 
-        jmp @loopNext
-
-scoreNameLookup:
-        .byte scoreNameClassic-scoreNameLookup
-        .byte scoreNameFloat-scoreNameLookup
-        .byte scoreNameExpand-scoreNameLookup
-        .byte scoreNameScorecap-scoreNameLookup
-scoreNameClassic:
+stringLookup:
+        .byte stringClassic-stringLookup
+        .byte stringFloat-stringLookup
+        .byte stringExpand-stringLookup
+        .byte stringScorecap-stringLookup
+        .byte stringNull-stringLookup
+        .byte stringNull-stringLookup
+        .byte stringNull-stringLookup
+        .byte stringNull-stringLookup
+        .byte stringOff-stringLookup
+        .byte stringOn-stringLookup
+        .byte stringPause-stringLookup
+        .byte stringDebug-stringLookup
+stringClassic:
         .byte $7,'C','L','A','S','S','I','C'
-scoreNameFloat:
+stringFloat:
         .byte $1,'M'
-scoreNameExpand:
+stringExpand:
         .byte $6,'E','X','P','A','N','D'
-scoreNameScorecap:
+stringScorecap:
         .byte $6,'C','A','P','P','E','D'
+stringOff:
+        .byte $3,'O','F','F'
+stringOn:
+        .byte $2,'O','N'
+stringPause:
+        .byte $5,'P','A','U','S','E'
+stringDebug:
+        .byte $5,'B','L','O','C','K'
+stringNull:
+        .byte $0
 
 ; <- menu item index in A
 ; -> high byte of offset in A
@@ -3178,9 +3207,9 @@ oamContentLookup:
         .addr   sprite00LevelSelectCursor
         .addr   sprite01GameTypeCursor
         .addr   sprite02Blank
-        .addr   sprite03PausePalette6
-        .addr   sprite05DebugPalette4
-        .addr   sprite05DebugPalette4
+        .addr   sprite02Blank
+        .addr   sprite02Blank
+        .addr   sprite02Blank
         .addr   sprite06TPiece
         .addr   sprite07SPiece
         .addr   sprite08ZPiece
@@ -3200,8 +3229,8 @@ oamContentLookup:
         .addr   spriteDebugLevelEdit ; $16
         .addr   spriteStateSave; $17
         .addr   spriteStateLoad; $18
-        .addr   spriteOff ; $19
-        .addr   spriteOn ; $1A
+        .addr   sprite02Blank ; $19
+        .addr   sprite02Blank ; $1A
         .addr   spriteSeedCursor ; $1B
         .addr   sprite02Blank
         .addr   spritePractiseTypeCursor ; $1D
@@ -3221,15 +3250,6 @@ sprite01GameTypeCursor:
 ; Used as a sort of NOOP for cursors
 sprite02Blank:
         .byte   $00,$FF,$00,$00,$FF
-sprite03PausePalette6:
-        .byte   $00,'P',$00,$00,$00,'A',$00,$08
-        .byte   $00,'U',$00,$10,$00,'S',$00,$18
-        .byte   $00,'E',$00,$20,$FF
-sprite05DebugPalette4:
-        .byte   $00,'B',$00,$00,$00,'L',$00,$08
-        .byte   $00,'O',$00,$10,$00,'C',$00,$18
-        .byte   $00,'K',$00,$20
-        .byte   $FF
 sprite06TPiece:
         .byte   $00,$7B,$02,$FC,$00,$7B,$02,$04
         .byte   $00,$7B,$02,$0C,$08,$7B,$02,$04
@@ -3272,13 +3292,6 @@ spriteStateSave:
         .byte   $00,'S',$03,$00,$00,'A',$03,$08
         .byte   $00,'V',$03,$10,$00,'E',$03,$18
         .byte   $00,'D',$03,$20
-        .byte   $FF
-spriteOff:
-        .byte   $00,'O',$00,$00,$00,'F',$00,$08
-        .byte   $00,'F',$00,$10
-        .byte   $FF
-spriteOn:
-        .byte   $00,'O',$00,$08,$00,'N',$00,$10
         .byte   $FF
 spriteSeedCursor:
         .byte   $00,$6B,$00,$00
@@ -6083,12 +6096,11 @@ pause:
         sta spriteYOffset
 
 @pauseLoopCommon:
-        ; put 3 or 5 in a
-        lda debugFlag
-        asl
-        adc #3
+        clc
+        lda #$A
+        adc debugFlag
         sta spriteIndexInOamContentLookup
-        jsr loadSpriteIntoOamStaging
+        jsr stringSprite
 
         ; block tool hud - X/Y/Piece
         lda debugFlag
