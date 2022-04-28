@@ -1083,6 +1083,7 @@ waitLoopContinue:
         rts
 
 gameMode_gameTypeMenu:
+        jsr makeNotReady
         jsr calc_menuScrollY
         sta menuScrollY
         lda #0
@@ -1912,7 +1913,7 @@ levelMenuCheckGoBack:
         bne @continue
         lda #$02
         sta soundEffectSlot1Init
-        jsr makeNotReady
+        ; jsr makeNotReady ; not needed, done on gametype screen
         dec gameMode
         rts
 @continue:
