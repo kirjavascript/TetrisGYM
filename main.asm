@@ -114,7 +114,7 @@ set_seed_input := $0037 ; copied to set_seed during gameModeState_initGameState
 ; ... $003A
 
 ; ... $003F
-tetriminoX  := $0040                        ; Player data is $20 in size. It is copied here from $60 or $80, processed, then copied back
+tetriminoX  := $0040
 tetriminoY  := $0041
 currentPiece    := $0042                    ; Current piece as an orientation ID
 levelNumber := $0044
@@ -1868,7 +1868,7 @@ gameMode_levelMenu_processPlayer1Navigation:
 
         jsr levelControl
         jsr levelMenuRenderHearts
-        jsr levelMenuHandleReady
+        jsr levelMenuRenderReady
 
         lda levelControlMode
         cmp #2
@@ -2005,7 +2005,7 @@ highScoreClearUpOrLeave:
 levelControlClearHighScores:
 levelControlClearHighScoresConfirm:
         lda #0
-        sta levelControlNormal
+        sta levelControlMode
         rts
 .endif
 
@@ -2117,8 +2117,17 @@ MAX_HEARTS := 7
         rts
 
 levelControlNormal:
-
-        ; Starts by checking if right pressed
+        ; hearts
+        lda newlyPressedButtons
+        cmp #BUTTON_SELECT
+        bne @notSelect
+        lda #$01
+        sta soundEffectSlot1Init
+        lda heartsAndReady
+        eor #$80
+        sta heartsAndReady
+@notSelect:
+        ; normal ctrl
         lda newlyPressedButtons
         cmp #BUTTON_RIGHT
         bne @checkLeftPressed
@@ -2152,6 +2161,7 @@ levelControlNormal:
         jmp @checkUpPressed
 
 @toHearts:
+        jsr makeNotReady
         inc levelControlMode
 @toCustomLevel:
         inc levelControlMode
@@ -2189,7 +2199,6 @@ levelControlNormal:
         rts
 
 levelMenuRenderHearts:
-        ; render
         lda #$1E
         sta spriteIndexInOamContentLookup
         lda #$7A
@@ -2222,11 +2231,7 @@ levelMenuRenderHearts:
 @skipCursor:
         rts
 
-levelMenuHandleReady:
-        lda frameCounter
-        eor #1
-        and #$03
-        beq @notReady
+levelMenuRenderReady:
         lda heartsAndReady
         and #$F0
         beq @notReady
@@ -2238,16 +2243,6 @@ levelMenuHandleReady:
         sta spriteIndexInOamContentLookup
         jsr loadSpriteIntoOamStaging
 @notReady:
-
-        lda newlyPressedButtons
-        cmp #BUTTON_SELECT
-        bne @notSelect
-        lda #$01
-        sta soundEffectSlot1Init
-        lda heartsAndReady
-        eor #$80
-        sta heartsAndReady
-@notSelect:
         rts
 
 levelToSpriteYOffset:
@@ -2301,7 +2296,6 @@ gameModeState_initGameBackground:
         sta PPUADDR
         lda #$B8
         sta PPUADDR
-        ; TODO: handle top byte
         lda highscores+highScoreNameLength
         sta tmpX
         lda highscores+highScoreNameLength+1
