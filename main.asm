@@ -13,7 +13,7 @@ NO_MUSIC := 1
 SAVE_HIGHSCORES := 1
 AUTO_WIN := 1 ; press select to end game
 NO_SCORING := 0 ; breaks pace
-INITIAL_CUSTOM_LEVEL := 29
+INITIAL_CUSTOM_LEVEL := 128
 
 BUTTON_DOWN := $4
 BUTTON_UP := $8
@@ -3655,9 +3655,6 @@ render_playfield:
         jsr copyPlayfieldRowToVRAM
         rts
 
-linesDash:
-        .byte $15, $12, $17, $E, $1C, $24
-
 render_mode_play_and_demo:
         lda playState
         cmp #$04
@@ -3672,34 +3669,14 @@ render_mode_play_and_demo:
 @playStateNotDisplayLineClearingAnimation:
         jsr render_playfield
 @renderLines:
-        ; 'lines-' tile queue
-        ; could lazy render this to make it 'free'
-        lda linesTileQueue
-        beq @endLinesTileQueue
-        cmp #$86
-        beq @endLinesTileQueue
-        lda #$20
-        sta PPUADDR
-        lda linesTileQueue
-        and #$F
-        sta tmpZ
-        adc #$6C
-        sta PPUADDR
-        ldx tmpZ
-        lda linesDash, x
-        sta PPUDATA
-        inc linesTileQueue
-@endLinesTileQueue:
 
-        ; check if we should actually update lines
+        lda scoringModifier
+        bne @modernLines
+
         lda outOfDateRenderFlags
         and #$01
         beq @renderLevel
 
-        ; 'normal' line drawing
-        lda linesBCDHigh
-        cmp #$A
-        bcs @extraLines
         lda #$20
         sta PPUADDR
         lda #$73
@@ -3708,17 +3685,11 @@ render_mode_play_and_demo:
         sta PPUDATA
         lda lines
         jsr twoDigsToPPU
-        jmp @doneRenderLines
-@extraLines:
-        lda #$20
-        sta PPUADDR
-        lda #$72
-        sta PPUADDR
-        lda linesBCDHigh
-        jsr twoDigsToPPU
-        lda lines
-        jsr twoDigsToPPU
-@doneRenderLines:
+        jmp @doneRenderingLines
+
+@modernLines:
+        jsr renderModernLines
+@doneRenderingLines:
         lda outOfDateRenderFlags
         and #$FE
         sta outOfDateRenderFlags
@@ -4061,6 +4032,58 @@ renderFloat:
         sta PPUDATA
         jsr renderBCDScore
         rts
+
+renderModernLines:
+        ; 'lines-' tile queue
+        ; could lazy render this to make it 'free'
+        lda linesTileQueue
+        beq @endLinesTileQueue
+        cmp #$86
+        beq @endLinesTileQueue
+        lda #$20
+        sta PPUADDR
+        lda linesTileQueue
+        and #$F
+        sta tmpZ
+        adc #$6C
+        sta PPUADDR
+        ldx tmpZ
+        lda linesDash, x
+        sta PPUDATA
+        inc linesTileQueue
+@endLinesTileQueue:
+
+        lda outOfDateRenderFlags
+        and #$01
+        beq @doneRenderLines
+
+        ; 'normal' line drawing
+        lda linesBCDHigh
+        cmp #$A
+        bcs @extraLines
+        lda #$20
+        sta PPUADDR
+        lda #$73
+        sta PPUADDR
+        lda lines+1
+        sta PPUDATA
+        lda lines
+        jsr twoDigsToPPU
+        jmp @doneRenderLines
+@extraLines:
+        lda #$20
+        sta PPUADDR
+        lda #$72
+        sta PPUADDR
+        lda linesBCDHigh
+        jsr twoDigsToPPU
+        lda lines
+        jsr twoDigsToPPU
+@doneRenderLines:
+        rts
+
+linesDash:
+        .byte $15, $12, $17, $E, $1C, $24
 
 ; addresses
 vramPlayfieldRows:
