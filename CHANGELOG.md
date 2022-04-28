@@ -7,7 +7,7 @@
 * Rewrite of all scoring code
     * Classic scoring
     * Millions counter 
-    * Expanding score 
+    * 7 digit score layout
     * 999999 scorecap 
     * Fixed T-Spin scoring
     * Crash free with no long frames

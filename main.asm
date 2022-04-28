@@ -11,7 +11,7 @@ INES_MAPPER := 1 ; supports 1 and 3
 PRACTISE_MODE := 1
 NO_MUSIC := 1
 SAVE_HIGHSCORES := 1
-AUTO_WIN := 0 ; press select to end game
+AUTO_WIN := 1 ; press select to end game
 NO_SCORING := 0 ; breaks pace
 INITIAL_CUSTOM_LEVEL := 29
 
@@ -2273,48 +2273,7 @@ gameModeState_initGameBackground:
         jsr copyRleNametableToPpu
         .addr   game_nametable
 
-
-        ; draw dot and M
-        lda scoringModifier
-        cmp #SCORING_FLOAT
-        bne @noFloat
-        lda #$21
-        sta PPUADDR
-        lda #$3b
-        sta PPUADDR
-        lda #$2D
-        sta PPUDATA
-        lda #$21
-        sta PPUADDR
-        lda #$3D
-        sta PPUADDR
-        lda #$16
-        sta PPUDATA
-@noFloat:
-
-        cmp #SCORING_SEVENDIGIT
-        bne @noSevenDigit
-
-        jsr bulkCopyToPpu
-        .addr seven_digit_nametable
-@noSevenDigit:
-
-        jsr showPaceDiffText
-        beq @skipTop
-        lda #$20
-        sta PPUADDR
-        lda #$B8
-        sta PPUADDR
-        lda highscores+highScoreNameLength
-        sta tmpX
-        lda highscores+highScoreNameLength+1
-        sta tmpY
-        jsr renderClassicHighByte
-        lda highscores+highScoreNameLength+2
-        jsr twoDigsToPPU
-        lda highscores+highScoreNameLength+3
-        jsr twoDigsToPPU
-@skipTop:
+        jsr scoringBackground
 
         lda hzFlag
         beq @noHz
@@ -2374,6 +2333,48 @@ displayModeText:
         inx
         dey
         bne @writeChar
+        rts
+
+scoringBackground:
+        ; draw dot and M
+        lda scoringModifier
+        cmp #SCORING_FLOAT
+        bne @noFloat
+        lda #$21
+        sta PPUADDR
+        lda #$3b
+        sta PPUADDR
+        lda #$2D
+        sta PPUDATA
+        lda #$21
+        sta PPUADDR
+        lda #$3D
+        sta PPUADDR
+        lda #$16
+        sta PPUDATA
+@noFloat:
+        cmp #SCORING_SEVENDIGIT
+        bne @noSevenDigit
+        jsr bulkCopyToPpu
+        .addr seven_digit_nametable
+@noSevenDigit:
+
+        jsr showPaceDiffText
+        beq @skipTop
+        lda #$20
+        sta PPUADDR
+        lda #$B8
+        sta PPUADDR
+        lda highscores+highScoreNameLength
+        sta tmpX
+        lda highscores+highScoreNameLength+1
+        sta tmpY
+        jsr renderClassicHighByte
+        lda highscores+highScoreNameLength+2
+        jsr twoDigsToPPU
+        lda highscores+highScoreNameLength+3
+        jsr twoDigsToPPU
+@skipTop:
         rts
 
 modeText:
@@ -3939,6 +3940,7 @@ scoreSetupPPU:
         rts
 renderBCDScore:
         jsr scoreSetupPPU
+renderBCDScoreData:
         lda score+2
         jsr twoDigsToPPU
         jmp renderLowScore
@@ -3994,25 +3996,14 @@ renderScoreCap:
         rts
 
 renderSevenDigit:
-        lda score+3
-        beq renderClassicScore
-        cmp #$A
-        bcc @oneExtraDigit
         lda #$21
         sta PPUADDR
-        lda #$16
+        lda #$18
         sta PPUADDR
         lda score+3
-        jsr twoDigsToPPU
-        jmp renderClassicScore
-@oneExtraDigit:
-        lda #$21
-        sta PPUADDR
-        lda #$17
-        sta PPUADDR
-        lda score+3
+        and #$F
         sta PPUDATA
-        jsr renderBCDScore
+        jsr renderBCDScoreData
         rts
 
 renderFloat:
