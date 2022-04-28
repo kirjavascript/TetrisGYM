@@ -11,9 +11,9 @@ INES_MAPPER := 1 ; supports 1 and 3
 PRACTISE_MODE := 1
 NO_MUSIC := 1
 SAVE_HIGHSCORES := 1
-AUTO_WIN := 1 ; press select to end game
+AUTO_WIN := 0 ; press select to end game
 NO_SCORING := 0 ; breaks pace
-INITIAL_CUSTOM_LEVEL := 128
+INITIAL_CUSTOM_LEVEL := 29
 
 BUTTON_DOWN := $4
 BUTTON_UP := $8
@@ -54,7 +54,7 @@ MODE_GAME_QUANTITY := 16
 
 SCORING_CLASSIC := 0 ; for scoringModifier
 SCORING_FLOAT := 1
-SCORING_EXPAND := 2
+SCORING_SEVENDIGIT := 2
 SCORING_SCORECAP := 3
 
 MENU_SPRITE_Y_BASE := $47
@@ -1753,7 +1753,7 @@ stringSpriteLoop:
 stringLookup:
         .byte stringClassic-stringLookup
         .byte stringFloat-stringLookup
-        .byte stringExpand-stringLookup
+        .byte stringSevenDigit-stringLookup
         .byte stringScorecap-stringLookup
         .byte stringNull-stringLookup
         .byte stringNull-stringLookup
@@ -1771,8 +1771,8 @@ stringClassic:
         .byte $7,'C','L','A','S','S','I','C'
 stringFloat:
         .byte $1,'M'
-stringExpand:
-        .byte $6,'E','X','P','A','N','D'
+stringSevenDigit:
+        .byte $6,'7','D','I','G','I','T'
 stringScorecap:
         .byte $6,'C','A','P','P','E','D'
 stringOff:
@@ -2273,6 +2273,7 @@ gameModeState_initGameBackground:
         jsr copyRleNametableToPpu
         .addr   game_nametable
 
+
         ; draw dot and M
         lda scoringModifier
         cmp #SCORING_FLOAT
@@ -2290,6 +2291,13 @@ gameModeState_initGameBackground:
         lda #$16
         sta PPUDATA
 @noFloat:
+
+        cmp #SCORING_SEVENDIGIT
+        bne @noSevenDigit
+
+        jsr bulkCopyToPpu
+        .addr seven_digit_nametable
+@noSevenDigit:
 
         jsr showPaceDiffText
         beq @skipTop
@@ -2459,6 +2467,14 @@ hzStats: ; stripe
         .byte $22, $A3, $3, $D, $12, $1B ; dir
         .byte $FF
 
+seven_digit_nametable:
+        .byte $20, $5F, $41, $3a
+        .byte $20, $7f, $C7, $3c
+        .byte $21, $5F, $41, $3F
+        .byte $20, $7E, $C7, $FF
+        .byte $20, $5E, $41, $39
+        .byte $21, $5E, $41, $3E
+        .byte $FF
 
 savestate_nametable_patch:
         .byte   $22,$F7,$38,$39,$39,$39,$39,$39,$39,$3A,$FE
@@ -3752,11 +3768,11 @@ render_mode_play_and_demo:
 @noScoreCap:
 
         lda scoringModifier
-        cmp #SCORING_EXPAND
-        bne @noExpand
-        jsr renderExpand
+        cmp #SCORING_SEVENDIGIT
+        bne @noSevenDigit
+        jsr renderSevenDigit
         jmp @clearScoreRenderFlags
-@noExpand:
+@noSevenDigit:
 
         ; millions
         lda scoringModifier
@@ -3977,7 +3993,7 @@ renderScoreCap:
         jsr twoDigsToPPU
         rts
 
-renderExpand:
+renderSevenDigit:
         lda score+3
         beq renderClassicScore
         cmp #$A
