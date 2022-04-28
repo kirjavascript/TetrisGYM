@@ -2487,12 +2487,13 @@ hzStats: ; stripe
         .byte $FF
 
 seven_digit_nametable:
-        .byte $20, $5F, $41, $3a
-        .byte $20, $7f, $C7, $3c
-        .byte $21, $5F, $41, $3F
-        .byte $20, $7E, $C7, $FF
-        .byte $20, $5E, $41, $39
-        .byte $21, $5E, $41, $3E
+        .byte $20, $5F, $41, $3a ; -
+        .byte $20, $7f, $C7, $3c ; |
+        .byte $21, $5F, $41, $3F ; -
+        .byte $20, $7E, $C7, $FF ; |
+        .byte $20, $5E, $41, $39 ; -
+        .byte $21, $5E, $41, $3E ; -
+        .byte $21, $1E, $41, $0  ; 0
         .byte $FF
 
 savestate_nametable_patch:
@@ -2622,6 +2623,31 @@ gameModeState_initGameState:
         lda #$57
         sta outOfDateRenderFlags
         jsr updateAudioWaitForNmiAndResetOamStaging
+
+        lda #BLOCK_TILES
+        ldx #0
+        ldy #0
+@loop:
+@lineLoop:
+        cmp #BLOCK_TILES
+        bne @alt
+        sta playfield, x
+        beq @next
+@alt:
+        eor #1
+        sta playfield+1, x
+        eor #1
+@next:
+        iny
+        iny
+        inx
+        inx
+        cpy #$A
+        bne @lineLoop
+        eor #1
+        ldy #0
+        cpx #$C8
+        bne @loop
 
         lda practiseType
         cmp #MODE_TYPEB

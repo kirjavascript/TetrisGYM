@@ -13,14 +13,14 @@
     * Crash free with no long frames
 * Rewrite of all highscore code
     * 8 digit name entry
-    * 8 digit scores
+    * up to 8 score digits
     * Added lines
     * Added start level
     * DAS-like movement for name entry
     * Added ! and ? to name entry
     * Store highscores in save RAM, if it's available
 * 3 digit level counter for levels over 99
-* 4 digit line counter for lines over 999
+* 4 digit line counter for lines over 999 (except in 'classic' scoring)
 * Added hearts to level menu
 * Added ready indicator to level menu
 * Added new screen for Speed Tester
