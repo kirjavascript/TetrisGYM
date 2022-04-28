@@ -2365,6 +2365,24 @@ scoringBackground:
         sta PPUADDR
         lda #$B8
         sta PPUADDR
+
+        lda scoringModifier
+        cmp #SCORING_SEVENDIGIT
+        bne @classicTopScore
+
+        lda highscores+highScoreNameLength
+        and #$F
+        sta PPUDATA
+        lda highscores+highScoreNameLength+1
+        jsr twoDigsToPPU
+        lda highscores+highScoreNameLength+2
+        jsr twoDigsToPPU
+        lda highscores+highScoreNameLength+3
+        jsr twoDigsToPPU
+
+        rts
+
+@classicTopScore:
         lda highscores+highScoreNameLength
         sta tmpX
         lda highscores+highScoreNameLength+1
@@ -3996,10 +4014,7 @@ renderScoreCap:
         rts
 
 renderSevenDigit:
-        lda #$21
-        sta PPUADDR
-        lda #$18
-        sta PPUADDR
+        jsr scoreSetupPPU
         lda score+3
         and #$F
         sta PPUDATA
