@@ -2627,31 +2627,6 @@ gameModeState_initGameState:
         sta outOfDateRenderFlags
         jsr updateAudioWaitForNmiAndResetOamStaging
 
-
-        ; and if you want to do the other checkerboard instead of loading block tiles load empty tile
-; CHECKERBOARD_TILE := BLOCK_TILES
-; CHECKERBOARD_FLIP := CHECKERBOARD_TILE ^ EMPTY_TILE
-;         lda frameCounter
-;         and #1
-;         beq @checkerStartA
-;         lda #CHECKERBOARD_TILE
-;         bne @checkerStart
-; @checkerStartA:
-;         lda #EMPTY_TILE
-; @checkerStart:
-;         ; hydrantdude found a short way to do this
-;         ldx #$C8
-;         ldy #$C
-; @loop:
-;         dey
-;         bne @notA
-;         eor #CHECKERBOARD_FLIP
-;         ldy #$A
-; @notA:  sta playfield, x
-;         eor #CHECKERBOARD_FLIP
-;         dex
-;         bne @loop
-
         lda practiseType
         cmp #MODE_TYPEB
         bne @noTypeBPlayfield
@@ -9580,6 +9555,10 @@ practiseInitGameState:
         bne @skipTapQuantity
         jsr prepareNextTapQuantity
 @skipTapQuantity:
+        cmp #MODE_CHECKERBOARD
+        bne @skipChecker
+        jsr initChecker
+@skipChecker:
         rts
 
 practiseAdvanceGame:
@@ -9809,6 +9788,31 @@ prepareNextTapQuantity:
         lda #$3
         sta playState
 @incomplete:
+        rts
+
+initChecker:
+CHECKERBOARD_TILE := BLOCK_TILES
+CHECKERBOARD_FLIP := CHECKERBOARD_TILE ^ EMPTY_TILE
+        lda frameCounter
+        and #1
+        beq @checkerStartA
+        lda #CHECKERBOARD_TILE
+        bne @checkerStart
+@checkerStartA:
+        lda #EMPTY_TILE
+@checkerStart:
+        ; hydrantdude found a short way to do this
+        ldx #$C8
+        ldy #$C
+@loop:
+        dey
+        bne @notA
+        eor #CHECKERBOARD_FLIP
+        ldy #$A
+@notA:  sta playfield, x
+        eor #CHECKERBOARD_FLIP
+        dex
+        bne @loop
         rts
 
 advanceGamePreset:
