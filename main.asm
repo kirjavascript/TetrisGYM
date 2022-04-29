@@ -9659,8 +9659,6 @@ practiseGameHUD:
         cpy #2
         bmi @drawQTY
 
-
-        ; jsr gameHUDTapQuantity
 @skipTapQuantity:
         rts
 
@@ -9793,6 +9791,9 @@ prepareNextTapQuantity:
 initChecker:
 CHECKERBOARD_TILE := BLOCK_TILES
 CHECKERBOARD_FLIP := CHECKERBOARD_TILE ^ EMPTY_TILE
+        ldx checkerModifier
+        lda typeBBlankInitCountByHeightTable, x
+        tax
         lda frameCounter
         and #1
         beq @checkerStartA
@@ -9801,9 +9802,8 @@ CHECKERBOARD_FLIP := CHECKERBOARD_TILE ^ EMPTY_TILE
 @checkerStartA:
         lda #EMPTY_TILE
 @checkerStart:
-        ; hydrantdude found a short way to do this
-        ldx #$C8
-        ldy #$C
+        ; hydrantdude found the short way to do this
+        ldy #$B
 @loop:
         dey
         bne @notA
@@ -9811,8 +9811,9 @@ CHECKERBOARD_FLIP := CHECKERBOARD_TILE ^ EMPTY_TILE
         ldy #$A
 @notA:  sta playfield, x
         eor #CHECKERBOARD_FLIP
-        dex
-        bne @loop
+        inx
+        cpx #$C8
+        bmi @loop
         rts
 
 advanceGamePreset:
