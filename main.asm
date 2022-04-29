@@ -35,22 +35,23 @@ MODE_FLOOR := 7
 MODE_TAP := 8
 MODE_TRANSITION := 9
 MODE_TAPQTY := 10
-MODE_GARBAGE := 11
-MODE_DROUGHT := 12
-MODE_DAS := 13
-MODE_INVISIBLE := 14
-MODE_HARDDROP := 15
-MODE_SPEED_TEST := 16
-MODE_SCORE_DISPLAY := 17
-MODE_HZ_DISPLAY := 18
-MODE_INPUT_DISPLAY := 19
-MODE_GOOFY := 20
-MODE_DEBUG := 21
-MODE_QUAL := 22
-MODE_PAL := 23
+MODE_CHECKERBOARD := 11
+MODE_GARBAGE := 12
+MODE_DROUGHT := 13
+MODE_DAS := 14
+MODE_INVISIBLE := 15
+MODE_HARDDROP := 16
+MODE_SPEED_TEST := 17
+MODE_SCORE_DISPLAY := 18
+MODE_HZ_DISPLAY := 19
+MODE_INPUT_DISPLAY := 20
+MODE_GOOFY := 21
+MODE_DEBUG := 22
+MODE_QUAL := 23
+MODE_PAL := 24
 
-MODE_QUANTITY := 24
-MODE_GAME_QUANTITY := 16
+MODE_QUANTITY := 25
+MODE_GAME_QUANTITY := 17
 
 SCORING_CLASSIC := 0 ; for scoringModifier
 SCORING_FLOAT := 1
@@ -66,7 +67,7 @@ INVISIBLE_TILE := $43
 TETRIMINO_X_HIDE := $EF
 
 ; menuConfigSizeLookup
-.define MENUSIZES $0, $0, $0, $0, $F, $7, $8, $C, $20, $10, $10, $4, $12, $10, $0, $0, $0, $3, $1, $1, $1, $1, $1, $1
+.define MENUSIZES $0, $0, $0, $0, $F, $7, $8, $C, $20, $10, $10, $8, $4, $12, $10, $0, $0, $0, $3, $1, $1, $1, $1, $1, $1
 
 .macro MODENAMES
     .byte   "TETRIS"
@@ -80,6 +81,7 @@ TETRIMINO_X_HIDE := $EF
     .byte   "QCKTAP"
     .byte   "TRNSTN"
     .byte   "TAPQTY"
+    .byte   "CKRBRD"
     .byte   "GARBGE"
     .byte   "LOBARS"
     .byte   "DASDLY"
@@ -360,16 +362,17 @@ floorModifier := menuVars+3
 tapModifier := menuVars+4
 transitionModifier := menuVars+5
 tapqtyModifier := menuVars+6
-garbageModifier := menuVars+7
-droughtModifier := menuVars+8
-dasModifier := menuVars+9
-scoringModifier := menuVars+10
-hzFlag := menuVars+11
-inputDisplayFlag := menuVars+12
-goofyFlag := menuVars+13
-debugFlag := menuVars+14
-qualFlag := menuVars+15
-palFlag := menuVars+16
+checkerModifier := menuVars+7
+garbageModifier := menuVars+8
+droughtModifier := menuVars+9
+dasModifier := menuVars+10
+scoringModifier := menuVars+11
+hzFlag := menuVars+12
+inputDisplayFlag := menuVars+13
+goofyFlag := menuVars+14
+debugFlag := menuVars+15
+qualFlag := menuVars+16
+palFlag := menuVars+17
 
 ; ... $7FF
 PPUCTRL     := $2000
@@ -2624,30 +2627,30 @@ gameModeState_initGameState:
         sta outOfDateRenderFlags
         jsr updateAudioWaitForNmiAndResetOamStaging
 
-        lda #BLOCK_TILES
-        ldx #0
-        ldy #0
-@loop:
-@lineLoop:
-        cmp #BLOCK_TILES
-        bne @alt
-        sta playfield, x
-        beq @next
-@alt:
-        eor #1
-        sta playfield+1, x
-        eor #1
-@next:
-        iny
-        iny
-        inx
-        inx
-        cpy #$A
-        bne @lineLoop
-        eor #1
-        ldy #0
-        cpx #$C8
-        bne @loop
+
+        ; and if you want to do the other checkerboard instead of loading block tiles load empty tile
+; CHECKERBOARD_TILE := BLOCK_TILES
+; CHECKERBOARD_FLIP := CHECKERBOARD_TILE ^ EMPTY_TILE
+;         lda frameCounter
+;         and #1
+;         beq @checkerStartA
+;         lda #CHECKERBOARD_TILE
+;         bne @checkerStart
+; @checkerStartA:
+;         lda #EMPTY_TILE
+; @checkerStart:
+;         ; hydrantdude found a short way to do this
+;         ldx #$C8
+;         ldy #$C
+; @loop:
+;         dey
+;         bne @notA
+;         eor #CHECKERBOARD_FLIP
+;         ldy #$A
+; @notA:  sta playfield, x
+;         eor #CHECKERBOARD_FLIP
+;         dex
+;         bne @loop
 
         lda practiseType
         cmp #MODE_TYPEB
@@ -9563,12 +9566,10 @@ practisePrepareNext:
         bne @skipPace
         jsr prepareNextPace
 @skipPace:
-        lda practiseType
         cmp #MODE_GARBAGE
         bne @skipGarbo
         jsr prepareNextGarbage
 @skipGarbo:
-        lda practiseType
         cmp #MODE_PARITY
         bne @skipParity
         jsr prepareNextParity
@@ -9587,17 +9588,14 @@ practiseAdvanceGame:
         bne @skipTSpins
         jsr advanceGameTSpins
 @skipTSpins:
-        lda practiseType
         cmp #MODE_PRESETS
         bne @skipPresets
         jsr advanceGamePreset
 @skipPresets:
-        lda practiseType
         cmp #MODE_FLOOR
         bne @skipFloor
         jsr advanceGameFloor
 @skipFloor:
-        lda practiseType
         cmp #MODE_TAP
         bne @skipTap
         jsr advanceGameTap

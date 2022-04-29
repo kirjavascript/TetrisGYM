@@ -53,6 +53,7 @@ drawTiles(buffer, lookup, `
 #a    (QUICK)TAP              d#
 #a    TRANSITION              d#
 #a    TAP QUANTITY            d#
+#a    CHECKERBOARD            d#
 #a    GARBAGE                 d#
 #a    DROUGHT                 d#
 #a    DAS DELAY               d#
@@ -62,15 +63,14 @@ drawTiles(buffer, lookup, `
 #a    SCORING                 d#
 #a    HZ DISPLAY              d#
 #a    INPUT DISPLAY           d#
-#a    GOOFY FOOT              d#
 `);drawTiles(extra, lookup, `
+#a    GOOFY FOOT              d#
 #a    BLOCK TOOL              d#
 #a    QUAL MODE               d#
 #a    PAL MODE                d#
 #a                            d#
 #a                            d#
 #a V5                         d#
-#a                            d#
 #a                            d#
 #a                            d#
 #a                            d#
