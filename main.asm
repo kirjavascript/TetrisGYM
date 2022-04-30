@@ -2627,6 +2627,17 @@ gameModeState_initGameState:
         sta lines
 @notTypeB:
 
+        lda practiseType
+        cmp #MODE_CHECKERBOARD
+        bne @noChecker
+        lda checkerModifier
+        asl
+        asl
+        asl
+        sta binScore+1
+        jsr setupScoreForRender
+@noChecker:
+
         lda #$57
         sta outOfDateRenderFlags
         jsr updateAudioWaitForNmiAndResetOamStaging
@@ -5049,16 +5060,13 @@ playState_checkForCompletedRows_return:
         rts
 
 playState_prepareNext:
-
         lda practiseType
         cmp #MODE_CHECKERBOARD
         bne @checkBType
         lda completedRow+3
         cmp #$13
         bne @endOfEndingCode
-
         jsr typeBEndingStuff
-
         rts
 
         ; bTypeGoalCheck
@@ -5305,6 +5313,10 @@ addPointsRaw:
 .if NO_SCORING
         rts
 .endif
+        lda practiseType
+        cmp #MODE_CHECKERBOARD
+        beq handlePointsCheckerboard
+
         lda holdDownPoints
         cmp #$02
         bmi @noPushDown
@@ -5313,6 +5325,14 @@ addPointsRaw:
         lda #$0
         sta holdDownPoints
         jsr addLineClearPoints
+        rts
+
+handlePointsCheckerboard:
+        jsr setupScoreForRender
+        lda #$00
+        sta completedLines
+        lda #$0
+        sta holdDownPoints
         rts
 
 clearPoints:
