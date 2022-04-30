@@ -9803,6 +9803,10 @@ CHECKERBOARD_FLIP := CHECKERBOARD_TILE ^ EMPTY_TILE
         ldx checkerModifier
         lda typeBBlankInitCountByHeightTable, x
         tax
+        cpx #$C8 ; edge case for height 0
+        bne @notZero
+        ldx #$BE
+@notZero:
         lda frameCounter
         and #1
         beq @checkerStartA
