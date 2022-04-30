@@ -3746,6 +3746,10 @@ render_mode_play_and_demo:
         cmp #MODE_TYPEB
         beq @renderLevelTypeB
 
+        lda practiseType
+        cmp #MODE_CHECKERBOARD
+        beq @renderLevelCheckerboard
+
         lda #$22
         sta PPUADDR
         lda #$B9
@@ -3754,15 +3758,14 @@ render_mode_play_and_demo:
         jsr renderByteBCD
         jmp @renderLevelEnd
 
-@renderLevelTypeB:
-        lda #$22
-        sta PPUADDR
-        lda #$B8
-        sta PPUADDR
-        lda levelNumber
-        jsr renderByteBCD
-        lda #$24
+@renderLevelCheckerboard:
+        jsr renderLevelDash
+        lda checkerModifier
         sta PPUDATA
+        jmp @renderLevelEnd
+
+@renderLevelTypeB:
+        jsr renderLevelDash
         lda typeBModifier
         sta PPUDATA
         ; jmp @renderLevelEnd
@@ -4061,6 +4064,17 @@ renderFloat:
         ror
         sta PPUDATA
         jsr renderBCDScore
+        rts
+
+renderLevelDash:
+        lda #$22
+        sta PPUADDR
+        lda #$B8
+        sta PPUADDR
+        lda levelNumber
+        jsr renderByteBCD
+        lda #'-'
+        sta PPUDATA
         rts
 
 renderModernLines:
@@ -9800,6 +9814,8 @@ prepareNextTapQuantity:
 initChecker:
 CHECKERBOARD_TILE := BLOCK_TILES
 CHECKERBOARD_FLIP := CHECKERBOARD_TILE ^ EMPTY_TILE
+        lda #0
+        sta vramRow
         ldx checkerModifier
         lda typeBBlankInitCountByHeightTable, x
         tax
