@@ -59,7 +59,7 @@ SCORING_SEVENDIGIT := 2
 SCORING_SCORECAP := 3
 
 MENU_SPRITE_Y_BASE := $47
-MENU_MAX_Y_SCROLL := $40
+MENU_MAX_Y_SCROLL := $48
 MENU_TOP_MARGIN_SCROLL := 7 ; in blocks
 BLOCK_TILES := $7B
 EMPTY_TILE := $EF
@@ -4988,6 +4988,7 @@ playState_checkForCompletedRows:
         sta soundEffectSlot1Init
         inc completedLines
         ldx lineIndex
+        stx $10
         lda generalCounter2
         sta completedRow,x
         ldy generalCounter
@@ -5048,36 +5049,26 @@ playState_checkForCompletedRows_return:
         rts
 
 playState_prepareNext:
-        ; bTypeGoalCheck
+
         lda practiseType
+        cmp #MODE_CHECKERBOARD
+        bne @checkBType
+        lda completedRow+3
+        cmp #$13
+        bne @endOfEndingCode
+
+        jsr typeBEndingStuff
+
+        rts
+
+        ; bTypeGoalCheck
+@checkBType:
         cmp #MODE_TYPEB
-        bne @bTypeEnd
+        bne @endOfEndingCode
         lda lines
-        bne @bTypeEnd
+        bne @endOfEndingCode
 
-        ; copy success graphic
-        ldx #$5C
-        ldy #$0
-@copySuccessGraphic:
-        lda typebSuccessGraphic,y
-        cmp #$80
-        beq @graphicCopied
-        sta playfield,x
-        inx
-        iny
-        jmp @copySuccessGraphic
-@graphicCopied:
-        lda #$00
-        sta vramRow
-
-        ; play sfx
-        lda #$4
-        sta soundEffectSlot1Init
-
-        lda #$30
-        jsr sleep_gameplay
-        lda #$0A ; playState_checkStartGameOver
-        sta playState
+        jsr typeBEndingStuff
 
         ; patch levelNumber with score multiplier
         ldx levelNumber
@@ -5101,10 +5092,36 @@ playState_prepareNext:
         sta levelNumber
 
         rts
-@bTypeEnd:
+@endOfEndingCode:
 
         jsr practisePrepareNext
         inc playState
+        rts
+
+typeBEndingStuff:
+        ; copy success graphic
+        ldx #$5C
+        ldy #$0
+@copySuccessGraphic:
+        lda typebSuccessGraphic,y
+        cmp #$80
+        beq @graphicCopied
+        sta playfield,x
+        inx
+        iny
+        jmp @copySuccessGraphic
+@graphicCopied:
+        lda #$00
+        sta vramRow
+
+        ; play sfx
+        lda #$4
+        sta soundEffectSlot1Init
+
+        lda #$30
+        jsr sleep_gameplay
+        lda #$0A ; playState_checkStartGameOver
+        sta playState
         rts
 
 sleep_gameplay:
