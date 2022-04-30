@@ -11,7 +11,7 @@ INES_MAPPER := 1 ; supports 1 and 3
 PRACTISE_MODE := 1
 NO_MUSIC := 1
 SAVE_HIGHSCORES := 1
-AUTO_WIN := 1 ; press select to end game
+AUTO_WIN := 0 ; press select to end game
 NO_SCORING := 0 ; breaks pace
 INITIAL_CUSTOM_LEVEL := 29
 
@@ -2014,6 +2014,7 @@ levelControlClearHighScoresConfirm:
 .endif
 
 levelControlCustomLevel:
+        jsr handleReadyInput
         lda frameCounter
         and #$03
         beq @indicatorEnd
@@ -2120,8 +2121,7 @@ MAX_HEARTS := 7
         sta soundEffectSlot1Init
         rts
 
-levelControlNormal:
-        ; hearts
+handleReadyInput:
         lda newlyPressedButtons
         cmp #BUTTON_SELECT
         bne @notSelect
@@ -2131,6 +2131,10 @@ levelControlNormal:
         eor #$80
         sta heartsAndReady
 @notSelect:
+        rts
+
+levelControlNormal:
+        jsr handleReadyInput
         ; normal ctrl
         lda newlyPressedButtons
         cmp #BUTTON_RIGHT
@@ -3779,7 +3783,7 @@ render_mode_play_and_demo:
         ; 1 added in level (3 total)
         ; 2 added in lines (5 total)
         ; independent writes;
-        ; 2 added in expand
+        ; 1 added in 7digit
         ; 3 added in float
 
         ; scorecap
@@ -9549,6 +9553,11 @@ practisePrepareNext:
         bne @skipParity
         jsr prepareNextParity
 @skipParity:
+        cmp #MODE_TAPQTY
+        bne @skipTapQuantity
+        jsr prepareNextTapQuantity
+@skipTapQuantity:
+        rts
 practiseInitGameState:
         lda practiseType
         cmp #MODE_TAPQTY
@@ -9813,7 +9822,7 @@ CHECKERBOARD_FLIP := CHECKERBOARD_TILE ^ EMPTY_TILE
         eor #CHECKERBOARD_FLIP
         inx
         cpx #$C8
-        bmi @loop
+        bcc @loop
         rts
 
 advanceGamePreset:
