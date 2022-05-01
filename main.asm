@@ -2818,8 +2818,8 @@ L885D:  sta playfield,y
 typeBBlankInitCountByHeightTable:
         .byte $C8,$AA,$96,$78,$64,$50,$3C,$28,$14
 rngTable:
-        .byte EMPTY_TILE,BLOCK_TILES,EMPTY_TILE,BLOCK_TILES+1,BLOCK_TILES+2,BLOCK_TILES+2,EMPTY_TILE
-        .byte EMPTY_TILE
+        .byte EMPTY_TILE,BLOCK_TILES,EMPTY_TILE,BLOCK_TILES+1
+        .byte BLOCK_TILES+2,BLOCK_TILES+2,EMPTY_TILE,EMPTY_TILE
 
 gameModeState_updateCountersAndNonPlayerState:
         ; CHR bank used to be reset to 0 here

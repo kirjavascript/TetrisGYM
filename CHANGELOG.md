@@ -1,13 +1,14 @@
 # Changelog
 ## [unreleased]
 * Tap Quantity Trainer
+* Checkerboard Trainer
 * Made Hard Drop instant
 * Added Sonic Drop
 * Start on any level
 * Rewrite of all scoring code
     * Classic scoring
     * Millions counter 
-    * 7 digit score layout
+    * 7 digit score
     * 999999 scorecap 
     * Fixed T-Spin scoring
     * Crash free with no long frames
@@ -20,7 +21,7 @@
     * Added ! and ? to name entry
     * Store highscores in save RAM, if it's available
 * 3 digit level counter for levels over 99
-* 4 digit line counter for lines over 999 (except in 'classic' scoring)
+* 4 digit line counter for lines over 999 (except in 'Classic' scoring)
 * Added hearts to level menu
 * Added ready indicator to level menu
 * Added new screen for Speed Tester
