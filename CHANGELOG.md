@@ -2,6 +2,7 @@
 ## [unreleased]
 * Tap Quantity Trainer
 * Checkerboard Trainer
+* Double Killscreen Trainer
 * Made Hard Drop instant
 * Added Sonic Drop
 * Start on any level

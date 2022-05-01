@@ -1143,8 +1143,17 @@ gameTypeLoopCheckStart:
         cmp #BUTTON_START
         bne gameTypeLoopNext
 
-        ; check if speed test mode
+        ; check double killscreen
         lda practiseType
+        cmp #MODE_KILLX2
+        bne @checkSpeedTest
+        inc gameMode
+        inc gameMode
+        rts
+
+
+@checkSpeedTest:
+        ; check if speed test mode
         cmp #MODE_SPEED_TEST
         beq gameTypeSpeedTest
 
@@ -2883,9 +2892,13 @@ rotationTable:
         .dbyt   $0F0D,$1212,$1111
 drop_tetrimino:
         jsr drop_tetrimino_actual
+        lda practiseType
+        cmp #MODE_KILLX2
+        bne @ret
         lda #$1
         sta fallTimer
         jsr drop_tetrimino_actual
+@ret:
         rts
 
 drop_tetrimino_actual:
