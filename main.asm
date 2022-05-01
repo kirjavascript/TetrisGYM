@@ -40,18 +40,19 @@ MODE_GARBAGE := 12
 MODE_DROUGHT := 13
 MODE_DAS := 14
 MODE_INVISIBLE := 15
-MODE_HARDDROP := 16
-MODE_SPEED_TEST := 17
-MODE_SCORE_DISPLAY := 18
-MODE_HZ_DISPLAY := 19
-MODE_INPUT_DISPLAY := 20
-MODE_GOOFY := 21
-MODE_DEBUG := 22
-MODE_QUAL := 23
-MODE_PAL := 24
+MODE_KILLX2 := 16
+MODE_HARDDROP := 17
+MODE_SPEED_TEST := 18
+MODE_SCORE_DISPLAY := 19
+MODE_HZ_DISPLAY := 20
+MODE_INPUT_DISPLAY := 21
+MODE_GOOFY := 22
+MODE_DEBUG := 23
+MODE_QUAL := 24
+MODE_PAL := 25
 
-MODE_QUANTITY := 25
-MODE_GAME_QUANTITY := 17
+MODE_QUANTITY := 26
+MODE_GAME_QUANTITY := 18
 
 SCORING_CLASSIC := 0 ; for scoringModifier
 SCORING_FLOAT := 1
@@ -59,7 +60,7 @@ SCORING_SEVENDIGIT := 2
 SCORING_SCORECAP := 3
 
 MENU_SPRITE_Y_BASE := $47
-MENU_MAX_Y_SCROLL := $48
+MENU_MAX_Y_SCROLL := $50
 MENU_TOP_MARGIN_SCROLL := 7 ; in blocks
 BLOCK_TILES := $7B
 EMPTY_TILE := $EF
@@ -67,7 +68,7 @@ INVISIBLE_TILE := $43
 TETRIMINO_X_HIDE := $EF
 
 ; menuConfigSizeLookup
-.define MENUSIZES $0, $0, $0, $0, $F, $7, $8, $C, $20, $10, $10, $8, $4, $12, $10, $0, $0, $0, $3, $1, $1, $1, $1, $1, $1
+.define MENUSIZES $0, $0, $0, $0, $F, $7, $8, $C, $20, $10, $10, $8, $4, $12, $10, $0, $0, $0, $0, $3, $1, $1, $1, $1, $1, $1
 
 .macro MODENAMES
     .byte   "TETRIS"
@@ -86,6 +87,7 @@ TETRIMINO_X_HIDE := $EF
     .byte   "LOBARS"
     .byte   "DASDLY"
     .byte   "INVZBL"
+    .byte   "KILLX2"
     .byte   "HRDDRP"
 .endmacro
 
@@ -2880,6 +2882,13 @@ rotationTable:
         .dbyt   $0B0B,$100E,$0D0F,$0E10
         .dbyt   $0F0D,$1212,$1111
 drop_tetrimino:
+        jsr drop_tetrimino_actual
+        lda #$1
+        sta fallTimer
+        jsr drop_tetrimino_actual
+        rts
+
+drop_tetrimino_actual:
         lda autorepeatY
         bpl @notBeginningOfGame
         lda newlyPressedButtons
