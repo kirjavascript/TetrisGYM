@@ -1147,10 +1147,18 @@ gameTypeLoopCheckStart:
         lda practiseType
         cmp #MODE_KILLX2
         bne @checkSpeedTest
+        lda #$10
+        jsr setMMC1Control
+        lda #29
+        sta startLevel
+        sta levelNumber
+        lda #$00
+        sta gameModeState
+        lda #$02
+        sta soundEffectSlot1Init
         inc gameMode
         inc gameMode
         rts
-
 
 @checkSpeedTest:
         ; check if speed test mode
@@ -5637,8 +5645,15 @@ gameModeState_handleGameOver:
         lda #$01
         sta playState
         jsr updateAudioWaitForNmiAndResetOamStaging
-        lda #$03
-        sta gameMode
+        ldx #3 ; levelMenu
+        lda practiseType
+        cmp #MODE_KILLX2
+        bne @notGameTypeMenu
+        dex
+@notGameTypeMenu:
+        stx gameMode
+        ; lda #$03
+        ; sta gameMode
         rts
 
 @ret:   inc gameModeState
