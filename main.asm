@@ -2634,6 +2634,7 @@ gameModeState_initGameState:
         asl
         asl
         asl
+        asl
         sta binScore+1
         jsr setupScoreForRender
 @noChecker:
@@ -5328,23 +5329,33 @@ addPointsRaw:
         rts
 
 handlePointsCheckerboard:
+        lda score+1
+        bne @handlePoints
+        lda score+2
+        beq @end
+@handlePoints:
+        lda completedLines
+        asl
+        asl
+        asl
+        asl
+        sta tmpZ
+        sec
+        lda binScore
+        sbc tmpZ
+        sta binScore
+        lda binScore+1
+        sbc #0
+        sta binScore+1
         jsr setupScoreForRender
-        lda #$00
+        lda outOfDateRenderFlags
+        ora #$04
+        sta outOfDateRenderFlags
+@end:
+        lda #$0
         sta completedLines
         lda #$0
         sta holdDownPoints
-        rts
-
-clearPoints:
-        lda #0
-        sta score
-        sta score+1
-        sta score+2
-        sta score+3
-        sta binScore
-        sta binScore+1
-        sta binScore+2
-        sta binScore+3
         rts
 
 ones := tmpX
@@ -5454,6 +5465,7 @@ addLineClearPoints:
 @multSetupEnd:
 
         lda completedLines
+        beq addLineClearPoints_end ; skip with 0 completed lines
         asl
         tax
         lda pointsTable, x
@@ -5479,6 +5491,7 @@ addLineClearPoints:
         adc #0
         sta binScore+3
 
+addLineClearPoints_end:
         lda outOfDateRenderFlags
         ora #$04
         sta outOfDateRenderFlags
@@ -5503,6 +5516,18 @@ setupScoreForRender:
         sta score+2
         lda bcd32+3
         sta score+3
+        rts
+
+clearPoints:
+        lda #0
+        sta score
+        sta score+1
+        sta score+2
+        sta score+3
+        sta binScore
+        sta binScore+1
+        sta binScore+2
+        sta binScore+3
         rts
 
 pointsTable:
