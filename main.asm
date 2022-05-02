@@ -4685,6 +4685,16 @@ playState_lockTetrimino:
         sta curtainRow
         jsr updateAudio2
 
+        ; reset checkerboard score
+        lda practiseType
+        cmp #MODE_CHECKERBOARD
+        bne @noChecker
+        lda #0
+        sta binScore
+        sta binScore+1
+        jsr setupScoreForRender
+@noChecker:
+
         ; make invisible tiles visible
         lda #$00
         sta vramRow
@@ -5661,8 +5671,6 @@ gameModeState_handleGameOver:
         dex
 @notGameTypeMenu:
         stx gameMode
-        ; lda #$03
-        ; sta gameMode
         rts
 
 @ret:   inc gameModeState
