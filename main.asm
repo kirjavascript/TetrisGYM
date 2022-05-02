@@ -2650,10 +2650,17 @@ gameModeState_initGameState:
         cmp #MODE_CHECKERBOARD
         bne @noChecker
         lda checkerModifier
-        asl
-        asl
-        sta binScore+1
-        jsr setupScoreForRender
+        rol
+        rol
+        rol
+        rol
+        and #$F0
+        sta bcd32+1
+        lda #0
+        sta bcd32
+        sta bcd32+2
+        sta bcd32+3
+        jsr presetScoreFromBCD
 @noChecker:
 
         lda #$57
@@ -2690,14 +2697,7 @@ transitionModeSetup:
         sta bcd32
         sta bcd32+1
         sta bcd32+3
-        jsr BCD_BIN
-        lda binary32
-        sta binScore
-        lda binary32+1
-        sta binScore+1
-        lda binary32+2
-        sta binScore+2
-        jsr setupScoreForRender
+        jsr presetScoreFromBCD
 
         lda levelNumber
         cmp #129 ; everything after 128 transitions immediately
@@ -2757,6 +2757,17 @@ transitionModeSetup:
 @lineLoop:  dex
         bne @incrementLines
         jmp @addLinesLoop
+
+presetScoreFromBCD:
+        jsr BCD_BIN
+        lda binary32
+        sta binScore
+        lda binary32+1
+        sta binScore+1
+        lda binary32+2
+        sta binScore+2
+        jsr setupScoreForRender
+        rts
 
 initPlayfieldForTypeB:
         lda typeBModifier
@@ -5362,11 +5373,8 @@ handlePointsCheckerboard:
         lda score+2
         beq @end
 @handlePoints:
-        lda completedLines
-        asl
-        asl
-        asl
-        asl
+        ldx completedLines
+        lda checkerboardPoints, x
         sta tmpZ
         sec
         lda binScore
@@ -5385,6 +5393,9 @@ handlePointsCheckerboard:
         lda #$0
         sta holdDownPoints
         rts
+
+checkerboardPoints:
+        .byte 0, 10, 20, 30, 40
 
 ones := tmpX
 hundredths := tmpY
