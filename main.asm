@@ -4878,6 +4878,16 @@ CNROM_CHR_ROCKET:
         sta PPUADDR
         lda #$18
         sta PPUADDR
+
+        lda score+3
+        beq @scoreEnd
+        cmp #$A
+        bmi @scoreHighWrite
+        jsr twoDigsToPPU
+        jmp @scoreEnd
+@scoreHighWrite:
+        sta PPUDATA
+@scoreEnd:
         lda score+2
         jsr twoDigsToPPU
         lda score+1
