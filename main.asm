@@ -2652,8 +2652,6 @@ gameModeState_initGameState:
         lda checkerModifier
         asl
         asl
-        asl
-        asl
         sta binScore+1
         jsr setupScoreForRender
 @noChecker:
