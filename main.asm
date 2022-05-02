@@ -5026,25 +5026,6 @@ playState_checkForCompletedRows:
         jmp playState_checkForCompletedRows_return
 
 @updatePlayfieldComplete:
-        ; patch tapquantity data
-        lda practiseType
-        cmp #MODE_TAPQTY
-        bne @tapQtyEnd
-        lda completedLines
-        beq @tapQtyEnd
-        ; mark as complete
-        lda tqtyNext
-        sta tqtyCurrent
-        ; handle no burns
-        lda tapqtyModifier
-        and #$F0
-        beq @tapQtyEnd
-        lda #0
-        sta vramRow
-        inc playState
-        inc playState
-        rts
-@tapQtyEnd:
 
         lda tetriminoY
         sec
@@ -5119,6 +5100,30 @@ playState_checkForCompletedRows:
         lda lineIndex
         cmp #$04
         bmi playState_checkForCompletedRows_return
+
+        ; patch tapquantity data
+        lda practiseType
+        cmp #MODE_TAPQTY
+        bne @tapQtyEnd
+        lda completedLines
+        cmp #0
+        beq @tapQtyEnd
+        ; mark as complete
+        lda tqtyNext
+        sta tqtyCurrent
+        ; handle no burns
+        lda tapqtyModifier
+        and #$F0
+        beq @tapQtyEnd
+        lda #0
+        sta vramRow
+        inc playState
+        inc playState
+        lda #0
+        sta completedLines
+        rts
+@tapQtyEnd:
+
         ldy completedLines
         lda garbageLines,y
         clc
