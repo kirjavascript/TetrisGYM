@@ -71,7 +71,7 @@ INVISIBLE_TILE := $43
 TETRIMINO_X_HIDE := $EF
 
 ; menuConfigSizeLookup
-.define MENUSIZES $0, $0, $0, $0, $F, $7, $8, $C, $20, $10, $10, $8, $4, $12, $10, $0, $0, $0, $0, $3, $1, $1, $1, $1, $1, $1
+.define MENUSIZES $0, $0, $0, $0, $F, $7, $8, $C, $20, $10, $1F, $8, $4, $12, $10, $0, $0, $0, $0, $3, $1, $1, $1, $1, $1, $1
 
 .macro MODENAMES
     .byte   "TETRIS"
@@ -5026,6 +5026,26 @@ playState_checkForCompletedRows:
         jmp playState_checkForCompletedRows_return
 
 @updatePlayfieldComplete:
+        ; patch tapquantity data
+        lda practiseType
+        cmp #MODE_TAPQTY
+        bne @tapQtyEnd
+        lda completedLines
+        beq @tapQtyEnd
+        ; mark as complete
+        lda tqtyNext
+        sta tqtyCurrent
+        ; handle no burns
+        lda tapqtyModifier
+        and #$F0
+        beq @tapQtyEnd
+        lda #0
+        sta vramRow
+        inc playState
+        inc playState
+        rts
+@tapQtyEnd:
+
         lda tetriminoY
         sec
         sbc #$02
@@ -5281,10 +5301,6 @@ playState_updateLinesAndStatistics:
         lda outOfDateRenderFlags
         ora #$01
         sta outOfDateRenderFlags
-
-; patch tapquantity data
-        lda tqtyNext
-        sta tqtyCurrent
 
 ; type-b lines decrement
         lda practiseType
@@ -9873,7 +9889,7 @@ clearPlayfield:
         rts
 
 prepareNextTapQuantity:
-; patch in @linesCleared
+; patch in @updatePlayfieldComplete
 @checkEqual:
         lda tqtyNext
         cmp tqtyCurrent
@@ -9885,7 +9901,9 @@ prepareNextTapQuantity:
 
         ; playfield
         sec
-        ldx tapqtyModifier
+        lda tapqtyModifier
+        and #$F
+        tax
         cpx #0
         bne @notZero
         ldx #4 ; default to four
@@ -9930,20 +9948,6 @@ prepareNextTapQuantity:
         tax
         cpx #$c8
         bcc @nextLoop
-
-        ; check correct
-        lda currentPiece
-        cmp #$11
-        bne @incomplete
-        lda tetriminoY
-        cmp #$12
-        bcc @incomplete
-        lda playState
-        cmp #$1
-        bne @incomplete
-        lda tqtyNext
-        sta tqtyCurrent
-@incomplete:
         rts
 
 initChecker:
