@@ -11,8 +11,11 @@ INES_MAPPER := 1 ; supports 1 and 3
 PRACTISE_MODE := 1
 NO_MUSIC := 1
 SAVE_HIGHSCORES := 1
-AUTO_WIN := 1 ; press select to end game
+
+; dev flags
+AUTO_WIN := 0 ; press select to end game
 NO_SCORING := 0 ; breaks pace
+NO_SFX := 1
 INITIAL_CUSTOM_LEVEL := 29
 
 BUTTON_DOWN := $4
@@ -8402,6 +8405,7 @@ updateSoundEffectSlot0:
         ldy #$0F
 ; x: sound effect slot; a: low byte addr, for $E0 high byte; y: low byte addr, for $E0 high byte, if slot unused
 updateSoundEffectSlotShared:
+.if !NO_SFX
         sta AUDIOTMP1
         stx currentSoundEffectSlot
         lda soundEffectSlot0Init,x
@@ -8415,6 +8419,7 @@ updateSoundEffectSlotShared:
         beq updateSoundEffectSlotShared_rts
         sty AUDIOTMP1
         bne @computeAndExecute
+.endif
 updateSoundEffectSlotShared_rts:
         rts
 
