@@ -11,7 +11,7 @@ INES_MAPPER := 1 ; supports 1 and 3
 PRACTISE_MODE := 1
 NO_MUSIC := 1
 SAVE_HIGHSCORES := 1
-AUTO_WIN := 0 ; press select to end game
+AUTO_WIN := 1 ; press select to end game
 NO_SCORING := 0 ; breaks pace
 INITIAL_CUSTOM_LEVEL := 29
 
@@ -1010,7 +1010,7 @@ waitScreenLoad:
         lda #$02
         jsr changeCHRBank1
         jsr bulkCopyToPpu
-        .addr menu_palette
+        .addr wait_palette
         jsr copyRleNametableToPpu
         .addr legal_nametable
 
@@ -6852,6 +6852,10 @@ menu_palette:
 rocket_palette:
         .byte   $3F,$11,$7,$16,$2A,$28,$0f,$37,$18,$38 ; sprite
         .byte   $3F,$00,$8,$0f,$3C,$38,$00,$0F,$20,$12,$15 ; bg
+        .byte   $FF
+wait_palette:
+        .byte   $3F,$11,$1,$30
+        .byte   $3F,$00,$8,$f,$30,$38,$26,$0F,$17,$27,$37
         .byte   $FF
 game_type_menu_nametable: ; RLE
         .incbin "gfx/nametables/game_type_menu_nametable_practise.bin"
