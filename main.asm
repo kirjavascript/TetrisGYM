@@ -893,7 +893,6 @@ harddrop_tetrimino:
         rts
 
 gameMode_bootScreen: ; boot
-        jsr endingAnimation
         ; ABSS goes to gameTypeMenu instead of here
 
         ; reset cursors
@@ -4888,12 +4887,7 @@ CNROM_CHR_ROCKET:
 @scoreHighWrite:
         sta PPUDATA
 @scoreEnd:
-        lda score+2
-        jsr twoDigsToPPU
-        lda score+1
-        jsr twoDigsToPPU
-        lda score
-        jsr twoDigsToPPU
+        jsr renderBCDScoreData
 
         ; level
         lda #$22
@@ -9949,8 +9943,6 @@ prepareNextTapQuantity:
         bne @incomplete
         lda tqtyNext
         sta tqtyCurrent
-        lda #$3
-        sta playState
 @incomplete:
         rts
 
