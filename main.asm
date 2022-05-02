@@ -893,6 +893,7 @@ harddrop_tetrimino:
         rts
 
 gameMode_bootScreen: ; boot
+        jsr endingAnimation
         ; ABSS goes to gameTypeMenu instead of here
 
         ; reset cursors
@@ -4191,7 +4192,13 @@ vramPlayfieldRows:
         .word   $2246,$2266,$2286,$22A6
         .word   $22C6,$22E6,$2306,$2326
 
+
+renderByteBCDNoPad:
+        ldx #1
+        jmp renderByteBCDStart
 renderByteBCD:
+        ldx #$0
+renderByteBCDStart:
         sta tmpZ
         cmp #200
         bcc @maybe100
@@ -4209,8 +4216,11 @@ renderByteBCD:
         sbc #100
         jmp @byte
 @not100:
+        cpx #0
+        bne @main
         lda #$EF
         sta PPUDATA
+@main:
         lda tmpZ
 @byte:
         tax
@@ -4835,7 +4845,7 @@ playState_checkStartGameOver:
         sta newlyPressedButtons_player1
 @ret2:  rts
 
-endingAnimation:
+endingAnimation: ; rocket_screen
         jsr updateAudioWaitForNmiAndDisablePpuRendering
         jsr disableNmi
 .if INES_MAPPER = 1
@@ -4880,16 +4890,14 @@ CNROM_CHR_ROCKET:
         sta PPUADDR
         lda #$98
         sta PPUADDR
-        ldx startLevel
-        lda levelDisplayTable, x
-        jsr twoDigsToPPU
+        lda startLevel
+        jsr renderByteBCDNoPad
         lda #$22
         sta PPUADDR
         lda #$18
         sta PPUADDR
-        ldx levelNumber
-        lda levelDisplayTable, x
-        jsr twoDigsToPPU
+        lda levelNumber
+        jsr renderByteBCDNoPad
 
         jsr waitForVBlankAndEnableNmi
         jsr updateAudioWaitForNmiAndResetOamStaging
