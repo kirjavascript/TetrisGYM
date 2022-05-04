@@ -5,6 +5,8 @@
 ; @disassembly CelestialAmber/TetrisNESDisasm
 ; @information ejona86/taus
 
+; killx2: draw background, reset scroll, change order of loading things
+
 .include "charmap.asm"
 
 INES_MAPPER := 1 ; supports 1 and 3
@@ -923,6 +925,25 @@ gameMode_bootScreen: ; boot
         sta gameMode
         rts
 
+bufferScreen:
+        lda #$0
+        sta renderMode
+        jsr updateAudioWaitForNmiAndDisablePpuRendering
+        jsr disableNmi
+        jsr drawBlackBGPalette
+        jsr resetScroll
+        jsr waitForVBlankAndEnableNmi
+        jsr updateAudioWaitForNmiAndResetOamStaging
+        jsr updateAudioWaitForNmiAndEnablePpuRendering
+        jsr updateAudioWaitForNmiAndResetOamStaging
+        lda #$3
+        sta sleepCounter
+@killLoop:
+        jsr updateAudioWaitForNmiAndResetOamStaging
+        lda sleepCounter
+        bne @killLoop
+        rts
+
 gameMode_speedTest:
         lda #$6
         sta renderMode
@@ -1144,6 +1165,9 @@ gameTypeLoopCheckStart:
         sta gameModeState
         lda #$02
         sta soundEffectSlot1Init
+
+        jsr bufferScreen ; hides glitchy scroll
+
         inc gameMode
         inc gameMode
         rts
@@ -1765,7 +1789,7 @@ stringLookup:
         .byte stringFloat-stringLookup
         .byte stringSevenDigit-stringLookup
         .byte stringScorecap-stringLookup
-        .byte stringNull-stringLookup
+        .byte stringNull-stringLookup ; reserved for future use
         .byte stringNull-stringLookup
         .byte stringNull-stringLookup
         .byte stringNull-stringLookup
@@ -2515,6 +2539,7 @@ savestate_nametable_patch:
 
 gameModeState_initGameBackground_finish:
         jsr resetScroll
+        jsr copyCurrentScrollAndCtrlToPPU
         jsr waitForVBlankAndEnableNmi
         jsr updateAudioWaitForNmiAndResetOamStaging
         jsr updateAudioWaitForNmiAndEnablePpuRendering
@@ -2666,6 +2691,7 @@ gameModeState_initGameState:
         lda musicSelectionTable,x
         jsr setMusicTrack
         inc gameModeState
+        jsr resetScroll
 initGameState_return:
         rts
 
@@ -3687,11 +3713,6 @@ render_mode_rocket:
         rts
 
 render_mode_pause:
-        ; lda pausedOutOfDateRenderFlags
-        ; and #$01
-        ; beq @skipStatisticsPatch
-        ; jsr statisticsNametablePatch
-; @skipStatisticsPatch:
         lda pausedOutOfDateRenderFlags
         and #$02
         beq @skipSaveSlotPatch
