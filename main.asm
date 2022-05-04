@@ -238,9 +238,8 @@ newlyPressedButtons_player2:= $00F6
 heldButtons_player1:= $00F7
 heldButtons_player2:= $00F8
 joy1Location    := $00FB                    ; normal=0; 1 or 3 for expansion
-
-; $FC, $FD free
-
+ppuScrollY      := $00FC
+ppuScrollX      := $00FD
 currentPpuMask  := $00FE
 currentPpuCtrl  := $00FF
 stack       := $0100
@@ -354,12 +353,11 @@ menuSeedCursorIndex := menuRAM+0
 menuScrollY := menuRAM+1
 menuMoveThrottle := menuRAM+2
 menuThrottleTmp := menuRAM+3
-menuPaletteDelay := menuRAM+4
-levelControlMode  := menuRAM+5
-customLevel := menuRAM+6
-classicLevel := menuRAM+7
-heartsAndReady := menuRAM+8 ; high nybble used for ready
-menuVars := $769
+levelControlMode  := menuRAM+4
+customLevel := menuRAM+5
+classicLevel := menuRAM+6
+heartsAndReady := menuRAM+7 ; high nybble used for ready
+menuVars := $768
 paceModifier := menuVars+0
 presetModifier := menuVars+1
 typeBModifier := menuVars+2
@@ -452,7 +450,7 @@ nmi:    pha
         ldx #rng_seed
         ldy #$02
         jsr generateNextPseudorandomNumber
-        ; PPUSCROLL used to be reset here
+        jsr copyCurrentScrollAndCtrlToPPU
         lda #$01
         sta verticalBlankingInterval
         jsr pollControllerButtons
@@ -565,14 +563,8 @@ initRamContinued:
         sta stack+4
         jsr updateAudioWaitForNmiAndDisablePpuRendering
         jsr disableNmi
-        lda #$20
-        jsr LAA82
-        lda #$24
-        jsr LAA82
-        lda #$28
-        jsr LAA82
-        lda #$2C
-        jsr LAA82
+        jsr drawBlackBGPalette
+        ; instead of clearing vram like the original, blank out the palette
         lda #$EF
         ldx #$04
         ldy #$04 ; used to be 5, but we dont need to clear 2p playfield
@@ -931,19 +923,6 @@ gameMode_bootScreen: ; boot
         sta gameMode
         rts
 
-blank_palette:
-        lda #$3F
-        sta PPUADDR
-        lda #$0
-        sta PPUADDR
-        ldx #$10
-@loadPaletteLoop:
-        lda #$F
-        sta PPUDATA
-        dex
-        bne @loadPaletteLoop
-        rts
-
 gameMode_speedTest:
         lda #$6
         sta renderMode
@@ -1109,9 +1088,8 @@ gameMode_gameTypeMenu:
         sta renderMode
         jsr updateAudioWaitForNmiAndDisablePpuRendering
         jsr disableNmi
-        jsr blank_palette
-        lda #$4
-        sta menuPaletteDelay ; title_palette loaded in render_mode_scroll
+        jsr bulkCopyToPpu
+        .addr   title_palette
         jsr copyRleNametableToPpu
         .addr   game_type_menu_nametable
         lda #$28
@@ -1849,12 +1827,9 @@ gameMode_levelMenu:
         ; render level when loading screen
         lda #$1
         sta outOfDateRenderFlags
+        jsr resetScroll
         jsr waitForVBlankAndEnableNmi
         jsr updateAudioWaitForNmiAndResetOamStaging
-        lda #$00
-        sta PPUSCROLL
-        lda #$00
-        sta PPUSCROLL
         jsr updateAudioWaitForNmiAndEnablePpuRendering
         jsr updateAudioWaitForNmiAndResetOamStaging
         lda #$00
@@ -2532,6 +2507,7 @@ savestate_nametable_patch:
         .byte   $23,$57,$3D,$3E,$3E,$3E,$3E,$3E,$3E,$3F,$FD
 
 gameModeState_initGameBackground_finish:
+        jsr resetScroll
         jsr waitForVBlankAndEnableNmi
         jsr updateAudioWaitForNmiAndResetOamStaging
         jsr updateAudioWaitForNmiAndEnablePpuRendering
@@ -3597,9 +3573,9 @@ render_mode_speed_test:
         sta outOfDateRenderFlags
 @noUpdate:
         lda #$B0
-        sta PPUSCROLL
+        sta ppuScrollX
         lda #$0
-        sta PPUSCROLL
+        sta ppuScrollY
         rts
 
 render_mode_level_menu:
@@ -3625,23 +3601,10 @@ render_mode_static:
         sta PPUCTRL
         sta currentPpuCtrl
 .endif
-        lda #$00
-        sta PPUSCROLL
-        sta PPUSCROLL
+        jsr resetScroll
         rts
 
 render_mode_scroll:
-        ; handle loading of palette (hacky)
-        lda menuPaletteDelay
-        beq @loadedPalette
-        cmp #1
-        bne @waitingPalette
-        jsr bulkCopyToPpu
-        .addr   title_palette
-@waitingPalette:
-        dec menuPaletteDelay
-@loadedPalette:
-
         ; handle scroll
         lda currentPpuCtrl
         and #$FC
@@ -3652,7 +3615,7 @@ render_mode_scroll:
         sta currentPpuCtrl
 .endif
         lda #0
-        sta PPUSCROLL
+        sta ppuScrollX
 
         jsr calc_menuScrollY
         cmp menuScrollY
@@ -3673,7 +3636,7 @@ render_mode_scroll:
         sta menuScrollY
 @uncapped:
 
-        sta PPUSCROLL
+        sta ppuScrollY
         rts
 
 calc_menuScrollY:
@@ -3713,9 +3676,7 @@ render_mode_rocket:
         sta PPUCTRL
         sta currentPpuCtrl
 .endif
-        lda #0
-        sta PPUSCROLL
-        sta PPUSCROLL
+        jsr resetScroll
         rts
 
 render_mode_pause:
@@ -3737,10 +3698,7 @@ render_mode_pause:
         beq @done
         jsr render_playfield
 @done:
-
-        lda #0
-        sta PPUSCROLL
-        sta PPUSCROLL
+        jsr resetScroll
         rts
 
 render_playfield:
@@ -3940,9 +3898,7 @@ render_mode_play_and_demo:
         sta PPUCTRL
         sta currentPpuCtrl
 .endif
-        lda #$0
-        sta PPUSCROLL
-        sta PPUSCROLL
+        jsr resetScroll
         rts
 
 renderHz:
@@ -5065,7 +5021,6 @@ playState_checkForCompletedRows:
         sta soundEffectSlot1Init
         inc completedLines
         ldx lineIndex
-        stx $10
         lda generalCounter2
         sta completedRow,x
         ldy generalCounter
@@ -6312,10 +6267,6 @@ highScoreEntryRowOffsetLookup:
         .byte   $0, highScoreLength, highScoreLength*2
 
 render_mode_congratulations_screen:
-        lda #$00
-        sta PPUSCROLL
-        sta PPUSCROLL
-
         lda outOfDateRenderFlags
         and #$80
         beq @ret
@@ -6336,11 +6287,10 @@ render_mode_congratulations_screen:
         ldx highScoreEntryCurrentLetter
         lda highScoreCharToTile,x
         sta PPUDATA
-        lda #$00
-        sta PPUSCROLL
-        sta PPUSCROLL
         sta outOfDateRenderFlags
-@ret:   rts
+@ret:
+        jsr resetScroll
+        rts
 
 ; Handles pausing and exiting demo
 gameModeState_startButtonHandling:
@@ -6517,17 +6467,34 @@ _updatePpuCtrl:
         sta currentPpuCtrl
         rts
 
-LAA82:  ldx #$FF
-        ldy #$00
-        jsr memset_ppu_page_and_more
+resetScroll:
+        lda #0
+        sta ppuScrollX
+        sta PPUSCROLL
+        sta ppuScrollY
+        sta PPUSCROLL
         rts
 
 copyCurrentScrollAndCtrlToPPU:
-        lda #$00
+        lda ppuScrollX
         sta PPUSCROLL
+        lda ppuScrollY
         sta PPUSCROLL
         lda currentPpuCtrl
         sta PPUCTRL
+        rts
+
+drawBlackBGPalette:
+        lda #$3F
+        sta PPUADDR
+        lda #$0
+        sta PPUADDR
+        ldx #$10
+@loadPaletteLoop:
+        lda #$F
+        sta PPUDATA
+        dex
+        bne @loadPaletteLoop
         rts
 
 bulkCopyToPpu:
@@ -6734,45 +6701,6 @@ diffOldAndNewButtons:
         bpl @diffForPlayer
         rts
 
-memset_ppu_page_and_more:
-        sta tmp1
-        stx tmp2
-        sty tmp3
-        lda PPUSTATUS
-        lda currentPpuCtrl
-        and #$FB
-        sta PPUCTRL
-        sta currentPpuCtrl
-        lda tmp1
-        sta PPUADDR
-        ldy #$00
-        sty PPUADDR
-        ldx #$04
-        cmp #$20
-        bcs LAC40
-        ldx tmp3
-LAC40:  ldy #$00
-        lda tmp2
-LAC44:  sta PPUDATA
-        dey
-        bne LAC44
-        dex
-        bne LAC44
-        ldy tmp3
-        lda tmp1
-        cmp #$20
-        bcc LAC67
-        adc #$02
-        sta PPUADDR
-        lda #$C0
-        sta PPUADDR
-        ldx #$40
-LAC61:  sty PPUDATA
-        dex
-        bne LAC61
-LAC67:  ldx tmp2
-        rts
-
 ; reg a: value; reg x: start page; reg y: end page (inclusive)
 memset_page:
         pha
@@ -6873,7 +6801,7 @@ changePRGBank:
 
 game_palette:
         .byte   $3F,$00,$20,$0F,$30,$12,$16,$0F
-        .byte   $20,$12,$00,$0F,$2C,$16,$30,$0F
+        .byte   $20,$12,$00,$0F,$2C,$16,$29,$0F
         .byte   $3C,$00,$30,$0F,$16,$2A,$22,$0F
         .byte   $10,$16,$2D,$0F,$2C,$16,$29,$0F
         .byte   $3C,$00,$30,$FF
