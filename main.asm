@@ -933,6 +933,13 @@ gameMode_speedTest:
         .addr speedtest_nametable
         jsr bulkCopyToPpu
         .addr game_palette
+        ; patch color
+        lda #$3f
+        sta PPUADDR
+        lda #$b
+        sta PPUADDR
+        lda #$30
+        sta PPUDATA
 .if INES_MAPPER = 1
         lda #$01
         jsr changeCHRBank0
