@@ -5,8 +5,6 @@
 ; @disassembly CelestialAmber/TetrisNESDisasm
 ; @information ejona86/taus
 
-; killx2: draw background, reset scroll, change order of loading things
-
 .include "charmap.asm"
 
 INES_MAPPER := 1 ; supports 1 and 3
@@ -2539,7 +2537,6 @@ savestate_nametable_patch:
 
 gameModeState_initGameBackground_finish:
         jsr resetScroll
-        jsr copyCurrentScrollAndCtrlToPPU
         jsr waitForVBlankAndEnableNmi
         jsr updateAudioWaitForNmiAndResetOamStaging
         jsr updateAudioWaitForNmiAndEnablePpuRendering
