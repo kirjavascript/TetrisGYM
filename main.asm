@@ -13,7 +13,7 @@ NO_MUSIC := 1
 SAVE_HIGHSCORES := 1
 
 ; dev flags
-AUTO_WIN := 0 ; press select to end game
+AUTO_WIN := 1 ; press select to end game
 NO_SCORING := 0 ; breaks pace
 NO_SFX := 1
 INITIAL_CUSTOM_LEVEL := 29
@@ -2416,10 +2416,8 @@ scoringBackground:
         rts
 
 @classicTopScore:
-        lda highscores+highScoreNameLength
-        sta tmpX
-        lda highscores+highScoreNameLength+1
-        sta tmpY
+        ldx highscores+highScoreNameLength
+        ldy highscores+highScoreNameLength+1
         jsr renderClassicHighByte
         lda highscores+highScoreNameLength+2
         jsr twoDigsToPPU
@@ -3995,6 +3993,9 @@ multBy10Table:
         .byte   $00,$0A,$14,$1E,$28,$32,$3C,$46
         .byte   $50,$5A,$64,$6E,$78,$82,$8C,$96
         .byte   $A0,$AA,$B4,$BE
+multBy100Table:
+        .byte $0, $64, $c8, $2c, $90
+        .byte $f4, $58, $bc, $20, $84
 
 scoreSetupPPU:
         lda #$21
@@ -4010,41 +4011,14 @@ renderBCDScoreData:
         jmp renderLowScore
 renderClassicScore:
         jsr scoreSetupPPU
-        lda score+3
-        sta tmpX
-        lda score+2
-        sta tmpY
+        ldx score+3
+        ldy score+2
         jsr renderClassicHighByte
 renderLowScore:
         lda score+1
         jsr twoDigsToPPU
         lda score
         jsr twoDigsToPPU
-        rts
-
-renderClassicHighByte:
-        lda #0
-        sta tmpZ
-        lda tmpX
-        and #$1
-        beq @bitParity
-        lda #$A
-        sta tmpZ
-@bitParity:
-
-        clc
-        lda tmpY
-        and #$F0
-        ror
-        ror
-        ror
-        ror
-        adc tmpZ
-        sta PPUDATA
-
-        lda tmpY
-        and #$F
-        sta PPUDATA
         rts
 
 renderScoreCap:
@@ -4160,6 +4134,64 @@ renderModernLines:
         jsr twoDigsToPPU
 @doneRenderLines:
         rts
+
+; X - score+3 Y = score+2
+
+; h = (0|score/100000)
+; offset = (0|h /16) << 4
+; output = h - offset
+renderClassicHighByte:
+        stx tmpX
+        sty tmpY
+
+        cpx #0
+        bne @startWrap
+
+        lda score+2
+        jsr twoDigsToPPU
+        rts
+@startWrap:
+
+        lda tmpY ; score+2
+        and #$F0
+        ror
+        ror
+        ror
+        ror
+        sta tmpZ
+
+        clc
+        lda tmpX ; score+3
+        and #$F
+        tax
+        lda multBy10Table, x
+        adc tmpZ
+        sta tmpZ
+
+        lda tmpX ; score+3
+        and #$F0
+        ror
+        ror
+        ror
+        ror
+        tax
+        lda multBy100Table, x
+        adc tmpZ
+        sta tmpZ ; (0|score/100000)
+
+        and #$F0 ; /16 << 4
+        sta tmpX
+        sec
+        lda tmpZ
+        sbc tmpX
+
+        sta PPUDATA
+
+        lda tmpY ; score+2
+        and #$F
+        sta PPUDATA
+        rts
+
 
 linesDash:
         .byte $15, $12, $17, $E, $1C, $24
