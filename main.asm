@@ -4011,6 +4011,18 @@ renderBCDScoreData:
         jmp renderLowScore
 renderClassicScore:
         jsr scoreSetupPPU
+        ; check for overflow questionmark score
+        lda binScore+3
+        cmp #5
+        bcc @normal
+        lda #$29
+        sta PPUDATA
+        lda score+2
+        and #$F
+        sta PPUDATA
+        jmp renderLowScore
+@normal:
+        ; otherwise just render normal classic score
         ldx score+3
         ldy score+2
         jsr renderClassicHighByte
@@ -4146,7 +4158,6 @@ renderClassicHighByte:
 
         cpx #0
         bne @startWrap
-
         lda score+2
         jsr twoDigsToPPU
         rts
