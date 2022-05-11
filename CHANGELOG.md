@@ -20,7 +20,7 @@
     * Added start level
     * DAS-like movement for name entry
     * Added ! and ? to name entry
-    * Store highscores in save RAM, if it's available
+    * Store highscores in clearable save data, if it's available
 * 3 digit level counter for levels over 99
 * 4 digit line counter for lines over 999 (except in 'Classic' scoring)
 * Added hearts to level menu

@@ -13,9 +13,9 @@ NO_MUSIC := 1
 SAVE_HIGHSCORES := 1
 
 ; dev flags
-AUTO_WIN := 1 ; press select to end game
+AUTO_WIN := 0 ; press select to end game
 NO_SCORING := 0 ; breaks pace
-NO_SFX := 1
+NO_SFX := 0
 INITIAL_CUSTOM_LEVEL := 29
 
 BUTTON_DOWN := $4
@@ -58,8 +58,8 @@ MODE_QUANTITY := 26
 MODE_GAME_QUANTITY := 18
 
 SCORING_CLASSIC := 0 ; for scoringModifier
-SCORING_FLOAT := 1
-SCORING_SEVENDIGIT := 2
+SCORING_SEVENDIGIT := 1
+SCORING_FLOAT := 2
 SCORING_SCORECAP := 3
 
 MENU_SPRITE_Y_BASE := $47
@@ -1784,8 +1784,8 @@ stringSpriteLoop:
 
 stringLookup:
         .byte stringClassic-stringLookup
-        .byte stringFloat-stringLookup
         .byte stringSevenDigit-stringLookup
+        .byte stringFloat-stringLookup
         .byte stringScorecap-stringLookup
         .byte stringNull-stringLookup ; reserved for future use
         .byte stringNull-stringLookup
@@ -1801,10 +1801,10 @@ stringLookup:
         .byte stringV5-stringLookup ; F
 stringClassic:
         .byte $7,'C','L','A','S','S','I','C'
-stringFloat:
-        .byte $1,'M'
 stringSevenDigit:
         .byte $6,'7','D','I','G','I','T'
+stringFloat:
+        .byte $1,'M'
 stringScorecap:
         .byte $6,'C','A','P','P','E','D'
 stringOff:
@@ -6038,7 +6038,6 @@ byteToBcdTable: ; original goes to 49
         ; 50 extra bytes is shorter than a conversion routine (and super fast)
         ; (used in renderByteBCD)
         .byte   $50,$51,$52,$53,$54,$55,$56,$57,$58,$59,$60,$61,$62,$63,$64,$65,$66,$67,$68,$69,$70,$71,$72,$73,$74,$75,$76,$77,$78,$79,$80,$81,$82,$83,$84,$85,$86,$87,$88,$89,$90,$91,$92,$93,$94,$95,$96,$97,$98,$99
-
 
 ; Adjusts high score table and handles data entry, if necessary
 handleHighScoreIfNecessary:
