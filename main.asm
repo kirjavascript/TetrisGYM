@@ -4014,14 +4014,14 @@ renderClassicScore:
         ; check for overflow questionmark score
         lda binScore+3
         cmp #5
-        bcc @normal
+        bcc :+
         lda #$29
         sta PPUDATA
         lda score+2
         and #$F
         sta PPUDATA
         jmp renderLowScore
-@normal:
+:
         ; otherwise just render normal classic score
         ldx score+3
         ldy score+2
