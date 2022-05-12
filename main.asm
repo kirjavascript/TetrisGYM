@@ -49,12 +49,13 @@ MODE_SPEED_TEST := 18
 MODE_SCORE_DISPLAY := 19
 MODE_HZ_DISPLAY := 20
 MODE_INPUT_DISPLAY := 21
-MODE_GOOFY := 22
-MODE_DEBUG := 23
-MODE_QUAL := 24
-MODE_PAL := 25
+MODE_DISABLE_FLASH := 22
+MODE_GOOFY := 23
+MODE_DEBUG := 24
+MODE_QUAL := 25
+MODE_PAL := 26
 
-MODE_QUANTITY := 26
+MODE_QUANTITY := 27
 MODE_GAME_QUANTITY := 18
 
 SCORING_CLASSIC := 0 ; for scoringModifier
@@ -63,7 +64,7 @@ SCORING_FLOAT := 2
 SCORING_SCORECAP := 3
 
 MENU_SPRITE_Y_BASE := $47
-MENU_MAX_Y_SCROLL := $50
+MENU_MAX_Y_SCROLL := $58
 MENU_TOP_MARGIN_SCROLL := 7 ; in blocks
 BLOCK_TILES := $7B
 EMPTY_TILE := $EF
@@ -71,7 +72,7 @@ INVISIBLE_TILE := $43
 TETRIMINO_X_HIDE := $EF
 
 ; menuConfigSizeLookup
-.define MENUSIZES $0, $0, $0, $0, $F, $7, $8, $C, $20, $10, $1F, $8, $4, $12, $10, $0, $0, $0, $0, $3, $1, $1, $1, $1, $1, $1
+.define MENUSIZES $0, $0, $0, $0, $F, $7, $8, $C, $20, $10, $1F, $8, $4, $12, $10, $0, $0, $0, $0, $3, $1, $1, $1, $1, $1, $1, $1
 
 .macro MODENAMES
     .byte   "TETRIS"
@@ -372,10 +373,11 @@ dasModifier := menuVars+10
 scoringModifier := menuVars+11
 hzFlag := menuVars+12
 inputDisplayFlag := menuVars+13
-goofyFlag := menuVars+14
-debugFlag := menuVars+15
-qualFlag := menuVars+16
-palFlag := menuVars+17
+disableFlashFlag := menuVars+14
+goofyFlag := menuVars+15
+debugFlag := menuVars+16
+qualFlag := menuVars+17
+palFlag := menuVars+18
 
 ; ... $7FF
 PPUCTRL     := $2000
@@ -3929,7 +3931,10 @@ render_mode_play_and_demo:
         lda #$09
         sta soundEffectSlot1Init
 @setPaletteColor:
+        lda disableFlashFlag
+        bne @noFlash
         stx PPUDATA
+@noFlash:
 .if INES_MAPPER = 3
         lda #%10011000
         sta PPUCTRL
