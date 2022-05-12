@@ -3673,7 +3673,17 @@ render_mode_scroll:
         ; not equal
         cmp menuScrollY
         bcc @lessThan
+
+        ; add a bump when top-wrapping
+        ; clc
+        ; sbc menuScrollY
+        ; cmp #$4D
+        ; bcc :+
+        ; inc menuScrollY
+; :
+
         inc menuScrollY
+
         jmp @endscroll
 @lessThan:
         dec menuScrollY
