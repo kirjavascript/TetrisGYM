@@ -1175,7 +1175,6 @@ gameTypeLoopCheckStart:
         cmp #MODE_SPEED_TEST
         beq gameTypeSpeedTest
 
-
         ; check for seed of 0000XX
         cmp #MODE_SEED
         bne @checkSelectable
@@ -1185,6 +1184,7 @@ gameTypeLoopCheckStart:
         beq gameTypeLoopNext
 
 @checkSelectable:
+        lda practiseType
         cmp #MODE_GAME_QUANTITY
         bpl gameTypeLoopNext
 
@@ -5086,8 +5086,7 @@ playState_checkForCompletedRows:
         iny
         dex
         bne @checkIfRowComplete
-        lda #$0A
-        sta soundEffectSlot1Init
+        ; sound effect $A to slot 1 used to live here
         inc completedLines
         ldx lineIndex
         lda generalCounter2
@@ -5120,10 +5119,6 @@ playState_checkForCompletedRows:
         lda #$00
         sta completedRow,x
 @incrementLineIndex:
-        inc lineIndex
-        lda lineIndex
-        cmp #$04
-        bmi playState_checkForCompletedRows_return
 
         ; patch tapquantity data
         lda practiseType
@@ -5145,8 +5140,21 @@ playState_checkForCompletedRows:
         inc playState
         lda #0
         sta completedLines
+        lda #$07
+        sta soundEffectSlot1Init
         rts
 @tapQtyEnd:
+
+        lda completedLines
+        beq :+
+        lda #$0A
+        sta soundEffectSlot1Init
+:
+
+        inc lineIndex
+        lda lineIndex
+        cmp #$04
+        bmi playState_checkForCompletedRows_return
 
         ldy completedLines
         lda garbageLines,y
