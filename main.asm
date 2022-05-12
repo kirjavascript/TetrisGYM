@@ -1175,8 +1175,16 @@ gameTypeLoopCheckStart:
         cmp #MODE_SPEED_TEST
         beq gameTypeSpeedTest
 
-        ; check it's a selectable option
-        lda practiseType
+
+        ; check for seed of 0000XX
+        cmp #MODE_SEED
+        bne @checkSelectable
+        lda set_seed_input
+        bne @checkSelectable
+        lda set_seed_input+1
+        beq gameTypeLoopNext
+
+@checkSelectable:
         cmp #MODE_GAME_QUANTITY
         bpl gameTypeLoopNext
 
@@ -1185,17 +1193,17 @@ gameTypeLoopCheckStart:
         inc gameMode
         rts
 
-gameTypeLoopNext:
-        jsr renderMenuVars
-        jsr updateAudioWaitForNmiAndResetOamStaging
-        jmp gameTypeLoop
-
 gameTypeSpeedTest:
         lda #$02
         sta soundEffectSlot1Init
         lda #7
         sta gameMode
         rts
+
+gameTypeLoopNext:
+        jsr renderMenuVars
+        jsr updateAudioWaitForNmiAndResetOamStaging
+        jmp gameTypeLoop
 
 seedControls:
         lda practiseType
@@ -1501,6 +1509,12 @@ renderMenuVars:
         jsr loadSpriteIntoOamStaging
 
         ; indicator
+
+        lda set_seed_input
+        bne @renderIndicator
+        lda set_seed_input+1
+        beq @cursorFinished
+@renderIndicator:
         ldx #$E
         lda set_seed_input+2
         and #$F0
@@ -4012,16 +4026,16 @@ renderBCDScoreData:
 renderClassicScore:
         jsr scoreSetupPPU
         ; check for overflow questionmark score
-        lda binScore+3
-        cmp #5
-        bcc :+
-        lda #$29
-        sta PPUDATA
-        lda score+2
-        and #$F
-        sta PPUDATA
-        jmp renderLowScore
-:
+        ; lda binScore+3
+        ; cmp #5
+        ; bcc :+
+        ; lda #$29
+        ; sta PPUDATA
+        ; lda score+2
+        ; and #$F
+        ; sta PPUDATA
+        ; jmp renderLowScore
+; :
         ; otherwise just render normal classic score
         ldx score+3
         ldy score+2
@@ -4535,19 +4549,6 @@ pickTetriminoSeed:
         jsr setSeedNextRNG
 
         ; SPSv3
-
-        ; v3: check for 0000 and do something special
-        lda set_seed_input
-        bne @normalRNG
-        lda set_seed_input+1
-        bne @normalRNG
-        lda set_seed_input+2
-        and #7
-        tax
-        lda spawnTable, x
-        sta spawnID
-        rts
-@normalRNG:
 
         lda set_seed_input+2
         ror
