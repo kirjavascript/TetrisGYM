@@ -1551,6 +1551,12 @@ menuYTmp := tmp2
         clc
         lda #MENU_SPRITE_Y_BASE + $10
         sbc menuScrollY
+
+        ; TODO: remove / fix in v6
+        cmp #1
+        bpl :+
+        lda #1
+:
         sta spriteYOffset
         lda #set_seed_input
         sta byteSpriteAddr
