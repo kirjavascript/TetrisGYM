@@ -4193,7 +4193,7 @@ renderClassicHighByte:
 
         cpx #0
         bne @startWrap
-        lda score+2
+        lda tmpY ; score+2
         jsr twoDigsToPPU
         rts
 @startWrap:
