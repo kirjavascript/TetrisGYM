@@ -2331,7 +2331,6 @@ gameModeState_initGameBackground:
         .addr   game_palette
         jsr copyRleNametableToPpu
         .addr   game_nametable
-
         jsr scoringBackground
 
         lda hzFlag
@@ -2347,7 +2346,21 @@ gameModeState_initGameBackground:
         jsr displayModeText
         jsr statisticsNametablePatch ; for input display
         jsr debugNametableUI
-        jmp gameModeState_initGameBackground_finish
+
+        jsr resetScroll
+        jsr waitForVBlankAndEnableNmi
+        jsr updateAudioWaitForNmiAndResetOamStaging
+        jsr updateAudioWaitForNmiAndEnablePpuRendering
+        jsr updateAudioWaitForNmiAndResetOamStaging
+.if INES_MAPPER = 3
+        lda #%10011000
+        sta PPUCTRL
+        sta currentPpuCtrl
+.endif
+        lda #$01
+        sta playState
+        inc gameModeState
+        rts
 
 displayModeText:
         ldx practiseType
@@ -2558,23 +2571,6 @@ savestate_nametable_patch:
         .byte   $23,$17,$3B,$1C,$15,$18,$1D,$FF,$FF,$3C,$FE
         .byte   $23,$37,$3B,$FF,$FF,$FF,$FF,$FF,$FF,$3C,$FE
         .byte   $23,$57,$3D,$3E,$3E,$3E,$3E,$3E,$3E,$3F,$FD
-
-gameModeState_initGameBackground_finish:
-        jsr resetScroll
-        jsr waitForVBlankAndEnableNmi
-        jsr updateAudioWaitForNmiAndResetOamStaging
-        jsr updateAudioWaitForNmiAndEnablePpuRendering
-.if INES_MAPPER = 1
-        jsr updateAudioWaitForNmiAndResetOamStaging
-.elseif INES_MAPPER = 3
-        lda #%10011000
-        sta PPUCTRL
-        sta currentPpuCtrl
-.endif
-        lda #$01
-        sta playState
-        inc gameModeState
-        rts
 
 
 gameModeState_initGameState:
