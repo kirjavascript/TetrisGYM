@@ -13,7 +13,7 @@ NO_MUSIC := 1
 SAVE_HIGHSCORES := 1
 
 ; dev flags
-AUTO_WIN := 1 ; press select to end game
+AUTO_WIN := 0 ; press select to end game
 NO_SCORING := 0 ; breaks pace
 NO_SFX := 0
 INITIAL_CUSTOM_LEVEL := 29
@@ -797,12 +797,13 @@ playState_playerControlsActiveTetrimino:
         beq @ret
         jsr hzControl
 @ret:
+playState_playerControlsActiveTetrimino_return:
         rts
 
 harddrop_tetrimino:
         lda newlyPressedButtons
         and #BUTTON_UP+BUTTON_SELECT
-        beq @noHard
+        beq playState_playerControlsActiveTetrimino_return
         sta tmpX
         lda tetriminoY
 @loop:
@@ -883,7 +884,9 @@ harddrop_tetrimino:
         sta playState
         lda dropSpeed
         sta fallTimer
-@noHard:
+        lda #$7
+        sta soundEffectSlot1Init
+@ret:
         rts
 
 gameMode_bootScreen: ; boot
