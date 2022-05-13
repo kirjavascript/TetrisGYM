@@ -7,7 +7,7 @@
 
 .include "charmap.asm"
 
-INES_MAPPER := 1 ; supports 1 and 3
+INES_MAPPER := 3 ; supports 1 and 3
 PRACTISE_MODE := 1
 NO_MUSIC := 1
 SAVE_HIGHSCORES := 1
@@ -17,6 +17,7 @@ AUTO_WIN := 0 ; press select to end game
 NO_SCORING := 0 ; breaks pace
 NO_SFX := 0
 INITIAL_CUSTOM_LEVEL := 29
+BTYPE_START_LINES := $25 ; bcd
 
 BUTTON_DOWN := $4
 BUTTON_UP := $8
@@ -2673,7 +2674,7 @@ gameModeState_initGameState:
         lda practiseType
         cmp #MODE_TYPEB
         bne @notTypeB
-        lda #$25
+        lda #BTYPE_START_LINES
         sta lines
 @notTypeB:
 
@@ -4893,6 +4894,13 @@ playState_checkStartGameOver:
         sta newlyPressedButtons_player1
 @ret2:  rts
 
+sleep_gameplay:
+        sta sleepCounter
+@loop:  jsr updateAudioWaitForNmiAndResetOamStaging
+        lda sleepCounter
+        bne @loop
+        rts
+
 endingAnimation: ; rocket_screen
         jsr updateAudioWaitForNmiAndDisablePpuRendering
         jsr disableNmi
@@ -5273,12 +5281,12 @@ typeBEndingStuff:
         sta soundEffectSlot1Init
 
         lda #$30
-        jsr sleep_gameplay
+        jsr sleep_gameplay_nextSprite
         lda #$0A ; playState_checkStartGameOver
         sta playState
         rts
 
-sleep_gameplay:
+sleep_gameplay_nextSprite:
         sta sleepCounter
         jsr stageSpriteForNextPiece
 @loop:  jsr updateAudioWaitForNmiAndResetOamStaging
