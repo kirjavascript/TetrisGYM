@@ -970,6 +970,10 @@ gameMode_speedTest:
         jsr changeCHRBank0
         lda #$01
         jsr changeCHRBank1
+.elseif INES_MAPPER = 3
+        lda #%10011001
+        sta PPUCTRL
+        sta currentPpuCtrl
 .endif
 
         jsr waitForVBlankAndEnableNmi
