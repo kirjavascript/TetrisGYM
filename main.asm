@@ -2350,17 +2350,16 @@ gameModeState_initGameBackground:
         jsr displayModeText
         jsr statisticsNametablePatch ; for input display
         jsr debugNametableUI
-
-        jsr resetScroll
-        jsr waitForVBlankAndEnableNmi
-        jsr updateAudioWaitForNmiAndResetOamStaging
-        jsr updateAudioWaitForNmiAndEnablePpuRendering
-        jsr updateAudioWaitForNmiAndResetOamStaging
 .if INES_MAPPER = 3
         lda #%10011000
         sta PPUCTRL
         sta currentPpuCtrl
 .endif
+        jsr resetScroll
+        jsr waitForVBlankAndEnableNmi
+        jsr updateAudioWaitForNmiAndResetOamStaging
+        jsr updateAudioWaitForNmiAndEnablePpuRendering
+        jsr updateAudioWaitForNmiAndResetOamStaging
         lda #$01
         sta playState
         inc gameModeState
@@ -3650,11 +3649,6 @@ render_mode_static:
         lda currentPpuCtrl
         and #$FC
         sta currentPpuCtrl
-.if INES_MAPPER = 3
-        and #%10000000
-        sta PPUCTRL
-        sta currentPpuCtrl
-.endif
         jsr resetScroll
         rts
 
