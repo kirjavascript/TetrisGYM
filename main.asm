@@ -7,7 +7,7 @@
 
 .include "charmap.asm"
 
-INES_MAPPER := 1 ; supports 1 and 3
+INES_MAPPER := 3 ; supports 1 and 3
 PRACTISE_MODE := 1
 NO_MUSIC := 1
 SAVE_HIGHSCORES := 1
@@ -1024,10 +1024,17 @@ waitScreenLoad:
         sta renderMode
         jsr updateAudioWaitForNmiAndDisablePpuRendering
         jsr disableNmi
+.if INES_MAPPER = 1
         lda #$02
         jsr changeCHRBank0
         lda #$02
         jsr changeCHRBank1
+.elseif INES_MAPPER = 3
+        lda #%10000000
+        sta PPUCTRL
+        sta currentPpuCtrl
+.endif
+
         jsr bulkCopyToPpu
         .addr wait_palette
         jsr copyRleNametableToPpu
