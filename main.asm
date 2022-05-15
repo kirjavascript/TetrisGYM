@@ -906,7 +906,6 @@ gameMode_bootScreen: ; boot
         sta customLevel
 
         ; detect region
-        ; jsr updateAudioWaitForNmiAndDisablePpuRendering
         jsr checkRegion
 
         ; check if qualMode is already set
