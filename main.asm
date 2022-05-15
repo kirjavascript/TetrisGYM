@@ -741,15 +741,16 @@ gameModeState_updatePlayer1:
         jsr practiseAdvanceGame
         jsr practiseGameHUD
         jsr branchOnPlayStatePlayer1
-
         jsr stageSpriteForCurrentPiece
         jsr stageSpriteForNextPiece
-        inc gameModeState
+
+        inc gameModeState ; 5
+        lda #$FF ; acc from stateSpriteForNextPiece
         rts
 
 gameModeState_next: ; used to be updatePlayer2
         inc gameModeState
-        lda #0 ; acc
+        lda #$1 ; acc should not be equal
         rts
 
 gameMode_playAndEndingHighScore:
@@ -758,9 +759,9 @@ gameMode_playAndEndingHighScore:
         .addr   gameModeState_initGameBackground ; gms: 1 acc: 0 - ne
         .addr   gameModeState_initGameState ; gms: 2 acc: 4/0 - ne
         .addr   gameModeState_updateCountersAndNonPlayerState ; gms: 3 acc: 0/1 - ne
-        .addr   gameModeState_handleGameOver ; gms: 4 acc: eq (set to $9) if gameOver, ne otherwise
+        .addr   gameModeState_handleGameOver ; gms: 4 acc: eq (set to $9) if gameOver, $1 otherwise (ne)
         .addr   gameModeState_updatePlayer1 ; gms: 5 acc: $FF - ne
-        .addr   gameModeState_next ; gms: 6 acc: 0 ne
+        .addr   gameModeState_next ; gms: 6 acc: $1 ne
         .addr   gameModeState_checkForResetKeyCombo ; gms: 7 acc: 0 or heldButtons - eq if holding down, left and right
         .addr   gameModeState_startButtonHandling ; gms: 8 acc: 0/3 - ne
         .addr   gameModeState_vblankThenRunState2 ; gms: 2 acc eq (set to $2)
@@ -2364,7 +2365,7 @@ gameModeState_initGameBackground:
         lda #$01
         sta playState
         inc gameModeState ; 1
-        lda #0 ; acc
+        lda #0 ; acc should not be equal
         rts
 
 displayModeText:
@@ -2714,7 +2715,7 @@ gameModeState_initGameState:
         lda musicSelectionTable,x
         jsr setMusicTrack
         inc gameModeState ; 2
-        ; TODO: acc
+        lda #4 ; acc should not be equal
 
 initGameState_return:
         rts
@@ -2890,13 +2891,15 @@ gameModeState_updateCountersAndNonPlayerState:
         lda #$00
         sta oamStagingLength
         inc fallTimer
+        ; next code makes acc behave as normal
+        ; (dont edit unless you know what you're doing)
         lda newlyPressedButtons_player1
         and #$20
         beq @ret
         lda displayNextPiece
         eor #$01
         sta displayNextPiece
-@ret:   inc gameModeState
+@ret:   inc gameModeState ; 3
         rts
 
 rotate_tetrimino:
@@ -5736,7 +5739,6 @@ gameModeState_handleGameOver:
         lda playState
         cmp #$00
         beq @gameOver
-        lda #$1 ; deleting this line causes the next piece to flash (?)
         jmp @ret
 @gameOver:
         lda #$03
@@ -5770,7 +5772,8 @@ gameModeState_handleGameOver:
         stx gameMode
         rts
 
-@ret:   inc gameModeState
+@ret:   inc gameModeState ; 4
+        lda #$1 ; acc should not be equal (always $1 in original game)
         rts
 
 updateMusicSpeed:
@@ -5933,6 +5936,7 @@ gameModeState_checkForResetKeyCombo:
         cmp #BUTTON_A+BUTTON_B+BUTTON_START+BUTTON_SELECT
         beq @reset
         inc gameModeState
+        ; acc has to be heldButtons_player1 here
         rts
 
 @reset: jsr updateAudio2
@@ -6425,7 +6429,8 @@ gameModeState_startButtonHandling:
         beq @ret
         jsr pause
 
-@ret:   inc gameModeState
+@ret:   inc gameModeState ; 8
+        lda #$0 ; acc must not be equal
         rts
 
 pause:
