@@ -2363,6 +2363,7 @@ gameModeState_initGameBackground:
         lda #$01
         sta playState
         inc gameModeState
+        lda #0 ; needed for accumulator value to be correct
         rts
 
 displayModeText:
