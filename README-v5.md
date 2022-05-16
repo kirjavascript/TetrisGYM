@@ -17,12 +17,17 @@
     * [B-Type](#b-type)
     * [Floor](#floor)
     * [(Quick)Tap](#quicktap)
+    * [Tap Quantity](#tap-quantity)
+    * [Checkerboard](#checkerboard)
     * [Transition](#transition)
     * [Garbage](#garbage)
     * [Drought](#drought)
     * [DAS Delay](#das-delay)
     * [Invisible](#invisible) 
+    * [Double Killscreen](#double=killscreen) 
     * [Hard Drop](#hard-drop) 
+* [Scoring]
+    * [Highscores]
 * [Tap/Roll Speed Tester](#taproll-speed-tester)
 * [Hz Display](#hz-display) 
 * [Input Display](#input-display)
@@ -53,13 +58,13 @@ Some trainers have additional configuration values; use left and right in the ma
 
 ### Tetris
 
-![Tetris](/screens/levelselect.png)
+![Tetris](./screens/levelmenu.png)
 
 Same gameplay as A-Type, with some improvements: no score cap, no rocket, no curtain, always next box, better pause, extended level select.
 
 ### T-Spins
 
-![T-Spins](/screens/tspins.png)
+![T-Spins](./screens/tspins.png)
 
 Spawn T-Spins in random positions. Additional entry delay on successful T-Spin to prepare for the next state.
 
@@ -69,19 +74,19 @@ Provides same piece sets for VS battles (or practise).
 
 Press `select` to generate a random seed.
 
-The seed trainer was improved in v3.1 to give a 'better' distribution of cases.
+A small number of seeds are different between v4 and v5, but otherwise both versions are compatible.
 
-Different versions of TetrisGYM can still share SPS by setting the fifth digit to 0.
+An indicator will show which seeds are for v4 and which are for v5, and pressing `select` will always generate a v4 compatible seed.
 
 ### Stacking
 
-![Stacking](/screens/stacking.png)
+![Stacking](./screens/stacking.png)
 
 An experiment in highlighting areas of the playfield.
 
 ### Pace
 
-![Pace](/screens/pace.png)
+![Pace](./screens/pace.png)
 
 Indicates how close you are to achieving a score by 230 lines. Loosely based on Tetris rate.
 
@@ -106,7 +111,7 @@ This can be adjusted for transition or PAL games;
 
 ### Setups
 
-![Setups](/screens/setups.png)
+![Setups](./screens/setups.png)
 
 Several preset playfields for practising different types of tucks and spins.
 
@@ -121,13 +126,13 @@ Several preset playfields for practising different types of tucks and spins.
 
 ### B-Type
 
-![B-Type](/screens/btype.png)
+![B-Type](./screens/btype.png)
 
 Same gameplay as B-Type in the original, except heights up to 8 are supported.
 
 ### Floor
 
-![Floor](/screens/floor.png)
+![Floor](./screens/floor.png)
 
 Fill in the floor to a certain height to force higher stacking. This mode is often referred to as 'handicap'.
 
@@ -135,13 +140,13 @@ Setting the height to zero will result in a game mode with burns disabled.
 
 ### (Quick)Tap
 
-![Tap](/screens/tap.png)
+![Tap](./screens/tap.png)
 
 For practising tapping and quicktapping pieces over towers. 0-G will have a tower on the left of the screen and H-W will have a tower to the right.
 
 ### Transition
 
-![Transition](/screens/transition.png)
+![Transition](./screens/transition.png)
 
 Puts you ten lines before transition. The value given will be added to your score, so set this to 5 and start on level 18 for a 'maxout trainer' style mode.
 
@@ -149,7 +154,7 @@ Setting the value to G causes the mode to act identical to the game genie code `
 
 ### Garbage
 
-![Garbage](/screens/garbage.png)
+![Garbage](./screens/garbage.png)
 
 Different styles of garbage to dig through.
 
@@ -171,13 +176,13 @@ Change the auto-shift delay rate.
 
 ### Invisible
 
-![Invisible](/screens/invisible.png)
+![Invisible](./screens/invisible.png)
 
 Blocks are invisible until the end of the game.
 
 ### Hard Drop
 
-![Hard Drop](/screens/harddrop.png)
+![Hard Drop](./screens/harddrop.png)
 
 Press `select` or `up` to hard drop.
 
@@ -187,7 +192,7 @@ Practise tapping rate outside of gameplay.
 
 ## Hz Display
 
-![Hz Display](/screens/hz.png)
+![Hz Display](./screens/hz.png)
 
 Shows the average tapping rate for each tap in a burst.
 
@@ -195,7 +200,7 @@ Also shows frames between spawn and first tap, and current tap direction.
 
 ## Input Display
 
-![Controller](/screens/controller.png)
+![Controller](./screens/controller.png)
 
 ## Goofy Foot
 
@@ -203,7 +208,7 @@ Flips A/B, Start/Select, and inverts DPad directions like a Goofy Foot controlle
 
 ## Block Tool
 
-![Block](/screens/block.png)
+![Block](./screens/block.png)
 
 Allow more fine control over aspects of gameplay.
 
@@ -258,9 +263,9 @@ Combined with the level editor, savestates are effective for practising specific
 
 ## Qual Mode
 
-![Legal](/screens/legal.png)
+![Legal](./screens/legal.png)
 
-![Rocket](/screens/rocket.png)
+![Rocket](./screens/rocket.png)
 
 Reintroduces the 'wait screens', intended for use in qualifiers where the the player would otherwise gain a time advantage skipping the rocket, legal and title screens.
 
@@ -280,7 +285,6 @@ TetrisGYM fixes some well known bugs in the original game;
 
 - Resetting during a tetris no longer creates an invalid state
 - Level numbers are correct past level 29
-- Tetrimino colours are correct past level 138
 - Game no longer crashes after ~1550 lines
 
 ## Resources
