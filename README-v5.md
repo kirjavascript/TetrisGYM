@@ -26,11 +26,11 @@
     * [Invisible](#invisible) 
     * [Double Killscreen](#double=killscreen) 
     * [Hard Drop](#hard-drop) 
-* [Scoring]
-    * [Highscores]
 * [Tap/Roll Speed Tester](#taproll-speed-tester)
+* [Scoring](#scoring)
 * [Hz Display](#hz-display) 
 * [Input Display](#input-display)
+* [Disable Flash](#disable-flash)
 * [Goofy Foot](#goofy-foot)
 * [Block Tool](#block-tool)
     * [Level Editor](#level-editor)
@@ -55,6 +55,8 @@ A link to the BPS can be found on the [releases page](https://github.com/kirjava
 ## Trainers
 
 Some trainers have additional configuration values; use left and right in the main menu to change them.
+
+Like in the original ROM, holding `a` `b` `select` and then pressing `start` will end gameplay and return to the menu screens.
 
 ### Tetris
 
@@ -144,6 +146,14 @@ Setting the height to zero will result in a game mode with burns disabled.
 
 For practising tapping and quicktapping pieces over towers. 0-G will have a tower on the left of the screen and H-W will have a tower to the right.
 
+### Tap Quantity
+
+![Tap Quantity](./screens/tapqty.png)
+
+### Checkerboard
+
+![Checkerboard](./screens/checkerboard.png)
+
 ### Transition
 
 ![Transition](./screens/transition.png)
@@ -180,15 +190,23 @@ Change the auto-shift delay rate.
 
 Blocks are invisible until the end of the game.
 
+### Double Killscreen
+
+The pieces fall by two blocks every frame. It's hard.
+
 ### Hard Drop
 
 ![Hard Drop](./screens/harddrop.png)
 
-Press `select` or `up` to hard drop.
+Press `up` to hard drop and `select` to soft drop.
 
 ## Tap/Roll Speed Tester
 
+![Speed Test](./screens/speedtest.png)
+
 Practise tapping rate outside of gameplay.
+
+## Scoring
 
 ## Hz Display
 
