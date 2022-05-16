@@ -1,8 +1,7 @@
-
 # TetrisGYM
 
 <div align="center">
-    <img src="./screens/menu4.png" alt="Menuscreen">
+    <img src="./screens/menu5.png" alt="Menuscreen">
     <br>
 </div>
 <br>
