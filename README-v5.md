@@ -26,6 +26,7 @@
     * [Invisible](#invisible) 
     * [Double Killscreen](#double=killscreen) 
     * [Hard Drop](#hard-drop) 
+* [Level Menu](#level-menu)
 * [Tap/Roll Speed Tester](#taproll-speed-tester)
 * [Scoring](#scoring)
 * [Hz Display](#hz-display) 
@@ -200,6 +201,8 @@ The pieces fall by two blocks every frame. It's hard.
 
 Press `up` to hard drop and `select` to soft drop.
 
+## Level Menu
+
 ## Tap/Roll Speed Tester
 
 ![Speed Test](./screens/speedtest.png)
@@ -207,6 +210,11 @@ Press `up` to hard drop and `select` to soft drop.
 Practise tapping rate outside of gameplay.
 
 ## Scoring
+
+![Classic](./screens/score-classic.png)
+![7 Digit](./screens/score-7digit.png)
+![M](./screens/score-m.png)
+![Capped](./screens/score-capped.png)
 
 ## Hz Display
 
