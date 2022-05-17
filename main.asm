@@ -7,7 +7,7 @@
 
 .include "charmap.asm"
 
-INES_MAPPER := 1 ; supports 1 and 3
+INES_MAPPER := 3 ; supports 1 and 3
 PRACTISE_MODE := 1
 NO_MUSIC := 1
 SAVE_HIGHSCORES := 1
@@ -1873,6 +1873,11 @@ gameMode_levelMenu:
         RESET_MMC1
         lda #$10
         jsr setMMC1Control
+.if INES_MAPPER = 3
+        lda currentPpuCtrl
+        and #%10000000
+        sta currentPpuCtrl
+.endif
         jsr updateAudio2
         lda #$7
         sta renderMode
