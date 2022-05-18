@@ -230,6 +230,14 @@ Used for keeping track of wins in local games.
 
 ## Highscores
 
+Shows scores up to 8 digits, and includes lines and start level. 
+
+Name entry has better controls and some added characters.
+
+If SRAM is available, scores will be saved and show again the next time the game boots.
+
+To clear the highscores, select hearts and press `down`. Then confirm the prompts by press `start`.
+
 ## Tap/Roll Speed Tester
 
 ![Speed Test](./screens/speedtest.png)
@@ -237,6 +245,8 @@ Used for keeping track of wins in local games.
 Practise tapping rate outside of gameplay.
 
 ## Scoring
+
+The scoring modes only affect the display ingame, and your real score will be displayed in the high score list.
 
 ![Classic](./screens/score-classic.png)
 ![7 Digit](./screens/score-7digit.png)
@@ -254,6 +264,10 @@ Also shows frames between spawn and first tap, and current tap direction.
 ## Input Display
 
 ![Controller](./screens/controller.png)
+
+## Disable Flash
+
+Disable the flashing from when you get a tetris.
 
 ## Goofy Foot
 
