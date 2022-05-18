@@ -248,10 +248,33 @@ Practise tapping rate outside of gameplay.
 
 The scoring modes only affect the display ingame, and your real score will be displayed in the high score list.
 
+The scoring code is a complete reimplementation, and is not vulnerable to the game crash that the original causes.
+
+__Classic Scoring__
+
 ![Classic](./screens/score-classic.png)
+
+Behaves like the original uncapped cores, with digits A-F used for a rollover at 1.6 million.
+
+After 100 million the score will jump by 800k, so you may want to use another mode if you plan on getting higher than that. (Your actual score will still display correctly in the high scores list.)
+
+__7 digit Score__
+
 ![7 Digit](./screens/score-7digit.png)
+
+An extra scoring digit, rolls over at 10 million.
+
+__M__
+
 ![M](./screens/score-m.png)
+
+Shows your score in millions, rolls over at 100 million.
+
+__Capped__
+
 ![Capped](./screens/score-capped.png)
+
+Cap your score at 999999.
 
 ## Hz Display
 
@@ -340,19 +363,13 @@ Also reintroduces other classic features like the end game curtain, standard pau
 
 These features make TetrisGYM work better with post processing tools like [NestrisChamps](https://github.com/timotheeg/nestrischamps) and [MaxoutClub](https://maxoutclub.com/).
 
+You can hold `select` when booting to start in Qual Mode.
+
 You cannot use the Block Tool and Qual mode at the same time.
 
 ## PAL Mode
 
 Dictate if the NTSC or PAL gameplay mechanics should be used. Should automatically detect region, but can be manually overwritten otherwise.
-
-## Bugfixes
-
-TetrisGYM fixes some well known bugs in the original game;
-
-- Resetting during a tetris no longer creates an invalid state
-- Level numbers are correct past level 29
-- Game no longer crashes after ~1550 lines
 
 ## Resources
 
