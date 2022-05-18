@@ -250,6 +250,8 @@ The scoring modes only affect the display ingame, and your real score will be di
 
 The scoring code is a complete reimplementation, and is not vulnerable to the game crash that the original causes.
 
+In every mode except Classic, at 1000 lines an extra digit is added to the lines counter.
+
 __Classic Scoring__
 
 ![Classic](./screens/score-classic.png)
@@ -258,7 +260,7 @@ Behaves like the original uncapped cores, with digits A-F used for a rollover at
 
 After 100 million the score will jump by 800k, so you may want to use another mode if you plan on getting higher than that. (Your actual score will still display correctly in the high scores list.)
 
-__7 digit Score__
+__7 Digit Score__
 
 ![7 Digit](./screens/score-7digit.png)
 
