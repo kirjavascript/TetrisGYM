@@ -64,7 +64,7 @@ Like in the original ROM, holding `a` `b` `select` and then pressing `start` wil
 
 ![Tetris](./screens/levelmenu.png)
 
-Same gameplay as A-Type, with some improvements: no score cap, no rocket, no curtain, always next box, better pause, extended level select.
+Same gameplay as A-Type, with some improvements: no score cap, no rocket, no curtain, always next box, better pause, start on any level.
 
 ### T-Spins
 
@@ -154,7 +154,7 @@ For practising tapping and quicktapping pieces over towers. 0-G will have a towe
 
 A trainer to drill different numbers of taps. Highlights the next well coming up.
 
-The options 0-F have burning enabled, and G-V has burning disabled.
+The options 0-F clear lines when you fill the well, and G-V act like the piece locks without a line clear.
 
 ### Checkerboard
 
@@ -212,7 +212,21 @@ Press `up` to hard drop and `select` to soft drop.
 
 ## Level Menu
 
-TODO: highscores info
+Retains the functionality of the original level menu, except;
+
+Press `select` when choosing a level to show 'READY' text
+
+![Ready](./screens/ready.png)
+
+Press `right` when on 9 to choose any level to start on with `up` and `down`.
+
+![Any Level](./screens/anylevel.png)
+
+Press `down` when on 5-9 to select hearts to display with `left` and `right`.
+
+![Hearts](./screens/hearts.png)
+
+Used for keeping track of wins in local games.
 
 ## Highscores
 
