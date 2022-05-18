@@ -27,6 +27,7 @@
     * [Double Killscreen](#double=killscreen) 
     * [Hard Drop](#hard-drop) 
 * [Level Menu](#level-menu)
+* [Highscores](#highscores)
 * [Tap/Roll Speed Tester](#taproll-speed-tester)
 * [Scoring](#scoring)
 * [Hz Display](#hz-display) 
@@ -151,9 +152,17 @@ For practising tapping and quicktapping pieces over towers. 0-G will have a towe
 
 ![Tap Quantity](./screens/tapqty.png)
 
+A trainer to drill different numbers of taps. Highlights the next well coming up.
+
+The options 0-F have burning enabled, and G-V has burning disabled.
+
 ### Checkerboard
 
 ![Checkerboard](./screens/checkerboard.png)
+
+Similar to B-Type, except the garbage is a checkerboard.
+
+Uses custom scoring.
 
 ### Transition
 
@@ -202,6 +211,10 @@ The pieces fall by two blocks every frame. It's hard.
 Press `up` to hard drop and `select` to soft drop.
 
 ## Level Menu
+
+TODO: highscores info
+
+## Highscores
 
 ## Tap/Roll Speed Tester
 
