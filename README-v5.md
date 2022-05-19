@@ -39,7 +39,6 @@
     * [Savestates](#savestates)
 * [Qualifier Mode](#qual-mode)
 * [PAL Mode](#pal-mode)
-* [Bugfixes](#bugfixes)
 * [Resources](#resources)
 
 ## Getting Started
@@ -256,7 +255,7 @@ __Classic Scoring__
 
 ![Classic](./screens/score-classic.png)
 
-Behaves like the original uncapped cores, with digits A-F used for a rollover at 1.6 million.
+Behaves like the original uncapped scores, with digits A-F used for a rollover at 1.6 million.
 
 After 100 million the score will jump by 800k, so you may want to use another mode if you plan on getting higher than that. (Your actual score will still display correctly in the high scores list.)
 
