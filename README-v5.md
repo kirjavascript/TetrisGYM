@@ -235,7 +235,7 @@ Name entry has better controls and some added characters.
 
 If SRAM is available, scores will be saved and show again the next time the game boots.
 
-To clear the highscores, select hearts and press `down`. Then confirm the prompts by press `start`.
+To clear the highscores, select hearts and press `down`. Then confirm the prompts by pressing `start`.
 
 ## Tap/Roll Speed Tester
 
@@ -251,7 +251,7 @@ The scoring code is a complete reimplementation, and is not vulnerable to the ga
 
 In every mode except Classic, at 1000 lines an extra digit is added to the lines counter.
 
-__Classic Scoring__
+__Classic__
 
 ![Classic](./screens/score-classic.png)
 
@@ -259,7 +259,7 @@ Behaves like the original uncapped scores, with digits A-F used for a rollover a
 
 After 100 million the score will jump by 800k, so you may want to use another mode if you plan on getting higher than that. (Your actual score will still display correctly in the high scores list.)
 
-__7 Digit Score__
+__7 Digit__
 
 ![7 Digit](./screens/score-7digit.png)
 

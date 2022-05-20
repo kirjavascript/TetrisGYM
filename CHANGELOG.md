@@ -1,5 +1,5 @@
 # Changelog
-## [unreleased]
+## [v5]
 * Tap Quantity Trainer
 * Checkerboard Trainer
 * Double Killscreen Trainer
