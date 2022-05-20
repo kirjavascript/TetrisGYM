@@ -1,7 +1,8 @@
+
 # TetrisGYM
 
 <div align="center">
-    <img src="./screens/menu5.png" alt="Menuscreen">
+    <img src="./screens/menu4.png" alt="Menuscreen">
     <br>
 </div>
 <br>
@@ -17,28 +18,22 @@
     * [B-Type](#b-type)
     * [Floor](#floor)
     * [(Quick)Tap](#quicktap)
-    * [Tap Quantity](#tap-quantity)
-    * [Checkerboard](#checkerboard)
     * [Transition](#transition)
     * [Garbage](#garbage)
     * [Drought](#drought)
     * [DAS Delay](#das-delay)
     * [Invisible](#invisible) 
-    * [Double Killscreen](#double=killscreen) 
     * [Hard Drop](#hard-drop) 
-* [Level Menu](#level-menu)
-* [Highscores](#highscores)
 * [Tap/Roll Speed Tester](#taproll-speed-tester)
-* [Scoring](#scoring)
 * [Hz Display](#hz-display) 
 * [Input Display](#input-display)
-* [Disable Flash](#disable-flash)
 * [Goofy Foot](#goofy-foot)
 * [Block Tool](#block-tool)
     * [Level Editor](#level-editor)
     * [Savestates](#savestates)
 * [Qualifier Mode](#qual-mode)
 * [PAL Mode](#pal-mode)
+* [Bugfixes](#bugfixes)
 * [Resources](#resources)
 
 ## Getting Started
@@ -57,17 +52,15 @@ A link to the BPS can be found on the [releases page](https://github.com/kirjava
 
 Some trainers have additional configuration values; use left and right in the main menu to change them.
 
-Like in the original ROM, holding `a` `b` `select` and then pressing `start` will end gameplay and return to the menu screens.
-
 ### Tetris
 
-![Tetris](./screens/levelmenu.png)
+![Tetris](/screens/levelselect.png)
 
-Same gameplay as A-Type, with some improvements: no score cap, no rocket, no curtain, always next box, better pause, start on any level.
+Same gameplay as A-Type, with some improvements: no score cap, no rocket, no curtain, always next box, better pause, extended level select.
 
 ### T-Spins
 
-![T-Spins](./screens/tspins.png)
+![T-Spins](/screens/tspins.png)
 
 Spawn T-Spins in random positions. Additional entry delay on successful T-Spin to prepare for the next state.
 
@@ -77,19 +70,19 @@ Provides same piece sets for VS battles (or practise).
 
 Press `select` to generate a random seed.
 
-A small number of seeds are different between v4 and v5, but otherwise both versions are compatible.
+The seed trainer was improved in v3.1 to give a 'better' distribution of cases.
 
-An indicator will show which seeds are for v4 and which are for v5, and pressing `select` will always generate a v4 compatible seed.
+Different versions of TetrisGYM can still share SPS by setting the fifth digit to 0.
 
 ### Stacking
 
-![Stacking](./screens/stacking.png)
+![Stacking](/screens/stacking.png)
 
 An experiment in highlighting areas of the playfield.
 
 ### Pace
 
-![Pace](./screens/pace.png)
+![Pace](/screens/pace.png)
 
 Indicates how close you are to achieving a score by 230 lines. Loosely based on Tetris rate.
 
@@ -114,7 +107,7 @@ This can be adjusted for transition or PAL games;
 
 ### Setups
 
-![Setups](./screens/setups.png)
+![Setups](/screens/setups.png)
 
 Several preset playfields for practising different types of tucks and spins.
 
@@ -129,13 +122,13 @@ Several preset playfields for practising different types of tucks and spins.
 
 ### B-Type
 
-![B-Type](./screens/btype.png)
+![B-Type](/screens/btype.png)
 
 Same gameplay as B-Type in the original, except heights up to 8 are supported.
 
 ### Floor
 
-![Floor](./screens/floor.png)
+![Floor](/screens/floor.png)
 
 Fill in the floor to a certain height to force higher stacking. This mode is often referred to as 'handicap'.
 
@@ -143,29 +136,13 @@ Setting the height to zero will result in a game mode with burns disabled.
 
 ### (Quick)Tap
 
-![Tap](./screens/tap.png)
+![Tap](/screens/tap.png)
 
 For practising tapping and quicktapping pieces over towers. 0-G will have a tower on the left of the screen and H-W will have a tower to the right.
 
-### Tap Quantity
-
-![Tap Quantity](./screens/tapqty.png)
-
-A trainer to drill different numbers of taps. Highlights the next well coming up.
-
-The options 0-F clear lines when you fill the well, and G-V act like the piece locks without a line clear.
-
-### Checkerboard
-
-![Checkerboard](./screens/checkerboard.png)
-
-Similar to B-Type, except the garbage is a checkerboard.
-
-Uses custom scoring.
-
 ### Transition
 
-![Transition](./screens/transition.png)
+![Transition](/screens/transition.png)
 
 Puts you ten lines before transition. The value given will be added to your score, so set this to 5 and start on level 18 for a 'maxout trainer' style mode.
 
@@ -173,7 +150,7 @@ Setting the value to G causes the mode to act identical to the game genie code `
 
 ### Garbage
 
-![Garbage](./screens/garbage.png)
+![Garbage](/screens/garbage.png)
 
 Different styles of garbage to dig through.
 
@@ -195,91 +172,23 @@ Change the auto-shift delay rate.
 
 ### Invisible
 
-![Invisible](./screens/invisible.png)
+![Invisible](/screens/invisible.png)
 
 Blocks are invisible until the end of the game.
 
-### Double Killscreen
-
-The pieces fall by two blocks every frame. It's hard.
-
 ### Hard Drop
 
-![Hard Drop](./screens/harddrop.png)
+![Hard Drop](/screens/harddrop.png)
 
-Press `up` to hard drop and `select` to soft drop.
-
-## Level Menu
-
-Retains the functionality of the original level menu, except;
-
-Press `select` when choosing a level to show 'READY' text
-
-![Ready](./screens/ready.png)
-
-Press `right` when on 9 to choose any level to start on with `up` and `down`.
-
-![Any Level](./screens/anylevel.png)
-
-Press `down` when on 5-9 to select hearts to display with `left` and `right`.
-
-![Hearts](./screens/hearts.png)
-
-Used for keeping track of wins in local games.
-
-## Highscores
-
-Shows scores up to 8 digits, and includes lines and start level. 
-
-Name entry has better controls and some added characters.
-
-If SRAM is available, scores will be saved and show again the next time the game boots.
-
-To clear the highscores, select hearts and press `down`. Then confirm the prompts by pressing `start`.
+Press `select` or `up` to hard drop.
 
 ## Tap/Roll Speed Tester
 
-![Speed Test](./screens/speedtest.png)
-
 Practise tapping rate outside of gameplay.
-
-## Scoring
-
-The scoring modes only affect the display ingame, and your real score will be displayed in the high score list.
-
-The scoring code is a complete reimplementation, and is not vulnerable to the game crash that the original causes.
-
-In every mode except Classic, at 1000 lines an extra digit is added to the lines counter.
-
-__Classic__
-
-![Classic](./screens/score-classic.png)
-
-Behaves like the original uncapped scores, with digits A-F used for a rollover at 1.6 million.
-
-After 100 million the score will jump by 800k, so you may want to use another mode if you plan on getting higher than that. (Your actual score will still display correctly in the high scores list.)
-
-__7 Digit__
-
-![7 Digit](./screens/score-7digit.png)
-
-An extra scoring digit, rolls over at 10 million.
-
-__M__
-
-![M](./screens/score-m.png)
-
-Shows your score in millions, rolls over at 100 million.
-
-__Capped__
-
-![Capped](./screens/score-capped.png)
-
-Cap your score at 999999.
 
 ## Hz Display
 
-![Hz Display](./screens/hz.png)
+![Hz Display](/screens/hz.png)
 
 Shows the average tapping rate for each tap in a burst.
 
@@ -287,11 +196,7 @@ Also shows frames between spawn and first tap, and current tap direction.
 
 ## Input Display
 
-![Controller](./screens/controller.png)
-
-## Disable Flash
-
-Disable the flashing from when you get a tetris.
+![Controller](/screens/controller.png)
 
 ## Goofy Foot
 
@@ -299,7 +204,7 @@ Flips A/B, Start/Select, and inverts DPad directions like a Goofy Foot controlle
 
 ## Block Tool
 
-![Block](./screens/block.png)
+![Block](/screens/block.png)
 
 Allow more fine control over aspects of gameplay.
 
@@ -354,9 +259,9 @@ Combined with the level editor, savestates are effective for practising specific
 
 ## Qual Mode
 
-![Legal](./screens/legal.png)
+![Legal](/screens/legal.png)
 
-![Rocket](./screens/rocket.png)
+![Rocket](/screens/rocket.png)
 
 Reintroduces the 'wait screens', intended for use in qualifiers where the the player would otherwise gain a time advantage skipping the rocket, legal and title screens.
 
@@ -364,13 +269,20 @@ Also reintroduces other classic features like the end game curtain, standard pau
 
 These features make TetrisGYM work better with post processing tools like [NestrisChamps](https://github.com/timotheeg/nestrischamps) and [MaxoutClub](https://maxoutclub.com/).
 
-You can hold `select` when booting to start in Qual Mode.
-
 You cannot use the Block Tool and Qual mode at the same time.
 
 ## PAL Mode
 
 Dictate if the NTSC or PAL gameplay mechanics should be used. Should automatically detect region, but can be manually overwritten otherwise.
+
+## Bugfixes
+
+TetrisGYM fixes some well known bugs in the original game;
+
+- Resetting during a tetris no longer creates an invalid state
+- Level numbers are correct past level 29
+- Tetrimino colours are correct past level 138
+- Game no longer crashes after ~1550 lines
 
 ## Resources
 
