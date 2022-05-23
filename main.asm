@@ -878,7 +878,7 @@ harddrop_tetrimino:
 @addScore:
         lda completedLines
         beq @noScore
-        jsr addPointsRaw
+        jsr playState_updateLinesAndStatistics
         lda #0
         sta vramRow
 @noScore:
