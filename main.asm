@@ -895,6 +895,9 @@ harddrop_tetrimino:
 gameMode_bootScreen: ; boot
         ; ABSS goes to gameTypeMenu instead of here
 
+        lda #1
+        sta hzFlag
+
         ; reset cursors
         lda #$0
         sta practiseType
@@ -3108,6 +3111,9 @@ shift_tetrimino:
         lda heldButtons
         and #BUTTON_RIGHT
         beq @notPressingRight
+        lda hzTapCounter
+        cmp #3
+        bcs @notPressingRight
         inc tetriminoX
         jsr isPositionValid
         bne @restoreX
@@ -3119,6 +3125,9 @@ shift_tetrimino:
         lda heldButtons
         and #BUTTON_LEFT
         beq @ret
+        lda hzTapCounter
+        cmp #3
+        bcs @restoreX
         dec tetriminoX
         jsr isPositionValid
         bne @restoreX
@@ -7778,6 +7787,7 @@ hzStart: ; called in playState_spawnNextTetrimino, gameModeState_initGameState, 
         rts
 
 hzControl: ; called in playState_playerControlsActiveTetrimino, gameTypeLoopContinue
+
         lda hzTapCounter
         beq @notTapping
         ; tick frame counter
@@ -7832,6 +7842,12 @@ hzTap:
         ; 0 is the first frame (4 means 5 frames)
         sta hzFrameCounter
 @within:
+
+        lda hzTapCounter
+        cmp #3
+        bcc :+
+        rts
+:
 
         ; increment taps, reset debounce
         inc hzTapCounter
