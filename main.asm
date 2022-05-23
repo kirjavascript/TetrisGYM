@@ -782,6 +782,10 @@ branchOnPlayStatePlayer1:
         .addr   playState_incrementPlayState
 
 playState_playerControlsActiveTetrimino:
+        lda hzFlag
+        beq @ret
+        jsr hzControl
+@ret:
         jsr shift_tetrimino
         jsr rotate_tetrimino
 
@@ -796,10 +800,6 @@ playState_playerControlsActiveTetrimino:
         jsr drop_tetrimino
 @noDrop:
 
-        lda hzFlag
-        beq @ret
-        jsr hzControl
-@ret:
 playState_playerControlsActiveTetrimino_return:
         rts
 
@@ -3058,6 +3058,10 @@ framesPerDropTablePAL:
         .byte   $02,$02,$02,$01,$01,$01,$01,$01
         .byte   $01,$01,$01,$01,$01,$01
 shift_tetrimino:
+        lda $11
+        beq :+
+        rts
+:
         lda practiseType
         cmp #MODE_DAS
         bne @normalDAS
@@ -3111,9 +3115,9 @@ shift_tetrimino:
         lda heldButtons
         and #BUTTON_RIGHT
         beq @notPressingRight
-        lda hzTapCounter
-        cmp #3
-        bcs @notPressingRight
+        ; lda hzTapCounter
+        ; cmp #3
+        ; bcs @notPressingRight
         inc tetriminoX
         jsr isPositionValid
         bne @restoreX
@@ -3125,9 +3129,9 @@ shift_tetrimino:
         lda heldButtons
         and #BUTTON_LEFT
         beq @ret
-        lda hzTapCounter
-        cmp #3
-        bcs @restoreX
+        ; lda hzTapCounter
+        ; cmp #3
+        ; bcs @restoreX
         dec tetriminoX
         jsr isPositionValid
         bne @restoreX
@@ -3997,6 +4001,27 @@ renderHz:
         sta PPUADDR
         lda hzSpawnDelay
         sta PPUDATA
+
+        lda #$22
+        sta PPUADDR
+        lda #$63
+        sta PPUADDR
+        lda $10
+        jsr renderByteBCD
+
+        lda #$22
+        sta PPUADDR
+        lda #$6A
+        sta PPUADDR
+        lda $11
+        sta PPUDATA
+
+        lda #$22
+        sta PPUADDR
+        lda #$A3
+        sta PPUADDR
+        lda hzFrameCounter
+        jsr renderByteBCD
 
 renderHzSpeedTest:
 
@@ -7824,6 +7849,9 @@ hzControl: ; called in playState_playerControlsActiveTetrimino, gameTypeLoopCont
 @noDelayInc:
         rts
 
+dasLimitLookup:
+        .byte 0, 0, 6, 12, 18, 24, 30, 36
+
 hzTap:
         tax ; button direction
         dex ; normalize to 1/0
@@ -7836,18 +7864,13 @@ hzTap:
 @fresh:
         stx hzTapDirection
 @wrap:
+
         lda #0
         sta hzTapCounter
         sta hzFrameCounter+1
         ; 0 is the first frame (4 means 5 frames)
         sta hzFrameCounter
 @within:
-
-        lda hzTapCounter
-        cmp #3
-        bcc :+
-        rts
-:
 
         ; increment taps, reset debounce
         inc hzTapCounter
@@ -7856,6 +7879,20 @@ hzTap:
         bcs @wrap
         lda #0
         sta hzDebounceCounter
+
+
+        lda #0
+        sta $11
+
+        ldx hzTapCounter
+        lda dasLimitLookup, x
+        sta $10
+        lda hzFrameCounter
+        cmp $10
+        bpl :+
+        lda #1
+        sta $11
+:
 
         ; ignore 1 tap
         lda hzTapCounter
