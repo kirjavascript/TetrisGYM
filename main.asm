@@ -16,6 +16,7 @@ SAVE_HIGHSCORES := 1
 AUTO_WIN := 0 ; press select to end game
 NO_SCORING := 0 ; breaks pace
 NO_SFX := 0
+NO_MENU := 0
 INITIAL_CUSTOM_LEVEL := 29
 BTYPE_START_LINES := $25 ; bcd
 
@@ -1115,6 +1116,10 @@ waitLoopContinue:
         rts
 
 gameMode_gameTypeMenu:
+.if NO_MENU
+        inc gameMode
+        rts
+.endif
         jsr makeNotReady
         jsr calc_menuScrollY
         sta menuScrollY
@@ -1981,6 +1986,7 @@ levelMenuCheckStartGame:
         rts
 
 levelMenuCheckGoBack:
+.if !NO_MENU
         lda newlyPressedButtons_player1
         cmp #BUTTON_B
         bne @continue
@@ -1989,6 +1995,7 @@ levelMenuCheckGoBack:
         ; jsr makeNotReady ; not needed, done on gametype screen
         dec gameMode
         rts
+.endif
 @continue:
 
 shredSeedAndContinue:
