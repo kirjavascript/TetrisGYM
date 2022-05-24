@@ -17,8 +17,14 @@ AUTO_WIN := 0 ; press select to end game
 NO_SCORING := 0 ; breaks pace
 NO_SFX := 0
 NO_MENU := 0
+
 INITIAL_CUSTOM_LEVEL := 29
 BTYPE_START_LINES := $25 ; bcd
+MENU_HIGHLIGHT_COLOR := $12 ; $12 in gym, $16 in original
+BLOCK_TILES := $7B
+EMPTY_TILE := $EF
+INVISIBLE_TILE := $43
+TETRIMINO_X_HIDE := $EF
 
 BUTTON_DOWN := $4
 BUTTON_UP := $8
@@ -68,10 +74,6 @@ SCORING_SCORECAP := 3
 MENU_SPRITE_Y_BASE := $47
 MENU_MAX_Y_SCROLL := $58
 MENU_TOP_MARGIN_SCROLL := 7 ; in blocks
-BLOCK_TILES := $7B
-EMPTY_TILE := $EF
-INVISIBLE_TILE := $43
-TETRIMINO_X_HIDE := $EF
 
 ; menuConfigSizeLookup
 .define MENUSIZES $0, $0, $0, $0, $F, $7, $8, $C, $20, $10, $1F, $8, $4, $12, $10, $0, $0, $0, $0, $3, $1, $1, $1, $1, $1, $1, $1
@@ -6936,11 +6938,11 @@ game_palette:
         .byte   $3C,$00,$30,$FF
 title_palette:
         .byte   $3F,$00,$14,$0F,$3C,$38,$00,$0F
-        .byte   $17,$27,$37,$0F,$30,$12,$00,$0F
+        .byte   $17,$27,$37,$0F,$30,MENU_HIGHLIGHT_COLOR,$00,$0F
         .byte   $22,$2A,$28,$0F,$30,$29,$27,$FF
 menu_palette:
         .byte   $3F,$00,$16,$0F,$30,$38,$26,$0F
-        .byte   $17,$27,$37,$0F,$30,$12,$00,$0F
+        .byte   $17,$27,$37,$0F,$30,MENU_HIGHLIGHT_COLOR,$00,$0F
         .byte   $16,$2A,$28,$0F,$16,$26,$27,$0f,$2A,$FF
 rocket_palette:
         .byte   $3F,$11,$7,$16,$2A,$28,$0f,$37,$18,$38 ; sprite
