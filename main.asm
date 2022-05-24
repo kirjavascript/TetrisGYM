@@ -16,11 +16,11 @@ SAVE_HIGHSCORES := 1
 AUTO_WIN := 0 ; press select to end game
 NO_SCORING := 0 ; breaks pace
 NO_SFX := 0
-NO_MENU := 0
+NO_MENU := 1
 
 INITIAL_CUSTOM_LEVEL := 29
 BTYPE_START_LINES := $25 ; bcd
-MENU_HIGHLIGHT_COLOR := $12 ; $12 in gym, $16 in original
+MENU_HIGHLIGHT_COLOR := $27 ; $12 in gym, $16 in original
 BLOCK_TILES := $7B
 EMPTY_TILE := $EF
 INVISIBLE_TILE := $43
@@ -79,7 +79,7 @@ MENU_TOP_MARGIN_SCROLL := 7 ; in blocks
 .define MENUSIZES $0, $0, $0, $0, $F, $7, $8, $C, $20, $10, $1F, $8, $4, $12, $10, $0, $0, $0, $0, $3, $1, $1, $1, $1, $1, $1, $1
 
 .macro MODENAMES
-    .byte   "TETRIS"
+    .byte   "CT DAS"
     .byte   "TSPINS"
     .byte   " SEED "
     .byte   "STACKN"
@@ -785,10 +785,8 @@ branchOnPlayStatePlayer1:
         .addr   playState_incrementPlayState
 
 playState_playerControlsActiveTetrimino:
-        lda hzFlag
-        beq @ret
         jsr hzControl
-@ret:
+
         jsr shift_tetrimino
         jsr rotate_tetrimino
 
@@ -7859,7 +7857,7 @@ hzControl: ; called in playState_playerControlsActiveTetrimino, gameTypeLoopCont
         rts
 
 dasLimitLookup:
-        .byte 0, 0, 6, 12, 18, 24, 30, 36
+        .byte 0, 0, 4, 11, 18, 24, 30, 36, 42, 48, 54, 60
 
 hzTap:
         tax ; button direction
