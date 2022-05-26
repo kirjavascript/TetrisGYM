@@ -916,32 +916,24 @@ lineOffset := hardDropRAM+1
 
         tax
         lda multBy10Table, x
-        sta tmpZ ; lineOffset * 10
+        sta lineOffset ; lineOffset * 10
 
         ; loop*10
         ldy #0
         ldx tmpY
         lda multBy10Table, x
-        tax
+        sta tmpX
 @shiftLineLoop:
-        ; sub
-        ; lda
-        ; add
-        ; sta
+
+        lda tmpX
         sec
-        txa
-        sbc tmpZ
+        sbc lineOffset
         tax
         lda playfield, x
-        sta tmpX ; temp row value
-        clc
-        txa
-        adc tmpZ
-        tax
-        lda tmpX
+        ldx tmpX
         sta playfield, x
 
-        inx
+        inc tmpX
         iny
         cpy #$A
         bne @shiftLineLoop
@@ -949,7 +941,7 @@ lineOffset := hardDropRAM+1
 @nextLine:
         dec tmpY
         lda tmpY
-        cmp #4 ; TODO fix
+        ; cmp #0 ; TODO fix
         beq @addScore
         jmp @lineLoop
 
