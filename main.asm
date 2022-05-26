@@ -284,8 +284,8 @@ hzSpawnDelay := hzRAM+7 ; 2 byte
 hzPalette := hzRAM+8 ; 1 byte
 tqtyCurrent := $621
 tqtyNext := $622
-completedLinesCopy := $623
-lineOffset := $624 ;
+completedLinesCopy := $623 ; hard drop
+lineOffset := $624 ; hard drop
 
 ; ... $67F
 musicStagingSq1Lo:= $0680
@@ -984,6 +984,7 @@ harddrop_tetrimino:
         ldx #0
 @topRowLoop:
         sta playfield, x
+        inx
         cpx #$A
         bne @topRowLoop
 
