@@ -838,6 +838,7 @@ harddrop_tetrimino:
         jsr playState_lockTetrimino
 
 
+; TODO: reassign this RAM
 hardDropRAM := $10
 completedLinesCopy := hardDropRAM+0
 lineOffset := hardDropRAM+1
@@ -868,26 +869,54 @@ lineOffset := hardDropRAM+1
 @lineClear:
         inc completedLines
 @noLineClear:
-
-
-        ; ; get line offset
-        ; lda #0
-        ; sta lineOffset
-        ; lda completedLines
-        ; sta completedLinesCopy
-
-
-        ; clc
-
-
-
-@shiftRowsUp:
         lda completedLines
+        beq @nextLine
+
+        ; get line offset
+        lda #0
+        sta lineOffset
+        lda completedLines
+        sta completedLinesCopy
+
+        sec
+        txa
+        sbc #20
+        sta tmpZ ; i - 1
+        tax
+
+@offsetLoop:
+        ; check for empty row
+        ldy #$0
+@offsetCheckLineFull:
+        lda playfield, x
+        cmp #EMPTY_TILE
+        beq @emptyLine
+
+        inx
+        iny
+        cpy #$A
+        beq @fullLine
+        jmp @offsetCheckLineFull
+
+@emptyLine:
+        dec completedLinesCopy
+@fullLine:
+        inc lineOffset
+
+        lda tmpZ
+        sbc #10
+        sta tmpZ
+        tax
+
+        lda completedLinesCopy
+        bne @offsetLoop
+
+        lda lineOffset
         beq @nextLine
 
         tax
         lda multBy10Table, x
-        sta tmpZ ; completedLines * 10
+        sta tmpZ ; lineOffset * 10
 
         ; loop*10
         ldy #0
@@ -924,52 +953,6 @@ lineOffset := hardDropRAM+1
         beq @addScore
         jmp @lineLoop
 
-
-
-        ; lda #0
-        ; sta tmpY
-; @lineLoop:
-        ; ldx tmpY
-        ; lda multBy10Table, x
-        ; tax
-        ; ldy #$0
-; @minoLoop:
-        ; lda playfield, x
-        ; cmp #EMPTY_TILE
-        ; beq @nextLine
-
-        ; inx
-        ; iny
-        ; cpy #$A
-        ; beq @lineClear
-        ; jmp @minoLoop
-
-; @lineClear:
-        ; ; shift down
-; @shiftLoop:
-        ; lda playfield-$A, x
-        ; sta playfield, x
-        ; dex
-        ; cpx #$A
-        ; bcs @shiftLoop
-        ; ; clear top row
-        ; ldx #0
-        ; lda #EMPTY_TILE
-; @topRowLoop:
-        ; sta playfield, x
-        ; inx
-        ; cpx #$A
-        ; bne @topRowLoop
-        ; inc completedLines
-
-        ; ; TODO: use a single pass
-
-; @nextLine:
-        ; inc tmpY
-        ; lda tmpY
-        ; cmp #20
-        ; beq @addScore
-        ; jmp @lineLoop
 
 @addScore:
         lda completedLines
