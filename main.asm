@@ -284,6 +284,8 @@ hzSpawnDelay := hzRAM+7 ; 2 byte
 hzPalette := hzRAM+8 ; 1 byte
 tqtyCurrent := $621
 tqtyNext := $622
+completedLinesCopy := $623
+lineOffset := $624 ;
 
 ; ... $67F
 musicStagingSq1Lo:= $0680
@@ -837,13 +839,38 @@ harddrop_tetrimino:
         sta completedLines
         jsr playState_lockTetrimino
 
+        ; hard drop line clear algorithm (kinda);
 
-; TODO: reassign this RAM
-hardDropRAM := $10
-completedLinesCopy := hardDropRAM+0
-lineOffset := hardDropRAM+1
+        ; completedLines = 0
 
-; TODO: test with debug mode
+        ; for (i = 19; i >= completedLines; i--) {
+        ;     if (rowIsFull(i)) {
+        ;         completedLines++
+        ;     }
+
+        ;     lineOffset = 0
+        ;     completedLinesCopy = completedLines
+
+        ;     for (lineIndex = i - 1; completedLinesCopy > 0; lineIndex--) {
+        ;         if (!rowIsFull(lineIndex)) {
+        ;             completedLinesCopy--
+        ;         }
+        ;         lineOffset++
+        ;     }
+
+        ;     if (completedLines > 0) {
+        ;         for (j = 0; j < 10 ; j++) {
+        ;             index = (i * 10) + j
+        ;             copyPlayfield(index - (lineOffset * 10), index)
+        ;         }
+        ;     }
+        ; }
+
+        ; for (i = 0; i < completedLines; i++ {
+        ;     clearRow(i)
+        ; }
+
+        ; TODO: fix bug when pulling ram from above the playfield
 
         lda #19
         sta tmpY ; row
@@ -916,7 +943,7 @@ lineOffset := hardDropRAM+1
 
         tax
         lda multBy10Table, x
-        sta lineOffset ; lineOffset * 10
+        sta lineOffset ; reuse for lineOffset * 10
 
         ; loop*10
         ldy #0
@@ -941,7 +968,7 @@ lineOffset := hardDropRAM+1
 @nextLine:
         dec tmpY
         lda tmpY
-        ; cmp #0 ; TODO fix
+        cmp #0 ; TODO fix
         beq @addScore
         jmp @lineLoop
 
@@ -952,6 +979,14 @@ lineOffset := hardDropRAM+1
         jsr playState_updateLinesAndStatistics
         lda #0
         sta vramRow
+        ; emty top row
+        lda #EMPTY_TILE
+        ldx #0
+@topRowLoop:
+        sta playfield, x
+        cpx #$A
+        bne @topRowLoop
+
 @noScore:
 
         lda #8 ; jump straight to spawnTetrimino
