@@ -837,17 +837,28 @@ harddrop_tetrimino:
         sta completedLines
         jsr playState_lockTetrimino
 
-        lda #0
-        sta tmpY
+
+hardDropRAM := $10
+completedLinesCopy := hardDropRAM+0
+lineOffset := hardDropRAM+1
+
+; TODO: test with debug mode
+
+        lda #19
+        sta tmpY ; row
 @lineLoop:
+
         ldx tmpY
         lda multBy10Table, x
         tax
+
+        ; check for empty row
         ldy #$0
 @minoLoop:
         lda playfield, x
         cmp #EMPTY_TILE
-        beq @nextLine
+        beq @noLineClear
+
         inx
         iny
         cpy #$A
@@ -855,28 +866,110 @@ harddrop_tetrimino:
         jmp @minoLoop
 
 @lineClear:
-        ; shift down
-@shiftLoop:
-        lda playfield-$A, x
-        sta playfield, x
-        dex
-        cpx #$A
-        bcs @shiftLoop
-        ; clear top row
-        ldx #0
-        lda #EMPTY_TILE
-@topRowLoop:
-        sta playfield, x
-        inx
-        cpx #$A
-        bne @topRowLoop
         inc completedLines
+@noLineClear:
+
+
+        ; ; get line offset
+        ; lda #0
+        ; sta lineOffset
+        ; lda completedLines
+        ; sta completedLinesCopy
+
+
+        ; clc
+
+
+
+@shiftRowsUp:
+        lda completedLines
+        beq @nextLine
+
+        tax
+        lda multBy10Table, x
+        sta tmpZ ; completedLines * 10
+
+        ; loop*10
+        ldy #0
+        ldx tmpY
+        lda multBy10Table, x
+        tax
+@shiftLineLoop:
+        ; sub
+        ; lda
+        ; add
+        ; sta
+        sec
+        txa
+        sbc tmpZ
+        tax
+        lda playfield, x
+        sta tmpX ; temp row value
+        clc
+        txa
+        adc tmpZ
+        tax
+        lda tmpX
+        sta playfield, x
+
+        inx
+        iny
+        cpy #$A
+        bne @shiftLineLoop
+
 @nextLine:
-        inc tmpY
+        dec tmpY
         lda tmpY
-        cmp #20
+        cmp #4 ; TODO fix
         beq @addScore
         jmp @lineLoop
+
+
+
+        ; lda #0
+        ; sta tmpY
+; @lineLoop:
+        ; ldx tmpY
+        ; lda multBy10Table, x
+        ; tax
+        ; ldy #$0
+; @minoLoop:
+        ; lda playfield, x
+        ; cmp #EMPTY_TILE
+        ; beq @nextLine
+
+        ; inx
+        ; iny
+        ; cpy #$A
+        ; beq @lineClear
+        ; jmp @minoLoop
+
+; @lineClear:
+        ; ; shift down
+; @shiftLoop:
+        ; lda playfield-$A, x
+        ; sta playfield, x
+        ; dex
+        ; cpx #$A
+        ; bcs @shiftLoop
+        ; ; clear top row
+        ; ldx #0
+        ; lda #EMPTY_TILE
+; @topRowLoop:
+        ; sta playfield, x
+        ; inx
+        ; cpx #$A
+        ; bne @topRowLoop
+        ; inc completedLines
+
+        ; ; TODO: use a single pass
+
+; @nextLine:
+        ; inc tmpY
+        ; lda tmpY
+        ; cmp #20
+        ; beq @addScore
+        ; jmp @lineLoop
 
 @addScore:
         lda completedLines
