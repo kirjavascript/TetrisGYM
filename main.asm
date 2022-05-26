@@ -950,17 +950,19 @@ harddrop_tetrimino:
         ldx tmpY
         lda multBy10Table, x
         sta tmpX
-@shiftLineLoop:
-
-        lda tmpX
         sec
         sbc lineOffset
-        tax
+        sta tmpZ
+
+@shiftLineLoop:
+
+        ldx tmpZ
         lda playfield, x
         ldx tmpX
         sta playfield, x
 
         inc tmpX
+        inc tmpZ
         iny
         cpy #$A
         bne @shiftLineLoop
@@ -968,7 +970,7 @@ harddrop_tetrimino:
 @nextLine:
         dec tmpY
         lda tmpY
-        cmp #0 ; TODO fix
+        cmp #1 ; TODO fix
         beq @addScore
         jmp @lineLoop
 
