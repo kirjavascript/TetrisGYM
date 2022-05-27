@@ -23,14 +23,14 @@
     * [Garbage](#garbage)
     * [Drought](#drought)
     * [DAS Delay](#das-delay)
-    * [Invisible](#invisible) 
-    * [Double Killscreen](#double=killscreen) 
-    * [Hard Drop](#hard-drop) 
+    * [Invisible](#invisible)
+    * [Double Killscreen](#double=killscreen)
+    * [Hard Drop](#hard-drop)
 * [Level Menu](#level-menu)
 * [Highscores](#highscores)
 * [Tap/Roll Speed Tester](#taproll-speed-tester)
 * [Scoring](#scoring)
-* [Hz Display](#hz-display) 
+* [Hz Display](#hz-display)
 * [Input Display](#input-display)
 * [Disable Flash](#disable-flash)
 * [Goofy Foot](#goofy-foot)
@@ -47,7 +47,7 @@ TetrisGYM is a modification of NES Tetris.
 
 While originally based on the NTSC version of the game, the patched ROM supports PAL and NTSC gameplay types.
 
-TetrisGYM is distributed in the form of a BPS patch and can be applied to the USA version of the game with [Rom PatcherJS](https://www.romhacking.net/patch/) or similar. 
+TetrisGYM is distributed in the form of a BPS patch and can be applied to the USA version of the game with [Rom PatcherJS](https://www.romhacking.net/patch/) or similar.
 
 `Unpatched File SHA-1: 77747840541BFC62A28A5957692A98C550BD6B2B`
 
@@ -201,7 +201,7 @@ Blocks are invisible until the end of the game.
 
 ### Double Killscreen
 
-The pieces fall by two blocks every frame. It's hard.
+The pieces fall by two blocks every frame. It's hard. The value controls the transition from normal killscreen (a value of `x` transitions at `10*x` lines)
 
 ### Hard Drop
 
@@ -229,7 +229,7 @@ Used for keeping track of wins in local games.
 
 ## Highscores
 
-Shows scores up to 8 digits, and includes lines and start level. 
+Shows scores up to 8 digits, and includes lines and start level.
 
 Name entry has better controls and some added characters.
 
@@ -303,7 +303,7 @@ Flips A/B, Start/Select, and inverts DPad directions like a Goofy Foot controlle
 
 Allow more fine control over aspects of gameplay.
 
-This is a config option only, and will enable the block tool globally. 
+This is a config option only, and will enable the block tool globally.
 
 When enabled, press start to use the editors.
 
