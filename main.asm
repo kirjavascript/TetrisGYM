@@ -76,7 +76,7 @@ MENU_MAX_Y_SCROLL := $58
 MENU_TOP_MARGIN_SCROLL := 7 ; in blocks
 
 ; menuConfigSizeLookup
-.define MENUSIZES $0, $0, $0, $0, $F, $7, $8, $C, $20, $10, $1F, $8, $4, $12, $10, $0, $0, $0, $0, $3, $1, $1, $1, $1, $1, $1, $1
+.define MENUSIZES $0, $0, $0, $0, $F, $7, $8, $C, $20, $10, $1F, $8, $4, $12, $10, $0, $0A, $0, $0, $3, $1, $1, $1, $1, $1, $1, $1
 
 .macro MODENAMES
     .byte   "TETRIS"
@@ -376,14 +376,15 @@ checkerModifier := menuVars+7
 garbageModifier := menuVars+8
 droughtModifier := menuVars+9
 dasModifier := menuVars+10
-scoringModifier := menuVars+11
-hzFlag := menuVars+12
-inputDisplayFlag := menuVars+13
-disableFlashFlag := menuVars+14
-goofyFlag := menuVars+15
-debugFlag := menuVars+16
-qualFlag := menuVars+17
-palFlag := menuVars+18
+killx2Modifier := menuVars+11
+scoringModifier := menuVars+12
+hzFlag := menuVars+13
+inputDisplayFlag := menuVars+14
+disableFlashFlag := menuVars+15
+goofyFlag := menuVars+16
+debugFlag := menuVars+17
+qualFlag := menuVars+18
+palFlag := menuVars+19
 
 ; ... $7FF
 PPUCTRL     := $2000
