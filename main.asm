@@ -987,6 +987,8 @@ harddrop_tetrimino:
         inx
         cpx #$A
         bne @topRowLoop
+        lda #TETRIMINO_X_HIDE
+        sta tetriminoX
 
 @noScore:
 
