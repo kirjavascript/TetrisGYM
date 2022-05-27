@@ -3079,6 +3079,13 @@ drop_tetrimino:
         lda practiseType
         cmp #MODE_KILLX2
         bne @ret
+        lda lines
+        lsr
+        lsr
+        lsr
+        lsr
+        cmp killx2Modifier
+        bcc @ret
         lda #$1
         sta fallTimer
         jsr drop_tetrimino_actual
