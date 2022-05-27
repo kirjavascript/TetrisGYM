@@ -3095,6 +3095,8 @@ drop_tetrimino:
         lda practiseType
         cmp #MODE_KILLX2
         bne @ret
+        lda lines+1
+        bne @secondDrop
         lda lines
         lsr
         lsr
@@ -3102,6 +3104,7 @@ drop_tetrimino:
         lsr
         cmp killx2Modifier
         bcc @ret
+@secondDrop:
         lda #$1
         sta fallTimer
         jsr drop_tetrimino_actual
