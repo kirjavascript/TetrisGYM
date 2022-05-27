@@ -50,8 +50,8 @@ MODE_CHECKERBOARD := 11
 MODE_GARBAGE := 12
 MODE_DROUGHT := 13
 MODE_DAS := 14
-MODE_INVISIBLE := 15
-MODE_KILLX2 := 16
+MODE_KILLX2 := 15
+MODE_INVISIBLE := 16
 MODE_HARDDROP := 17
 MODE_SPEED_TEST := 18
 MODE_SCORE_DISPLAY := 19
@@ -76,7 +76,7 @@ MENU_MAX_Y_SCROLL := $58
 MENU_TOP_MARGIN_SCROLL := 7 ; in blocks
 
 ; menuConfigSizeLookup
-.define MENUSIZES $0, $0, $0, $0, $F, $7, $8, $C, $20, $10, $1F, $8, $4, $12, $10, $0, $0A, $0, $0, $3, $1, $1, $1, $1, $1, $1, $1
+.define MENUSIZES $0, $0, $0, $0, $F, $7, $8, $C, $20, $10, $1F, $8, $4, $12, $10, $0A, $0, $0, $0, $3, $1, $1, $1, $1, $1, $1, $1
 
 .macro MODENAMES
     .byte   "TETRIS"
@@ -94,8 +94,8 @@ MENU_TOP_MARGIN_SCROLL := 7 ; in blocks
     .byte   "GARBGE"
     .byte   "LOBARS"
     .byte   "DASDLY"
-    .byte   "INVZBL"
     .byte   "KILLX2"
+    .byte   "INVZBL"
     .byte   "HRDDRP"
 .endmacro
 

@@ -23,8 +23,8 @@
     * [Garbage](#garbage)
     * [Drought](#drought)
     * [DAS Delay](#das-delay)
+    * [Double Killscreen](#double-killscreen)
     * [Invisible](#invisible)
-    * [Double Killscreen](#double=killscreen)
     * [Hard Drop](#hard-drop)
 * [Level Menu](#level-menu)
 * [Highscores](#highscores)
@@ -193,15 +193,19 @@ Create artificially inflated droughts. Increasing the value causes less I pieces
 
 Change the auto-shift delay rate.
 
+### Double Killscreen
+
+The pieces fall by two blocks every frame. It's hard.
+
+The value multiplied by ten is the number of lines to transition from normal killscreen.
+
+The value controls the transition from normal killscreen (a value of `x` transitions at `10*x` lines)
+
 ### Invisible
 
 ![Invisible](./screens/invisible.png)
 
 Blocks are invisible until the end of the game.
-
-### Double Killscreen
-
-The pieces fall by two blocks every frame. It's hard. The value controls the transition from normal killscreen (a value of `x` transitions at `10*x` lines)
 
 ### Hard Drop
 
