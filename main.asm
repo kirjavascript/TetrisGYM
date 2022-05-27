@@ -870,8 +870,6 @@ harddrop_tetrimino:
         ;     clearRow(i)
         ; }
 
-        ; TODO: fix bug when pulling ram from above the playfield
-
         lda #19
         sta tmpY ; row
 @lineLoop:
@@ -970,7 +968,7 @@ harddrop_tetrimino:
 @nextLine:
         dec tmpY
         lda tmpY
-        cmp #1 ; TODO fix
+        cmp #0
         beq @addScore
         jmp @lineLoop
 
