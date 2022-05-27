@@ -4630,7 +4630,7 @@ playState_spawnNextTetrimino:
         bne @noHD
         jsr isPositionValid
         beq @noHD
-        lda #0
+        lda #$A
         sta playState
 @noHD:
         lda currentPiece
