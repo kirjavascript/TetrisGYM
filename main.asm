@@ -4623,6 +4623,19 @@ playState_spawnNextTetrimino:
         ldx nextPiece
         lda spawnOrientationFromOrientation,x
         sta currentPiece
+
+.if PRACTISE_MODE
+        lda practiseType
+        cmp #MODE_HARDDROP
+        bne @noHD
+        jsr isPositionValid
+        beq @noHD
+        lda #0
+        sta playState
+@noHD:
+        lda currentPiece
+.endif
+
         jsr incrementPieceStat
         jsr chooseNextTetrimino
         sta nextPiece
