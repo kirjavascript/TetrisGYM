@@ -2480,6 +2480,7 @@ gameModeState_initGameBackground:
         jsr displayModeText
         jsr statisticsNametablePatch ; for input display
         jsr debugNametableUI
+        jsr displayOption
 .if INES_MAPPER = 3
         lda #%10011000
         sta PPUCTRL
@@ -2494,6 +2495,21 @@ gameModeState_initGameBackground:
         sta playState
         inc gameModeState ; 1
         lda #0 ; acc should not be equal
+        rts
+
+displayOption:
+        lda practiseType
+        cmp #MODE_KILLX2
+        bne @ret
+        lda #$20
+        sta PPUADDR
+        lda #$9B
+        sta PPUADDR
+        lda #$24
+        sta PPUDATA
+        lda killx2Modifier
+        sta PPUDATA
+@ret:
         rts
 
 displayModeText:
