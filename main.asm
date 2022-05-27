@@ -2480,7 +2480,7 @@ gameModeState_initGameBackground:
         jsr displayModeText
         jsr statisticsNametablePatch ; for input display
         jsr debugNametableUI
-        jsr displayOption
+        jsr displayDKSModifier
 .if INES_MAPPER = 3
         lda #%10011000
         sta PPUCTRL
@@ -2497,13 +2497,13 @@ gameModeState_initGameBackground:
         lda #0 ; acc should not be equal
         rts
 
-displayOption:
+displayDKSModifier:
         lda practiseType
         cmp #MODE_KILLX2
         bne @ret
-        lda #$20
+        lda #$22
         sta PPUADDR
-        lda #$9B
+        lda #$BB
         sta PPUADDR
         lda #$24
         sta PPUDATA
@@ -3978,6 +3978,11 @@ render_mode_play_and_demo:
         lda #$22
         sta PPUADDR
         lda #$B9
+        ldx practiseType
+        cpx #MODE_KILLX2
+        bne @notDKS
+        sbc #1
+@notDKS:
         sta PPUADDR
         lda levelNumber
         jsr renderByteBCD
