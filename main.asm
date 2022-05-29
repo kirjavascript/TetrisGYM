@@ -5595,6 +5595,8 @@ checkLevelUp:
         bne @lineLoop
 
         lda practiseType
+        cmp #MODE_TAPQTY
+        beq @lineLoop
         cmp #MODE_TRANSITION
         bne @notSXTOKL
         lda transitionModifier
