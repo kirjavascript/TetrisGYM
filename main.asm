@@ -5342,8 +5342,6 @@ playState_checkForCompletedRows:
         sta vramRow
         inc playState
         inc playState
-        lda #0
-        sta completedLines
         lda #$07
         sta soundEffectSlot1Init
         rts
@@ -5640,7 +5638,20 @@ addPointsRaw:
         lda practiseType
         cmp #MODE_CHECKERBOARD
         beq handlePointsCheckerboard
-
+        cmp #MODE_TAPQTY
+        bne @notTapQuantity
+        lda completedLines
+        cmp #0
+        bne @continueStreak
+        jsr clearPoints
+        lda outOfDateRenderFlags
+        ora #$04
+        sta outOfDateRenderFlags
+        rts
+@continueStreak:
+        lda #4
+        sta completedLines
+@notTapQuantity:
         lda holdDownPoints
         cmp #$02
         bmi @noPushDown
