@@ -821,8 +821,8 @@ harddrop_tetrimino:
         lda newlyPressedButtons
         and #BUTTON_UP+BUTTON_SELECT
         beq playState_playerControlsActiveTetrimino_return
-        sta tmpX
         lda tetriminoY
+        sta tmpY
 @loop:
         inc tetriminoY
         jsr isPositionValid
@@ -833,6 +833,11 @@ harddrop_tetrimino:
         lda newlyPressedButtons
         and #BUTTON_SELECT
         beq @noSonic
+        lda tetriminoY
+        cmp tmpY
+        bne @sonic
+        rts
+@sonic:
         lda #0
         sta vramRow
         lda #$D0
