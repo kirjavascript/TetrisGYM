@@ -120,6 +120,10 @@ score       := $C ; 4 bytes BCD
 rng_seed    := $0017
 spawnID     := $0019
 spawnCount  := $001A
+pointerAddr := $001B ; 2 bytes
+pointerAddr1 := $001D ; 2 bytes
+; .. $1F
+
 verticalBlankingInterval:= $0033
 set_seed    := $0034 ; 3 bytes - rng_seed, rng_seed+1, spawnCount
 set_seed_input := $0037 ; copied to set_seed during gameModeState_initGameState
@@ -284,8 +288,12 @@ hzSpawnDelay := hzRAM+7 ; 2 byte
 hzPalette := hzRAM+8 ; 1 byte
 tqtyCurrent := $621
 tqtyNext := $622
-completedLinesCopy := $623 ; hard drop
-lineOffset := $624 ; hard drop
+; hard drop ram is pretty big, but can be reused in other modes
+; 22 bytes total
+completedLinesCopy := $623
+lineOffset := $624
+harddropBuffer := $625 ; 20 bytes (!)
+; ... $639
 
 ; ... $67F
 musicStagingSq1Lo:= $0680
@@ -879,26 +887,65 @@ harddrop_tetrimino:
         ;     clearRow(i)
         ; }
 
-        lda #19
+harddropAddr = pointerAddr
+
+        lda #$04
+        sta harddropAddr+1
+        sta harddropAddr+3
+
+harddropMarkCleared:
+        sec
+        lda tetriminoY
+        sbc #3
+        sta tmpX
+        clc
+        adc #4
         sta tmpY ; row
 @lineLoop:
+        ; A should always be tmpY
 
-        ldx tmpY
-        lda multBy10Table, x
         tax
+        lda multBy10Table, x
+        sta harddropAddr
 
         ; check for empty row
         ldy #$0
 @minoLoop:
-        lda playfield, x
+        lda (harddropAddr), y
         cmp #EMPTY_TILE
         beq @noLineClear
 
-        inx
         iny
         cpy #$A
         beq @lineClear
         jmp @minoLoop
+
+@lineClear:
+        lda #1
+        jmp @write
+@noLineClear:
+        lda #0
+@write:
+        ; X should be tmpY
+        sta harddropBuffer, x
+
+        dec tmpY
+
+        lda tmpY
+        cmp tmpX
+        bne @lineLoop
+
+harddropShift:
+        clc
+        lda tetriminoY
+        adc #1
+        sta tmpY ; row
+@lineLoop:
+        ; A should always be tmpY
+
+        tax
+        lda harddropBuffer, x
+        beq @noLineClear
 
 @lineClear:
         inc completedLines
@@ -912,35 +959,15 @@ harddrop_tetrimino:
         lda completedLines
         sta completedLinesCopy
 
-        sec
-        txa
-        sbc #20
-        sta tmpZ ; i - 1
-        tax
-
+        ldx tmpY
 @offsetLoop:
-        ; check for empty row
-        ldy #$0
-@offsetCheckLineFull:
-        lda playfield, x
-        cmp #EMPTY_TILE
-        beq @emptyLine
+        dex
 
-        inx
-        iny
-        cpy #$A
-        beq @fullLine
-        jmp @offsetCheckLineFull
-
-@emptyLine:
+        lda harddropBuffer, x
+        bne @lineIsFull
         dec completedLinesCopy
-@fullLine:
+@lineIsFull:
         inc lineOffset
-
-        lda tmpZ
-        sbc #10
-        sta tmpZ
-        tax
 
         lda completedLinesCopy
         bne @offsetLoop
@@ -952,24 +979,18 @@ harddrop_tetrimino:
         lda multBy10Table, x
         sta lineOffset ; reuse for lineOffset * 10
 
-        ; loop*10
-        ldy #0
         ldx tmpY
         lda multBy10Table, x
-        sta tmpX
+        sta harddropAddr+0
         sec
         sbc lineOffset
-        sta tmpZ
+        sta harddropAddr+2
 
+        ldy #0
 @shiftLineLoop:
+        lda (harddropAddr+2), y
+        sta (harddropAddr), y
 
-        ldx tmpZ
-        lda playfield, x
-        ldx tmpX
-        sta playfield, x
-
-        inc tmpX
-        inc tmpZ
         iny
         cpy #$A
         bne @shiftLineLoop
@@ -977,9 +998,9 @@ harddrop_tetrimino:
 @nextLine:
         dec tmpY
         lda tmpY
-        cmp #0
         beq @addScore
         jmp @lineLoop
+
 
 
 @addScore:
