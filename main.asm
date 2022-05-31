@@ -121,7 +121,7 @@ rng_seed    := $0017
 spawnID     := $0019
 spawnCount  := $001A
 pointerAddr := $001B ; 2 bytes
-pointerAddr1 := $001D ; 2 bytes
+pointerAddrB := $001D ; 2 bytes
 ; .. $1F
 
 verticalBlankingInterval:= $0033
@@ -1009,6 +1009,7 @@ harddropShift:
         jsr playState_updateLinesAndStatistics
         lda #0
         sta vramRow
+        sta completedLines
         ; emty top row
         lda #EMPTY_TILE
         ldx #0
