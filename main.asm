@@ -50,8 +50,8 @@ MODE_CHECKERBOARD := 11
 MODE_GARBAGE := 12
 MODE_DROUGHT := 13
 MODE_DAS := 14
-MODE_INVISIBLE := 15
-MODE_KILLX2 := 16
+MODE_KILLX2 := 15
+MODE_INVISIBLE := 16
 MODE_HARDDROP := 17
 MODE_SPEED_TEST := 18
 MODE_SCORE_DISPLAY := 19
@@ -76,7 +76,7 @@ MENU_MAX_Y_SCROLL := $58
 MENU_TOP_MARGIN_SCROLL := 7 ; in blocks
 
 ; menuConfigSizeLookup
-.define MENUSIZES $0, $0, $0, $0, $F, $7, $8, $C, $20, $10, $1F, $8, $4, $12, $10, $0, $0, $0, $0, $3, $1, $1, $1, $1, $1, $1, $1
+.define MENUSIZES $0, $0, $0, $0, $F, $7, $8, $C, $20, $10, $1F, $8, $4, $12, $10, $0A, $0, $0, $0, $3, $1, $1, $1, $1, $1, $1, $1
 
 .macro MODENAMES
     .byte   "CT DAS"
@@ -94,8 +94,8 @@ MENU_TOP_MARGIN_SCROLL := 7 ; in blocks
     .byte   "GARBGE"
     .byte   "LOBARS"
     .byte   "DASDLY"
-    .byte   "INVZBL"
     .byte   "KILLX2"
+    .byte   "INVZBL"
     .byte   "HRDDRP"
 .endmacro
 
@@ -120,6 +120,10 @@ score       := $C ; 4 bytes BCD
 rng_seed    := $0017
 spawnID     := $0019
 spawnCount  := $001A
+pointerAddr := $001B ; 2 bytes
+pointerAddrB := $001D ; 2 bytes
+; .. $1F
+
 verticalBlankingInterval:= $0033
 set_seed    := $0034 ; 3 bytes - rng_seed, rng_seed+1, spawnCount
 set_seed_input := $0037 ; copied to set_seed during gameModeState_initGameState
@@ -284,6 +288,12 @@ hzSpawnDelay := hzRAM+7 ; 2 byte
 hzPalette := hzRAM+8 ; 1 byte
 tqtyCurrent := $621
 tqtyNext := $622
+; hard drop ram is pretty big, but can be reused in other modes
+; 22 bytes total
+completedLinesCopy := $623
+lineOffset := $624
+harddropBuffer := $625 ; 20 bytes (!)
+; ... $639
 
 ; ... $67F
 musicStagingSq1Lo:= $0680
@@ -374,14 +384,15 @@ checkerModifier := menuVars+7
 garbageModifier := menuVars+8
 droughtModifier := menuVars+9
 dasModifier := menuVars+10
-scoringModifier := menuVars+11
-hzFlag := menuVars+12
-inputDisplayFlag := menuVars+13
-disableFlashFlag := menuVars+14
-goofyFlag := menuVars+15
-debugFlag := menuVars+16
-qualFlag := menuVars+17
-palFlag := menuVars+18
+killx2Modifier := menuVars+11
+scoringModifier := menuVars+12
+hzFlag := menuVars+13
+inputDisplayFlag := menuVars+14
+disableFlashFlag := menuVars+15
+goofyFlag := menuVars+16
+debugFlag := menuVars+17
+qualFlag := menuVars+18
+palFlag := menuVars+19
 
 ; ... $7FF
 PPUCTRL     := $2000
@@ -808,8 +819,8 @@ harddrop_tetrimino:
         lda newlyPressedButtons
         and #BUTTON_UP+BUTTON_SELECT
         beq playState_playerControlsActiveTetrimino_return
-        sta tmpX
         lda tetriminoY
+        sta tmpY
 @loop:
         inc tetriminoY
         jsr isPositionValid
@@ -820,6 +831,11 @@ harddrop_tetrimino:
         lda newlyPressedButtons
         and #BUTTON_SELECT
         beq @noSonic
+        lda tetriminoY
+        cmp tmpY
+        bne @sonic
+        rts
+@sonic:
         lda #0
         sta vramRow
         lda #$D0
@@ -835,46 +851,160 @@ harddrop_tetrimino:
         sta completedLines
         jsr playState_lockTetrimino
 
-        lda #0
-        sta tmpY
+        ; check for gameOver
+        lda playState
+        cmp #$A
+        bne @continueDropping
+        rts
+@continueDropping:
+
+
+        ; hard drop line clear algorithm (kinda);
+
+        ; completedLines = 0
+
+        ; for (i = 19; i >= completedLines; i--) {
+        ;     if (rowIsFull(i)) {
+        ;         completedLines++
+        ;     }
+
+        ;     lineOffset = 0
+        ;     completedLinesCopy = completedLines
+
+        ;     for (lineIndex = i - 1; completedLinesCopy > 0; lineIndex--) {
+        ;         if (!rowIsFull(lineIndex)) {
+        ;             completedLinesCopy--
+        ;         }
+        ;         lineOffset++
+        ;     }
+
+        ;     if (completedLines > 0) {
+        ;         for (j = 0; j < 10 ; j++) {
+        ;             index = (i * 10) + j
+        ;             copyPlayfield(index - (lineOffset * 10), index)
+        ;         }
+        ;     }
+        ; }
+
+        ; for (i = 0; i < completedLines; i++ {
+        ;     clearRow(i)
+        ; }
+
+harddropAddr = pointerAddr
+
+        lda #$04
+        sta harddropAddr+1
+        sta harddropAddr+3
+
+harddropMarkCleared:
+        sec
+        lda tetriminoY
+        sbc #3
+        sta tmpX
+        clc
+        adc #4
+        sta tmpY ; row
 @lineLoop:
-        ldx tmpY
-        lda multBy10Table, x
+        ; A should always be tmpY
+
         tax
+        lda multBy10Table, x
+        sta harddropAddr
+
+        ; check for empty row
         ldy #$0
 @minoLoop:
-        lda playfield, x
+        lda (harddropAddr), y
         cmp #EMPTY_TILE
-        beq @nextLine
-        inx
+        beq @noLineClear
+
         iny
         cpy #$A
         beq @lineClear
         jmp @minoLoop
 
 @lineClear:
-        ; shift down
-@shiftLoop:
-        lda playfield-$A, x
-        sta playfield, x
-        dex
-        cpx #$A
-        bcs @shiftLoop
-        ; clear top row
-        ldx #0
-        lda #EMPTY_TILE
-@topRowLoop:
-        sta playfield, x
-        inx
-        cpx #$A
-        bne @topRowLoop
-        inc completedLines
-@nextLine:
-        inc tmpY
+        lda #1
+        jmp @write
+@noLineClear:
+        lda #0
+@write:
+        ; X should be tmpY
+        sta harddropBuffer, x
+
+        dec tmpY
+
         lda tmpY
-        cmp #20
+        cmp tmpX
+        bne @lineLoop
+
+harddropShift:
+        clc
+        lda tetriminoY
+        adc #1
+        sta tmpY ; row
+@lineLoop:
+        ; A should always be tmpY
+
+        tax
+        lda harddropBuffer, x
+        beq @noLineClear
+
+@lineClear:
+        inc completedLines
+@noLineClear:
+        lda completedLines
+        beq @nextLine
+
+        ; get line offset
+        lda #0
+        sta lineOffset
+        lda completedLines
+        sta completedLinesCopy
+
+        ldx tmpY
+@offsetLoop:
+        dex
+
+        lda harddropBuffer, x
+        bne @lineIsFull
+        dec completedLinesCopy
+@lineIsFull:
+        inc lineOffset
+
+        lda completedLinesCopy
+        bne @offsetLoop
+
+        lda lineOffset
+        beq @nextLine
+
+        tax
+        lda multBy10Table, x
+        sta lineOffset ; reuse for lineOffset * 10
+
+        ldx tmpY
+        lda multBy10Table, x
+        sta harddropAddr+0
+        sec
+        sbc lineOffset
+        sta harddropAddr+2
+
+        ldy #0
+@shiftLineLoop:
+        lda (harddropAddr+2), y
+        sta (harddropAddr), y
+
+        iny
+        cpy #$A
+        bne @shiftLineLoop
+
+@nextLine:
+        dec tmpY
+        lda tmpY
         beq @addScore
         jmp @lineLoop
+
+
 
 @addScore:
         lda completedLines
@@ -882,6 +1012,18 @@ harddrop_tetrimino:
         jsr playState_updateLinesAndStatistics
         lda #0
         sta vramRow
+        sta completedLines
+        ; emty top row
+        lda #EMPTY_TILE
+        ldx #0
+@topRowLoop:
+        sta playfield, x
+        inx
+        cpx #$A
+        bne @topRowLoop
+        ; lda #TETRIMINO_X_HIDE
+        ; sta tetriminoX
+
 @noScore:
 
         lda #8 ; jump straight to spawnTetrimino
@@ -2374,6 +2516,7 @@ gameModeState_initGameBackground:
         jsr displayModeText
         jsr statisticsNametablePatch ; for input display
         jsr debugNametableUI
+        jsr displayDKSModifier
 .if INES_MAPPER = 3
         lda #%10011000
         sta PPUCTRL
@@ -2388,6 +2531,21 @@ gameModeState_initGameBackground:
         sta playState
         inc gameModeState ; 1
         lda #0 ; acc should not be equal
+        rts
+
+displayDKSModifier:
+        lda practiseType
+        cmp #MODE_KILLX2
+        bne @ret
+        lda #$22
+        sta PPUADDR
+        lda #$BB
+        sta PPUADDR
+        lda #$24
+        sta PPUDATA
+        lda killx2Modifier
+        sta PPUDATA
+@ret:
         rts
 
 displayModeText:
@@ -2973,6 +3131,16 @@ drop_tetrimino:
         lda practiseType
         cmp #MODE_KILLX2
         bne @ret
+        lda lines+1
+        bne @secondDrop
+        lda lines
+        lsr
+        lsr
+        lsr
+        lsr
+        cmp killx2Modifier
+        bcc @ret
+@secondDrop:
         lda #$1
         sta fallTimer
         jsr drop_tetrimino_actual
@@ -3856,6 +4024,11 @@ render_mode_play_and_demo:
         lda #$22
         sta PPUADDR
         lda #$B9
+        ldx practiseType
+        cpx #MODE_KILLX2
+        bne @notDKS
+        sbc #1
+@notDKS:
         sta PPUADDR
         lda levelNumber
         jsr renderByteBCD
@@ -5223,8 +5396,6 @@ playState_checkForCompletedRows:
         sta vramRow
         inc playState
         inc playState
-        lda #0
-        sta completedLines
         lda #$07
         sta soundEffectSlot1Init
         rts
@@ -5476,6 +5647,8 @@ checkLevelUp:
         bne @lineLoop
 
         lda practiseType
+        cmp #MODE_TAPQTY
+        beq @lineLoop
         cmp #MODE_TRANSITION
         bne @notSXTOKL
         lda transitionModifier
@@ -5519,7 +5692,20 @@ addPointsRaw:
         lda practiseType
         cmp #MODE_CHECKERBOARD
         beq handlePointsCheckerboard
-
+        cmp #MODE_TAPQTY
+        bne @notTapQuantity
+        lda completedLines
+        cmp #0
+        bne @continueStreak
+        jsr clearPoints
+        lda outOfDateRenderFlags
+        ora #$04
+        sta outOfDateRenderFlags
+        rts
+@continueStreak:
+        lda #4
+        sta completedLines
+@notTapQuantity:
         lda holdDownPoints
         cmp #$02
         bmi @noPushDown

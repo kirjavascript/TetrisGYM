@@ -57,8 +57,8 @@ drawTiles(buffer, lookup, `
 #a    GARBAGE                 d#
 #a    DROUGHT                 d#
 #a    DAS DELAY               d#
-#a    INVISIBLE               d#
 #a    KILLSCREEN »2           d#
+#a    INVISIBLE               d#
 #a    HARD DROP               d#
 #a    TAP/ROLL SPEED          d#
 #a    SCORING                 d#
