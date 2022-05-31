@@ -843,9 +843,9 @@ harddrop_tetrimino:
         ; check for gameOver
         lda playState
         cmp #$A
-        bne :+
+        bne @continueDropping
         rts
-:
+@continueDropping:
 
 
         ; hard drop line clear algorithm (kinda);
