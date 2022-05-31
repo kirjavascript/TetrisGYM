@@ -16,7 +16,7 @@ SAVE_HIGHSCORES := 1
 AUTO_WIN := 0 ; press select to end game
 NO_SCORING := 0 ; breaks pace
 NO_SFX := 0
-NO_MENU := 1
+NO_MENU := 0
 
 INITIAL_CUSTOM_LEVEL := 29
 BTYPE_START_LINES := $25 ; bcd
