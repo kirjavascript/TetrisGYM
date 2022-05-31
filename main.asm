@@ -1023,8 +1023,8 @@ harddropShift:
         inx
         cpx #$A
         bne @topRowLoop
-        lda #TETRIMINO_X_HIDE
-        sta tetriminoX
+        ; lda #TETRIMINO_X_HIDE
+        ; sta tetriminoX
 
 @noScore:
 
