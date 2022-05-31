@@ -840,6 +840,14 @@ harddrop_tetrimino:
         sta completedLines
         jsr playState_lockTetrimino
 
+        ; check for gameOver
+        lda playState
+        cmp #$A
+        bne :+
+        rts
+:
+
+
         ; hard drop line clear algorithm (kinda);
 
         ; completedLines = 0
@@ -4657,19 +4665,6 @@ playState_spawnNextTetrimino:
         ldx nextPiece
         lda spawnOrientationFromOrientation,x
         sta currentPiece
-
-.if PRACTISE_MODE
-        lda practiseType
-        cmp #MODE_HARDDROP
-        bne @noHD
-        jsr isPositionValid
-        beq @noHD
-        lda #$A
-        sta playState
-@noHD:
-        lda currentPiece
-.endif
-
         jsr incrementPieceStat
         jsr chooseNextTetrimino
         sta nextPiece

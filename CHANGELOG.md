@@ -42,7 +42,7 @@
 * Added transition options to Double Killscreen
 * Fixed a bug in hard drop where you didn't get lines
 * Fixed a bug in hard drop where it crashed if you got a tetris
-* Fixed a bug in hard drop where you can spam drop to float at the top of the platfield
+* Fixed a bug in hard drop where you can spam drop to float at the top of the playfield
 
 ## [CNROM]
 * CNROM support
