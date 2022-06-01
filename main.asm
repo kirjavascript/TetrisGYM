@@ -3234,7 +3234,23 @@ framesPerDropTablePAL:
         .byte   $01,$01,$01,$01,$01,$01
 shift_tetrimino:
         lda $11
-        beq :+
+        beq :++
+        lda heldButtons
+        and #BUTTON_LEFT|BUTTON_RIGHT
+        beq :++
+        inc $12
+        lda $12
+        cmp #6
+        bne :+
+        lda #0
+        sta $11
+        jsr shift_tetrimino
+        jsr shift_tetrimino
+        jsr shift_tetrimino
+        jsr shift_tetrimino
+        jsr shift_tetrimino
+        jsr shift_tetrimino
+:
         rts
 :
         lda practiseType
@@ -3290,9 +3306,6 @@ shift_tetrimino:
         lda heldButtons
         and #BUTTON_RIGHT
         beq @notPressingRight
-        ; lda hzTapCounter
-        ; cmp #3
-        ; bcs @notPressingRight
         inc tetriminoX
         jsr isPositionValid
         bne @restoreX
@@ -3304,9 +3317,6 @@ shift_tetrimino:
         lda heldButtons
         and #BUTTON_LEFT
         beq @ret
-        ; lda hzTapCounter
-        ; cmp #3
-        ; bcs @restoreX
         dec tetriminoX
         jsr isPositionValid
         bne @restoreX
@@ -8074,6 +8084,10 @@ hzTap:
         sta hzDebounceCounter
 
 
+        ; $10 - tmp
+        ; $11 - shift_tetrimino_disabled
+        ; $12 - undisable counter
+
         lda #0
         sta $11
 
@@ -8085,6 +8099,8 @@ hzTap:
         bpl :+
         lda #1
         sta $11
+        lda #0
+        sta $12
 :
 
         ; ignore 1 tap
