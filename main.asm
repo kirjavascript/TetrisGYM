@@ -3823,6 +3823,7 @@ render_mode_speed_test:
         lda outOfDateRenderFlags
         beq @noUpdate
         jsr renderHzSpeedTest
+        jsr renderHzInputRows
         lda #0
         sta outOfDateRenderFlags
 @noUpdate:
@@ -4223,10 +4224,9 @@ renderHzSpeedTest:
         clc
         adc #$D6
         sta PPUDATA
-        ; start extended vblank
-        lda currentPpuMask
-        and #%11100111
-        sta PPUMASK
+        rts
+
+renderHzInputRows:
         ; if hzFrameCounter >= $20 or whatever, don't do anything
         lda hzFrameCounter+1
         bne @ret
@@ -4238,66 +4238,104 @@ renderHzSpeedTest:
         bne @updateDpadRow
         lda hzFrameCounter
         bne @updateDpadRow
+        lda #$24
+        sta PPUADDR
+        lda #$E0
+        sta PPUADDR
+        jsr clearInputRow
         lda #$25
         sta PPUADDR
         lda #$00
         sta PPUADDR
-        lda #$FF
-        ldx #15
-@clearRow:
-        sta PPUDATA
-        dex
-        bne @clearRow
+        jsr clearInputRow
         lda #$00
         sta lastDrawnHzFrame
 ; we know there's an update because render flag was set
 @updateDpadRow:
         ; update dpad row
         ; L=15,R=1B,-=24
-        lda #$25
+        lda #$24
         sta PPUADDR
         lda lastDrawnHzFrame ; technically points to the first undrawn frame but whatever
+        clc
+        adc #$E0
         sta PPUADDR
-        ; draw
+        jsr drawDashLine
+        jsr drawLorR
+        ; update ab row
+        ; A=0A,B=0B
+        ; lda #$25
+        ; sta PPUDATA
+        ; lda lastDrawnHzFrame
+        ; sta PPUADDR
+        ; jsr drawDashLine
+        ; jsr drawAorB
+        lda hzFrameCounter
+        clc
+        adc #$01
+        sta lastDrawnHzFrame
+@ret:
+        rts
+
+drawDashLine:
         lda hzFrameCounter
         sec
         sbc lastDrawnHzFrame
         tax
-@loop1:
+@loop:
         cpx #$00
-        beq @addDpadTail
+        beq @ret
         lda #$24
         sta PPUDATA
         dex
-        jmp @loop1
-@addDpadTail:
+        jmp @loop
+@ret:
+        rts
+
+clearInputRow:
+        lda #$FF
+        ldx #15
+@clearRow:
+        sta PPUDATA
+        dex
+        bne @clearRow
+        rts
+
+drawLorR:
         lda heldButtons_player1
         and #BUTTON_RIGHT
         beq @notRight
         lda #$1B
         sta PPUDATA
-        jmp @notLeft
+        rts
 @notRight:
         lda heldButtons_player1
         and #BUTTON_LEFT
-        beq @notLeft
+        beq @ret
         lda #$15
         sta PPUDATA
-        jmp @notLeft
-@notLeft:
-        lda hzFrameCounter
-        clc
-        adc #$01
-        sta lastDrawnHzFrame
-
-        ; update ab row
-        ; A=0A,B=0B
 @ret:
-        ; end extended vblank
-        lda currentPpuMask
-        sta PPUMASK
+        lda #$24
+        sta PPUDATA
         rts
 
+drawAorB:
+        lda heldButtons_player1
+        and #BUTTON_A
+        beq @notA
+        lda #$0A
+        sta PPUDATA
+        rts
+@notA:
+        lda heldButtons_player1
+        and #BUTTON_B
+        beq @ret
+        lda #$0B
+        sta PPUDATA
+@ret:
+        lda #$24
+        sta PPUDATA
+        rts
 
 
 pieceToPpuStatAddr:
