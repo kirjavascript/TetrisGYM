@@ -1152,7 +1152,7 @@ gameMode_speedTest:
 
 speedTestControl:
         ; add sfx
-        lda newlyPressedButtons_player1
+        lda heldButtons_player1
         and #BUTTON_LEFT+BUTTON_RIGHT+BUTTON_B+BUTTON_A
         beq @noupdate
         lda #$10
