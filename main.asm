@@ -279,6 +279,8 @@ debugLevelEdit := $610
 debugNextCounter := $611
 paceResult := $612 ; 3 bytes
 paceSign := $615
+
+lastDrawnHzFrame := $60E ; reusing presetIndex
 hzRAM := $616
 hzTapCounter := hzRAM+0
 hzFrameCounter := hzRAM+1 ; 2 byte
@@ -4218,6 +4220,18 @@ renderHzSpeedTest:
         clc
         adc #$D6
         sta PPUDATA
+        ; start extended vblank
+        ; if hzFrameCounter >= $20 or whatever, don't do anything
+        ; if hzFrameCounter == 0, reset rows
+
+        ; if left/right/a/b, update needs to happen
+
+        ; update dpad row
+        ; L=15,R=1B,-=24
+
+        ; update ab row
+        ; A=0A,B=0B
+        ; end extended vblank
         rts
 
 pieceToPpuStatAddr:
