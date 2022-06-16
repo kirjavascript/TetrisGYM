@@ -4264,12 +4264,12 @@ renderHzInputRows:
         jsr drawLorR
         ; update ab row
         ; A=0A,B=0B
-        ; lda #$25
-        ; sta PPUDATA
-        ; lda lastDrawnHzFrame
-        ; sta PPUADDR
-        ; jsr drawDashLine
-        ; jsr drawAorB
+        lda #$25
+        sta PPUADDR
+        lda lastDrawnHzFrame
+        sta PPUADDR
+        jsr drawDashLine
+        jsr drawAorB
         lda hzFrameCounter
         clc
         adc #$01
