@@ -4224,18 +4224,81 @@ renderHzSpeedTest:
         adc #$D6
         sta PPUDATA
         ; start extended vblank
+        lda currentPpuMask
+        and #%11100111
+        sta PPUMASK
         ; if hzFrameCounter >= $20 or whatever, don't do anything
+        lda hzFrameCounter+1
+        bne @ret
+        lda hzFrameCounter
+        cmp #14
+        bcs @ret
         ; if hzFrameCounter == 0, reset rows
-
-        ; if left/right/a/b, update needs to happen
-
+        lda hzFrameCounter+1
+        bne @updateDpadRow
+        lda hzFrameCounter
+        bne @updateDpadRow
+        lda #$25
+        sta PPUADDR
+        lda #$00
+        sta PPUADDR
+        lda #$FF
+        ldx #15
+@clearRow:
+        sta PPUDATA
+        dex
+        bne @clearRow
+        lda #$00
+        sta lastDrawnHzFrame
+; we know there's an update because render flag was set
+@updateDpadRow:
         ; update dpad row
         ; L=15,R=1B,-=24
+        lda #$25
+        sta PPUADDR
+        lda lastDrawnHzFrame ; technically points to the first undrawn frame but whatever
+        sta PPUADDR
+        ; draw
+        lda hzFrameCounter
+        sec
+        sbc lastDrawnHzFrame
+        tax
+@loop1:
+        cpx #$00
+        beq @addDpadTail
+        lda #$24
+        sta PPUDATA
+        dex
+        jmp @loop1
+@addDpadTail:
+        lda heldButtons_player1
+        and #BUTTON_RIGHT
+        beq @notRight
+        lda #$1B
+        sta PPUDATA
+        jmp @notLeft
+@notRight:
+        lda heldButtons_player1
+        and #BUTTON_LEFT
+        beq @notLeft
+        lda #$15
+        sta PPUDATA
+        jmp @notLeft
+@notLeft:
+        lda hzFrameCounter
+        clc
+        adc #$01
+        sta lastDrawnHzFrame
 
         ; update ab row
         ; A=0A,B=0B
+@ret:
         ; end extended vblank
+        lda currentPpuMask
+        sta PPUMASK
         rts
+
+
 
 pieceToPpuStatAddr:
         .dbyt   $2186,$21C6,$2206,$2246
