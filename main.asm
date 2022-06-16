@@ -1153,13 +1153,16 @@ gameMode_speedTest:
 speedTestControl:
         ; add sfx
         lda newlyPressedButtons_player1
-        and #BUTTON_LEFT+BUTTON_RIGHT
-        beq @notap
-        lda #$1
-        sta soundEffectSlot1Init
+        and #BUTTON_LEFT+BUTTON_RIGHT+BUTTON_B+BUTTON_A
+        beq @noupdate
         lda #$10
         sta outOfDateRenderFlags
-@notap:
+        lda newlyPressedButtons_player1
+        and #BUTTON_LEFT+BUTTON_RIGHT
+        beq @noupdate
+        lda #$1
+        sta soundEffectSlot1Init
+@noupdate:
         ; use normal controls
         jsr hzControl
         rts
