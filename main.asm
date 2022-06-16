@@ -6,6 +6,7 @@
 ; @information ejona86/taus
 
 .include "charmap.asm"
+.include "config.asm"
 
 INES_MAPPER := 1 ; supports 1 and 3
 PRACTISE_MODE := 1
@@ -1635,11 +1636,11 @@ menuThrottle: ; add DAS-like movement to the menu
         lda #0
         rts
 menuThrottleNew:
-        lda #$10
+        lda #menuThrottleStart
         sta menuMoveThrottle
         rts
 menuThrottleContinue:
-        lda #$4
+        lda #menuThrottleRepeat
         sta menuMoveThrottle
         rts
 
@@ -7960,8 +7961,6 @@ gameHUDPace:
 ; PAL is 50.006
 ;
 ; HydrantDude explains how and why the formula works here: https://discord.com/channels/374368504465457153/405470199400235013/867156217259884574
-
-hzDebounceThreshold := $10
 
 hzStart: ; called in playState_spawnNextTetrimino, gameModeState_initGameState, gameMode_gameTypeMenu
         lda #0
