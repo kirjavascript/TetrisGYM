@@ -4314,6 +4314,7 @@ drawLorR:
         beq @ret
         lda #$15
         sta PPUDATA
+        rts
 @ret:
         lda #$24
         sta PPUDATA
@@ -4332,6 +4333,7 @@ drawAorB:
         beq @ret
         lda #$0B
         sta PPUDATA
+        rts
 @ret:
         lda #$24
         sta PPUDATA
