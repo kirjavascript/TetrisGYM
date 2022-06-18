@@ -4192,26 +4192,26 @@ renderHz:
         lda hzSpawnDelay
         sta PPUDATA
 
-        lda #$22
-        sta PPUADDR
-        lda #$63
-        sta PPUADDR
-        lda $10
-        jsr renderByteBCD
+        ; lda #$22
+        ; sta PPUADDR
+        ; lda #$63
+        ; sta PPUADDR
+        ; lda $10
+        ; jsr renderByteBCD
 
-        lda #$22
-        sta PPUADDR
-        lda #$6A
-        sta PPUADDR
-        lda $11
-        sta PPUDATA
+        ; lda #$22
+        ; sta PPUADDR
+        ; lda #$6A
+        ; sta PPUADDR
+        ; lda $11
+        ; sta PPUDATA
 
-        lda #$22
-        sta PPUADDR
-        lda #$A3
-        sta PPUADDR
-        lda hzFrameCounter
-        jsr renderByteBCD
+        ; lda #$22
+        ; sta PPUADDR
+        ; lda #$A3
+        ; sta PPUADDR
+        ; lda hzFrameCounter
+        ; jsr renderByteBCD
 
 renderHzSpeedTest:
 
@@ -8083,13 +8083,14 @@ hzTap:
         lda #0
         sta hzDebounceCounter
 
-
         ; $10 - tmp
         ; $11 - shift_tetrimino_disabled
         ; $12 - undisable counter
 
         lda #0
         sta $11
+        lda #$2A
+        sta hzPalette
 
         ldx hzTapCounter
         lda dasLimitLookup, x
@@ -8101,12 +8102,19 @@ hzTap:
         sta $11
         lda #0
         sta $12
+        lda #$16
+        sta hzPalette
 :
 
         ; ignore 1 tap
         lda hzTapCounter
         cmp #2
-        bcc @calcEnd
+        bcs @notFirstTap
+        lda #0
+        sta hzResult
+        sta hzResult+1
+        jmp @calcEnd
+@notFirstTap:
 
         lda #$7A
         sta factorB24
@@ -8151,9 +8159,9 @@ hzTap:
 
         jsr unsigned_div24 ; hz*100 in dividend
 
-        ldx dividend+1 ; get hz for palette
-        lda hzPaletteGradient, x
-        sta hzPalette
+        ; ldx dividend+1 ; get hz for palette
+        ; lda hzPaletteGradient, x
+        ; sta hzPalette
 
         lda dividend
         sta binary32
