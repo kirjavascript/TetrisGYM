@@ -4303,41 +4303,29 @@ clearInputRow:
 
 drawLorR:
         lda heldButtons_player1
-        and #BUTTON_RIGHT
-        beq @notRight
-        lda #$1B
+        and #%00000011
+        tax
+        lda lOrR,x
         sta PPUDATA
         rts
-@notRight:
-        lda heldButtons_player1
-        and #BUTTON_LEFT
-        beq @ret
-        lda #$15
-        sta PPUDATA
-        rts
-@ret:
-        lda #$24
-        sta PPUDATA
-        rts
+lOrR:
+        .byte $24,$1B,$15,$1B
 
 drawAorB:
         lda heldButtons_player1
-        and #BUTTON_A
-        beq @notA
-        lda #$0A
+        lsr a
+        lsr a
+        lsr a
+        lsr a
+        lsr a
+        lsr a
+        tax
+        lda aOrB,x
         sta PPUDATA
         rts
-@notA:
-        lda heldButtons_player1
-        and #BUTTON_B
-        beq @ret
-        lda #$0B
-        sta PPUDATA
-        rts
-@ret:
-        lda #$24
-        sta PPUDATA
-        rts
+; last byte is socd
+aOrB:
+        .byte $24,$0B,$0A,$0A
 
 
 pieceToPpuStatAddr:
