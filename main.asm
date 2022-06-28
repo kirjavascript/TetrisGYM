@@ -280,7 +280,7 @@ debugNextCounter := $611
 paceResult := $612 ; 3 bytes
 paceSign := $615
 
-lastDrawnHzFrame := $60E ; reusing presetIndex
+firstUndrawnHzFrame := $60E ; reusing presetIndex
 hzRAM := $616
 hzTapCounter := hzRAM+0
 hzFrameCounter := hzRAM+1 ; 2 byte
@@ -4249,38 +4249,37 @@ renderHzInputRows:
         sta PPUADDR
         jsr clearInputRow
         lda #$00
-        sta lastDrawnHzFrame
+        sta firstUndrawnHzFrame
 ; we know there's an update because render flag was set
 @updateDpadRow:
         ; update dpad row
-        ; L=15,R=1B,-=24
         lda #$24
         sta PPUADDR
-        lda lastDrawnHzFrame ; technically points to the first undrawn frame but whatever
+        lda firstUndrawnHzFrame
         clc
         adc #$E0
         sta PPUADDR
         jsr drawDashLine
         jsr drawLorR
         ; update ab row
-        ; A=0A,B=0B
         lda #$25
         sta PPUADDR
-        lda lastDrawnHzFrame
+        lda firstUndrawnHzFrame
         sta PPUADDR
         jsr drawDashLine
         jsr drawAorB
+        ; update last position
         lda hzFrameCounter
         clc
         adc #$01
-        sta lastDrawnHzFrame
+        sta firstUndrawnHzFrame
 @ret:
         rts
 
 drawDashLine:
         lda hzFrameCounter
         sec
-        sbc lastDrawnHzFrame
+        sbc firstUndrawnHzFrame
         tax
 @loop:
         cpx #$00
@@ -4308,6 +4307,7 @@ drawLorR:
         lda lOrR,x
         sta PPUDATA
         rts
+; -, R, L, R
 lOrR:
         .byte $24,$1B,$15,$1B
 
@@ -4323,7 +4323,7 @@ drawAorB:
         lda aOrB,x
         sta PPUDATA
         rts
-; last byte is socd
+; -, B, A, A
 aOrB:
         .byte $24,$0B,$0A,$0A
 
