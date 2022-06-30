@@ -4145,27 +4145,7 @@ render_mode_play_and_demo:
         lda outOfDateRenderFlags
         and #$10
         beq :+
-        lda outOfDateRenderFlags
-        and #$EF
-        sta outOfDateRenderFlags
-        lda #$27
-        sta PPUADDR
-        lda #$38
-        sta PPUADDR
-        lda hzResult
-        jsr twoDigsToPPU
-        lda #$27
-        sta PPUADDR
-        lda #$3b
-        sta PPUADDR
-        lda hzResult+1
-        jsr twoDigsToPPU
-        lda #$3F
-        sta PPUADDR
-        lda #$07
-        sta PPUADDR
-        lda hzPalette
-        sta PPUDATA
+        jsr renderCTWCDAS
 :
 
         lda outOfDateRenderFlags
@@ -4218,6 +4198,36 @@ render_mode_play_and_demo:
         sta currentPpuCtrl
 .endif
         jsr resetScroll
+        rts
+
+renderCTWCDAS:
+        lda outOfDateRenderFlags
+        and #$EF
+        sta outOfDateRenderFlags
+        lda #$27
+        sta PPUADDR
+        lda #$18
+        sta PPUADDR
+        lda hzResult
+        jsr twoDigsToPPU
+        lda #$27
+        sta PPUADDR
+        lda #$1b
+        sta PPUADDR
+        lda hzResult+1
+        jsr twoDigsToPPU
+        lda #$3F
+        sta PPUADDR
+        lda #$07
+        sta PPUADDR
+        lda hzPalette
+        sta PPUDATA
+        lda #$27
+        sta PPUADDR
+        lda #$3c
+        sta PPUADDR
+        lda hzTapCounter
+        sta PPUDATA
         rts
 
 renderHz:
@@ -8133,7 +8143,7 @@ hzTap:
         beq :+
         lda #0
         sta $11
-        lda #$2A
+        lda #$30
         sta hzPalette
 
         ldx hzTapCounter
