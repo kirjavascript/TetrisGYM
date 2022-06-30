@@ -17,6 +17,7 @@ AUTO_WIN := 0 ; press select to end game
 NO_SCORING := 0 ; breaks pace
 NO_SFX := 0
 NO_MENU := 0
+LINECAP := 0
 
 INITIAL_CUSTOM_LEVEL := 29
 BTYPE_START_LINES := $25 ; bcd
@@ -3129,8 +3130,14 @@ rotationTable:
 drop_tetrimino:
         jsr drop_tetrimino_actual
         lda practiseType
+.if LINECAP
+        lda levelNumber
+        cmp #39
+        bpl @redrop
+.endif
         cmp #MODE_KILLX2
         bne @ret
+@redrop:
         lda lines+1
         bne @secondDrop
         lda lines
