@@ -63,8 +63,9 @@ MODE_GOOFY := 23
 MODE_DEBUG := 24
 MODE_QUAL := 25
 MODE_PAL := 26
+MODE_DASONLY := 26
 
-MODE_QUANTITY := 27
+MODE_QUANTITY := 28
 MODE_GAME_QUANTITY := 18
 
 SCORING_CLASSIC := 0 ; for scoringModifier
@@ -73,11 +74,11 @@ SCORING_FLOAT := 2
 SCORING_SCORECAP := 3
 
 MENU_SPRITE_Y_BASE := $47
-MENU_MAX_Y_SCROLL := $58
+MENU_MAX_Y_SCROLL := $60
 MENU_TOP_MARGIN_SCROLL := 7 ; in blocks
 
 ; menuConfigSizeLookup
-.define MENUSIZES $0, $0, $0, $0, $F, $7, $8, $C, $20, $10, $1F, $8, $4, $12, $10, $0A, $0, $0, $0, $3, $1, $1, $1, $1, $1, $1, $1
+.define MENUSIZES $0, $0, $0, $0, $F, $7, $8, $C, $20, $10, $1F, $8, $4, $12, $10, $0A, $0, $0, $0, $3, $1, $1, $1, $1, $1, $1, $1, $1
 
 .macro MODENAMES
     .byte   "CT DAS"
@@ -394,6 +395,7 @@ goofyFlag := menuVars+16
 debugFlag := menuVars+17
 qualFlag := menuVars+18
 palFlag := menuVars+19
+dasOnlyFlag := menuVars+20
 
 ; ... $7FF
 PPUCTRL     := $2000
@@ -1039,8 +1041,13 @@ harddropShift:
 gameMode_bootScreen: ; boot
         ; ABSS goes to gameTypeMenu instead of here
 
+        ; CTDAS
         lda #1
         sta hzFlag
+        sta dasOnlyFlag
+        lda #0
+        sta $10
+        sta $11
 
         ; reset cursors
         lda #$0
@@ -3240,6 +3247,8 @@ framesPerDropTablePAL:
         .byte   $02,$02,$02,$01,$01,$01,$01,$01
         .byte   $01,$01,$01,$01,$01,$01
 shift_tetrimino:
+        lda dasOnlyFlag
+        beq :++
         lda $11
         beq :++
         lda heldButtons
@@ -8094,6 +8103,8 @@ hzTap:
         ; $11 - shift_tetrimino_disabled
         ; $12 - undisable counter
 
+        lda dasOnlyFlag
+        beq :+
         lda #0
         sta $11
         lda #$2A

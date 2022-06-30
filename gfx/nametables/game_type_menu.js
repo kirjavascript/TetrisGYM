@@ -70,10 +70,10 @@ drawTiles(buffer, lookup, `
 #a    BLOCK TOOL              d#
 #a    QUAL MODE               d#
 #a    PAL MODE                d#
+#a    DAS ONLY                d#
 #a                            d#
 #a                            d#
 #a V5                         d#
-#a                            d#
 #a                            d#
 #a                            d#
 #a                            d#
@@ -101,7 +101,7 @@ drawRect(buffer, 19, 2, 7, 7, 0x92); // draw logo
 // drawRect(extra, 20, 0, 5, 5, 0x9A); // draw QR code
 
 const urlX = 3;
-const urlY = 8;
+const urlY = 9;
 drawRect(extra, urlX, urlY, 12, 1, 0x74);
 drawRect(extra, urlX+12, urlY, 12, 1, 0x84);
 
