@@ -1043,7 +1043,6 @@ gameMode_bootScreen: ; boot
 
         ; CTDAS
         lda #1
-        sta hzFlag
         sta dasOnlyFlag
         lda #0
         sta $10
@@ -4142,6 +4141,33 @@ render_mode_play_and_demo:
         jmp @renderPieceStat
 
 @renderStats:
+        ; CTDAS
+        lda outOfDateRenderFlags
+        and #$10
+        beq :+
+        lda outOfDateRenderFlags
+        and #$EF
+        sta outOfDateRenderFlags
+        lda #$27
+        sta PPUADDR
+        lda #$38
+        sta PPUADDR
+        lda hzResult
+        jsr twoDigsToPPU
+        lda #$27
+        sta PPUADDR
+        lda #$3b
+        sta PPUADDR
+        lda hzResult+1
+        jsr twoDigsToPPU
+        lda #$3F
+        sta PPUADDR
+        lda #$07
+        sta PPUADDR
+        lda hzPalette
+        sta PPUDATA
+:
+
         lda outOfDateRenderFlags
         and #$40
         beq @renderTetrisFlashAndSound
@@ -7176,7 +7202,7 @@ changePRGBank:
 
 game_palette:
         .byte   $3F,$00,$20,$0F,$30,$12,$16,$0F
-        .byte   $20,$12,$00,$0F,$2C,$16,$29,$0F
+        .byte   $20,$00,$00,$0F,$2C,$16,$29,$0F
         .byte   $3C,$00,$30,$0F,$16,$2A,$22,$0F
         .byte   $10,$16,$2D,$0F,$2C,$16,$29,$0F
         .byte   $3C,$00,$30,$FF
