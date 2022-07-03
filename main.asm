@@ -4251,18 +4251,6 @@ renderBCDScoreData:
         jmp renderLowScore
 renderClassicScore:
         jsr scoreSetupPPU
-        ; check for overflow questionmark score
-        ; lda binScore+3
-        ; cmp #5
-        ; bcc :+
-        ; lda #$29
-        ; sta PPUDATA
-        ; lda score+2
-        ; and #$F
-        ; sta PPUDATA
-        ; jmp renderLowScore
-; :
-        ; otherwise just render normal classic score
         ldx score+3
         ldy score+2
         jsr renderClassicHighByte
@@ -4443,6 +4431,31 @@ renderClassicHighByte:
         sta PPUDATA
         rts
 
+; X - score+3 Y = score+2
+; renderLettersHighByte:
+;         lda #0
+;         sta tmpZ
+;         txa
+;         and #$3
+;         beq @bitParity
+;         tax
+;         lda multBy10Table, x
+;         sta tmpZ
+; @bitParity:
+
+;         clc
+;         tya
+;         lsr
+;         lsr
+;         lsr
+;         lsr
+;         adc tmpZ
+;         sta PPUDATA
+
+;         tya
+;         and #$F
+;         sta PPUDATA
+;         rts
 
 linesDash:
         .byte $15, $12, $17, $E, $1C, $24
