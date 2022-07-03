@@ -5070,9 +5070,12 @@ playState_checkStartGameOver:
 @ret:   rts
 
 @curtainFinished:
+        lda score+3
+        bne @over30kormaxedout
         lda score+2
         cmp #$03
         bcc @checkForStartButton
+@over30kormaxedout:
 
         lda #$80
         ldx palFlag
