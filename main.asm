@@ -68,16 +68,17 @@ MODE_QUANTITY := 27
 MODE_GAME_QUANTITY := 18
 
 SCORING_CLASSIC := 0 ; for scoringModifier
-SCORING_SEVENDIGIT := 1
-SCORING_FLOAT := 2
-SCORING_SCORECAP := 3
+SCORING_LETTERS := 1
+SCORING_SEVENDIGIT := 2
+SCORING_FLOAT := 3
+SCORING_SCORECAP := 4
 
 MENU_SPRITE_Y_BASE := $47
 MENU_MAX_Y_SCROLL := $58
 MENU_TOP_MARGIN_SCROLL := 7 ; in blocks
 
 ; menuConfigSizeLookup
-.define MENUSIZES $0, $0, $0, $0, $F, $7, $8, $C, $20, $10, $1F, $8, $4, $12, $10, $0A, $0, $0, $0, $3, $1, $1, $1, $1, $1, $1, $1
+.define MENUSIZES $0, $0, $0, $0, $F, $7, $8, $C, $20, $10, $1F, $8, $4, $12, $10, $0A, $0, $0, $0, $4, $1, $1, $1, $1, $1, $1, $1
 
 .macro MODENAMES
     .byte   "TETRIS"
@@ -1973,11 +1974,11 @@ stringSpriteLoop:
 
 stringLookup:
         .byte stringClassic-stringLookup
+        .byte stringLetters-stringLookup
         .byte stringSevenDigit-stringLookup
         .byte stringFloat-stringLookup
         .byte stringScorecap-stringLookup
         .byte stringNull-stringLookup ; reserved for future use
-        .byte stringNull-stringLookup
         .byte stringNull-stringLookup
         .byte stringNull-stringLookup
         .byte stringOff-stringLookup ; 8
@@ -1990,6 +1991,8 @@ stringLookup:
         .byte stringV5-stringLookup ; F
 stringClassic:
         .byte $7,'C','L','A','S','S','I','C'
+stringLetters:
+        .byte $7,'L','E','T','T','E','R','S'
 stringSevenDigit:
         .byte $6,'7','D','I','G','I','T'
 stringFloat:
@@ -2626,7 +2629,7 @@ scoringBackground:
 
         lda scoringModifier
         cmp #SCORING_SEVENDIGIT
-        bne @classicTopScore
+        bne @otherTopScore
 
         lda highscores+highScoreNameLength
         and #$F
@@ -2640,10 +2643,16 @@ scoringBackground:
 
         rts
 
-@classicTopScore:
+@otherTopScore:
         ldx highscores+highScoreNameLength
         ldy highscores+highScoreNameLength+1
+        cmp #SCORING_LETTERS
+        bne @classicTopScore
+        jsr renderLettersHighByte
+        jmp @otherTopScoreLow
+@classicTopScore:
         jsr renderClassicHighByte
+@otherTopScoreLow:
         lda highscores+highScoreNameLength+2
         jsr twoDigsToPPU
         lda highscores+highScoreNameLength+3
@@ -4070,6 +4079,13 @@ render_mode_play_and_demo:
 @noScoreCap:
 
         lda scoringModifier
+        cmp #SCORING_LETTERS
+        bne @noLetters
+        jsr renderLettersScore
+        jmp @clearScoreRenderFlags
+@noLetters:
+
+        lda scoringModifier
         cmp #SCORING_SEVENDIGIT
         bne @noSevenDigit
         jsr renderSevenDigit
@@ -4261,6 +4277,13 @@ renderLowScore:
         jsr twoDigsToPPU
         rts
 
+renderLettersScore:
+        jsr scoreSetupPPU
+        ldx score+3
+        ldy score+2
+        jsr renderLettersHighByte
+        jmp renderLowScore
+
 renderScoreCap:
         lda score+3
         beq renderBCDScore
@@ -4391,32 +4414,7 @@ renderClassicHighByte:
         rts
 @startWrap:
 
-        lda tmpY ; score+2
-        and #$F0
-        ror
-        ror
-        ror
-        ror
-        sta tmpZ
-
-        clc
-        lda tmpX ; score+3
-        and #$F
-        tax
-        lda multBy10Table, x
-        adc tmpZ
-        sta tmpZ
-
-        lda tmpX ; score+3
-        and #$F0
-        ror
-        ror
-        ror
-        ror
-        tax
-        lda multBy100Table, x
-        adc tmpZ
-        sta tmpZ ; (0|score/100000)
+        jsr getScoreDiv100k
 
         and #$F0 ; /16 << 4
         sta tmpX
@@ -4431,31 +4429,60 @@ renderClassicHighByte:
         sta PPUDATA
         rts
 
+getScoreDiv100k:
+        lda tmpY ; score+2
+        lsr
+        lsr
+        lsr
+        lsr
+        sta tmpZ
+
+        clc
+        lda tmpX ; score+3
+        and #$F
+        tax
+        lda multBy10Table, x
+        adc tmpZ
+        sta tmpZ
+
+        lda tmpX ; score+3
+        lsr
+        lsr
+        lsr
+        lsr
+        tax
+        lda multBy100Table, x
+        adc tmpZ
+        sta tmpZ ; (0|score/100000)
+        rts
+
 ; X - score+3 Y = score+2
-; renderLettersHighByte:
-;         lda #0
-;         sta tmpZ
-;         txa
-;         and #$3
-;         beq @bitParity
-;         tax
-;         lda multBy10Table, x
-;         sta tmpZ
-; @bitParity:
+renderLettersHighByte:
+        stx tmpX
+        sty tmpY
 
-;         clc
-;         tya
-;         lsr
-;         lsr
-;         lsr
-;         lsr
-;         adc tmpZ
-;         sta PPUDATA
+        cpx #0
+        bne @startWrap
+        lda tmpY ; score+2
+        jsr twoDigsToPPU
+        rts
+@startWrap:
 
-;         tya
-;         and #$F
-;         sta PPUDATA
-;         rts
+        jsr getScoreDiv100k
+
+        sec
+@mod40:
+        sbc #36 ; loop body is ~20 cycles for worst case?
+        bcs @mod40
+        adc #36
+
+        sta PPUDATA
+
+        lda tmpY ; score+2
+        and #$F
+        sta PPUDATA
+
+        rts
 
 linesDash:
         .byte $15, $12, $17, $E, $1C, $24
