@@ -52,6 +52,10 @@
 * Fixed soft drop spamming cheat
 * Fixed some top row bugs in Hard Drop
 
+### rev03
+
+* Fixed a bug where Rocket wouldn't show with a score between 1.0 and 1.03
+
 ## [CNROM]
 * CNROM support
 
