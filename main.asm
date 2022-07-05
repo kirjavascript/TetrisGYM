@@ -8072,7 +8072,7 @@ gameHUDPace:
 ;
 ; HydrantDude explains how and why the formula works here: https://discord.com/channels/374368504465457153/405470199400235013/867156217259884574
 
-hzDebounceThreshold := $0A
+hzDebounceThreshold := $10
 
 hzStart: ; called in playState_spawnNextTetrimino, gameModeState_initGameState, gameMode_gameTypeMenu
         lda #0
