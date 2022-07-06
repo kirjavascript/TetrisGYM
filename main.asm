@@ -280,6 +280,8 @@ debugLevelEdit := $610
 debugNextCounter := $611
 paceResult := $612 ; 3 bytes
 paceSign := $615
+
+firstUndrawnHzFrame := $60E ; reusing presetIndex
 hzRAM := $616
 hzTapCounter := hzRAM+0
 hzFrameCounter := hzRAM+1 ; 2 byte
@@ -1151,14 +1153,17 @@ gameMode_speedTest:
 
 speedTestControl:
         ; add sfx
-        lda newlyPressedButtons_player1
-        and #BUTTON_LEFT+BUTTON_RIGHT
-        beq @notap
-        lda #$1
-        sta soundEffectSlot1Init
+        lda heldButtons_player1
+        and #BUTTON_LEFT+BUTTON_RIGHT+BUTTON_B+BUTTON_A
+        beq @noupdate
         lda #$10
         sta outOfDateRenderFlags
-@notap:
+        lda newlyPressedButtons_player1
+        and #BUTTON_LEFT+BUTTON_RIGHT
+        beq @noupdate
+        lda #$1
+        sta soundEffectSlot1Init
+@noupdate:
         ; use normal controls
         jsr hzControl
         rts
@@ -1636,12 +1641,15 @@ menuThrottle: ; add DAS-like movement to the menu
 @endThrottle:
         lda #0
         rts
+
+menuThrottleStart := $10
+menuThrottleRepeat := $4
 menuThrottleNew:
-        lda #$10
+        lda #menuThrottleStart
         sta menuMoveThrottle
         rts
 menuThrottleContinue:
-        lda #$4
+        lda #menuThrottleRepeat
         sta menuMoveThrottle
         rts
 
@@ -3833,6 +3841,7 @@ render_mode_speed_test:
         lda outOfDateRenderFlags
         beq @noUpdate
         jsr renderHzSpeedTest
+        jsr renderHzInputRows
         lda #0
         sta outOfDateRenderFlags
 @noUpdate:
@@ -4241,6 +4250,108 @@ renderHzSpeedTest:
         adc #$D6
         sta PPUDATA
         rts
+
+renderHzInputRows:
+        ; if hzFrameCounter >= $20 or whatever, don't do anything
+        lda hzFrameCounter+1
+        bne @ret
+        lda hzFrameCounter
+        cmp #14
+        bcs @ret
+        ; if hzFrameCounter == 0, reset rows
+        lda hzFrameCounter+1
+        bne @updateDpadRow
+        lda hzFrameCounter
+        bne @updateDpadRow
+        lda #$24
+        sta PPUADDR
+        lda #$E0
+        sta PPUADDR
+        jsr clearInputRow
+        lda #$25
+        sta PPUADDR
+        lda #$00
+        sta PPUADDR
+        jsr clearInputRow
+        lda #$00
+        sta firstUndrawnHzFrame
+; we know there's an update because render flag was set
+@updateDpadRow:
+        ; update dpad row
+        lda #$24
+        sta PPUADDR
+        lda firstUndrawnHzFrame
+        clc
+        adc #$E0
+        sta PPUADDR
+        jsr drawDashLine
+        jsr drawLorR
+        ; update ab row
+        lda #$25
+        sta PPUADDR
+        lda firstUndrawnHzFrame
+        sta PPUADDR
+        jsr drawDashLine
+        jsr drawAorB
+        ; update last position
+        lda hzFrameCounter
+        clc
+        adc #$01
+        sta firstUndrawnHzFrame
+@ret:
+        rts
+
+drawDashLine:
+        lda hzFrameCounter
+        sec
+        sbc firstUndrawnHzFrame
+        tax
+@loop:
+        cpx #$00
+        beq @ret
+        lda #$24
+        sta PPUDATA
+        dex
+        jmp @loop
+@ret:
+        rts
+
+clearInputRow:
+        lda #$FF
+        ldx #15
+@clearRow:
+        sta PPUDATA
+        dex
+        bne @clearRow
+        rts
+
+drawLorR:
+        lda heldButtons_player1
+        and #%00000011
+        tax
+        lda lOrR,x
+        sta PPUDATA
+        rts
+; -, R, L, R
+lOrR:
+        .byte $24,$1B,$15,$1B
+
+drawAorB:
+        lda heldButtons_player1
+        lsr a
+        lsr a
+        lsr a
+        lsr a
+        lsr a
+        lsr a
+        tax
+        lda aOrB,x
+        sta PPUDATA
+        rts
+; -, B, A, A
+aOrB:
+        .byte $24,$0B,$0A,$0A
+
 
 pieceToPpuStatAddr:
         .dbyt   $2186,$21C6,$2206,$2246
@@ -8011,7 +8122,7 @@ gameHUDPace:
 ;
 ; HydrantDude explains how and why the formula works here: https://discord.com/channels/374368504465457153/405470199400235013/867156217259884574
 
-hzDebounceThreshold := $10
+hzDebounceThreshold := $0A
 
 hzStart: ; called in playState_spawnNextTetrimino, gameModeState_initGameState, gameMode_gameTypeMenu
         lda #0
