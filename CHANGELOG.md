@@ -54,8 +54,9 @@
 
 ### rev03
 
-* Fixed a bug where Rocket wouldn't show with a score between 1.0 and 1.03
 * Added letters-based scoring that count 0-9 A-Z then wraps
+* Added input log to Speed Test
+* Fixed a bug where Rocket wouldn't show with a score between 1.0 and 1.03
 
 ## [CNROM]
 * CNROM support

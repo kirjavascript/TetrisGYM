@@ -263,6 +263,12 @@ Behaves like the original uncapped scores, with digits A-F used for a rollover a
 
 After 100 million the score will jump by 800k, so you may want to use another mode if you plan on getting higher than that. (Your actual score will still display correctly in the high scores list.)
 
+__Letters__
+
+![Classic](./screens/score-letters.png)
+
+Show 0-9, then A-Z, then wrap.
+
 __7 Digit__
 
 ![7 Digit](./screens/score-7digit.png)
