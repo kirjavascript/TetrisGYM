@@ -4350,14 +4350,6 @@ renderHzInputRows:
         sta PPUDATA
 
         inc inputLogCounter
-
-        jsr getInputAddr
-        tya
-        sta PPUADDR
-        txa
-        sta PPUADDR
-        lda #$FF
-        sta PPUDATA
         rts
 
 clearInputLine:
