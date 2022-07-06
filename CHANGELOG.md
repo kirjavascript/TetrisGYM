@@ -44,6 +44,19 @@
 * Fixed a bug in hard drop where it crashed if you got a tetris
 * Fixed a bug in hard drop where you can spam drop to float at the top of the playfield
 
+### rev02
+
+* Removed transitions in Tap Quantity
+* Added scoring to Tap Quantity
+* Fixed Hard Drop crashing for real
+* Fixed soft drop spamming cheat
+* Fixed some top row bugs in Hard Drop
+
+### rev03
+
+* Fixed a bug where Rocket wouldn't show with a score between 1.0 and 1.03
+* Added letters-based scoring that count 0-9 A-Z then wraps
+
 ## [CNROM]
 * CNROM support
 
