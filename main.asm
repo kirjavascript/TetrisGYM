@@ -279,7 +279,6 @@ debugNextCounter := $611
 paceResult := $612 ; 3 bytes
 paceSign := $615
 
-firstUndrawnHzFrame := $60E ; reusing presetIndex
 hzRAM := $616
 hzTapCounter := hzRAM+0
 hzFrameCounter := hzRAM+1 ; 2 byte
@@ -288,6 +287,7 @@ hzTapDirection := hzRAM+4 ; 1 byte
 hzResult := hzRAM+5 ; 2 byte
 hzSpawnDelay := hzRAM+7 ; 2 byte
 hzPalette := hzRAM+8 ; 1 byte
+inputLogCounter := $60E ; reusing presetIndex
 tqtyCurrent := $621
 tqtyNext := $622
 ; hard drop ram is pretty big, but can be reused in other modes
@@ -1100,6 +1100,12 @@ bufferScreen:
 gameMode_speedTest:
         lda #$6
         sta renderMode
+        ; reset some stuff for input log rendering
+        lda #$EF
+        sta inputLogCounter
+        lda #$1
+        sta hzFrameCounter+1
+
         jsr hzStart
         jsr updateAudioWaitForNmiAndDisablePpuRendering
         jsr disableNmi
@@ -3822,10 +3828,10 @@ isPositionValid:
         rts
 
 render_mode_speed_test:
+        jsr renderHzInputRows
         lda outOfDateRenderFlags
         beq @noUpdate
         jsr renderHzSpeedTest
-        jsr renderHzInputRows
         lda #0
         sta outOfDateRenderFlags
 @noUpdate:
@@ -4228,107 +4234,121 @@ renderHzSpeedTest:
         sta PPUDATA
         rts
 
+getInputAddr:
+        clc
+        lda inputLogCounter
+        and #$18
+        lsr
+        lsr
+        lsr
+        adc #$20
+        and #$23
+        tay ; high
+
+        clc
+        ldx inputLogCounter
+        txa
+        and #$7
+        tax
+        lda multBy32Table, x
+        clc
+        adc #$19
+        tax ; low
+        rts
+
 renderHzInputRows:
-        ; if hzFrameCounter >= $20 or whatever, don't do anything
-        lda hzFrameCounter+1
-        bne @ret
-        lda hzFrameCounter
-        cmp #14
-        bcs @ret
         ; if hzFrameCounter == 0, reset rows
         lda hzFrameCounter+1
-        bne @updateDpadRow
+        bne @checkLimit
         lda hzFrameCounter
-        bne @updateDpadRow
-        lda #$24
-        sta PPUADDR
-        lda #$E0
-        sta PPUADDR
-        jsr clearInputRow
-        lda #$25
-        sta PPUADDR
-        lda #$00
-        sta PPUADDR
-        jsr clearInputRow
-        lda #$00
-        sta firstUndrawnHzFrame
-; we know there's an update because render flag was set
-@updateDpadRow:
-        ; update dpad row
-        lda #$24
-        sta PPUADDR
-        lda firstUndrawnHzFrame
-        clc
-        adc #$E0
-        sta PPUADDR
-        jsr drawDashLine
-        jsr drawLorR
-        ; update ab row
-        lda #$25
-        sta PPUADDR
-        lda firstUndrawnHzFrame
-        sta PPUADDR
-        jsr drawDashLine
-        jsr drawAorB
-        ; update last position
-        lda hzFrameCounter
-        clc
-        adc #$01
-        sta firstUndrawnHzFrame
-@ret:
-        rts
+        bne @checkLimit
 
-drawDashLine:
-        lda hzFrameCounter
-        sec
-        sbc firstUndrawnHzFrame
+        lda #2
+        sta inputLogCounter
+
+        ; enable vertical drawing
+        lda PPUCTRL
+        ora #%100
+        sta PPUCTRL
+
+        jsr getInputAddr
+        tya
+        sta PPUADDR
+        txa
+        sta PPUADDR
+
+        jsr clearInputLine
+
+        jsr getInputAddr
+        inx
+        tya
+        sta PPUADDR
+        txa
+        sta PPUADDR
+
+        jsr clearInputLine
+
+        lda PPUCTRL
+        and #%11111011
+        sta PPUCTRL
+
+
+@checkLimit:
+        lda inputLogCounter
+        cmp #28
+        bcc @tickCounter
+        rts
+@tickCounter:
+        jsr getInputAddr
+        tya
+        sta PPUADDR
+        txa
+        sta PPUADDR
+
+        lda heldButtons_player1
+        ora newlyPressedButtons_player1
+        sta tmpZ
+        and #BUTTON_RIGHT|BUTTON_LEFT
         tax
-@loop:
-        cpx #$00
-        beq @ret
-        lda #$24
+        lda inputLogTiles, x
         sta PPUDATA
-        dex
-        jmp @loop
-@ret:
+
+        ; print A/B
+        lda tmpZ
+        and #BUTTON_A|BUTTON_B
+        lsr
+        lsr
+        lsr
+        lsr
+        lsr
+        lsr
+        tax
+        lda inputLogTiles+3, x
+        sta PPUDATA
+
+        inc inputLogCounter
+
+        jsr getInputAddr
+        tya
+        sta PPUADDR
+        txa
+        sta PPUADDR
+        lda #$FF
+        sta PPUDATA
         rts
 
-clearInputRow:
+clearInputLine:
         lda #$FF
-        ldx #15
+        ldx #28
 @clearRow:
         sta PPUDATA
         dex
         bne @clearRow
         rts
 
-drawLorR:
-        lda heldButtons_player1
-        and #%00000011
-        tax
-        lda lOrR,x
-        sta PPUDATA
-        rts
-; -, R, L, R
-lOrR:
-        .byte $24,$1B,$15,$1B
-
-drawAorB:
-        lda heldButtons_player1
-        lsr a
-        lsr a
-        lsr a
-        lsr a
-        lsr a
-        lsr a
-        tax
-        lda aOrB,x
-        sta PPUDATA
-        rts
-; -, B, A, A
-aOrB:
-        .byte $24,$0B,$0A,$0A
-
+inputLogTiles:
+        .byte $24, $1B, $15
+        .byte $24, $B, $A
 
 pieceToPpuStatAddr:
         .dbyt   $2186,$21C6,$2206,$2246
@@ -4337,6 +4357,8 @@ multBy10Table:
         .byte   $00,$0A,$14,$1E,$28,$32,$3C,$46
         .byte   $50,$5A,$64,$6E,$78,$82,$8C,$96
         .byte   $A0,$AA,$B4,$BE
+multBy32Table:
+        .byte 0,32,64,96,128,160,192,224
 multBy100Table:
         .byte $0, $64, $c8, $2c, $90
         .byte $f4, $58, $bc, $20, $84
