@@ -13,7 +13,7 @@ NO_MUSIC := 1
 SAVE_HIGHSCORES := 1
 
 ; dev flags
-AUTO_WIN := 1 ; press select to end game
+AUTO_WIN := 0 ; press select to end game
 NO_SCORING := 0 ; breaks pace
 NO_SFX := 0
 NO_MENU := 0
@@ -281,6 +281,7 @@ debugLevelEdit := $610
 debugNextCounter := $611
 paceResult := $612 ; 3 bytes
 paceSign := $615
+
 hzRAM := $616
 hzTapCounter := hzRAM+0
 hzFrameCounter := hzRAM+1 ; 2 byte
@@ -289,6 +290,7 @@ hzTapDirection := hzRAM+4 ; 1 byte
 hzResult := hzRAM+5 ; 2 byte
 hzSpawnDelay := hzRAM+7 ; 2 byte
 hzPalette := hzRAM+8 ; 1 byte
+inputLogCounter := $60E ; reusing presetIndex
 tqtyCurrent := $621
 tqtyNext := $622
 ; hard drop ram is pretty big, but can be reused in other modes
@@ -1107,6 +1109,12 @@ bufferScreen:
 gameMode_speedTest:
         lda #$6
         sta renderMode
+        ; reset some stuff for input log rendering
+        lda #$EF
+        sta inputLogCounter
+        lda #$1
+        sta hzFrameCounter+1
+
         jsr hzStart
         jsr updateAudioWaitForNmiAndDisablePpuRendering
         jsr disableNmi
@@ -1158,14 +1166,17 @@ gameMode_speedTest:
 
 speedTestControl:
         ; add sfx
-        lda newlyPressedButtons_player1
-        and #BUTTON_LEFT+BUTTON_RIGHT
-        beq @notap
-        lda #$1
-        sta soundEffectSlot1Init
+        lda heldButtons_player1
+        and #BUTTON_LEFT+BUTTON_RIGHT+BUTTON_B+BUTTON_A
+        beq @noupdate
         lda #$10
         sta outOfDateRenderFlags
-@notap:
+        lda newlyPressedButtons_player1
+        and #BUTTON_LEFT+BUTTON_RIGHT
+        beq @noupdate
+        lda #$1
+        sta soundEffectSlot1Init
+@noupdate:
         ; use normal controls
         jsr hzControl
         rts
@@ -1643,12 +1654,15 @@ menuThrottle: ; add DAS-like movement to the menu
 @endThrottle:
         lda #0
         rts
+
+menuThrottleStart := $10
+menuThrottleRepeat := $4
 menuThrottleNew:
-        lda #$10
+        lda #menuThrottleStart
         sta menuMoveThrottle
         rts
 menuThrottleContinue:
-        lda #$4
+        lda #menuThrottleRepeat
         sta menuMoveThrottle
         rts
 
@@ -3859,6 +3873,7 @@ isPositionValid:
         rts
 
 render_mode_speed_test:
+        jsr renderHzInputRows
         lda outOfDateRenderFlags
         beq @noUpdate
         jsr renderHzSpeedTest
@@ -4329,6 +4344,114 @@ renderHzSpeedTest:
         sta PPUDATA
         rts
 
+getInputAddr:
+        clc
+        lda inputLogCounter
+        and #$18
+        lsr
+        lsr
+        lsr
+        adc #$20
+        and #$23
+        tay ; high
+
+        clc
+        ldx inputLogCounter
+        txa
+        and #$7
+        tax
+        lda multBy32Table, x
+        clc
+        adc #$19
+        tax ; low
+        rts
+
+renderHzInputRows:
+        ; if hzFrameCounter == 0, reset rows
+        lda hzFrameCounter+1
+        bne @checkLimit
+        lda hzFrameCounter
+        bne @checkLimit
+
+        lda #2
+        sta inputLogCounter
+
+        ; enable vertical drawing
+        lda PPUCTRL
+        ora #%100
+        sta PPUCTRL
+
+        jsr getInputAddr
+        tya
+        sta PPUADDR
+        txa
+        sta PPUADDR
+
+        jsr clearInputLine
+
+        jsr getInputAddr
+        inx
+        tya
+        sta PPUADDR
+        txa
+        sta PPUADDR
+
+        jsr clearInputLine
+
+        lda PPUCTRL
+        and #%11111011
+        sta PPUCTRL
+
+
+@checkLimit:
+        lda inputLogCounter
+        cmp #28
+        bcc @tickCounter
+        rts
+@tickCounter:
+        jsr getInputAddr
+        tya
+        sta PPUADDR
+        txa
+        sta PPUADDR
+
+        lda heldButtons_player1
+        ora newlyPressedButtons_player1
+        sta tmpZ
+        and #BUTTON_RIGHT|BUTTON_LEFT
+        tax
+        lda inputLogTiles, x
+        sta PPUDATA
+
+        ; print A/B
+        lda tmpZ
+        and #BUTTON_A|BUTTON_B
+        lsr
+        lsr
+        lsr
+        lsr
+        lsr
+        lsr
+        tax
+        lda inputLogTiles+3, x
+        sta PPUDATA
+
+        inc inputLogCounter
+        rts
+
+clearInputLine:
+        lda #$FF
+        ldx #28
+@clearRow:
+        sta PPUDATA
+        dex
+        bne @clearRow
+        rts
+
+inputLogTiles:
+        .byte $24, $1B, $15
+        .byte $24, $B, $A
+
 pieceToPpuStatAddr:
         .dbyt   $2186,$21C6,$2206,$2246
         .dbyt   $2286,$22C6,$2306
@@ -4336,6 +4459,8 @@ multBy10Table:
         .byte   $00,$0A,$14,$1E,$28,$32,$3C,$46
         .byte   $50,$5A,$64,$6E,$78,$82,$8C,$96
         .byte   $A0,$AA,$B4,$BE
+multBy32Table:
+        .byte 0,32,64,96,128,160,192,224
 multBy100Table:
         .byte $0, $64, $c8, $2c, $90
         .byte $f4, $58, $bc, $20, $84
