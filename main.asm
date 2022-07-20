@@ -7299,11 +7299,11 @@ game_palette:
         .byte   $3C,$00,$30,$FF
 title_palette:
         .byte   $3F,$00,$14,$0F,$3C,$38,$00,$0F
-        .byte   $17,$27,$37,$0F,$30,MENU_HIGHLIGHT_COLOR,$00,$0F
+        .byte   $19,$27,$29,$0F,$30,MENU_HIGHLIGHT_COLOR,$00,$0F
         .byte   $22,$2A,$28,$0F,$30,$29,$27,$FF
 menu_palette:
         .byte   $3F,$00,$16,$0F,$30,$38,$26,$0F
-        .byte   $19,$27,$29,$0F,$30,MENU_HIGHLIGHT_COLOR,$00,$0F
+        .byte   $17,$27,$37,$0F,$30,MENU_HIGHLIGHT_COLOR,$00,$0F
         .byte   $16,$2A,$28,$0F,$16,$26,$27,$0f,$2A,$FF
 rocket_palette:
         .byte   $3F,$11,$7,$16,$2A,$28,$0f,$37,$18,$38 ; sprite
