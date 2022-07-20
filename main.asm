@@ -21,7 +21,7 @@ LINECAP := 0
 
 INITIAL_CUSTOM_LEVEL := 29
 BTYPE_START_LINES := $25 ; bcd
-MENU_HIGHLIGHT_COLOR := $12 ; $12 in gym, $16 in original
+MENU_HIGHLIGHT_COLOR := $19 ; $12 in gym, $16 in original
 BLOCK_TILES := $7B
 EMPTY_TILE := $EF
 INVISIBLE_TILE := $43
@@ -7303,7 +7303,7 @@ title_palette:
         .byte   $22,$2A,$28,$0F,$30,$29,$27,$FF
 menu_palette:
         .byte   $3F,$00,$16,$0F,$30,$38,$26,$0F
-        .byte   $17,$27,$37,$0F,$30,MENU_HIGHLIGHT_COLOR,$00,$0F
+        .byte   $19,$27,$29,$0F,$30,MENU_HIGHLIGHT_COLOR,$00,$0F
         .byte   $16,$2A,$28,$0F,$16,$26,$27,$0f,$2A,$FF
 rocket_palette:
         .byte   $3F,$11,$7,$16,$2A,$28,$0f,$37,$18,$38 ; sprite
