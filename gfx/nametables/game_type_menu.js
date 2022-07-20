@@ -40,7 +40,7 @@ drawTiles(buffer, lookup, `
 #a                            d#
 #a    CTWC DAS 2022           d#
 #a                            d#
-#a                            d#
+#a    WORLD CHAMPION          d#
 #a                            d#
 #a    TETRIS                  d#
 #a    T-SPINS                 d#
@@ -109,7 +109,7 @@ drawAttrs(buffer, [`
     2222222222222222
     2222222222111112
     2222222222111112
-    2222222222111112
+    2211111111111112
     2222222222111112
     2222222222222222
     2222222222222222

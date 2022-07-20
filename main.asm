@@ -7,7 +7,7 @@
 
 .include "charmap.asm"
 
-INES_MAPPER := 1 ; supports 1 and 3
+INES_MAPPER := 3 ; supports 1 and 3
 PRACTISE_MODE := 1
 NO_MUSIC := 1
 SAVE_HIGHSCORES := 1
