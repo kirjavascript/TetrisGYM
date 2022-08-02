@@ -1094,10 +1094,10 @@ bufferScreen:
         jsr updateAudioWaitForNmiAndResetOamStaging
         lda #$3
         sta sleepCounter
-@killLoop:
+@endLoop:
         jsr updateAudioWaitForNmiAndResetOamStaging
         lda sleepCounter
-        bne @killLoop
+        bne @endLoop
         rts
 
 gameMode_speedTest:
@@ -1173,6 +1173,50 @@ speedTestControl:
 @noupdate:
         ; use normal controls
         jsr hzControl
+        rts
+
+linecapMenu:
+        lda #$0
+        sta renderMode
+        jsr updateAudioWaitForNmiAndDisablePpuRendering
+        jsr disableNmi
+
+        ; 110 to beat for nametable size
+
+        ; clearNametable
+        lda #$20
+        sta PPUADDR
+        lda #$0
+        sta PPUADDR
+        lda #EMPTY_TILE
+        ldx #4
+        ldy #$BF
+@clearTile:
+        sta PPUDATA
+        dey
+        bne @clearTile
+        sta PPUDATA
+        ldy #$FF
+        dex
+        bne @clearTile
+
+
+        ; ; bne clear_page
+
+        jsr bulkCopyToPpu
+        .addr hzStats
+
+        jsr waitForVBlankAndEnableNmi
+        jsr updateAudioWaitForNmiAndResetOamStaging
+        jsr updateAudioWaitForNmiAndEnablePpuRendering
+        jsr updateAudioWaitForNmiAndResetOamStaging
+        lda #$3
+        sta sleepCounter
+@endLoop:
+        jsr updateAudioWaitForNmiAndResetOamStaging
+
+        lda #1
+        bne @endLoop
         rts
 
 
@@ -1355,7 +1399,9 @@ gameTypeLoopCheckStart:
 @checkSpeedTest:
         ; check if speed test mode
         cmp #MODE_SPEED_TEST
-        beq gameTypeSpeedTest
+        beq changeGameTypeToSpeedTest
+        cmp #MODE_LINECAP
+        beq gotoLinecapMenu
 
         ; check for seed of 0000XX
         cmp #MODE_SEED
@@ -1375,12 +1421,15 @@ gameTypeLoopCheckStart:
         inc gameMode
         rts
 
-gameTypeSpeedTest:
+changeGameTypeToSpeedTest:
         lda #$02
         sta soundEffectSlot1Init
         lda #7
         sta gameMode
         rts
+
+gotoLinecapMenu:
+        jmp linecapMenu
 
 gameTypeLoopNext:
         jsr renderMenuVars
@@ -2846,7 +2895,7 @@ gameModeState_initGameState:
         sta demoIndex
         sta demoButtonsAddr
         sta spawnID
-        lda #$70
+        lda #>demoButtonsTable
         sta demoButtonsAddr+1
         lda #$03
         sta renderMode
@@ -6224,7 +6273,7 @@ pollControllerButtons:
         sta demo_repeats
         jsr demoButtonsTable_indexIncr
         lda demoButtonsAddr+1
-        cmp #$DF
+        cmp #>demoTetriminoTypeTable
         beq @ret
         jmp @holdButtons
 
@@ -6237,7 +6286,7 @@ pollControllerButtons:
 @ret:   rts
 
 @startButtonPressed:
-        lda #$DD
+        lda #>demoButtonsTable
         sta demoButtonsAddr+1
         lda #$00
         sta frameCounter+1
@@ -6264,7 +6313,7 @@ pollControllerButtons:
         sta (demoButtonsAddr,x)
         jsr demoButtonsTable_indexIncr
         lda demoButtonsAddr+1
-        cmp #$DF ; check movie has ended
+        cmp #>demoTetriminoTypeTable ; check movie has ended
         beq @ret2
         lda heldButtons_player1
         sta demo_heldButtons
@@ -8692,7 +8741,7 @@ copyToApuChannel:
         lda #$40
         sta AUDIOTMP2
         sty AUDIOTMP3
-        lda #$E1
+        lda #>soundEffectSlot0_gameOverCurtainInitData
         sta AUDIOTMP4
         ldy #$00
 @copyByte:
@@ -8708,7 +8757,7 @@ copyToApuChannel:
 computeSoundEffMethod:
         sta currentAudioSlot
         pha
-        ldy #$E0
+        ldy #>soundEffectSlot0Init_table
         sty AUDIOTMP2
         ldy #$00
 @whileYNot2TimesA:
@@ -8721,7 +8770,7 @@ computeSoundEffMethod:
         bne @whileYNot2TimesA
         lda #$91
         sta AUDIOTMP3
-        lda #$E0
+        lda #>soundEffectSlot0Init_table
         sta AUDIOTMP4
 @ret:   pla
         sta currentAudioSlot
