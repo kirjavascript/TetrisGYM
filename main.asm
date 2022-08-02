@@ -61,10 +61,11 @@ MODE_INPUT_DISPLAY := 21
 MODE_DISABLE_FLASH := 22
 MODE_GOOFY := 23
 MODE_DEBUG := 24
-MODE_QUAL := 25
-MODE_PAL := 26
+MODE_LINECAP := 25
+MODE_QUAL := 26
+MODE_PAL := 27
 
-MODE_QUANTITY := 27
+MODE_QUANTITY := 28
 MODE_GAME_QUANTITY := 18
 
 SCORING_CLASSIC := 0 ; for scoringModifier
@@ -74,11 +75,11 @@ SCORING_FLOAT := 3
 SCORING_SCORECAP := 4
 
 MENU_SPRITE_Y_BASE := $47
-MENU_MAX_Y_SCROLL := $58
+MENU_MAX_Y_SCROLL := $60
 MENU_TOP_MARGIN_SCROLL := 7 ; in blocks
 
 ; menuConfigSizeLookup
-.define MENUSIZES $0, $0, $0, $0, $F, $7, $8, $C, $20, $10, $1F, $8, $4, $12, $10, $0A, $0, $0, $0, $4, $1, $1, $1, $1, $1, $1, $1
+.define MENUSIZES $0, $0, $0, $0, $F, $7, $8, $C, $20, $10, $1F, $8, $4, $12, $10, $0A, $0, $0, $0, $4, $1, $1, $1, $1, $1, $1, $1, $1
 
 .macro MODENAMES
     .byte   "TETRIS"
@@ -1733,12 +1734,6 @@ menuYTmp := tmp2
         clc
         lda #MENU_SPRITE_Y_BASE + $10
         sbc menuScrollY
-
-        ; TODO: remove / fix in v6
-        cmp #1
-        bpl :+
-        lda #1
-:
         sta spriteYOffset
         lda #set_seed_input
         sta byteSpriteAddr
