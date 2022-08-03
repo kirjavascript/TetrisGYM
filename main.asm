@@ -396,8 +396,9 @@ inputDisplayFlag := menuVars+14
 disableFlashFlag := menuVars+15
 goofyFlag := menuVars+16
 debugFlag := menuVars+17
-qualFlag := menuVars+18
-palFlag := menuVars+19
+linecapFlag := menuVars+18
+qualFlag := menuVars+19
+palFlag := menuVars+20
 
 ; ... $7FF
 PPUCTRL     := $2000
@@ -1176,6 +1177,7 @@ speedTestControl:
         rts
 
 linecapMenu:
+        ; TODO jump here when enabling
         lda #$0
         sta renderMode
         jsr updateAudioWaitForNmiAndDisablePpuRendering
@@ -1200,24 +1202,30 @@ linecapMenu:
         dex
         bne @clearTile
 
-
-        ; ; bne clear_page
-
         jsr bulkCopyToPpu
-        .addr hzStats
+        .addr linecapMenuNametable
 
         jsr waitForVBlankAndEnableNmi
         jsr updateAudioWaitForNmiAndResetOamStaging
         jsr updateAudioWaitForNmiAndEnablePpuRendering
         jsr updateAudioWaitForNmiAndResetOamStaging
-        lda #$3
+        lda #$10
         sta sleepCounter
 @endLoop:
         jsr updateAudioWaitForNmiAndResetOamStaging
 
         lda #1
         bne @endLoop
-        rts
+
+        ; gameMode remains unchanged so we just jump back
+        jmp gameMode_gameTypeMenu
+
+linecapMenuNametable: ; stripe
+        .byte $21, $0A, 12, 'L','I','N','E','C','A','P',' ','M','E','N','U'
+        .byte $21, $CA, 4, 'W','H','E','N'
+        .byte $22, $4A, 3, 'H','O','W'
+        .byte $21, $2A, $4C, $39
+        .byte $FF
 
 
 gameMode_waitScreen:
