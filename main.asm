@@ -1792,10 +1792,10 @@ menuYTmp := tmp2
 
         lda #$b8
         sta spriteXOffset
-        clc
-        lda #MENU_SPRITE_Y_BASE + $10
-        sbc menuScrollY
-        sta spriteYOffset
+        lda #MODE_SEED
+        jsr menuItemY16Offset
+        bne @notSeed
+        stx spriteYOffset
         lda #set_seed_input
         sta byteSpriteAddr
         lda #0
@@ -1805,6 +1805,7 @@ menuYTmp := tmp2
         lda #3
         sta byteSpriteLen
         jsr byteSprite
+@notSeed:
 
         ; render config vars
 
@@ -2059,6 +2060,8 @@ stringLookup:
         .byte stringConfirm-stringLookup
         .byte stringV4-stringLookup
         .byte stringV5-stringLookup ; F
+        ; .byte stringLevel-stringLookup
+        ; .byte stringLines-stringLookup
 stringClassic:
         .byte $7,'C','L','A','S','S','I','C'
 stringLetters:
