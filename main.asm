@@ -1355,6 +1355,31 @@ linecapMenuControlsLinesLevel:
         rts
 
 linecapMenuControlsHow:
+        lda #BUTTON_RIGHT
+        jsr menuThrottle
+        beq @notRight
+        lda #$01
+        sta soundEffectSlot1Init
+        inc linecapHow
+        lda linecapHow
+        cmp #3
+        bne @notRight
+        lda #0
+        sta linecapHow
+@notRight:
+
+        lda #BUTTON_LEFT
+        jsr menuThrottle
+        beq @notLeft
+        lda #$01
+        sta soundEffectSlot1Init
+        dec linecapHow
+        lda linecapHow
+        cmp #$FF
+        bne @notLeft
+        lda #2
+        sta linecapHow
+@notLeft:
         rts
 
 
@@ -2243,7 +2268,7 @@ stringLevel:
 stringKSX2:
         .byte $4,'K','S',$69,'2'
 stringFromBelow:
-        .byte $A,'F','R','O','M',' ','B','E','L','O','W'
+        .byte $5,'F','L','O','O','R'
 stringHalt:
         .byte $4,'H','A','L','T'
 stringNull:
