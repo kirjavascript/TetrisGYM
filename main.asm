@@ -1193,11 +1193,8 @@ speedTestControl:
 linecapMenu:
 
 linecapMenuCursorIndices := 3
-
         lda #$8
         sta renderMode
-        lda #1
-        sta outOfDateRenderFlags
         jsr updateAudioWaitForNmiAndDisablePpuRendering
         jsr disableNmi
 
@@ -1220,6 +1217,9 @@ linecapMenuCursorIndices := 3
 
         jsr bulkCopyToPpu
         .addr linecapMenuNametable
+
+        lda #1
+        sta outOfDateRenderFlags
 
         jsr waitForVBlankAndEnableNmi
         jsr updateAudioWaitForNmiAndResetOamStaging
@@ -1309,13 +1309,15 @@ linecapMenuControlsLR:
         jsr switch_s_plus_2a
         .addr   linecapMenuControlsWhen
         .addr   linecapMenuControlsLinesLevel
-        .addr   linecapMenuControlsLinesLevel
+        .addr   linecapMenuControlsHow
 linecapMenuControlsWhen:
         lda newlyPressedButtons_player1
         and #BUTTON_LEFT|BUTTON_RIGHT
         beq @ret
         lda #$01
         sta soundEffectSlot1Init
+        lda #1
+        sta outOfDateRenderFlags
         lda linecapWhen
         eor #1
         sta linecapWhen
@@ -1328,6 +1330,8 @@ linecapMenuControlsLinesLevel:
         beq @notRight
         lda #$01
         sta soundEffectSlot1Init
+        lda #1
+        sta outOfDateRenderFlags
         ldy linecapWhen
         clc
         lda linecapWhenValues, y
@@ -1340,12 +1344,17 @@ linecapMenuControlsLinesLevel:
         beq @notLeft
         lda #$01
         sta soundEffectSlot1Init
+        lda #1
+        sta outOfDateRenderFlags
         ldy linecapWhen
         sec
         lda linecapWhenValues, y
         sbc #1
         sta linecapWhenValues, y
 @notLeft:
+        rts
+
+linecapMenuControlsHow:
         rts
 
 
@@ -4065,6 +4074,8 @@ render_mode_linecap_menu:
         lda outOfDateRenderFlags
         and #1
         beq @static
+        lda #0
+        sta outOfDateRenderFlags
         ; render level / lines
         lda linecapWhen
         bne @linecapLines
