@@ -20,6 +20,8 @@ NO_MENU := 0
 LINECAP := 0
 
 INITIAL_CUSTOM_LEVEL := 29
+INITIAL_LINECAP_LEVEL := 39
+INITIAL_LINECAP_LINES := 33 ; div 10
 BTYPE_START_LINES := $25 ; bcd
 MENU_HIGHLIGHT_COLOR := $12 ; $12 in gym, $16 in original
 BLOCK_TILES := $7B
@@ -380,6 +382,7 @@ heartsAndReady := menuRAM+7 ; high nybble used for ready
 linecapCursorIndex := menuRAM+8
 linecapWhen := menuRAM+9
 linecapHow := menuRAM+10
+linecapWhenValues := menuRAM+11
 linecapLevel := menuRAM+11
 linecapLines := menuRAM+12
 menuVars := $76D
@@ -545,6 +548,11 @@ initRamContinued:
 
         lda #$10
         sta dasModifier
+
+        lda #INITIAL_LINECAP_LEVEL
+        sta linecapLevel
+        lda #INITIAL_LINECAP_LINES
+        sta linecapLines
 
         jsr resetScores
 
@@ -1188,6 +1196,8 @@ linecapMenuCursorIndices := 3
 
         lda #$8
         sta renderMode
+        lda #1
+        sta outOfDateRenderFlags
         jsr updateAudioWaitForNmiAndDisablePpuRendering
         jsr disableNmi
 
@@ -1234,7 +1244,9 @@ linecapMenuCursorIndices := 3
         jsr stringSpriteAlignRight
 
         ; how
+        clc
         lda #$12
+        adc linecapHow
         sta spriteIndexInOamContentLookup
         lda #$8F
         sta spriteYOffset
@@ -1252,7 +1264,16 @@ linecapMenuCursorIndices := 3
         jsr loadSpriteIntoOamStaging
 
 ; controls
+        jsr linecapMenuControls
 
+        lda newlyPressedButtons_player1
+        and #BUTTON_B
+        bne @back
+        beq @menuLoop
+@back:
+        jmp gameMode_gameTypeMenu
+
+linecapMenuControls:
         lda #BUTTON_DOWN
         jsr menuThrottle
         beq @downEnd
@@ -1280,22 +1301,16 @@ linecapMenuCursorIndices := 3
         sta linecapCursorIndex
 @upEnd:
 
-        jsr linecapMenuHandleLRWhen
+        jsr linecapMenuControlsLR
+        rts
 
-        lda newlyPressedButtons_player1
-        and #BUTTON_B
-        bne @back
-        beq @menuLoop
-@back:
-        jmp gameMode_gameTypeMenu
-
-linecapMenuHandleLR:
+linecapMenuControlsLR:
         lda linecapCursorIndex
         jsr switch_s_plus_2a
-        .addr   linecapMenuHandleLRWhen
-        .addr   linecapMenuHandleLRWhen
-        .addr   linecapMenuHandleLRWhen
-linecapMenuHandleLRWhen:
+        .addr   linecapMenuControlsWhen
+        .addr   linecapMenuControlsLinesLevel
+        .addr   linecapMenuControlsLinesLevel
+linecapMenuControlsWhen:
         lda newlyPressedButtons_player1
         and #BUTTON_LEFT|BUTTON_RIGHT
         beq @ret
@@ -1307,6 +1322,35 @@ linecapMenuHandleLRWhen:
 @ret:
         rts
 
+linecapMenuControlsLinesLevel:
+        lda #BUTTON_RIGHT
+        jsr menuThrottle
+        beq @notRight
+        lda #$01
+        sta soundEffectSlot1Init
+        ldy linecapWhen
+        clc
+        lda linecapWhenValues, y
+        adc #1
+        sta linecapWhenValues, y
+@notRight:
+
+        lda #BUTTON_LEFT
+        jsr menuThrottle
+        beq @notLeft
+        lda #$01
+        sta soundEffectSlot1Init
+        ldy linecapWhen
+        sec
+        lda linecapWhenValues, y
+        sbc #1
+        sta linecapWhenValues, y
+@notLeft:
+        rts
+
+
+        ; lda #1
+        ; sta outOfDateRenderFlags
 
 linecapMenuNametable: ; stripe
         .byte $21, $0A, 12, 'L','I','N','E','C','A','P',' ','M','E','N','U'
@@ -4018,14 +4062,32 @@ render_mode_speed_test:
         rts
 
 render_mode_linecap_menu:
-
+        lda outOfDateRenderFlags
+        and #1
+        beq @static
+        ; render level / lines
+        lda linecapWhen
+        bne @linecapLines
         lda #$21
         sta PPUADDR
         lda #$F3
         sta PPUADDR
-        lda #39
+        lda linecapLevel
         jsr renderByteBCD
+        jmp render_mode_static
 
+@linecapLines:
+
+        lda #$21
+        sta PPUADDR
+        lda #$F2
+        sta PPUADDR
+        lda linecapLines
+        jsr renderByteBCD
+        lda #0
+        sta PPUDATA
+
+@static:
         jmp render_mode_static
 
 
