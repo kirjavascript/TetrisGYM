@@ -377,11 +377,12 @@ levelControlMode  := menuRAM+4
 customLevel := menuRAM+5
 classicLevel := menuRAM+6
 heartsAndReady := menuRAM+7 ; high nybble used for ready
-linecapWhere := menuRAM+8
-linecapHow := menuRAM+9
-linecapLevel := menuRAM+10
-linecapLines := menuRAM+11
-menuVars := $76C
+linecapCursorIndex := menuRAM+8
+linecapWhere := menuRAM+9
+linecapHow := menuRAM+10
+linecapLevel := menuRAM+11
+linecapLines := menuRAM+12
+menuVars := $76D
 paceModifier := menuVars+0
 presetModifier := menuVars+1
 typeBModifier := menuVars+2
@@ -498,6 +499,7 @@ render: lda renderMode
         .addr   render_mode_rocket
         .addr   render_mode_speed_test
         .addr   render_mode_level_menu
+        .addr   render_mode_linecap_menu
 initRamContinued:
         ldy #$06
         sty tmp2
@@ -1181,13 +1183,10 @@ speedTestControl:
         rts
 
 linecapMenu:
-        ; TODO jump here when enabling
-        lda #$0
+        lda #$8
         sta renderMode
         jsr updateAudioWaitForNmiAndDisablePpuRendering
         jsr disableNmi
-
-        ; 110 to beat for nametable size
 
         ; clearNametable
         lda #$20
@@ -1215,13 +1214,45 @@ linecapMenu:
         jsr updateAudioWaitForNmiAndResetOamStaging
         lda #$10
         sta sleepCounter
-@endLoop:
+@menuLoop:
         jsr updateAudioWaitForNmiAndResetOamStaging
 
-        lda #1
-        bne @endLoop
+; render
 
-        ; gameMode remains unchanged so we just jump back
+        ; when
+        lda #$10
+        sta spriteIndexInOamContentLookup
+        lda #$6F
+        sta spriteYOffset
+        lda #$B0
+        sta spriteXOffset
+        jsr stringSpriteAlignRight
+
+        ; how
+        lda #$12
+        sta spriteIndexInOamContentLookup
+        lda #$8F
+        sta spriteYOffset
+        lda #$B0
+        sta spriteXOffset
+        jsr stringSpriteAlignRight
+
+        ldx linecapCursorIndex
+        lda linecapCursorYOffset, x
+        sta spriteYOffset
+        lda #$40
+        sta spriteXOffset
+        lda #$1D
+        sta spriteIndexInOamContentLookup
+        jsr loadSpriteIntoOamStaging
+
+; controls
+
+        lda newlyPressedButtons_player1
+        and #BUTTON_B
+        bne @back
+        beq @menuLoop
+@back:
         jmp gameMode_gameTypeMenu
 
 linecapMenuNametable: ; stripe
@@ -1231,6 +1262,10 @@ linecapMenuNametable: ; stripe
         .byte $21, $2A, $4C, $39
         .byte $FF
 
+linecapCursorYOffsetOffset := $6F
+
+linecapCursorYOffset:
+        .byte 0+linecapCursorYOffsetOffset, 8+linecapCursorYOffsetOffset, 16+linecapCursorYOffsetOffset
 
 gameMode_waitScreen:
         lda #0
@@ -2060,8 +2095,11 @@ stringLookup:
         .byte stringConfirm-stringLookup
         .byte stringV4-stringLookup
         .byte stringV5-stringLookup ; F
-        ; .byte stringLevel-stringLookup
-        ; .byte stringLines-stringLookup
+        .byte stringLevel-stringLookup
+        .byte stringLines-stringLookup
+        .byte stringKSX2-stringLookup
+        .byte stringFromBelow-stringLookup
+        .byte stringHalt-stringLookup
 stringClassic:
         .byte $7,'C','L','A','S','S','I','C'
 stringLetters:
@@ -2092,6 +2130,16 @@ stringV4:
         .byte $2,'V','4'
 stringV5:
         .byte $2,'V','5'
+stringLines:
+        .byte $5,'L','I','N','E','S'
+stringLevel:
+        .byte $5,'L','E','V','E','L'
+stringKSX2:
+        .byte $4,'K','S',$69,'2'
+stringFromBelow:
+        .byte $A,'F','R','O','M',' ','B','E','L','O','W'
+stringHalt:
+        .byte $4,'H','A','L','T'
 stringNull:
         .byte $0
 
@@ -3916,6 +3964,18 @@ render_mode_speed_test:
         sta ppuScrollY
         rts
 
+render_mode_linecap_menu:
+
+        lda #$21
+        sta PPUADDR
+        lda #$F3
+        sta PPUADDR
+        lda #39
+        jsr renderByteBCD
+
+        jmp render_mode_static
+
+
 render_mode_level_menu:
         lda outOfDateRenderFlags
         and #1
@@ -3956,14 +4016,6 @@ render_mode_scroll:
         ; not equal
         cmp menuScrollY
         bcc @lessThan
-
-        ; add a bump when top-wrapping
-        ; clc
-        ; sbc menuScrollY
-        ; cmp #$4D
-        ; bcc :+
-        ; inc menuScrollY
-; :
 
         inc menuScrollY
 
