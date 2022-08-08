@@ -4465,7 +4465,7 @@ renderHzInputRows:
 
 clearInputLine:
         lda #$FF
-        ldx #28
+        ldx #26
 @clearRow:
         sta PPUDATA
         dex
