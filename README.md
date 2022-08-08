@@ -49,9 +49,20 @@ While originally based on the NTSC version of the game, the patched ROM supports
 
 TetrisGYM is distributed in the form of a BPS patch and can be applied to the USA version of the game with [Rom PatcherJS](https://www.romhacking.net/patch/) or similar.
 
-`Unpatched File SHA-1: 77747840541BFC62A28A5957692A98C550BD6B2B`
+```
+File SHA-1: 77747840541BFC62A28A5957692A98C550BD6B2B
+File CRC32: 6D72C53A
+ROM SHA-1: FD9079CB5E8479EB06D93C2AE5175BFCE871746A
+ROM CRC32: 1394F57E
+```
 
 A link to the BPS can be found on the [releases page](https://github.com/kirjavascript/TetrisGYM/releases).
+
+There is also a `CNROM.bps` patch for mapper 3 support. (The original ROM uses MMC1/mapper 1)
+
+
+
+
 
 ## Trainers
 
@@ -63,7 +74,7 @@ Like in the original ROM, holding `a` `b` `select` and then pressing `start` wil
 
 ![Tetris](./screens/levelmenu.png)
 
-Same gameplay as A-Type, with some improvements: no score cap, no rocket, no curtain, always next box, better pause, start on any level.
+Same gameplay as A-Type, with some improvements: no score cap, no rocket, no curtain, no music, always next box, better pause, start on any level.
 
 ### T-Spins
 
