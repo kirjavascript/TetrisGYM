@@ -378,7 +378,7 @@ customLevel := menuRAM+5
 classicLevel := menuRAM+6
 heartsAndReady := menuRAM+7 ; high nybble used for ready
 linecapCursorIndex := menuRAM+8
-linecapWhere := menuRAM+9
+linecapWhen := menuRAM+9
 linecapHow := menuRAM+10
 linecapLevel := menuRAM+11
 linecapLines := menuRAM+12
@@ -1183,6 +1183,9 @@ speedTestControl:
         rts
 
 linecapMenu:
+
+linecapMenuCursorIndices := 3
+
         lda #$8
         sta renderMode
         jsr updateAudioWaitForNmiAndDisablePpuRendering
@@ -1220,7 +1223,9 @@ linecapMenu:
 ; render
 
         ; when
+        clc
         lda #$10
+        adc linecapWhen
         sta spriteIndexInOamContentLookup
         lda #$6F
         sta spriteYOffset
@@ -1248,12 +1253,60 @@ linecapMenu:
 
 ; controls
 
+        lda #BUTTON_DOWN
+        jsr menuThrottle
+        beq @downEnd
+        lda #$01
+        sta soundEffectSlot1Init
+
+        inc linecapCursorIndex
+        lda linecapCursorIndex
+        cmp #linecapMenuCursorIndices
+        bne @downEnd
+        lda #0
+        sta linecapCursorIndex
+@downEnd:
+
+        lda #BUTTON_UP
+        jsr menuThrottle
+        beq @upEnd
+        lda #$01
+        sta soundEffectSlot1Init
+        dec linecapCursorIndex
+        lda linecapCursorIndex
+        cmp #$FF
+        bne @upEnd
+        lda #linecapMenuCursorIndices-1
+        sta linecapCursorIndex
+@upEnd:
+
+        jsr linecapMenuHandleLRWhen
+
         lda newlyPressedButtons_player1
         and #BUTTON_B
         bne @back
         beq @menuLoop
 @back:
         jmp gameMode_gameTypeMenu
+
+linecapMenuHandleLR:
+        lda linecapCursorIndex
+        jsr switch_s_plus_2a
+        .addr   linecapMenuHandleLRWhen
+        .addr   linecapMenuHandleLRWhen
+        .addr   linecapMenuHandleLRWhen
+linecapMenuHandleLRWhen:
+        lda newlyPressedButtons_player1
+        and #BUTTON_LEFT|BUTTON_RIGHT
+        beq @ret
+        lda #$01
+        sta soundEffectSlot1Init
+        lda linecapWhen
+        eor #1
+        sta linecapWhen
+@ret:
+        rts
+
 
 linecapMenuNametable: ; stripe
         .byte $21, $0A, 12, 'L','I','N','E','C','A','P',' ','M','E','N','U'
@@ -1265,7 +1318,7 @@ linecapMenuNametable: ; stripe
 linecapCursorYOffsetOffset := $6F
 
 linecapCursorYOffset:
-        .byte 0+linecapCursorYOffsetOffset, 8+linecapCursorYOffsetOffset, 16+linecapCursorYOffsetOffset
+        .byte 0+linecapCursorYOffsetOffset, 8+linecapCursorYOffsetOffset, 32+linecapCursorYOffsetOffset
 
 gameMode_waitScreen:
         lda #0

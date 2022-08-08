@@ -60,10 +60,6 @@ A link to the BPS can be found on the [releases page](https://github.com/kirjava
 
 There is also a `CNROM.bps` patch for mapper 3 support. (The original ROM uses MMC1/mapper 1)
 
-
-
-
-
 ## Trainers
 
 Some trainers have additional configuration values; use left and right in the main menu to change them.
