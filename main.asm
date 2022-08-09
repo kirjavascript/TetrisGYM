@@ -13,7 +13,7 @@ NO_MUSIC := 1
 SAVE_HIGHSCORES := 1
 
 ; dev flags
-AUTO_WIN := 0 ; press select to end game
+AUTO_WIN := 1 ; press select to end game
 NO_SCORING := 0 ; breaks pace
 NO_SFX := 0
 NO_MENU := 0
@@ -295,12 +295,15 @@ hzPalette := hzRAM+8 ; 1 byte
 inputLogCounter := $60E ; reusing presetIndex
 tqtyCurrent := $621
 tqtyNext := $622
+
 ; hard drop ram is pretty big, but can be reused in other modes
 ; 22 bytes total
 completedLinesCopy := $623
 lineOffset := $624
 harddropBuffer := $625 ; 20 bytes (!)
-; ... $639
+
+linecapState := $639 ; 0 if not triggered, 1 + linecapHow otherwise, reset on game init
+; ... $63A
 
 ; ... $67F
 musicStagingSq1Lo:= $0680
@@ -3059,6 +3062,7 @@ gameModeState_initGameState:
         sta presetIndex ; actually for tspinQuantity
         sta linesTileQueue
         sta linesBCDHigh
+        sta linecapState
 
         lda practiseType
         cmp #MODE_TAPQTY
@@ -6017,11 +6021,12 @@ playState_updateLinesAndStatistics:
 @checkForBorrow:
         and #$0F
         cmp #$0A
-        bmi addPoints
+        bmi @addPoints_jmp
         lda lines
         sec
         sbc #$06
         sta lines
+@addPoints_jmp:
         jmp addPoints
 @notTypeB:
 
@@ -6087,6 +6092,33 @@ checkLevelUp:
         sta outOfDateRenderFlags
 @lineLoop:  dex
         bne incrementLines
+
+checkLinecap: ; set linecapState
+        ; check if enabled
+        lda linecapFlag
+        beq @linecapEnd
+        ; skip check if already set
+        lda linecapState
+        bne @linecapEnd
+
+        lda linecapWhen
+        beq @linecapLevelCheck
+
+;linecapLinesCheck
+
+
+@linecapLevelCheck:
+        lda levelNumber
+        cmp linecapLevel
+        bcc @linecapEnd
+
+@linecapApply:
+        clc
+        lda linecapHow
+        adc #1
+        sta linecapState
+
+@linecapEnd:
 
 addPoints:
         inc playState
