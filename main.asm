@@ -4103,25 +4103,23 @@ render_mode_linecap_menu:
         lda outOfDateRenderFlags
         and #1
         beq @static
+        ; render level / lines
         lda #0
         sta outOfDateRenderFlags
-        ; render level / lines
-        lda linecapWhen
-        bne @linecapLines
         lda #$21
         sta PPUADDR
-        lda #$F3
+        lda #$F2
         sta PPUADDR
+        lda linecapWhen
+        bne @linecapLines
+        lda #EMPTY_TILE
+        sta PPUDATA
         lda linecapLevel
         jsr renderByteBCD
         jmp render_mode_static
 
 @linecapLines:
 
-        lda #$21
-        sta PPUADDR
-        lda #$F2
-        sta PPUADDR
         lda linecapLines
         jsr renderByteBCD
         lda #0
@@ -6106,6 +6104,8 @@ checkLinecap: ; set linecapState
 
 ;linecapLinesCheck
 
+        ; compare $F of linecapLines and $F0 of lines
+        ; compare $FF - $F
 
 @linecapLevelCheck:
         lda levelNumber
