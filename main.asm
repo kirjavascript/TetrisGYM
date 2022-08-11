@@ -21,7 +21,8 @@ LINECAP := 0
 
 INITIAL_CUSTOM_LEVEL := 29
 INITIAL_LINECAP_LEVEL := 39
-INITIAL_LINECAP_LINES := 33 ; div 10
+INITIAL_LINECAP_LINES := $30 ; bcd
+INITIAL_LINECAP_LINES_1 := 3 ; hex (lol)
 BTYPE_START_LINES := $25 ; bcd
 MENU_HIGHLIGHT_COLOR := $12 ; $12 in gym, $16 in original
 BLOCK_TILES := $7B
@@ -385,10 +386,9 @@ heartsAndReady := menuRAM+7 ; high nybble used for ready
 linecapCursorIndex := menuRAM+8
 linecapWhen := menuRAM+9
 linecapHow := menuRAM+10
-linecapWhenValues := menuRAM+11
 linecapLevel := menuRAM+11
-linecapLines := menuRAM+12
-menuVars := $76D
+linecapLines := menuRAM+12 ; 2 bytes
+menuVars := $76E
 paceModifier := menuVars+0
 presetModifier := menuVars+1
 typeBModifier := menuVars+2
@@ -556,6 +556,8 @@ initRamContinued:
         sta linecapLevel
         lda #INITIAL_LINECAP_LINES
         sta linecapLines
+        lda #INITIAL_LINECAP_LINES_1
+        sta linecapLines+1
 
         jsr resetScores
 
@@ -1331,31 +1333,73 @@ linecapMenuControlsLinesLevel:
         lda #BUTTON_RIGHT
         jsr menuThrottle
         beq @notRight
-        lda #$01
-        sta soundEffectSlot1Init
+        lda linecapWhen
+        bne linecapMenuControlsAdjLinesUp
         lda #1
-        sta outOfDateRenderFlags
-        ldy linecapWhen
-        clc
-        lda linecapWhenValues, y
-        adc #1
-        sta linecapWhenValues, y
+        jsr linecapMenuControlsAdjLevel
 @notRight:
 
         lda #BUTTON_LEFT
         jsr menuThrottle
         beq @notLeft
+        lda linecapWhen
+        bne linecapMenuControlsAdjLinesDown
+        lda #$FF
+        jsr linecapMenuControlsAdjLevel
+@notLeft:
+        rts
+
+linecapMenuControlsAdjLevel:
+        sta tmpZ
+        clc
+        lda linecapLevel
+        adc tmpZ
+        sta linecapLevel
+
+linecapMenuControlsBoopAndRender:
         lda #$01
         sta soundEffectSlot1Init
         lda #1
         sta outOfDateRenderFlags
-        ldy linecapWhen
-        sec
-        lda linecapWhenValues, y
-        sbc #1
-        sta linecapWhenValues, y
-@notLeft:
         rts
+
+linecapMenuControlsAdjLinesUp:
+        clc
+        lda linecapLines
+        adc #$10
+        cmp #$A0
+        beq @overflowLines
+        sta linecapLines
+        bne @noverflow
+@overflowLines:
+        lda #0
+        sta linecapLines
+        clc
+        lda linecapLines+1
+        adc #1
+        and #$F
+        sta linecapLines+1
+@noverflow:
+        jmp linecapMenuControlsBoopAndRender
+
+linecapMenuControlsAdjLinesDown:
+        sec
+        lda linecapLines
+        beq @overflowLines
+        sbc #$10
+        sta linecapLines
+        jmp @noverflow
+@overflowLines:
+        lda #$90
+        sta linecapLines
+        sec
+        lda linecapLines+1
+        sbc #1
+        and #$F
+        sta linecapLines+1
+@noverflow:
+        jmp linecapMenuControlsBoopAndRender
+
 
 linecapMenuControlsHow:
         lda #BUTTON_RIGHT
@@ -1384,10 +1428,6 @@ linecapMenuControlsHow:
         sta linecapHow
 @notLeft:
         rts
-
-
-        ; lda #1
-        ; sta outOfDateRenderFlags
 
 linecapMenuNametable: ; stripe
         .byte $21, $0A, 12, 'L','I','N','E','C','A','P',' ','M','E','N','U'
@@ -4108,22 +4148,19 @@ render_mode_linecap_menu:
         sta outOfDateRenderFlags
         lda #$21
         sta PPUADDR
-        lda #$F2
+        lda #$F3
         sta PPUADDR
         lda linecapWhen
         bne @linecapLines
-        lda #EMPTY_TILE
-        sta PPUDATA
         lda linecapLevel
         jsr renderByteBCD
         jmp render_mode_static
 
 @linecapLines:
-
-        lda linecapLines
-        jsr renderByteBCD
-        lda #0
+        lda linecapLines+1
         sta PPUDATA
+        lda linecapLines
+        jsr twoDigsToPPU
 
 @static:
         jmp render_mode_static
@@ -6102,6 +6139,7 @@ checkLinecap: ; set linecapState
         lda linecapWhen
         beq @linecapLevelCheck
 
+
 ;linecapLinesCheck
     ; bcd = num => +('0x'+String(num))
 
@@ -6116,44 +6154,46 @@ checkLinecap: ; set linecapState
     ; high  = (bcd(lines) >> 4) + t1
     ; low = bcd(lines) & 0xF
 
-        ldx #0
-        sec
-        lda linecapLines
-        cmp #200
-        bcc @maybe100
-        sbc #200
-        ldx #20
-@maybe100:
-        cmp #100
-        bcc @byte
-        sbc #100
-        ldx #10
-@byte:
-        stx tmpZ
-        ; linecapLines %100 in A, t1 in tmpZ
-        tax
-        lda byteToBcdTable, x
-        sta tmpX
-; high
-        lsr
-        lsr
-        lsr
-        lsr
-        clc
-        adc tmpZ
-        cmp lines+1
-        bcc @linecapEnd
-; low
-        lda lines
-        lsr
-        lsr
-        lsr
-        lsr
-        sta tmpZ
+        ; scrap this, use two bytes and just render it better on linecap menu :^)
 
-        lda tmpX
-        and #$F
-        cmp lines+1
+        ; ldx #0
+        ; sec
+        ; lda linecapLines
+        ; cmp #200
+        ; bcc @maybe100
+        ; sbc #200
+        ; ldx #20
+; @maybe100:
+        ; cmp #100
+        ; bcc @byte
+        ; sbc #100
+        ; ldx #10
+; @byte:
+        ; stx tmpZ
+        ; ; linecapLines %100 in A, t1 in tmpZ
+        ; tax
+        ; lda byteToBcdTable, x
+        ; sta tmpX
+; ; high
+        ; lsr
+        ; lsr
+        ; lsr
+        ; lsr
+        ; clc
+        ; adc tmpZ
+        ; cmp lines+1
+        ; bcc @linecapEnd
+; ; low
+        ; lda lines
+        ; lsr
+        ; lsr
+        ; lsr
+        ; lsr
+        ; sta tmpZ
+
+        ; lda tmpX
+        ; and #$F
+        ; cmp lines+1
         bcc @linecapEnd
         bcs @linecapApply
 
