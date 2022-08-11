@@ -6139,61 +6139,13 @@ checkLinecap: ; set linecapState
         lda linecapWhen
         beq @linecapLevelCheck
 
-
 ;linecapLinesCheck
-    ; bcd = num => +('0x'+String(num))
 
-    ; lines = 234;
-    ; t1 = 0
-
-    ; if (lines >= 200) t1+=20
-    ; else if (lines >= 100) t1=10
-
-    ; lines = lines % 100
-
-    ; high  = (bcd(lines) >> 4) + t1
-    ; low = bcd(lines) & 0xF
-
-        ; scrap this, use two bytes and just render it better on linecap menu :^)
-
-        ; ldx #0
-        ; sec
-        ; lda linecapLines
-        ; cmp #200
-        ; bcc @maybe100
-        ; sbc #200
-        ; ldx #20
-; @maybe100:
-        ; cmp #100
-        ; bcc @byte
-        ; sbc #100
-        ; ldx #10
-; @byte:
-        ; stx tmpZ
-        ; ; linecapLines %100 in A, t1 in tmpZ
-        ; tax
-        ; lda byteToBcdTable, x
-        ; sta tmpX
-; ; high
-        ; lsr
-        ; lsr
-        ; lsr
-        ; lsr
-        ; clc
-        ; adc tmpZ
-        ; cmp lines+1
-        ; bcc @linecapEnd
-; ; low
-        ; lda lines
-        ; lsr
-        ; lsr
-        ; lsr
-        ; lsr
-        ; sta tmpZ
-
-        ; lda tmpX
-        ; and #$F
-        ; cmp lines+1
+        lda lines+1
+        cmp linecapLines+1
+        bcc @linecapEnd
+        lda lines
+        cmp linecapLines
         bcc @linecapEnd
         bcs @linecapApply
 
