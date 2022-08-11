@@ -6105,6 +6105,17 @@ checkLevelUp:
 @lineLoop:  dex
         bne incrementLines
 
+
+        ; floor linecap effect
+        lda linecapState
+        cmp #LINECAP_FLOOR
+        bne checkLinecap
+        lda #$B
+        sta garbageHole
+        lda completedLines
+        sta pendingGarbage
+
+
 checkLinecap: ; set linecapState
         ; check if enabled
         lda linecapFlag
