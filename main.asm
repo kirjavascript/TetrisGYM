@@ -17,7 +17,6 @@ AUTO_WIN := 1 ; press select to end game
 NO_SCORING := 0 ; breaks pace
 NO_SFX := 0
 NO_MENU := 0
-LINECAP := 0
 
 INITIAL_CUSTOM_LEVEL := 29
 INITIAL_LINECAP_LEVEL := 39
@@ -76,6 +75,10 @@ SCORING_LETTERS := 1
 SCORING_SEVENDIGIT := 2
 SCORING_FLOAT := 3
 SCORING_SCORECAP := 4
+
+LINECAP_KILLX2 := 1
+LINECAP_FLOOR := 2
+LINECAP_HALT := 3
 
 MENU_SPRITE_Y_BASE := $47
 MENU_MAX_Y_SCROLL := $60
@@ -3416,14 +3419,13 @@ rotationTable:
         .dbyt   $0F0D,$1212,$1111
 drop_tetrimino:
         jsr drop_tetrimino_actual
+        lda linecapState
+        cmp #LINECAP_KILLX2
+        beq @killX2
         lda practiseType
-.if LINECAP
-        lda levelNumber
-        cmp #39
-        bpl @redrop
-.endif
         cmp #MODE_KILLX2
         bne @ret
+@killX2:
         lda #$1
         sta fallTimer
         jsr drop_tetrimino_actual
@@ -6126,7 +6128,6 @@ checkLinecap: ; set linecapState
         lda linecapHow
         adc #1
         sta linecapState
-        .byte $12, $34, 56, 67, 78, 12, 34, 34, 56, 23, 76, 37, 25 ; crash
 
 @linecapEnd:
 
