@@ -13,7 +13,7 @@ NO_MUSIC := 1
 SAVE_HIGHSCORES := 1
 
 ; dev flags
-AUTO_WIN := 1 ; press select to end game
+AUTO_WIN := 0 ; press select to end game
 NO_SCORING := 0 ; breaks pace
 NO_SFX := 0
 NO_MENU := 0
@@ -5892,6 +5892,14 @@ playState_prepareNext:
 
         rts
 @endOfEndingCode:
+
+        lda linecapState
+        cmp #LINECAP_HALT
+        bne @linecapHaltEnd
+        lda #$0A ; playState_checkStartGameOver
+        sta playState
+        rts
+@linecapHaltEnd:
 
         jsr practisePrepareNext
         inc playState
