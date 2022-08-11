@@ -82,7 +82,7 @@ MENU_MAX_Y_SCROLL := $60
 MENU_TOP_MARGIN_SCROLL := 7 ; in blocks
 
 ; menuConfigSizeLookup
-.define MENUSIZES $0, $0, $0, $0, $F, $7, $8, $C, $20, $10, $1F, $8, $4, $12, $10, $0A, $0, $0, $0, $4, $1, $1, $1, $1, $1, $1, $1, $1
+.define MENUSIZES $0, $0, $0, $0, $F, $7, $8, $C, $20, $10, $1F, $8, $4, $12, $10, $0, $0, $0, $0, $4, $1, $1, $1, $1, $1, $1, $1, $1
 
 .macro MODENAMES
     .byte   "TETRIS"
@@ -400,16 +400,15 @@ checkerModifier := menuVars+7
 garbageModifier := menuVars+8
 droughtModifier := menuVars+9
 dasModifier := menuVars+10
-killx2Modifier := menuVars+11
-scoringModifier := menuVars+12
-hzFlag := menuVars+13
-inputDisplayFlag := menuVars+14
-disableFlashFlag := menuVars+15
-goofyFlag := menuVars+16
-debugFlag := menuVars+17
-linecapFlag := menuVars+18
-qualFlag := menuVars+19
-palFlag := menuVars+20
+scoringModifier := menuVars+11
+hzFlag := menuVars+12
+inputDisplayFlag := menuVars+13
+disableFlashFlag := menuVars+14
+goofyFlag := menuVars+15
+debugFlag := menuVars+16
+linecapFlag := menuVars+17
+qualFlag := menuVars+18
+palFlag := menuVars+19
 
 ; ... $7FF
 PPUCTRL     := $2000
@@ -2814,7 +2813,6 @@ gameModeState_initGameBackground:
         jsr displayModeText
         jsr statisticsNametablePatch ; for input display
         jsr debugNametableUI
-        jsr displayDKSModifier
 .if INES_MAPPER = 3
         lda #%10011000
         sta PPUCTRL
@@ -2829,21 +2827,6 @@ gameModeState_initGameBackground:
         sta playState
         inc gameModeState ; 1
         lda #0 ; acc should not be equal
-        rts
-
-displayDKSModifier:
-        lda practiseType
-        cmp #MODE_KILLX2
-        bne @ret
-        lda #$22
-        sta PPUADDR
-        lda #$BB
-        sta PPUADDR
-        lda #$24
-        sta PPUDATA
-        lda killx2Modifier
-        sta PPUDATA
-@ret:
         rts
 
 displayModeText:
@@ -3441,17 +3424,6 @@ drop_tetrimino:
 .endif
         cmp #MODE_KILLX2
         bne @ret
-@redrop:
-        lda lines+1
-        bne @secondDrop
-        lda lines
-        lsr
-        lsr
-        lsr
-        lsr
-        cmp killx2Modifier
-        bcc @ret
-@secondDrop:
         lda #$1
         sta fallTimer
         jsr drop_tetrimino_actual
@@ -4345,11 +4317,6 @@ render_mode_play_and_demo:
         lda #$22
         sta PPUADDR
         lda #$B9
-        ldx practiseType
-        cpx #MODE_KILLX2
-        bne @notDKS
-        sbc #1
-@notDKS:
         sta PPUADDR
         lda levelNumber
         jsr renderByteBCD
