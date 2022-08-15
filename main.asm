@@ -6097,23 +6097,14 @@ checkLevelUp:
 
 @nextLevel:
         inc levelNumber
-        lda #$06
+        lda #$06 ; checked in floor linecap stuff, just below
         sta soundEffectSlot1Init
         lda outOfDateRenderFlags
         ora #$02
         sta outOfDateRenderFlags
+
 @lineLoop:  dex
         bne incrementLines
-
-
-        ; floor linecap effect
-        lda linecapState
-        cmp #LINECAP_FLOOR
-        bne checkLinecap
-        lda #$B
-        sta garbageHole
-        lda completedLines
-        sta pendingGarbage
 
 
 checkLinecap: ; set linecapState
@@ -6149,6 +6140,20 @@ checkLinecap: ; set linecapState
         sta linecapState
 
 @linecapEnd:
+
+        ; floor linecap effect
+        lda linecapState
+        cmp #LINECAP_FLOOR
+        bne @floorLinecapEnd
+        ; check level up sound is happening
+        lda soundEffectSlot1Init
+        cmp #6
+        bne @floorLinecapEnd
+        lda #$A
+        sta garbageHole
+        lda #1
+        sta pendingGarbage
+@floorLinecapEnd:
 
 addPoints:
         inc playState
