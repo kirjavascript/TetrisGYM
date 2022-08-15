@@ -3418,18 +3418,22 @@ rotationTable:
         .dbyt   $0B0B,$100E,$0D0F,$0E10
         .dbyt   $0F0D,$1212,$1111
 drop_tetrimino:
-        jsr drop_tetrimino_actual
         lda linecapState
         cmp #LINECAP_KILLX2
         beq @killX2
         lda practiseType
         cmp #MODE_KILLX2
-        bne @ret
+        bne @normal
 @killX2:
-        lda #$1
+        jsr lookupDropSpeed
+        sta tmpY
         sta fallTimer
         jsr drop_tetrimino_actual
-@ret:
+        lda tmpY
+        sta fallTimer
+        jsr drop_tetrimino_actual
+@normal:
+        jsr drop_tetrimino_actual
         rts
 
 drop_tetrimino_actual:
@@ -3491,6 +3495,14 @@ drop_tetrimino_actual:
         jmp @ret
 
 @lookupDropSpeed:
+        jsr lookupDropSpeed
+        sta dropSpeed
+        lda fallTimer
+        cmp dropSpeed
+        bpl @drop
+        jmp @ret
+
+lookupDropSpeed:
         lda #$01
         ldx levelNumber
         cpx #$1D
@@ -3501,11 +3513,7 @@ drop_tetrimino_actual:
         beq @noTableLookup
         lda framesPerDropTablePAL,x
 @noTableLookup:
-        sta dropSpeed
-        lda fallTimer
-        cmp dropSpeed
-        bpl @drop
-        jmp @ret
+        rts
 
 framesPerDropTableNTSC:
         .byte   $30,$2B,$26,$21,$1C,$17,$12,$0D
