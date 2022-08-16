@@ -61,13 +61,14 @@ MODE_SCORE_DISPLAY := 19
 MODE_HZ_DISPLAY := 20
 MODE_INPUT_DISPLAY := 21
 MODE_DISABLE_FLASH := 22
-MODE_GOOFY := 23
-MODE_DEBUG := 24
-MODE_LINECAP := 25
-MODE_QUAL := 26
-MODE_PAL := 27
+MODE_DISABLE_PAUSE := 23
+MODE_GOOFY := 24
+MODE_DEBUG := 25
+MODE_LINECAP := 26
+MODE_QUAL := 27
+MODE_PAL := 28
 
-MODE_QUANTITY := 28
+MODE_QUANTITY := 29
 MODE_GAME_QUANTITY := 18
 
 SCORING_CLASSIC := 0 ; for scoringModifier
@@ -81,11 +82,11 @@ LINECAP_FLOOR := 2
 LINECAP_HALT := 3
 
 MENU_SPRITE_Y_BASE := $47
-MENU_MAX_Y_SCROLL := $60
+MENU_MAX_Y_SCROLL := $68
 MENU_TOP_MARGIN_SCROLL := 7 ; in blocks
 
 ; menuConfigSizeLookup
-.define MENUSIZES $0, $0, $0, $0, $F, $7, $8, $C, $20, $10, $1F, $8, $4, $12, $10, $0, $0, $0, $0, $4, $1, $1, $1, $1, $1, $1, $1, $1
+.define MENUSIZES $0, $0, $0, $0, $F, $7, $8, $C, $20, $10, $1F, $8, $4, $12, $10, $0, $0, $0, $0, $4, $1, $1, $1, $1, $1, $1, $1, $1, $1
 
 .macro MODENAMES
     .byte   "TETRIS"
@@ -408,11 +409,12 @@ scoringModifier := menuVars+11
 hzFlag := menuVars+12
 inputDisplayFlag := menuVars+13
 disableFlashFlag := menuVars+14
-goofyFlag := menuVars+15
-debugFlag := menuVars+16
-linecapFlag := menuVars+17
-qualFlag := menuVars+18
-palFlag := menuVars+19
+disablePauseFlag := menuVars+15
+goofyFlag := menuVars+16
+debugFlag := menuVars+17
+linecapFlag := menuVars+18
+qualFlag := menuVars+19
+palFlag := menuVars+20
 
 ; ... $7FF
 PPUCTRL     := $2000
