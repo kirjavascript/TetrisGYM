@@ -1380,7 +1380,7 @@ linecapMenuControlsAdjLinesUp:
         clc
         lda linecapLines+1
         adc #1
-        and #$F
+        and #$1F
         sta linecapLines+1
 @noverflow:
         jmp linecapMenuControlsBoopAndRender
@@ -1398,7 +1398,7 @@ linecapMenuControlsAdjLinesDown:
         sec
         lda linecapLines+1
         sbc #1
-        and #$F
+        and #$1F
         sta linecapLines+1
 @noverflow:
         jmp linecapMenuControlsBoopAndRender
