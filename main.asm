@@ -155,6 +155,7 @@ lines       := $0050
 rowY        := $0052
 linesBCDHigh := $53
 linesTileQueue := $54
+currentPiece_copy := $55 ; used in floor code checking
 ; $55 free
 completedLines  := $0056
 lineIndex   := $0057                        ; Iteration count of playState_checkForCompletedRows
@@ -5430,6 +5431,7 @@ playState_lockTetrimino:
         adc tetriminoX
         sta generalCounter
         lda currentPiece
+        sta currentPiece_copy
         asl a
         asl a
         sta generalCounter2
@@ -5830,7 +5832,7 @@ playState_checkForCompletedRows:
 
         inc lineIndex
         lda lineIndex
-        cmp #$04
+        cmp #$04 ; check actual height
         bmi playState_checkForCompletedRows_return
 
         ldy completedLines
@@ -10435,29 +10437,46 @@ practiseRowCompletePatch:
         cmp #MODE_TSPINS
         beq @skipCheck
 
-        lda practiseType
-        cmp #MODE_FLOOR
-        bne @normal
+        ; bugfix to ensure complete rows aren't cleared
+        ; used in floor / linecap floor
+        lda currentPiece_copy
+        beq @IJLTedge
+        cmp #5
+        beq @IJLTedge
+        cmp #$10
+        beq @IJLTedge
+        cmp #$12
+        beq @IJLTedge
+        bne @normalRow
+@IJLTedge:
+        lda lineIndex
+        cmp #3
+        bcs @skipCheck
+@normalRow:
 
-        ; floor patch stuff
-        stx tmp3 ; store X
+        ; old floor patch stuff
+        ; lda practiseType
+        ; cmp #MODE_FLOOR
+        ; bne @normal
 
-        ldx floorModifier
-        cpx #0
-        beq @normal
-        lda multBy10Table, x
-        sta tmp1
-        ; $4c8 = last playfield byte
-        lda #$c8
-        sbc tmp1
-        sta tmp1
+        ; stx tmp3 ; store X
 
-        ldx tmp3 ; restore X
+        ; ldx floorModifier
+        ; cpx #0
+        ; beq @normal
+        ; lda multBy10Table, x
+        ; sta tmp1
+        ; ; $4c8 = last playfield byte
+        ; lda #$c8
+        ; sbc tmp1
+        ; sta tmp1
 
-        cpy tmp1
-        bpl @skipCheck
+        ; ldx tmp3 ; restore X
 
-@normal: ; normal behaviour
+        ; cpy tmp1
+        ; bpl @skipCheck
+
+; @normal: ; normal behaviour
         lda (playfieldAddr),y ; patched command
         cmp #EMPTY_TILE ; patched command
         rts
