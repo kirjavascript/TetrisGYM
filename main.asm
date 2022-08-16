@@ -5419,6 +5419,7 @@ playState_lockTetrimino:
         bne @invizLoop
         rts
 
+
 @notGameOver:
         lda vramRow
         cmp #$20
@@ -7147,6 +7148,8 @@ gameModeState_startButtonHandling:
 
 @startPressed:
         ; do nothing if curtain is being lowered
+        lda disablePauseFlag
+        bne @ret
         lda playState
         cmp #$0A
         beq @ret

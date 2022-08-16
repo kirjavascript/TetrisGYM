@@ -8,6 +8,7 @@
     * Halting
 * Added option to disable pause
 * Fixed a graphics glitch in Block Tool
+* Fixed the first mino to becoming visible in Invisible
 
 ## [v5]
 * Tap Quantity Trainer
