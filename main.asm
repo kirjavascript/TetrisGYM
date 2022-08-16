@@ -5410,15 +5410,19 @@ playState_lockTetrimino:
         ldx #$C8
         lda #BLOCK_TILES+3
 @invizLoop:
+        jsr @makeVisible
+        dex
+        bne @invizLoop
+        jsr @makeVisible
+        rts
+
+@makeVisible:
         ldy playfield, x
         cpy #INVISIBLE_TILE
         bne @emptyTile
         sta playfield, x
 @emptyTile:
-        dex
-        bne @invizLoop
         rts
-
 
 @notGameOver:
         lda vramRow
