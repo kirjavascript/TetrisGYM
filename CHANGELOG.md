@@ -1,4 +1,13 @@
 # Changelog
+
+## [unreleased]
+* Linecap Menu
+    * Trigger from any level or lines
+    * Killscreen x2
+    * Floor From Below
+    * Halting
+* Added option to disable pause
+
 ## [v5]
 * Tap Quantity Trainer
 * Checkerboard Trainer
@@ -30,6 +39,7 @@
 * Backwards compatible Seed Trainer improvements
 * Tap counter wrapping improvement
 * Added Block Tool HUD for piece information
+* Added option to disable tetris flashing
 * Changes made to more closely match the original ROM
     * Restore seed shredding on level menu
     * Hold `select` to start in Qual Mode and reset level cursor 
