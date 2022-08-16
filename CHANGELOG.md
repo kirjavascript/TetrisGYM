@@ -7,6 +7,7 @@
     * Floor From Below
     * Halting
 * Added option to disable pause
+* Fixed a graphics glitch in Block Tool
 
 ## [v5]
 * Tap Quantity Trainer

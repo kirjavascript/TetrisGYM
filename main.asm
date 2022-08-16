@@ -7939,6 +7939,7 @@ checkSaveStateControlsDebug:
         beq @notPressedB
         jsr loadState
         jsr renderStateDebug
+        jmp @notPressedA ; dont allow both actions to happen at once
 @notPressedB:
         lda newlyPressedButtons_player1
         and #BUTTON_A
