@@ -80,7 +80,8 @@ SCORING_SCORECAP := 4
 
 LINECAP_KILLX2 := 1
 LINECAP_FLOOR := 2
-LINECAP_HALT := 3
+LINECAP_INVISIBLE := 3
+LINECAP_HALT := 4
 
 MENU_SPRITE_Y_BASE := $47
 MENU_MAX_Y_SCROLL := $70
@@ -1416,7 +1417,7 @@ linecapMenuControlsHow:
         sta soundEffectSlot1Init
         inc linecapHow
         lda linecapHow
-        cmp #3
+        cmp #4
         bne @notRight
         lda #0
         sta linecapHow
@@ -1431,7 +1432,7 @@ linecapMenuControlsHow:
         lda linecapHow
         cmp #$FF
         bne @notLeft
-        lda #2
+        lda #3
         sta linecapHow
 @notLeft:
         rts
@@ -2280,6 +2281,7 @@ stringLookup:
         .byte stringLines-stringLookup
         .byte stringKSX2-stringLookup
         .byte stringFromBelow-stringLookup
+        .byte stringInviz-stringLookup
         .byte stringHalt-stringLookup
 stringClassic:
         .byte $7,'C','L','A','S','S','I','C'
@@ -2319,6 +2321,8 @@ stringKSX2:
         .byte $4,'K','S',$69,'2'
 stringFromBelow:
         .byte $5,'F','L','O','O','R'
+stringInviz:
+        .byte $5,'I','N','V','I','Z'
 stringHalt:
         .byte $4,'H','A','L','T'
 stringNull:
@@ -5486,9 +5490,13 @@ playState_lockTetrimino:
         inx
         lda orientationTable,x
         sta generalCounter5
+        lda linecapState
+        cmp #LINECAP_INVISIBLE
+        beq @inviz
         lda practiseType
         cmp #MODE_INVISIBLE
         bne @notInvisible
+@inviz:
         lda #INVISIBLE_TILE
         sta generalCounter5
 @notInvisible:

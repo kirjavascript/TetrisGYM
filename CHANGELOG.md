@@ -5,9 +5,10 @@
     * Trigger from any level or lines
     * Killscreen x2
     * Floor From Below
+    * Invisible
     * Halting
-* Added option to disable pause
 * DAS Only Mode (from CTWC DAS 2022)
+* Added option to disable pause
 * Fixed a graphics glitch in Block Tool
 * Fixed the first mino becoming visible in Invisible
 
