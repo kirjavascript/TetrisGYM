@@ -5790,20 +5790,40 @@ playState_checkForCompletedRows:
         ldx #$0A
 
 @checkIfRowComplete:
-        ; this block
-        jsr practiseRowCompletePatch
-.if !AUTO_WIN
-        beq @rowNotComplete
+.if AUTO_WIN
+        jmp @rowIsComplete
 .endif
+        lda practiseType
+        cmp #MODE_TSPINS
+        beq @rowNotComplete
 
-        ; replaces this one
-        ; lda (playfieldAddr),y
-        ; cmp #EMTPY_TILE
-        ; beq @rowNotComplete
+        ; bugfix to ensure complete rows aren't cleared
+        ; used in floor / linecap floor
+        lda currentPiece_copy
+        beq @IJLTedge
+        cmp #5
+        beq @IJLTedge
+        cmp #$10
+        beq @IJLTedge
+        cmp #$12
+        beq @IJLTedge
+        bne @normalRow
+@IJLTedge:
+        lda lineIndex
+        cmp #3
+        bcs @rowNotComplete
+@normalRow:
 
+
+@checkIfRowCompleteLoopStart:
+        lda (playfieldAddr),y
+        cmp #EMPTY_TILE
+        beq @rowNotComplete
         iny
         dex
-        bne @checkIfRowComplete
+        bne @checkIfRowCompleteLoopStart
+
+@rowIsComplete:
         ; sound effect $A to slot 1 used to live here
         inc completedLines
         ldx lineIndex
@@ -10502,61 +10522,6 @@ musicDataTableIndex:
 musicDataTable:
 
 .if PRACTISE_MODE
-
-practiseRowCompletePatch:
-        lda practiseType
-        cmp #MODE_TSPINS
-        beq @skipCheck
-
-        ; bugfix to ensure complete rows aren't cleared
-        ; used in floor / linecap floor
-        lda currentPiece_copy
-        beq @IJLTedge
-        cmp #5
-        beq @IJLTedge
-        cmp #$10
-        beq @IJLTedge
-        cmp #$12
-        beq @IJLTedge
-        bne @normalRow
-@IJLTedge:
-        lda lineIndex
-        cmp #3
-        bcs @skipCheck
-@normalRow:
-
-        ; old floor patch stuff
-        ; lda practiseType
-        ; cmp #MODE_FLOOR
-        ; bne @normal
-
-        ; stx tmp3 ; store X
-
-        ; ldx floorModifier
-        ; cpx #0
-        ; beq @normal
-        ; lda multBy10Table, x
-        ; sta tmp1
-        ; ; $4c8 = last playfield byte
-        ; lda #$c8
-        ; sbc tmp1
-        ; sta tmp1
-
-        ; ldx tmp3 ; restore X
-
-        ; cpy tmp1
-        ; bpl @skipCheck
-
-; @normal: ; normal behaviour
-        lda (playfieldAddr),y ; patched command
-        cmp #EMPTY_TILE ; patched command
-        rts
-
-@skipCheck:
-        ; jump to @rowNotComplete
-        lda #EMPTY_TILE
-        cmp #EMPTY_TILE
-        rts
 
 practisePrepareNext:
         lda practiseType
