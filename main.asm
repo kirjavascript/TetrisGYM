@@ -3540,13 +3540,10 @@ shift_tetrimino:
         beq @dasOnlyEnd
         inc dasOnlyShiftDisabled
         lda dasOnlyShiftDisabled
-        cmp #7
+        cmp #4
         bne :+
         lda #0
         sta dasOnlyShiftDisabled
-        jsr shift_tetrimino
-        jsr shift_tetrimino
-        jsr shift_tetrimino
         jsr shift_tetrimino
         jsr shift_tetrimino
         jsr shift_tetrimino
@@ -8591,16 +8588,16 @@ hzTap:
         sta dasOnlyShiftDisabled
 
         ldx hzTapCounter
-        cpx #$8
+        cpx #$A
         bcs @disableShift
         lda palFlag
         beq @NTSCDASOnly
         clc
         txa
-        adc #8
+        adc #$A
         tax
 @NTSCDASOnly:
-        lda dasLimitLookup, x ; TODO PAL (also TODO bugs)
+        lda dasLimitLookup, x
         sta tmpZ
         lda hzFrameCounter
         cmp tmpZ
@@ -8687,8 +8684,8 @@ hzTap:
         rts
 
 dasLimitLookup:
-        .byte 0, 0, 4, 11, 18, 24, 30, 36, 42 ; , 48, 54, 60
-        .byte 0, 3, 7, 12, 16, 20, 24, 28 ; PAL
+        .byte 0, 0, 4, 11, 18, 24, 30, 36, 42 , 48; , 54, 60
+        .byte 0, 0, 3, 7, 12, 16, 20, 24, 28, 32 ; PAL
 
 ; Kitaru on reddit - Thankfully, the same "round-down" effect also benefits DAS speed. Whereas the NTSC DAS timings were 16f start-up and 6f period, PAL DAS timings are 12f start-up and 4f period. Accounting for framerate, this is an improvement from NTSC DAS's real-time rate of 10Hz vs. PAL's real-time rate of 12.5Hz. So, although PAL hits its max gravity at Level 19 instead of Level 29, the boosted DAS makes it a bit more survivable. PAL DAS can still be out-tapped, albeit at a slimmer margin.
 
