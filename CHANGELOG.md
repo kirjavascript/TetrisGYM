@@ -1,14 +1,15 @@
 # Changelog
 
 ## [unreleased]
-* Linecap Menu
+* Linecap Menu (from CTM Masters September 2022)
     * Trigger from any level or lines
     * Killscreen x2
     * Floor From Below
     * Halting
 * Added option to disable pause
+* DAS Only Mode (from CTWC DAS 2022)
 * Fixed a graphics glitch in Block Tool
-* Fixed the first mino to becoming visible in Invisible
+* Fixed the first mino becoming visible in Invisible
 
 ## [v5]
 * Tap Quantity Trainer

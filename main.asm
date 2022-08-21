@@ -65,10 +65,11 @@ MODE_DISABLE_PAUSE := 23
 MODE_GOOFY := 24
 MODE_DEBUG := 25
 MODE_LINECAP := 26
-MODE_QUAL := 27
-MODE_PAL := 28
+MODE_DASONLY := 27
+MODE_QUAL := 28
+MODE_PAL := 29
 
-MODE_QUANTITY := 29
+MODE_QUANTITY := 30
 MODE_GAME_QUANTITY := 18
 
 SCORING_CLASSIC := 0 ; for scoringModifier
@@ -82,11 +83,11 @@ LINECAP_FLOOR := 2
 LINECAP_HALT := 3
 
 MENU_SPRITE_Y_BASE := $47
-MENU_MAX_Y_SCROLL := $68
+MENU_MAX_Y_SCROLL := $70
 MENU_TOP_MARGIN_SCROLL := 7 ; in blocks
 
 ; menuConfigSizeLookup
-.define MENUSIZES $0, $0, $0, $0, $F, $7, $8, $C, $20, $10, $1F, $8, $4, $12, $10, $0, $0, $0, $0, $4, $1, $1, $1, $1, $1, $1, $1, $1, $1
+.define MENUSIZES $0, $0, $0, $0, $F, $7, $8, $C, $20, $10, $1F, $8, $4, $12, $10, $0, $0, $0, $0, $4, $1, $1, $1, $1, $1, $1, $1, $1, $1, $1
 
 .macro MODENAMES
     .byte   "TETRIS"
@@ -309,7 +310,9 @@ lineOffset := $624
 harddropBuffer := $625 ; 20 bytes (!)
 
 linecapState := $639 ; 0 if not triggered, 1 + linecapHow otherwise, reset on game init
-; ... $63A
+
+dasOnlyShiftDisabled := $63A
+; ... $63B
 
 ; ... $67F
 musicStagingSq1Lo:= $0680
@@ -413,8 +416,9 @@ disablePauseFlag := menuVars+15
 goofyFlag := menuVars+16
 debugFlag := menuVars+17
 linecapFlag := menuVars+18
-qualFlag := menuVars+19
-palFlag := menuVars+20
+dasOnlyFlag := menuVars+19
+qualFlag := menuVars+20
+palFlag := menuVars+21
 
 ; ... $7FF
 PPUCTRL     := $2000
@@ -826,6 +830,8 @@ branchOnPlayStatePlayer1:
         .addr   playState_incrementPlayState
 
 playState_playerControlsActiveTetrimino:
+        jsr hzControl ; and dasOnly control
+
         jsr shift_tetrimino
         jsr rotate_tetrimino
 
@@ -840,10 +846,6 @@ playState_playerControlsActiveTetrimino:
         jsr drop_tetrimino
 @noDrop:
 
-        lda hzFlag
-        beq @ret
-        jsr hzControl
-@ret:
 playState_playerControlsActiveTetrimino_return:
         rts
 
@@ -3092,6 +3094,7 @@ gameModeState_initGameState:
         sta linesTileQueue
         sta linesBCDHigh
         sta linecapState
+        sta dasOnlyShiftDisabled
 
         lda practiseType
         cmp #MODE_TAPQTY
@@ -3529,6 +3532,28 @@ framesPerDropTablePAL:
         .byte   $02,$02,$02,$01,$01,$01,$01,$01
         .byte   $01,$01,$01,$01,$01,$01
 shift_tetrimino:
+        ; dasOnlyFlag
+        lda dasOnlyShiftDisabled
+        beq @dasOnlyEnd
+        lda heldButtons
+        and #BUTTON_LEFT|BUTTON_RIGHT
+        beq @dasOnlyEnd
+        inc dasOnlyShiftDisabled
+        lda dasOnlyShiftDisabled
+        cmp #7
+        bne :+
+        lda #0
+        sta dasOnlyShiftDisabled
+        jsr shift_tetrimino
+        jsr shift_tetrimino
+        jsr shift_tetrimino
+        jsr shift_tetrimino
+        jsr shift_tetrimino
+        jsr shift_tetrimino
+:
+        rts
+@dasOnlyEnd:
+
         lda practiseType
         cmp #MODE_DAS
         bne @normalDAS
@@ -8560,6 +8585,31 @@ hzTap:
         lda #0
         sta hzDebounceCounter
 
+        lda dasOnlyFlag
+        beq :+
+        lda #0
+        sta dasOnlyShiftDisabled
+
+        ldx hzTapCounter
+        cpx #$8
+        bcs @disableShift
+        lda palFlag
+        beq @NTSCDASOnly
+        clc
+        txa
+        adc #8
+        tax
+@NTSCDASOnly:
+        lda dasLimitLookup, x ; TODO PAL (also TODO bugs)
+        sta tmpZ
+        lda hzFrameCounter
+        cmp tmpZ
+        bpl :+
+@disableShift:
+        lda #1
+        sta dasOnlyShiftDisabled
+:
+
         ; ignore 1 tap
         lda hzTapCounter
         cmp #2
@@ -8635,6 +8685,12 @@ hzTap:
         ora #$10 ; @renderHz
         sta outOfDateRenderFlags
         rts
+
+dasLimitLookup:
+        .byte 0, 0, 4, 11, 18, 24, 30, 36, 42 ; , 48, 54, 60
+        .byte 0, 3, 7, 12, 16, 20, 24, 28 ; PAL
+
+; Kitaru on reddit - Thankfully, the same "round-down" effect also benefits DAS speed. Whereas the NTSC DAS timings were 16f start-up and 6f period, PAL DAS timings are 12f start-up and 4f period. Accounting for framerate, this is an improvement from NTSC DAS's real-time rate of 10Hz vs. PAL's real-time rate of 12.5Hz. So, although PAL hits its max gravity at Level 19 instead of Level 29, the boosted DAS makes it a bit more survivable. PAL DAS can still be out-tapped, albeit at a slimmer margin.
 
 hzPaletteGradient: ; goes up to B
         .byte $16, $26, $27, $28, $29, $2a, $2c, $22, $23, $24, $14, $15
