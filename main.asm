@@ -83,6 +83,9 @@ LINECAP_FLOOR := 2
 LINECAP_INVISIBLE := 3
 LINECAP_HALT := 4
 
+LINECAP_WHEN_STRING_OFFSET := $10
+LINECAP_HOW_STRING_OFFSET := $12
+
 MENU_SPRITE_Y_BASE := $47
 MENU_MAX_Y_SCROLL := $70
 MENU_TOP_MARGIN_SCROLL := 7 ; in blocks
@@ -192,6 +195,7 @@ byteSpriteLen := byteSpriteRAM+3
 spriteXOffset   := $00A0
 spriteYOffset   := $00A1
 spriteIndexInOamContentLookup:= $00A2
+stringIndexLookup:= $00A2
 outOfDateRenderFlags:= $00A3
 ; play/demo
 ; Bit 0-lines 1-level 2-score 4-hz 6-stats 7-high score entry letter
@@ -1243,11 +1247,20 @@ linecapMenuCursorIndices := 3
 @menuLoop:
         jsr updateAudioWaitForNmiAndResetOamStaging
 
-; render
+        jsr linecapMenuRenderSprites
+        jsr linecapMenuControls
 
+        lda newlyPressedButtons_player1
+        and #BUTTON_B
+        bne @back
+        beq @menuLoop
+@back:
+        jmp gameMode_gameTypeMenu
+
+linecapMenuRenderSprites:
         ; when
         clc
-        lda #$10
+        lda #LINECAP_WHEN_STRING_OFFSET
         adc linecapWhen
         sta spriteIndexInOamContentLookup
         lda #$6F
@@ -1258,7 +1271,7 @@ linecapMenuCursorIndices := 3
 
         ; how
         clc
-        lda #$12
+        lda #LINECAP_HOW_STRING_OFFSET
         adc linecapHow
         sta spriteIndexInOamContentLookup
         lda #$8F
@@ -1275,16 +1288,7 @@ linecapMenuCursorIndices := 3
         lda #$1D
         sta spriteIndexInOamContentLookup
         jsr loadSpriteIntoOamStaging
-
-; controls
-        jsr linecapMenuControls
-
-        lda newlyPressedButtons_player1
-        and #BUTTON_B
-        bne @back
-        beq @menuLoop
-@back:
-        jmp gameMode_gameTypeMenu
+        rts
 
 linecapMenuControls:
         lda #BUTTON_DOWN
@@ -2206,6 +2210,23 @@ menuXTmp := tmp2
 
         rts
 
+stringBackground:
+        ldx stringIndexLookup
+        lda stringLookup, x
+        tax
+        lda stringLookup, x
+        sta tmpZ
+        inx
+        ldy #0
+@loop:
+        lda stringLookup, x
+        sta PPUDATA
+        inx
+        iny
+        cpy tmpZ
+        bne @loop
+        rts
+
 stringSprite:
         ldx spriteIndexInOamContentLookup
         lda stringLookup, x
@@ -2356,6 +2377,10 @@ gameMode_levelMenu:
         sta tmp2
         jsr displayModeText
         jsr showHighScores
+        lda linecapFlag
+        beq @noLinecapInfo
+        jsr levelMenuLinecapInfo
+@noLinecapInfo:
         ; render level when loading screen
         lda #$1
         sta outOfDateRenderFlags
@@ -2375,6 +2400,34 @@ gameMode_levelMenu:
         sbc #$0A
         sta classicLevel
         jmp @forceStartLevelToRange
+
+levelMenuLinecapInfo:
+        lda #$20
+        sta PPUADDR
+        lda #$F5
+        sta PPUADDR
+        clc
+        lda #LINECAP_WHEN_STRING_OFFSET
+        adc linecapWhen
+        sta stringIndexLookup
+        jsr stringBackground
+
+        lda #$21
+        sta PPUADDR
+        lda #$15
+        sta PPUADDR
+        clc
+        lda #LINECAP_HOW_STRING_OFFSET
+        adc linecapHow
+        sta stringIndexLookup
+        jsr stringBackground
+
+        lda #$20
+        sta PPUADDR
+        lda #$FA
+        sta PPUADDR
+        jsr render_linecap_level_lines
+        rts
 
 gameMode_levelMenu_processPlayer1Navigation:
         ; this copying is an artefact of the original
@@ -4161,6 +4214,12 @@ render_mode_linecap_menu:
         sta PPUADDR
         lda #$F3
         sta PPUADDR
+        jsr render_linecap_level_lines
+
+@static:
+        jmp render_mode_static
+
+render_linecap_level_lines:
         lda linecapWhen
         bne @linecapLines
         lda linecapLevel
@@ -4172,10 +4231,7 @@ render_mode_linecap_menu:
         sta PPUDATA
         lda linecapLines
         jsr twoDigsToPPU
-
-@static:
-        jmp render_mode_static
-
+        rts
 
 render_mode_level_menu:
         lda outOfDateRenderFlags
