@@ -1238,6 +1238,9 @@ linecapMenuCursorIndices := 3
         lda #1
         sta outOfDateRenderFlags
 
+        lda #$02
+        sta soundEffectSlot1Init
+
         jsr waitForVBlankAndEnableNmi
         jsr updateAudioWaitForNmiAndResetOamStaging
         jsr updateAudioWaitForNmiAndEnablePpuRendering
@@ -1255,6 +1258,9 @@ linecapMenuCursorIndices := 3
         bne @back
         beq @menuLoop
 @back:
+
+        lda #$02
+        sta soundEffectSlot1Init
         jmp gameMode_gameTypeMenu
 
 linecapMenuRenderSprites:
