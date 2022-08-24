@@ -4056,6 +4056,7 @@ oamContentLookup:
         .addr   spriteHeart ; $1F
         .addr   spriteReady ; $20
         .addr   spriteCustomLevelCursor ; $21
+        .addr   spriteIngameHeart ; $22
 ; Sprites are sets of 4 bytes in the OAM format, terminated by FF. byte0=y, byte1=tile, byte2=attrs, byte3=x
 ; YY AA II XX
 sprite00LevelSelectCursor:
@@ -4129,6 +4130,8 @@ spriteReady:
 spriteCustomLevelCursor:
         .byte   $00,$6A,$00,$00,$21,$6A,$80,$00
         .byte   $FF
+spriteIngameHeart:
+        .byte   $00,$2c,$00,$00,$FF
 isPositionValid:
         lda tetriminoY
         asl a
@@ -10647,6 +10650,29 @@ practiseGameHUD:
         bne @skipPace
         jsr gameHUDPace
 @skipPace:
+
+        ; hearts
+
+        lda heartsAndReady
+        and #$F
+        beq @heartEnd
+        sta tmpZ
+        lda #$22
+        sta spriteIndexInOamContentLookup
+        lda #$C9
+        sta spriteYOffset
+        lda #$12
+        sta spriteXOffset
+@heartLoop:
+        lda tmpZ
+        beq @heartEnd
+        jsr loadSpriteIntoOamStaging
+        lda spriteXOffset
+        adc #$8
+        sta spriteXOffset
+        dec tmpZ
+        bcc @heartLoop
+@heartEnd:
 
         lda practiseType
         cmp #MODE_TAPQTY
