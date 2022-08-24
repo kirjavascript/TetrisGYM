@@ -9,6 +9,7 @@
     * Halting
 * DAS Only Mode (from CTWC DAS 2022)
 * Added option to disable pause
+* Show hearts ingame
 * Fixed a graphics glitch in Block Tool
 * Fixed the first mino becoming visible in Invisible
 

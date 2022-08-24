@@ -10659,7 +10659,7 @@ practiseGameHUD:
         sta tmpZ
         lda #$22
         sta spriteIndexInOamContentLookup
-        lda #$C9
+        lda #$C8
         sta spriteYOffset
         lda #$12
         sta spriteXOffset
