@@ -223,7 +223,7 @@ heldButtons := $00B6                        ; Active player's buttons
 playfieldAddr   := $00B8                    ; HI byte is leftPlayfield in canon. Current playfield being processed: $0400 (left; 1st player) or $0500 (right; 2nd player)
 allegro     := $00BA
 pendingGarbage  := $00BB                    ; Garbage waiting to be delivered to the current player. This is exchanged with pendingGarbageInactivePlayer when swapping players.
-pendingGarbageInactivePlayer := $00BC       ; canon is totalGarbage
+; pendingGarbageInactivePlayer := $00BC       ; canon is totalGarbage
 renderMode  := $00BD
 ; numberOfPlayers := $00BE
 nextPiece   := $00BF                        ; Stored by its orientation ID
@@ -3175,7 +3175,6 @@ gameModeState_initGameState:
         sta vramRow
         sta fallTimer
         sta pendingGarbage
-        sta pendingGarbageInactivePlayer
         sta lines
         sta lines+1
         sta lineClearStatsByType
@@ -5957,11 +5956,6 @@ playState_checkForCompletedRows:
         cmp #$04 ; check actual height
         bmi playState_checkForCompletedRows_return
 
-        ldy completedLines
-        lda garbageLines,y
-        clc
-        adc pendingGarbageInactivePlayer
-        sta pendingGarbageInactivePlayer
         lda #$00
         sta vramRow
         sta rowY
