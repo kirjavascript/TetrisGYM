@@ -37,6 +37,7 @@ BUTTON_B := $40
 BUTTON_A := $80
 BUTTON_SELECT := $20
 BUTTON_START := $10
+BUTTON_DPAD := BUTTON_UP | BUTTON_DOWN | BUTTON_LEFT | BUTTON_RIGHT
 
 MODE_TETRIS := 0
 MODE_TSPINS := 1
@@ -8631,11 +8632,13 @@ hzControl: ; called in playState_playerControlsActiveTetrimino, gameTypeLoopCont
 
         ; detect inputs
         lda newlyPressedButtons_player1
-        and #BUTTON_LEFT
-        bne hzTap
+        and #BUTTON_DPAD
+        cmp #BUTTON_LEFT
+        beq hzTap
         lda newlyPressedButtons_player1
-        and #BUTTON_RIGHT
-        bne hzTap
+        and #BUTTON_DPAD
+        cmp #BUTTON_RIGHT
+        beq hzTap
 
         lda hzTapCounter
         bne @noDelayInc

@@ -11,6 +11,7 @@
 * Added option to disable pause
 * Show hearts ingame
 * Removed garbage / floor spawn delay
+* Correctly handle DL inputs for HZ Display
 * Fixed a graphics glitch in Block Tool
 * Fixed the first mino becoming visible in Invisible
 * Other buttons can be pressed when using A+Start to add 10 levels
