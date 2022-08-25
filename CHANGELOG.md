@@ -12,6 +12,7 @@
 * Show hearts ingame
 * Fixed a graphics glitch in Block Tool
 * Fixed the first mino becoming visible in Invisible
+* A+Start to add 10 levels is more forgiving
 
 ## [v5]
 * Tap Quantity Trainer

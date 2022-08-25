@@ -2478,8 +2478,8 @@ levelMenuCheckStartGame:
         jmp @startGame
 @normalLevel:
         lda heldButtons_player1
-        cmp #BUTTON_START+BUTTON_A
-        bne @noA
+        and #BUTTON_A
+        beq @noA
         lda classicLevel
         clc
         adc #$0A
