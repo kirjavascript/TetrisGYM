@@ -10659,16 +10659,17 @@ practiseGameHUD:
         sta tmpZ
         lda #$22
         sta spriteIndexInOamContentLookup
-        lda #$C8
+        lda #$16
         sta spriteYOffset
-        lda #$12
+        lda #$C0
         sta spriteXOffset
 @heartLoop:
         lda tmpZ
         beq @heartEnd
         jsr loadSpriteIntoOamStaging
+        clc
         lda spriteXOffset
-        adc #$8
+        adc #$7
         sta spriteXOffset
         dec tmpZ
         bcc @heartLoop
