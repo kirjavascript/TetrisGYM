@@ -10,9 +10,10 @@
 * DAS Only Mode (from CTWC DAS 2022)
 * Added option to disable pause
 * Show hearts ingame
+* Removed garbage / floor spawn delay
 * Fixed a graphics glitch in Block Tool
 * Fixed the first mino becoming visible in Invisible
-* A+Start to add 10 levels is more forgiving
+* Other buttons can be pressed when using A+Start to add 10 levels
 
 ## [v5]
 * Tap Quantity Trainer

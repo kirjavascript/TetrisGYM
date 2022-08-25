@@ -6072,9 +6072,6 @@ typebSuccessGraphic:
 playState_receiveGarbage:
         ldy pendingGarbage
         beq @ret
-        lda vramRow
-        cmp #$20
-        bmi @delay
         lda multBy10Table,y
         sta generalCounter2
         lda #$00
