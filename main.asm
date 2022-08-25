@@ -10586,15 +10586,15 @@ practisePrepareNext:
         lda practiseType
         cmp #MODE_PACE
         bne @skipPace
-        jsr prepareNextPace
+        jmp prepareNextPace
 @skipPace:
         cmp #MODE_GARBAGE
         bne @skipGarbo
-        jsr prepareNextGarbage
+        jmp prepareNextGarbage
 @skipGarbo:
         cmp #MODE_PARITY
         bne @skipParity
-        jsr prepareNextParity
+        jmp prepareNextParity
 @skipParity:
         cmp #MODE_TAPQTY
         bne @skipTapQuantity
@@ -10607,6 +10607,7 @@ practiseInitGameState:
         bne @skipTapQuantity
         jsr prepareNextTapQuantity
 @skipTapQuantity:
+        lda practiseType
         cmp #MODE_CHECKERBOARD
         bne @skipChecker
         jsr initChecker
@@ -10617,19 +10618,19 @@ practiseAdvanceGame:
         lda practiseType
         cmp #MODE_TSPINS
         bne @skipTSpins
-        jsr advanceGameTSpins
+        jmp advanceGameTSpins
 @skipTSpins:
         cmp #MODE_PRESETS
         bne @skipPresets
-        jsr advanceGamePreset
+        jmp advanceGamePreset
 @skipPresets:
         cmp #MODE_FLOOR
         bne @skipFloor
-        jsr advanceGameFloor
+        jmp advanceGameFloor
 @skipFloor:
         cmp #MODE_TAP
         bne @skipTap
-        jsr advanceGameTap
+        jmp advanceGameTap
 @skipTap:
         rts
 
