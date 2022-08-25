@@ -6022,8 +6022,14 @@ playState_prepareNext:
         lda linecapState
         cmp #LINECAP_HALT
         bne @linecapHaltEnd
-        lda #$0A ; playState_checkStartGameOver
-        sta playState
+        lda #'G'
+        sta playfield+$67
+        sta playfield+$68
+        lda #$28
+        sta playfield+$6A
+        lda #0
+        sta vramRow
+        jsr typeBEndingStuffEnd
         rts
 @linecapHaltEnd:
 
@@ -6047,6 +6053,7 @@ typeBEndingStuff:
         lda #$00
         sta vramRow
 
+typeBEndingStuffEnd:
         ; play sfx
         lda #$4
         sta soundEffectSlot1Init
