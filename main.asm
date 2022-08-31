@@ -836,21 +836,20 @@ branchOnPlayStatePlayer1:
         .addr   playState_incrementPlayState
 
 playState_playerControlsActiveTetrimino:
+        lda practiseType
+        cmp #MODE_HARDDROP
+        bne @notHard
+        jsr harddrop_tetrimino
+        lda playState
+        cmp #8
+        beq playState_playerControlsActiveTetrimino_return
+@notHard:
         jsr hzControl ; and dasOnly control
 
         jsr shift_tetrimino
         jsr rotate_tetrimino
 
-        lda practiseType
-        cmp #MODE_HARDDROP
-        bne @soft
-        jsr harddrop_tetrimino
-        lda playState
-        cmp #8
-        beq @noDrop
-@soft:
         jsr drop_tetrimino
-@noDrop:
 
 playState_playerControlsActiveTetrimino_return:
         rts
@@ -9328,30 +9327,30 @@ noisevol_table:
         .byte   $22,$22,$22,$22,$21,$11,$11,$11
 updateSoundEffectSlot2:
         ldx #$02
-        lda #$45
-        ldy #$45
+        lda #<soundEffectSlot2Init_table
+        ldy #<soundEffectSlot2Init_table
         bne updateSoundEffectSlotShared
 updateSoundEffectSlot3:
         ldx #$03
-        lda #$3D
-        ldy #$41
+        lda #<soundEffectSlot3Init_table
+        ldy #<soundEffectSlot3Playing_table
         bne updateSoundEffectSlotShared
 updateSoundEffectSlot4_unused:
         ldx #$04
-        lda #$45
-        ldy #$45
+        lda #<soundEffectSlot2Init_table
+        ldy #<soundEffectSlot2Init_table
         bne updateSoundEffectSlotShared
 updateSoundEffectSlot1:
         lda soundEffectSlot4Playing
         bne updateSoundEffectSlotShared_rts
         ldx #$01
-        lda #$15
-        ldy #$29
+        lda #<soundEffectSlot1Init_table
+        ldy #<soundEffectSlot1Playing_table
         bne updateSoundEffectSlotShared
 updateSoundEffectSlot0:
         ldx #$00
-        lda #$09
-        ldy #$0F
+        lda #<soundEffectSlot0Init_table
+        ldy #<soundEffectSlot0Playing_table
 ; x: sound effect slot; a: low byte addr, for $E0 high byte; y: low byte addr, for $E0 high byte, if slot unused
 updateSoundEffectSlotShared:
 .if !NO_SFX
@@ -9385,7 +9384,7 @@ initAudioAndMarkInited:
         sta $0683
         rts
 
-LE1EF:  lda audioInitialized
+handlePausedAudio:  lda audioInitialized
         beq initAudioAndMarkInited
         lda $0683
         cmp #$12
@@ -9398,7 +9397,7 @@ LE1EF:  lda audioInitialized
         lda $068B
         and #$01
         bne LE20F
-        ldy #$0C
+        ldy #<unknown_sq1_data1
 LE20F:  jsr copyToSq1Channel
 LE212:  inc $0683
 LE215:  rts
@@ -9409,7 +9408,7 @@ updateAudio:
         sta JOY2_APUFC
         lda musicStagingNoiseHi
         cmp #$05
-        beq LE1EF
+        beq handlePausedAudio
         lda #$00
         sta audioInitialized
         sta $068B
@@ -9499,7 +9498,7 @@ initSoundEffectShared:
 
 soundEffectSlot0_endingRocketInit:
         lda #$20
-        ldy #$08
+        ldy #<soundEffectSlot0_endingRocketInitData
         jmp initSoundEffectShared
 
 setNoiseLo:
@@ -9531,7 +9530,7 @@ unreferenced_code2:
         sta currentAudioSlot
 soundEffectSlot0_gameOverCurtainInit:
         lda #$40
-        ldy #$04
+        ldy #<soundEffectSlot0_gameOverCurtainInitData
         jmp initSoundEffectShared
 
 updateSoundEffectSlot0_apu:
@@ -9540,9 +9539,9 @@ updateSoundEffectSlot0_apu:
         jmp stopSoundEffectSlot0
 
 updateSoundEffectNoiseAudio:
-        ldx #$54
+        ldx #<noiselo_table
         jsr loadNoiseLo
-        ldx #$74
+        ldx #<noisevol_table
         jsr getSoundEffectNoiseNibble
         ora #$10
         sta NOISE_VOL
@@ -9552,7 +9551,7 @@ updateSoundEffectNoiseAudio:
 ; Loads from noiselo_table(x=$54)/noisevol_table(x=$74)
 getSoundEffectNoiseNibble:
         stx AUDIOTMP1
-        ldy #$E1
+        ldy #>soundEffectSlot0_gameOverCurtainInitData
         sty AUDIOTMP2
         ldx soundEffectSlot0SecondaryCounter
         txa
@@ -9604,26 +9603,26 @@ soundEffectSlot1_chirpChirpPlaying:
         cmp #$08
         bne soundEffectSlot1Playing_ret
         inc soundEffectSlot1TertiaryCounter
-        ldy #$40
+        ldy #<soundEffectSlot1Playing_chirpChirpStage2
         jmp copyToSq1Channel
 
 ; Unused.
 soundEffectSlot1_chirpChirpInit:
-        ldy #$3C
+        ldy #<soundEffectSlot1_chirpChirpInitData
         jmp initSoundEffectShared
 
 soundEffectSlot1_lockTetriminoInit:
         jsr LE33B
         beq soundEffectSlot1Playing_ret
         lda #$0F
-        ldy #$20
+        ldy #<soundEffectSlot1_lockTetriminoInitData
         jmp initSoundEffectShared
 
 soundEffectSlot1_shiftTetriminoInit:
         jsr LE33B
         beq soundEffectSlot1Playing_ret
         lda #$02
-        ldy #$44
+        ldy #<soundEffectSlot1_shiftTetriminoInitData
         jmp initSoundEffectShared
 
 soundEffectSlot1Playing_advance:
@@ -9651,12 +9650,12 @@ soundEffectSlot1_menuOptionSelectPlaying:
         bne @stage2
         jmp soundEffectSlot1Playing_stop
 
-@stage2:ldy #$28
+@stage2:ldy #<soundEffectSlot1Playing_menuOptionSelectStage2
         jmp copyToSq1Channel
 
 soundEffectSlot1_menuOptionSelectInit:
         lda #$03
-        ldy #$24
+        ldy #<soundEffectSlot1_menuOptionSelectInitData
         bne LE417
 soundEffectSlot1_rotateTetrimino_ret:
         rts
@@ -9665,7 +9664,7 @@ soundEffectSlot1_rotateTetriminoInit:
         jsr LE33B
         beq soundEffectSlot1_rotateTetrimino_ret
         lda #$04
-        ldy #$14
+        ldy #<soundEffectSlot1_rotateTetriminoInitData
         jsr LE417
 soundEffectSlot1_rotateTetriminoPlaying:
         jsr advanceAudioSlotFrame
@@ -9681,11 +9680,11 @@ soundEffectSlot1_rotateTetriminoPlaying:
         bne soundEffectSlot1_rotateTetrimino_ret
         jmp soundEffectSlot1Playing_stop
 
-@stage2:ldy #$14
+@stage2:ldy #<soundEffectSlot1_rotateTetriminoInitData
         jmp copyToSq1Channel
 
 ; On first glance it appears this is used twice, but the first beq does nothing because the inc result will never be 0
-@stage3:ldy #$18
+@stage3:ldy #<soundEffectSlot1Playing_rotateTetriminoStage3
         jmp copyToSq1Channel
 
 soundEffectSlot1_tetrisAchievedInit:
@@ -9695,14 +9694,14 @@ soundEffectSlot1_tetrisAchievedInit:
         beq @ntsc
         lda #$4
 @ntsc:
-        ldy #$30
+        ldy #<soundEffectSlot1_tetrisAchievedInitData
         jsr LE417
         lda #$10
         bne LE437
 soundEffectSlot1_tetrisAchievedPlaying:
         jsr advanceAudioSlotFrame
         bne LE43A
-        ldy #$30
+        ldy #<soundEffectSlot1_tetrisAchievedInitData
         bne LE442
 LE417:  jmp initSoundEffectShared
 
@@ -9713,14 +9712,14 @@ soundEffectSlot1_lineCompletedInit:
         beq @ntsc
         lda #$4
 @ntsc:
-        ldy #$34
+        ldy #<soundEffectSlot1_lineCompletedInitData
         jsr LE417
         lda #$08
         bne LE437
 soundEffectSlot1_lineCompletedPlaying:
         jsr advanceAudioSlotFrame
         bne LE43A
-        ldy #$34
+        ldy #<soundEffectSlot1_lineCompletedInitData
         bne LE442
 soundEffectSlot1_lineClearingInit:
         lda #$04
@@ -9729,7 +9728,7 @@ soundEffectSlot1_lineClearingInit:
         beq @ntsc
         lda #$3
 @ntsc:
-        ldy #$38
+        ldy #<soundEffectSlot1_lineClearingInitData
         jsr LE417
         lda #$00
 LE437:  sta soundEffectSlot1TertiaryCounter
@@ -9738,7 +9737,7 @@ LE43A:  rts
 soundEffectSlot1_lineClearingPlaying:
         jsr advanceAudioSlotFrame
         bne LE43A
-        ldy #$38
+        ldy #<soundEffectSlot1_lineClearingInitData
 LE442:  jsr copyToSq1Channel
         clc
         lda soundEffectSlot1TertiaryCounter
@@ -9764,7 +9763,7 @@ LE472:  rts
 
 soundEffectSlot1_menuScreenSelectInit:
         lda #$03
-        ldy #$2C
+        ldy #<soundEffectSlot1_menuScreenSelectInitData
         jsr initSoundEffectShared
         lda soundEffectSlot1_menuScreenSelectInitData+2
         sta soundEffectSlot1SecondaryCounter
@@ -9821,7 +9820,7 @@ soundEffectSlot1_levelUpInit:
         beq @ntsc
         lda #$5
 @ntsc:
-        ldy #$1C
+        ldy #<soundEffectSlot1_levelUpInitData
         jmp initSoundEffectShared
 
 unknown18_table:
@@ -9884,7 +9883,7 @@ updateSoundEffectSlot3_apu:
 ; Unused
 soundEffectSlot3_fallingAlien:
         lda #$06
-        ldy #$48
+        ldy #<soundEffectSlot3_unknown1InitData
         jsr initSoundEffectShared
         lda soundEffectSlot3_unknown1InitData+2
         sta soundEffectSlot3TertiaryCounter
