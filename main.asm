@@ -5861,6 +5861,7 @@ playState_checkForCompletedRows:
         cmp #MODE_TSPINS
         beq @rowNotComplete
 
+        lda practiseType
         cmp #MODE_FLOOR
         beq @fullRowBurningCheck
         lda linecapState
