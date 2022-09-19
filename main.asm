@@ -5861,6 +5861,14 @@ playState_checkForCompletedRows:
         cmp #MODE_TSPINS
         beq @rowNotComplete
 
+        cmp #MODE_FLOOR
+        beq @fullRowBurningCheck
+        lda linecapState
+        cmp #LINECAP_FLOOR
+        beq @fullRowBurningCheck
+        bne @normalRow
+
+@fullRowBurningCheck:
         ; bugfix to ensure complete rows aren't cleared
         ; used in floor / linecap floor
         lda currentPiece_copy
