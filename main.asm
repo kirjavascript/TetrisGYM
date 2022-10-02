@@ -2884,6 +2884,25 @@ gameModeState_initGameBackground:
         jsr displayModeText
         jsr statisticsNametablePatch ; for input display
         jsr debugNametableUI
+
+        ; ingame hearts
+        lda heartsAndReady
+        and #$F
+        sta tmpZ
+        beq @heartEnd
+        lda #$23
+        sta PPUADDR
+        lda #$25
+        sta PPUADDR
+        clc
+        lda tmpZ
+        adc #$F0
+        sta PPUDATA
+        lda #$2C
+        sta PPUDATA
+@heartEnd:
+
+
 .if INES_MAPPER = 3
         lda #%10011000
         sta PPUCTRL
@@ -10660,30 +10679,6 @@ practiseGameHUD:
         bne @skipPace
         jsr gameHUDPace
 @skipPace:
-
-        ; hearts
-
-        lda heartsAndReady
-        and #$F
-        beq @heartEnd
-        sta tmpZ
-        lda #$22
-        sta spriteIndexInOamContentLookup
-        lda #$16
-        sta spriteYOffset
-        lda #$C0
-        sta spriteXOffset
-@heartLoop:
-        lda tmpZ
-        beq @heartEnd
-        jsr loadSpriteIntoOamStaging
-        clc
-        lda spriteXOffset
-        adc #$7
-        sta spriteXOffset
-        dec tmpZ
-        bcc @heartLoop
-@heartEnd:
 
         lda practiseType
         cmp #MODE_TAPQTY
