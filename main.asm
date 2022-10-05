@@ -2890,13 +2890,13 @@ gameModeState_initGameBackground:
         and #$F
         sta tmpZ
         beq @heartEnd
-        lda #$23
+        lda #$20
         sta PPUADDR
-        lda #$25
+        lda #$9C
         sta PPUADDR
-        clc
+        ; clc
         lda tmpZ
-        adc #$F0
+        ; adc #$F0
         sta PPUDATA
         lda #$2C
         sta PPUDATA
