@@ -2894,9 +2894,7 @@ gameModeState_initGameBackground:
         sta PPUADDR
         lda #$9C
         sta PPUADDR
-        ; clc
         lda tmpZ
-        ; adc #$F0
         sta PPUDATA
         lda #$2C
         sta PPUDATA
