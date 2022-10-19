@@ -1,4 +1,3 @@
-
 require('./game');
 require('./enter_high_score');
 require('./game_type_menu');
