@@ -2,8 +2,8 @@ tetris_obj := main.o tetris-ram.o tetris.o
 
 MD5 := md5sum -c
 
-CA65 := /usr/bin/ca65
-LD65 := /usr/bin/ld65
+CA65 := D:\STUFF\cc65\bin\ca65
+LD65 := D:\STUFF\cc65\bin\ld65
 nesChrEncode := python tools/nes-util/nes_chr_encode.py
 
 tetris.nes: tetris.o main.o tetris-ram.o
@@ -36,7 +36,7 @@ $(info $(shell $(MAKE) -C tools/cTools/))
 endif
 
 
-%.o: dep = $(shell tools/cTools/scan_includes $(@D)/$*.asm)
+%.o: dep = $(shell tools/cTools/scan_includes.exe $(@D)/$*.asm)
 $(tetris_obj): %.o: %.asm $$(dep)
 		$(CA65) $(CAFLAGS) $*.asm -o $@
 

@@ -28,6 +28,8 @@ BLOCK_TILES := $7B
 EMPTY_TILE := $EF
 INVISIBLE_TILE := $43
 TETRIMINO_X_HIDE := $EF
+GRID_TILE := $93
+GRID_INVISIBLE_TILE := $94
 
 BUTTON_DOWN := $4
 BUTTON_UP := $8
@@ -69,8 +71,9 @@ MODE_LINECAP := 26
 MODE_DASONLY := 27
 MODE_QUAL := 28
 MODE_PAL := 29
+MODE_GRID := 30
 
-MODE_QUANTITY := 30
+MODE_QUANTITY := 31
 MODE_GAME_QUANTITY := 18
 
 SCORING_CLASSIC := 0 ; for scoringModifier
@@ -88,11 +91,11 @@ LINECAP_WHEN_STRING_OFFSET := $10
 LINECAP_HOW_STRING_OFFSET := $12
 
 MENU_SPRITE_Y_BASE := $47
-MENU_MAX_Y_SCROLL := $70
+MENU_MAX_Y_SCROLL := $7C
 MENU_TOP_MARGIN_SCROLL := 7 ; in blocks
 
 ; menuConfigSizeLookup
-.define MENUSIZES $0, $0, $0, $0, $F, $7, $8, $C, $20, $10, $1F, $8, $4, $12, $10, $0, $0, $0, $0, $4, $1, $1, $1, $1, $1, $1, $1, $1, $1, $1
+.define MENUSIZES $0, $0, $0, $0, $F, $7, $8, $C, $20, $10, $1F, $8, $4, $12, $10, $0, $0, $0, $0, $4, $1, $1, $1, $1, $1, $1, $1, $1, $1, $1, $1
 
 .macro MODENAMES
     .byte   "TETRIS"
@@ -425,6 +428,7 @@ linecapFlag := menuVars+18
 dasOnlyFlag := menuVars+19
 qualFlag := menuVars+20
 palFlag := menuVars+21
+gridFlag := menuVars+22
 
 ; ... $7FF
 PPUCTRL     := $2000
@@ -954,6 +958,8 @@ harddropMarkCleared:
         ldy #$0
 @minoLoop:
         lda (harddropAddr), y
+        cmp #GRID_TILE
+        beq @noLineClear
         cmp #EMPTY_TILE
         beq @noLineClear
 
@@ -1053,7 +1059,13 @@ harddropShift:
         sta vramRow
         sta completedLines
         ; emty top row
+        lda gridFlag
+        beq @noGrid
+        lda #GRID_TILE
+        jmp @skipEmpty
+@noGrid:
         lda #EMPTY_TILE
+@skipEmpty:
         ldx #0
 @topRowLoop:
         sta playfield, x
@@ -1220,7 +1232,13 @@ linecapMenuCursorIndices := 3
         sta PPUADDR
         lda #$0
         sta PPUADDR
+        lda gridFlag
+        beq @noGrid
+        lda #GRID_TILE
+        jmp @skipEmpty
+@noGrid:
         lda #EMPTY_TILE
+@skipEmpty:
         ldx #4
         ldy #$BF
 @clearTile:
@@ -3135,7 +3153,13 @@ savestate_nametable_patch:
 
 
 gameModeState_initGameState:
+        lda gridFlag
+        beq @defaultBackground
+        lda #$93
+        jmp @skipDefault
+@defaultBackground:
         lda #$EF
+@skipDefault:
         ldx #$04
         ldy #$04
         jsr memset_page
@@ -3392,6 +3416,13 @@ L87FC:  ldx #$17
         tay
         lda rngTable,y
         sta generalCounter4
+        cmp #EMPTY_TILE
+        bne @skipGrid
+        lda gridFlag
+        beq @skipGrid
+        lda #GRID_TILE
+        sta generalCounter4
+@skipGrid:
         ldx generalCounter2
         lda multBy10Table,x
         clc
@@ -3417,7 +3448,13 @@ L8824:  ldx #$17
         clc
         adc generalCounter5
         tay
+        lda gridFlag
+        beq @noGrid
+        lda #GRID_TILE
+        jmp @skipEmpty
+@noGrid:
         lda #EMPTY_TILE
+@skipEmpty:
         sta playfield,y
         jsr updateAudioWaitForNmiAndResetOamStaging
         dec generalCounter
@@ -3426,6 +3463,11 @@ L884A:
         ldx typeBModifier
         lda typeBBlankInitCountByHeightTable,x
         tay
+        lda gridFlag
+        beq @noGrid
+        lda #GRID_TILE
+        jmp L885D
+@noGrid:
         lda #EMPTY_TILE
 L885D:  sta playfield,y
         dey
@@ -4195,8 +4237,11 @@ isPositionValid:
         adc positionValidTmp
         tay
         lda (playfieldAddr),y
+        cmp #GRID_TILE
+        beq @allowGrid
         cmp #EMPTY_TILE
         bcc @invalid
+@allowGrid:
         lda orientationTable,x
         clc
         adc tetriminoX
@@ -5578,7 +5623,13 @@ playState_lockTetrimino:
         cmp #MODE_INVISIBLE
         bne @notInvisible
 @inviz:
+        lda gridFlag
+        beq @noGrid
+        lda #GRID_INVISIBLE_TILE
+        jmp @skipEmpty
+@noGrid:
         lda #INVISIBLE_TILE
+@skipEmpty:
         sta generalCounter5
 @notInvisible:
         inx
@@ -5907,6 +5958,8 @@ playState_checkForCompletedRows:
 
 @checkIfRowCompleteLoopStart:
         lda (playfieldAddr),y
+        cmp #GRID_TILE
+        beq @rowNotComplete
         cmp #EMPTY_TILE
         beq @rowNotComplete
         iny
@@ -5931,7 +5984,13 @@ playState_checkForCompletedRows:
         dey
         cpy #$FF
         bne @movePlayfieldDownOneRow
+        lda gridFlag
+        beq @noGrid
+        lda #GRID_TILE
+        jmp @skipEmpty
+@noGrid:
         lda #EMPTY_TILE
+@skipEmpty:
         ldy #$00
 @clearRowTopRow:
         sta (playfieldAddr),y
@@ -6128,6 +6187,11 @@ playState_receiveGarbage:
         lda #BLOCK_TILES + 3
         jmp @set
 @hole:
+        lda gridFlag
+        beq @noGrid
+        lda #GRID_TILE
+        jmp @set
+@noGrid:
         lda #EMPTY_TILE ; was $FF ?
 @set:
         sta (playfieldAddr),y
@@ -6650,6 +6714,8 @@ updateMusicSpeed:
         ldx #$0A
 @checkForBlockInRow:
         lda (playfieldAddr),y
+        cmp #GRID_TILE
+        bne @foundBlockInRow
         cmp #EMPTY_TILE
         bne @foundBlockInRow
         iny
@@ -8334,7 +8400,13 @@ handleLevelEditor:
         beq @notPressedB
         jsr @getPos
         ldx tmp3
+        lda gridFlag
+        beq @noGrid
+        lda #GRID_TILE
+        jmp @skipEmpty
+@noGrid:
         lda #EMPTY_TILE
+@skipEmpty:
         sta playfield, x
         jmp renderDebugPlayfield
 
@@ -10789,8 +10861,13 @@ controllerInputDisplayX:
         rts
 
 clearPlayfield:
-        lda #EMPTY_TILE
         ldx #$C8
+        lda gridFlag
+        beq @noGrid
+        lda #GRID_TILE
+        jmp @loop
+@noGrid:
+        lda #EMPTY_TILE
 @loop:
         sta $0400, x
         dex
@@ -10828,6 +10905,11 @@ prepareNextTapQuantity:
         lda #BLOCK_TILES
         cpx tmp1
         bcs @saveMino
+        lda gridFlag
+        beq @noGrid
+        lda #GRID_TILE
+        jmp @saveMino
+@noGrid:
         lda #EMPTY_TILE
 @saveMino:
         sta playfield, x
@@ -10843,7 +10925,13 @@ prepareNextTapQuantity:
         txa
         adc tqtyCurrent
         tay
+        lda gridFlag
+        beq @noGrid2
+        lda #GRID_TILE
+        jmp @skipEmpty2
+@noGrid2:
         lda #EMPTY_TILE
+@skipEmpty2:
         sta playfield, y
 
         txa
@@ -10877,6 +10965,11 @@ CHECKERBOARD_FLIP := CHECKERBOARD_TILE ^ EMPTY_TILE
         lda #CHECKERBOARD_TILE
         bne @checkerStart
 @checkerStartA:
+        lda gridFlag
+        beq @noGrid3
+        lda #GRID_TILE
+        jmp @checkerStart
+@noGrid3:
         lda #EMPTY_TILE
 @checkerStart:
         ; hydrantdude found the short way to do this
@@ -11037,7 +11130,13 @@ renderTSpin:
         sbc tmp1 ; sub Y
         tax
         ; draw tspin
+        lda gridFlag
+        beq @noGrid
+        lda #GRID_TILE
+        jmp @skipEmpty
+@noGrid:
         lda #EMPTY_TILE
+@skipEmpty:
         sta $03bc, x
         sta $03bd, x
         sta $03be, x
@@ -11122,6 +11221,8 @@ prepareNextParity:
         lda #$7B
 @loop:
         ldy playfield, x
+        cpy #GRID_TILE
+        beq @empty
         cpy #EMPTY_TILE
         beq @empty
         sta playfield, x
@@ -11154,9 +11255,13 @@ highlightGaps:
 highlistGapsLeft:
         ; check first gap
         lda playfield, x
+        cmp #GRID_TILE
+        bne @startGapEnd
         cmp #EMPTY_TILE
         bne @startGapEnd
         lda playfield+1, x
+        cmp #GRID_TILE
+        beq @startGapEnd
         cmp #EMPTY_TILE
         beq @startGapEnd
         lda parityColor
@@ -11168,9 +11273,13 @@ highlightGapsOverhang:
 
 @checkHang:
         lda playfield, x
+        cmp #GRID_TILE
+        bne @checkGroup
         cmp #EMPTY_TILE
         bne @checkGroup
         lda playfield-10, x
+        cmp #GRID_TILE
+        beq @checkGroup
         cmp #EMPTY_TILE
         beq @checkGroup
 
@@ -11183,12 +11292,18 @@ highlightGapsOverhang:
         bmi @groupNext
         ; horizontal
         lda playfield, x
+        cmp #GRID_TILE
+        beq @groupNext
         cmp #EMPTY_TILE
         beq @groupNext
         lda playfield+1, x
+        cmp #GRID_TILE
+        bne @groupNext
         cmp #EMPTY_TILE
         bne @groupNext
         lda playfield+2, x
+        cmp #GRID_TILE
+        beq @groupNext
         cmp #EMPTY_TILE
         beq @groupNext
 
@@ -11213,6 +11328,8 @@ highlightOrphans:
 
 @checkString:
         lda playfield, x
+        cmp #GRID_TILE
+        beq @stringEmpty
         cmp #EMPTY_TILE
         beq @stringEmpty
         inc parityCount
@@ -11277,6 +11394,8 @@ findTopBulky:
         ldy #9
 @loopLine:
         lda playfield, x
+        cmp #GRID_TILE
+        beq @noBlock
         cmp #EMPTY_TILE
         beq @noBlock
         inc tmp2
@@ -11299,6 +11418,8 @@ findTopBulky:
 swapMino:
         ldy #EMPTY_TILE
         lda playfield, x
+        cmp #GRID_TILE
+        bne @full
         cmp #EMPTY_TILE
         bne @full
         ldy #BLOCK_TILES+3
@@ -11321,6 +11442,8 @@ findTop:
         ldx #$0
 @loop:
         lda playfield, x
+        cmp #GRID_TILE
+        bne @done
         cmp #EMPTY_TILE
         bne @done
         inx
@@ -11367,6 +11490,8 @@ smartHole:
         ldx #199
 @loop:
         lda playfield, x
+        cmp #GRID_TILE
+        beq @done
         cmp #EMPTY_TILE
         beq @done
         dex
@@ -11430,6 +11555,8 @@ checkTetrisReady:
         ldy #9
 @loop:
         lda playfield, x
+        cmp #GRID_TILE
+        bne @filled
         cmp #EMPTY_TILE
         bne @filled
         inc tmp1 ; add garbage
