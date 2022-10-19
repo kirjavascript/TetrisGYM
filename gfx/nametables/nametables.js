@@ -24,7 +24,7 @@ function writeRLE(filename, buffer) {
 
 function printNT(buffer, lookup) {
     const chars = [...buffer].map(value => lookup[value] || '__NOWAYNOWAY');
-    console.log(chars.join('').match(/.{32}/g).join('\n'));
+    // console.log(chars.join('').match(/.{32}/g).join('\n'));
 }
 
 function drawTiles(buffer, lookup, tiles) {
