@@ -18,7 +18,7 @@ function readStripe(filename) {
 
 function writeRLE(filename, buffer) {
     const compressed = Buffer.from(konamiComp(Array.from(buffer)));
-    console.log(`compressed ${buffer.length} -> ${compressed.length}`);
+    // console.log(`${filename.split('/').pop()} ${buffer.length} -> ${compressed.length}`);
     writeFileSync(filename, compressed);
 }
 
