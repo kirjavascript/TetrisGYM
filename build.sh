@@ -1,19 +1,38 @@
 #!/bin/sh
 
-# create nametables
+# build / compress nametables
 
 node gfx/nametables/build.js
 
 # PNG -> CHR
 
-python tools/nes-util/nes_chr_encode.py gfx/title_menu_tileset.png gfx/title_menu_tileset.chr
-python tools/nes-util/nes_chr_encode.py gfx/game_tileset.png gfx/game_tileset.chr
-python tools/nes-util/nes_chr_encode.py gfx/rocket_tileset.png gfx/rocket_tileset.chr
+function png2chr {
 
-# slower but more portable JS alternative
-# npx img2chr gfx/title_menu_tileset.png gfx/title_menu_tileset.chr
-# npx img2chr gfx/game_tileset.png gfx/game_tileset.chr
-# npx img2chr gfx/rocket_tileset.png gfx/rocket_tileset.chr
+    python tools/nes-util/nes_chr_encode.py gfx/title_menu_tileset.png gfx/title_menu_tileset.chr
+    python tools/nes-util/nes_chr_encode.py gfx/game_tileset.png gfx/game_tileset.chr
+    python tools/nes-util/nes_chr_encode.py gfx/rocket_tileset.png gfx/rocket_tileset.chr
+
+    # slower but more portable JS alternative
+    # npx img2chr gfx/title_menu_tileset.png gfx/title_menu_tileset.chr
+    # npx img2chr gfx/game_tileset.png gfx/game_tileset.chr
+    # npx img2chr gfx/rocket_tileset.png gfx/rocket_tileset.chr
+}
+
+# compare the last modified time of the PNGS to the touch time of this file and see if it's newer
+
+pngTimes=$(stat -c "%Y" gfx/*.png)
+scriptTime=$(stat -c "%X" "$0")
+
+for pngTime in $pngTimes; do
+    if [ $pngTime -gt $scriptTime ]; then
+        echo "converting PNG to CHR"
+            png2chr
+        break;
+    fi
+done
+
+touch gfx/*.png
+touch "$0"
 
 # build object files
 

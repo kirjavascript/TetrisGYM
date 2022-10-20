@@ -1,7 +1,7 @@
 # TetrisGYM
 
 <div align="center">
-    <img src="./screens/menu5.png" alt="Menuscreen">
+    <img src="./assets/screens/menu5.png" alt="Menuscreen">
     <br>
 </div>
 <br>
@@ -68,13 +68,13 @@ Like in the original ROM, holding `a` `b` `select` and then pressing `start` wil
 
 ### Tetris
 
-![Tetris](./screens/levelmenu.png)
+![Tetris](./assets/screens/levelmenu.png)
 
 Same gameplay as A-Type, with some improvements: no score cap, no rocket, no curtain, no music, always next box, better pause, start on any level.
 
 ### T-Spins
 
-![T-Spins](./screens/tspins.png)
+![T-Spins](./assets/screens/tspins.png)
 
 Spawn T-Spins in random positions. Additional entry delay on successful T-Spin to prepare for the next state.
 
@@ -90,13 +90,13 @@ An indicator will show which seeds are for v4 and which are for v5, and pressing
 
 ### Stacking
 
-![Stacking](./screens/stacking.png)
+![Stacking](./assets/screens/stacking.png)
 
 An experiment in highlighting areas of the playfield.
 
 ### Pace
 
-![Pace](./screens/pace.png)
+![Pace](./assets/screens/pace.png)
 
 Indicates how close you are to achieving a score by 230 lines. Loosely based on Tetris rate.
 
@@ -121,7 +121,7 @@ This can be adjusted for transition or PAL games;
 
 ### Setups
 
-![Setups](./screens/setups.png)
+![Setups](./assets/screens/setups.png)
 
 Several preset playfields for practising different types of tucks and spins.
 
@@ -136,13 +136,13 @@ Several preset playfields for practising different types of tucks and spins.
 
 ### B-Type
 
-![B-Type](./screens/btype.png)
+![B-Type](./assets/screens/btype.png)
 
 Same gameplay as B-Type in the original, except heights up to 8 are supported.
 
 ### Floor
 
-![Floor](./screens/floor.png)
+![Floor](./assets/screens/floor.png)
 
 Fill in the floor to a certain height to force higher stacking. This mode is often referred to as 'handicap'.
 
@@ -150,13 +150,13 @@ Setting the height to zero will result in a game mode with burns disabled.
 
 ### (Quick)Tap
 
-![Tap](./screens/tap.png)
+![Tap](./assets/screens/tap.png)
 
 For practising tapping and quicktapping pieces over towers. 0-G will have a tower on the left of the screen and H-W will have a tower to the right.
 
 ### Tap Quantity
 
-![Tap Quantity](./screens/tapqty.png)
+![Tap Quantity](./assets/screens/tapqty.png)
 
 A trainer to drill different numbers of taps. Highlights the next well coming up.
 
@@ -164,7 +164,7 @@ The options 0-F clear lines when you fill the well, and G-V act like the piece l
 
 ### Checkerboard
 
-![Checkerboard](./screens/checkerboard.png)
+![Checkerboard](./assets/screens/checkerboard.png)
 
 Similar to B-Type, except the garbage is a checkerboard.
 
@@ -172,7 +172,7 @@ Uses custom scoring.
 
 ### Transition
 
-![Transition](./screens/transition.png)
+![Transition](./assets/screens/transition.png)
 
 Puts you ten lines before transition. The value given will be added to your score, so set this to 5 and start on level 18 for a 'maxout trainer' style mode.
 
@@ -180,7 +180,7 @@ Setting the value to G causes the mode to act identical to the game genie code `
 
 ### Garbage
 
-![Garbage](./screens/garbage.png)
+![Garbage](./assets/screens/garbage.png)
 
 Different styles of garbage to dig through.
 
@@ -210,13 +210,13 @@ The value controls the transition from normal killscreen (a value of `x` transit
 
 ### Invisible
 
-![Invisible](./screens/invisible.png)
+![Invisible](./assets/screens/invisible.png)
 
 Blocks are invisible until the end of the game.
 
 ### Hard Drop
 
-![Hard Drop](./screens/harddrop.png)
+![Hard Drop](./assets/screens/harddrop.png)
 
 Press `up` to hard drop and `select` to soft drop.
 
@@ -226,15 +226,15 @@ Retains the functionality of the original level menu, except;
 
 Press `select` when choosing a level to show 'READY' text
 
-![Ready](./screens/ready.png)
+![Ready](./assets/screens/ready.png)
 
 Press `right` when on 9 to choose any level to start on with `up` and `down`.
 
-![Any Level](./screens/anylevel.png)
+![Any Level](./assets/screens/anylevel.png)
 
 Press `down` when on 5-9 to select hearts to display with `left` and `right`.
 
-![Hearts](./screens/hearts.png)
+![Hearts](./assets/screens/hearts.png)
 
 Used for keeping track of wins in local games.
 
@@ -250,7 +250,7 @@ To clear the highscores, select hearts and press `down`. Then confirm the prompt
 
 ## Tap/Roll Speed Tester
 
-![Speed Test](./screens/speedtest.png)
+![Speed Test](./assets/screens/speedtest.png)
 
 Practise tapping rate outside of gameplay.
 
@@ -264,7 +264,7 @@ In every mode except Classic, at 1000 lines an extra digit is added to the lines
 
 __Classic__
 
-![Classic](./screens/score-classic.png)
+![Classic](./assets/screens/score-classic.png)
 
 Behaves like the original uncapped scores, with digits A-F used for a rollover at 1.6 million.
 
@@ -272,31 +272,31 @@ After 100 million the score will jump by 800k, so you may want to use another mo
 
 __Letters__
 
-![Classic](./screens/score-letters.png)
+![Classic](./assets/screens/score-letters.png)
 
 Show 0-9, then A-Z, then wrap.
 
 __7 Digit__
 
-![7 Digit](./screens/score-7digit.png)
+![7 Digit](./assets/screens/score-7digit.png)
 
 An extra scoring digit, rolls over at 10 million.
 
 __M__
 
-![M](./screens/score-m.png)
+![M](./assets/screens/score-m.png)
 
 Shows your score in millions, rolls over at 100 million.
 
 __Capped__
 
-![Capped](./screens/score-capped.png)
+![Capped](./assets/screens/score-capped.png)
 
 Cap your score at 999999.
 
 ## Hz Display
 
-![Hz Display](./screens/hz.png)
+![Hz Display](./assets/screens/hz.png)
 
 Shows the average tapping rate for each tap in a burst.
 
@@ -304,7 +304,7 @@ Also shows frames between spawn and first tap, and current tap direction.
 
 ## Input Display
 
-![Controller](./screens/controller.png)
+![Controller](./assets/screens/controller.png)
 
 ## Disable Flash
 
@@ -316,7 +316,7 @@ Flips A/B, Start/Select, and inverts DPad directions like a Goofy Foot controlle
 
 ## Block Tool
 
-![Block](./screens/block.png)
+![Block](./assets/screens/block.png)
 
 Allow more fine control over aspects of gameplay.
 
@@ -371,9 +371,9 @@ Combined with the level editor, savestates are effective for practising specific
 
 ## Qual Mode
 
-![Legal](./screens/legal.png)
+![Legal](./assets/screens/legal.png)
 
-![Rocket](./screens/rocket.png)
+![Rocket](./assets/screens/rocket.png)
 
 Reintroduces the 'wait screens', intended for use in qualifiers where the the player would otherwise gain a time advantage skipping the rocket, legal and title screens.
 
