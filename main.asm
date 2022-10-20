@@ -3203,6 +3203,7 @@ gameModeState_initGameState:
         lda practiseType
         cmp #MODE_TAPQTY
         bne @noTapQty
+        jsr tapQtyDeleteGrid
         jsr random10
         sta tqtyNext
         sta tqtyCurrent
@@ -5175,6 +5176,14 @@ updateLineClearingAnimation:
         clc
         adc generalCounter
         sta PPUADDR
+        lda gridFlag
+        beq @noGrid
+        lda practiseType
+        cmp #MODE_INVISIBLE
+        beq @noGrid
+        lda #$93
+        sta tmp3
+@noGrid:
         lda tmp3 ; #$FF
         sta PPUDATA
         lda generalCounter2
@@ -6062,6 +6071,11 @@ playState_completeRowContinue:
         lda #$07
         sta soundEffectSlot1Init
 playState_checkForCompletedRows_return:
+        lda practiseType
+        cmp #MODE_TAPQTY
+        bne @ret
+        jsr tapQtyDeleteGrid
+@ret:
         rts
 
 playState_prepareNext:
@@ -10948,6 +10962,35 @@ prepareNextTapQuantity:
         tax
         cpx #$c8
         bcc @nextLoop
+        rts
+
+tapQtyDeleteGrid:
+        ldx #0
+        ldy #0
+        lda #$EF
+@loop:
+        sta playfield, y
+        inx
+        iny
+        cpx #3
+        bne @loop
+        cpy #33
+        beq @ret
+        tya
+        clc
+        adc #7
+        tay
+        ldx #0
+        lda gridFlag
+        beq @noGrid
+        cpy #30
+        bne @noGrid
+        lda #$93
+        jmp @loop
+@noGrid:
+        lda #$EF
+        jmp @loop
+@ret:
         rts
 
 initChecker:
