@@ -6,7 +6,7 @@ node gfx/nametables/build.js
 
 # PNG -> CHR
 
-function png2chr {
+png2chr() {
 
     python tools/nes-util/nes_chr_encode.py gfx/title_menu_tileset.png gfx/title_menu_tileset.chr
     python tools/nes-util/nes_chr_encode.py gfx/game_tileset.png gfx/game_tileset.chr
@@ -20,7 +20,7 @@ function png2chr {
 
 # build CHR if it doesnt already exist
 
-if [ `ls -1 gfx/*.chr 2>/dev/null | wc -l` == 0 ]; then
+if [ "$(find gfx/*.chr 2>/dev/null | wc -l)" = 0 ]; then
     echo "building CHR for the first time"
     png2chr
 else
