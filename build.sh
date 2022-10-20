@@ -18,18 +18,28 @@ function png2chr {
     # npx img2chr gfx/rocket_tileset.png gfx/rocket_tileset.chr
 }
 
-# compare the last modified time of the PNGS to the touch time of this file and see if it's newer
+# build CHR if it doesnt already exist
 
-pngTimes=$(stat -c "%Y" gfx/*.png)
-scriptTime=$(stat -c "%X" "$0")
+if [ `ls -1 gfx/*.chr 2>/dev/null | wc -l` == 0 ]; then
+    echo "building CHR for the first time"
+    png2chr
+else
 
-for pngTime in $pngTimes; do
-    if [ $pngTime -gt $scriptTime ]; then
-        echo "converting PNG to CHR"
-            png2chr
-        break;
-    fi
-done
+    # if it does exist check if the PNG has been modified
+
+    pngTimes=$(stat -c "%Y" gfx/*.png)
+    scriptTime=$(stat -c "%X" "$0")
+
+    for pngTime in $pngTimes; do
+        if [ "$pngTime" -gt "$scriptTime" ]; then
+            echo "converting PNG to CHR"
+                png2chr
+            break;
+        fi
+    done
+fi
+
+# touch this file to store the last modified / checked date
 
 touch gfx/*.png
 touch "$0"
