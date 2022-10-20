@@ -5571,9 +5571,12 @@ playState_lockTetrimino:
 @makeVisible:
         ldy playfield, x
         cpy #INVISIBLE_TILE
-        bne @emptyTile
+        beq @filledTile
+        cpy #GRID_INVISIBLE_TILE
+        beq @filledTile
+        rts
+@filledTile:
         sta playfield, x
-@emptyTile:
         rts
 
 @notGameOver:
@@ -10950,6 +10953,7 @@ prepareNextTapQuantity:
 initChecker:
 CHECKERBOARD_TILE := BLOCK_TILES
 CHECKERBOARD_FLIP := CHECKERBOARD_TILE ^ EMPTY_TILE
+CHECKERBOARD_GRID_FLIP = CHECKERBOARD_TILE ^ GRID_TILE
         lda #0
         sta vramRow
         ldx checkerModifier
@@ -10959,6 +10963,15 @@ CHECKERBOARD_FLIP := CHECKERBOARD_TILE ^ EMPTY_TILE
         bne @notZero
         ldx #$BE
 @notZero:
+        lda gridFlag
+        beq @noGrid
+        lda #CHECKERBOARD_GRID_FLIP
+        sta tmp3
+        jmp @skipNoGrid
+@noGrid:
+        lda #CHECKERBOARD_FLIP
+        sta tmp3
+@skipNoGrid:
         lda frameCounter
         and #1
         beq @checkerStartA
@@ -10966,10 +10979,10 @@ CHECKERBOARD_FLIP := CHECKERBOARD_TILE ^ EMPTY_TILE
         bne @checkerStart
 @checkerStartA:
         lda gridFlag
-        beq @noGrid3
+        beq @noGrid2
         lda #GRID_TILE
         jmp @checkerStart
-@noGrid3:
+@noGrid2:
         lda #EMPTY_TILE
 @checkerStart:
         ; hydrantdude found the short way to do this
@@ -10977,10 +10990,10 @@ CHECKERBOARD_FLIP := CHECKERBOARD_TILE ^ EMPTY_TILE
 @loop:
         dey
         bne @notA
-        eor #CHECKERBOARD_FLIP
+        eor tmp3
         ldy #$A
 @notA:  sta playfield, x
-        eor #CHECKERBOARD_FLIP
+        eor tmp3
         inx
         cpx #$C8
         bcc @loop
@@ -11416,10 +11429,17 @@ findTopBulky:
         rts
 
 swapMino:
-        ldy #EMPTY_TILE
+        lda gridFlag
+        beq @noGrid
+        ldy #GRID_TILE
         lda playfield, x
         cmp #GRID_TILE
         bne @full
+        ldy #BLOCK_TILES+3
+        jmp @full
+@noGrid:
+        ldy #EMPTY_TILE
+        lda playfield, x
         cmp #EMPTY_TILE
         bne @full
         ldy #BLOCK_TILES+3
