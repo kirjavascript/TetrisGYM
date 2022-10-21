@@ -9146,7 +9146,7 @@ sintab:
 
 .segment    "PRG_chunk2": absolute
 
-.include "data/demo_data.asm"
+.include "demo_data.asm"
 
 ; canon is updateAudio
 updateAudio_jmp:
