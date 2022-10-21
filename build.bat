@@ -15,13 +15,13 @@ python tools/nes-util/nes_chr_encode.py src/gfx/rocket_tileset.png src/gfx/rocke
 
 : build object files
 
-ca65 -g src/tetris.asm -o tetris.o
+ca65 -g src/header.asm -o header.o
 ca65 -l tetris.lst -g src/main.asm -o main.o
 ca65 -g src/tetris-ram.asm -o tetris-ram.o
 
 : link object files
 
-ld65 -m tetris.map -Ln tetris.lbl --dbgfile tetris.dbg -o tetris.nes -C src/tetris.nes.cfg main.o tetris-ram.o tetris.o
+ld65 -m tetris.map -Ln tetris.lbl --dbgfile tetris.dbg -o tetris.nes -C src/tetris.nes.cfg main.o tetris-ram.o header.o
 
 : create patch
 
