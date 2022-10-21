@@ -4,14 +4,9 @@ node src/nametables/build.js
 
 : PNG -> CHR
 
-python tools/nes-util/nes_chr_encode.py src/gfx/title_menu_tileset.png src/gfx/title_menu_tileset.chr
-python tools/nes-util/nes_chr_encode.py src/gfx/game_tileset.png src/gfx/game_tileset.chr
-python tools/nes-util/nes_chr_encode.py src/gfx/rocket_tileset.png src/gfx/rocket_tileset.chr
-
-: slower but more portable JS alternative
-: npx img2chr gfx/title_menu_tileset.png gfx/title_menu_tileset.chr
-: npx img2chr gfx/game_tileset.png gfx/game_tileset.chr
-: npx img2chr gfx/rocket_tileset.png gfx/rocket_tileset.chr
+node tools/png2chr/convert.js src/gfx/title_menu_tileset.png src/gfx/title_menu_tileset.chr
+node tools/png2chr/convert.js src/gfx/game_tileset.png src/gfx/game_tileset.chr
+node tools/png2chr/convert.js src/gfx/rocket_tileset.png src/gfx/rocket_tileset.chr
 
 : build object files
 
