@@ -48,11 +48,10 @@ touch "$0"
 
 ca65 -g src/header.asm -o header.o
 ca65 -l tetris.lst -g src/main.asm -o main.o
-ca65 -g src/tetris-ram.asm -o tetris-ram.o
 
 # link object files
 
-ld65 -m tetris.map -Ln tetris.lbl --dbgfile tetris.dbg -o tetris.nes -C src/tetris.nes.cfg main.o tetris-ram.o header.o
+ld65 -m tetris.map -Ln tetris.lbl --dbgfile tetris.dbg -o tetris.nes -C src/tetris.nes.cfg main.o header.o
 
 # create patch
 
@@ -61,5 +60,5 @@ ld65 -m tetris.map -Ln tetris.lbl --dbgfile tetris.dbg -o tetris.nes -C src/tetr
 # show some stats
 
 sha1sum tetris.nes
-sed -n '18p;19p;24,26p' < tetris.map
+sed -n '19,22p' < tetris.map
 stat -c %s tetris.bps

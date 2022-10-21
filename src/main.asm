@@ -117,6 +117,7 @@ MENU_TOP_MARGIN_SCROLL := 7 ; in blocks
 
         .setcpu "6502"
 
+; RAM start
 SRAM        := $6000 ; 8kb
 SRAM_states := SRAM
 SRAM_hsMagic := SRAM+$A00
@@ -461,6 +462,7 @@ JOY2_APUFC  := $4017                        ; read: bits 0-4 joy data lines (bit
 MMC1_Control := $8000
 MMC1_CHR0   := $BFFF
 MMC1_CHR1   := $DFFF
+; RAM end
 
 .macro RESET_MMC1
 .if INES_MAPPER = 1
