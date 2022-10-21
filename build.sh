@@ -2,7 +2,7 @@
 
 # build / compress nametables
 
-node src/gfx/nametables/build.js
+node src/nametables/build.js
 
 # PNG -> CHR
 

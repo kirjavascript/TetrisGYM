@@ -7801,21 +7801,21 @@ wait_palette:
         .byte   $3F,$00,$8,$f,$30,$38,$26,$0F,$17,$27,$37
         .byte   $FF
 game_type_menu_nametable: ; RLE
-        .incbin "gfx/nametables/game_type_menu_nametable_practise.bin"
+        .incbin "nametables/game_type_menu_nametable_practise.bin"
 game_type_menu_nametable_extra: ; RLE
-        .incbin "gfx/nametables/game_type_menu_nametable_extra.bin"
+        .incbin "nametables/game_type_menu_nametable_extra.bin"
 level_menu_nametable: ; RLE
-        .incbin "gfx/nametables/level_menu_nametable_practise.bin"
+        .incbin "nametables/level_menu_nametable_practise.bin"
 game_nametable: ; RLE
-        .incbin "gfx/nametables/game_nametable_practise.bin"
+        .incbin "nametables/game_nametable_practise.bin"
 enter_high_score_nametable: ; RLE
-        .incbin "gfx/nametables/enter_high_score_nametable_practise.bin"
+        .incbin "nametables/enter_high_score_nametable_practise.bin"
 rocket_nametable: ; RLE
-        .incbin "gfx/nametables/rocket_nametable.bin"
+        .incbin "nametables/rocket_nametable.bin"
 legal_nametable: ; RLE
-        .incbin "gfx/nametables/legal_nametable.bin"
+        .incbin "nametables/legal_nametable.bin"
 speedtest_nametable: ; RLE
-        .incbin "gfx/nametables/speedtest_nametable.bin"
+        .incbin "nametables/speedtest_nametable.bin"
 title_nametable_patch: ; stripe
         .byte $21, $69, $5, $1D, $12, $1D, $15, $E
         .byte $FF
@@ -7825,7 +7825,7 @@ rocket_nametable_patch: ; stripe
         .byte $FF
 
 
-.include "gfx/nametables/rle.asm"
+.include "nametables/rle.asm"
 
 .include "presets/presets.asm"
 
