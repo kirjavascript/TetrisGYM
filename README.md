@@ -39,6 +39,7 @@
     * [Savestates](#savestates)
 * [Qualifier Mode](#qual-mode)
 * [PAL Mode](#pal-mode)
+* [Development](#development)
 * [Resources](#resources)
 
 ## Getting Started
@@ -388,6 +389,12 @@ You cannot use the Block Tool and Qual mode at the same time.
 ## PAL Mode
 
 Dictate if the NTSC or PAL gameplay mechanics should be used. Should automatically detect region, but can be manually overwritten otherwise.
+
+## Development
+
+To build, you need a copy of `node` and `ca65` installed on your system.
+
+Provide a `clean.nes` file of the unpatched ROM and run `sh build.sh` in a shell or `build.bat` on Windows.
 
 ## Resources
 

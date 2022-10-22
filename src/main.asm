@@ -115,65 +115,65 @@ MENU_TOP_MARGIN_SCROLL := 7 ; in blocks
     .byte   "HRDDRP"
 .endmacro
 
-        .setcpu "6502"
+.setcpu "6502"
 
-; RAM start
 SRAM        := $6000 ; 8kb
 SRAM_states := SRAM
 SRAM_hsMagic := SRAM+$A00
 SRAM_highscores := SRAM_hsMagic+$4
 
-tmp1        := $0000
-tmp2        := $0001
-tmp3        := $0002
-tmpX        := $0003
-tmpY        := $0004
-tmpZ        := $0005
-tmpBulkCopyToPpuReturnAddr:= $0006 ; 2 bytes
-binScore    := $8 ; 4 bytes binary
-score       := $C ; 4 bytes BCD
-; ... $10
+.zeropage
+tmp1: .res 1
+tmp2: .res 1
+tmp3: .res 1
+tmpX: .res 1 ;  $0003
+tmpY: .res 1 ;  $0004
+tmpZ: .res 1 ;  $0005
+tmpBulkCopyToPpuReturnAddr: .res 2 ;  $0006 ; 2 bytes
+binScore: .res 4 ;  $8 ; 4 bytes binary
+score: .res 4 ;  $C ; 4 bytes BCD
+    .res 7
 
-rng_seed    := $0017
-spawnID     := $0019
-spawnCount  := $001A
-pointerAddr := $001B ; 2 bytes
-pointerAddrB := $001D ; 2 bytes
-; .. $1F
+rng_seed: .res 2 ; $0017
+spawnID: .res 1 ; $0019
+spawnCount: .res 1 ; $001A
+pointerAddr: .res 2 ; $001B
+pointerAddrB: .res 2 ; $001D
+    .res $14
 
-verticalBlankingInterval:= $0033
-set_seed    := $0034 ; 3 bytes - rng_seed, rng_seed+1, spawnCount
-set_seed_input := $0037 ; copied to set_seed during gameModeState_initGameState
-; ... $003A
+verticalBlankingInterval: .res 1 ; $0033
+set_seed: .res 3 ; $0034 ; rng_seed, rng_seed+1, spawnCount
+set_seed_input: .res 3 ; $0037 ; copied to set_seed during gameModeState_initGameState
+    .res 6
 
-; ... $003F
-tetriminoX  := $0040
-tetriminoY  := $0041
-currentPiece    := $0042                    ; Current piece as an orientation ID
-levelNumber := $0044
-fallTimer   := $0045
-autorepeatX := $0046
-startLevel  := $0047
-playState   := $0048
-vramRow     := $0049                        ; Next playfield row to copy. Set to $20 when playfield copy is complete
-completedRow    := $004A                    ; Row which has been cleared. 0 if none complete
-autorepeatY := $004E
-holdDownPoints  := $004F
-lines       := $0050
-rowY        := $0052
-linesBCDHigh := $53
-linesTileQueue := $54
-currentPiece_copy := $55 ; used in floor code checking
-; $55 free
-completedLines  := $0056
-lineIndex   := $0057                        ; Iteration count of playState_checkForCompletedRows
-startHeight := $0058
-garbageHole := $0059                        ; Position of hole in received garbage
-garbageDelay  := $005A
-pieceTileModifier := $005B ; above $80 - use a single one, below - use an offset
-curtainRow := $5C
+tetriminoX: .res 1 ; $0040
+tetriminoY: .res 1 ; $0041
+currentPiece: .res 1 ; $0042                    ; Current piece as an orientation ID
+    .res 1
+levelNumber: .res 1 ; $0044
+fallTimer: .res 1 ; $0045
+autorepeatX: .res 1 ; $0046
+startLevel: .res 1 ; $0047
+playState: .res 1 ; $0048
+vramRow: .res 1 ; $0049                        ; Next playfield row to copy. Set to $20 when playfield copy is complete
+completedRow: .res 4 ; $004A                    ; Row which has been cleared. 0 if none complete
+autorepeatY: .res 1 ; $004E
+holdDownPoints: .res 1 ; $004F
+lines: .res 2 ; $0050
+rowY: .res 1 ; $0052
+linesBCDHigh: .res 1 ; $53
+linesTileQueue: .res 1 ; $54
+currentPiece_copy: .res 1 ; $55 ; used in floor code checking
+completedLines: .res 1 ; $0056
+lineIndex: .res 1 ; $0057                        ; Iteration count of playState_checkForCompletedRows
+startHeight: .res 1 ; $0058
+garbageHole: .res 1 ; $0059                        ; Position of hole in received garbage
+garbageDelay: .res 1 ; $005A
+pieceTileModifier: .res 1 ; $005B ; above $80 - use a single one, below - use an offset
+curtainRow: .res 1 ; $5C
+    .res 3
 
-mathRAM := $60 ; $12 bytes
+mathRAM: .res $12
 binary32 := mathRAM+$0
 bcd32 := mathRAM+$4
 exp := mathRAM+$8
@@ -187,18 +187,16 @@ divisor := mathRAM+$7
 remainder := mathRAM+$A
 pztemp := mathRAM+$D
 
-byteSpriteRAM := $72
-byteSpriteAddr := byteSpriteRAM+0
-byteSpriteTile := byteSpriteRAM+2
-byteSpriteLen := byteSpriteRAM+3
-; ... $0076
+byteSpriteAddr: .res 2
+byteSpriteTile: .res 1
+byteSpriteLen: .res 1
+    .res $2A
 
-; ... $009A
-spriteXOffset   := $00A0
-spriteYOffset   := $00A1
-spriteIndexInOamContentLookup:= $00A2
-stringIndexLookup:= $00A2
-outOfDateRenderFlags:= $00A3
+spriteXOffset: .res 1 ; $00A0
+spriteYOffset: .res 1 ; $00A1
+stringIndexLookup:
+spriteIndexInOamContentLookup: .res 1 ; $00A2
+outOfDateRenderFlags: .res 1 ; $00A3
 ; play/demo
 ; Bit 0-lines 1-level 2-score 4-hz 6-stats 7-high score entry letter
 ; speedtest
@@ -206,178 +204,201 @@ outOfDateRenderFlags:= $00A3
 ; level menu
 ; 0-customLevel
 
-; ... $00A6
-gameModeState   := $00A7                    ; For values, see playState_checkForCompletedRows
-generalCounter  := $00A8                    ; canon is legalScreenCounter2
-generalCounter2 := $00A9
-generalCounter3 := $00AA
-generalCounter4 := $00AB
-generalCounter5 := $00AC
-positionValidTmp:= $00AD              ; 0-level, 1-height
-originalY   := $00AE
-dropSpeed   := $00AF
-tmpCurrentPiece := $00B0                    ; Only used as a temporary
-frameCounter    := $00B1
-oamStagingLength:= $00B3
-newlyPressedButtons:= $00B5                 ; Active player's buttons
-heldButtons := $00B6                        ; Active player's buttons
-; activePlayer    := $00B7                    ; Which player is being processed (data in $40)
-playfieldAddr   := $00B8                    ; HI byte is leftPlayfield in canon. Current playfield being processed: $0400 (left; 1st player) or $0500 (right; 2nd player)
-allegro     := $00BA
-pendingGarbage  := $00BB                    ; Garbage waiting to be delivered to the current player. This is exchanged with pendingGarbageInactivePlayer when swapping players.
-; pendingGarbageInactivePlayer := $00BC       ; canon is totalGarbage
-renderMode  := $00BD
-; numberOfPlayers := $00BE
-nextPiece   := $00BF                        ; Stored by its orientation ID
-gameMode    := $00C0                        ; 0=legal, 1=title, 2=type menu, 3=level menu, 4=play and ending and high score, 5=demo, 6=start demo
-screenStage    := $00C1                        ; used in gameMode_waitScreen, endingAnimation
-musicType   := $00C2                        ; 0-3; 3 is off
-sleepCounter    := $00C3                    ;
-endingSleepCounter := $00C4                 ; 2 bytes
-endingRocketCounter := $00C6
-endingRocketX := $C7
-endingRocketY := $C8
+    .res $3
 
-; ... $00CD
-demo_heldButtons:= $00CE
-demo_repeats    := $00CF
-demoButtonsAddr := $00D1                    ; Current address within demoButtonsTable
-demoIndex   := $00D3
-highScoreEntryNameOffsetForLetter:= $00D4   ; Relative to current row
-highScoreEntryRawPos:= $00D5                ; High score position 0=1st type A, 1=2nd... 4=1st type B... 7=4th/extra type B
-highScoreEntryNameOffsetForRow:= $00D6      ; Relative to start of table
-highScoreEntryCurrentLetter:= $00D7
-lineClearStatsByType:= $00D8                ; bcd. one entry for each of single, double, triple, tetris
-displayNextPiece:= $00DF
-AUDIOTMP1   := $00E0
-AUDIOTMP2   := $00E1
-AUDIOTMP3   := $00E2
-AUDIOTMP4   := $00E3
-AUDIOTMP5   := $00E4
-musicChanTmpAddr:= $00E6
-music_unused2   := $00EA                    ; Always 0
-soundRngSeed    := $00EB                    ; Set, but not read
-currentSoundEffectSlot:= $00ED              ; Temporary
-musicChannelOffset:= $00EE                  ; Temporary. Added to $4000-3 for MMIO
-currentAudioSlot:= $00EF                    ; Temporary
-unreferenced_buttonMirror := $00F1          ; Mirror of $F5-F8
-newlyPressedButtons_player1:= $00F5         ; $80-a $40-b $20-select $10-start $08-up $04-down $02-left $01-right
-newlyPressedButtons_player2:= $00F6
-heldButtons_player1:= $00F7
-heldButtons_player2:= $00F8
-joy1Location    := $00FB                    ; normal=0; 1 or 3 for expansion
-ppuScrollY      := $00FC
-ppuScrollX      := $00FD
-currentPpuMask  := $00FE
-currentPpuCtrl  := $00FF
-stack       := $0100
-oamStaging  := $0200                        ; format: https://wiki.nesdev.com/w/index.php/PPU_programmer_reference#OAM
-statsByType := $03F0
-playfield   := $0400
-; $500 ...
+gameModeState: .res 1 ; $00A7                    ; For values, see playState_checkForCompletedRows
+generalCounter: .res 1 ; $00A8                    ; canon is legalScreenCounter2
+generalCounter2: .res 1 ; $00A9
+generalCounter3: .res 1 ; $00AA
+generalCounter4: .res 1 ; $00AB
+generalCounter5: .res 1 ; $00AC
+positionValidTmp: .res 1 ; $00AD              ; 0-level, 1-height
+originalY: .res 1 ; $00AE
+dropSpeed: .res 1 ; $00AF
+tmpCurrentPiece: .res 1 ; $00B0                    ; Only used as a temporary
+frameCounter: .res 2 ; $00B1
+oamStagingLength: .res 1 ; $00B3
+    .res 1
+newlyPressedButtons: .res 1 ; $00B5                 ; Active player's buttons
+heldButtons: .res 1 ; $00B6                        ; Active player's buttons
+    .res 1
+playfieldAddr: .res 2 ; $00B8                    ; HI byte is leftPlayfield in canon. Current playfield being processed: $0400 (left; 1st player) or $0500 (right; 2nd player)
+allegro: .res 1 ; $00BA
+pendingGarbage: .res 1 ; $00BB                    ; Garbage waiting to be delivered to the current player. This is exchanged with pendingGarbageInactivePlayer when swapping players.
+    .res 1
+renderMode: .res 1 ; $00BD
+    .res 1
+nextPiece: .res 1 ; $00BF                        ; Stored by its orientation ID
+gameMode: .res 1 ; $00C0                        ; 0=legal, 1=title, 2=type menu, 3=level menu, 4=play and ending and high score, 5=demo, 6=start demo
+screenStage: .res 1 ; $00C1                        ; used in gameMode_waitScreen, endingAnimation
+musicType: .res 1 ; $00C2                        ; 0-3; 3 is off
+sleepCounter: .res 1 ; $00C3                    ;
+endingSleepCounter: .res 2 ; $00C4
+endingRocketCounter: .res 1 ; $00C6
+endingRocketX: .res 1 ; $C7
+endingRocketY: .res 1 ; $C8
+    .res 5
+demo_heldButtons: .res 1 ; $00CE
+demo_repeats: .res 1 ; $00CF
+    .res 1
+demoButtonsAddr: .res 2 ; $00D1                    ; Current address within demoButtonsTable
+demoIndex: .res 1 ; $00D3
+highScoreEntryNameOffsetForLetter: .res 1 ; $00D4   ; Relative to current row
+highScoreEntryRawPos: .res 1 ; $00D5                ; High score position 0=1st type A, 1=2nd... 4=1st type B... 7=4th/extra type B
+highScoreEntryNameOffsetForRow: .res 1 ; $00D6      ; Relative to start of table
+highScoreEntryCurrentLetter: .res 1 ; $00D7
+lineClearStatsByType: .res 7 ; $00D8                ; bcd. one entry for each of single, double, triple, tetris
+displayNextPiece: .res 1 ; $00DF
+AUDIOTMP1: .res 1 ; $00E0
+AUDIOTMP2: .res 1 ; $00E1
+AUDIOTMP3: .res 1 ; $00E2
+AUDIOTMP4: .res 1 ; $00E3
+AUDIOTMP5: .res 1 ; $00E4
+    .res 1
+musicChanTmpAddr: .res 2 ; $00E6
+    .res 2
+music_unused2: .res 1 ; $00EA                    ; Always 0
+soundRngSeed: .res 2 ; $00EB                    ; Set, but not read
+currentSoundEffectSlot: .res 1 ; $00ED              ; Temporary
+musicChannelOffset: .res 1 ;  $00EE                  ; Temporary. Added to $4000-3 for MMIO
+currentAudioSlot: .res 1 ; $00EF                    ; Temporary
+    .res 1
+unreferenced_buttonMirror: .res 3 ; $00F1          ; Mirror of $F5-F8
+    .res 1
+newlyPressedButtons_player1: .res 1 ; $00F5         ; $80-a $40-b $20-select $10-start $08-up $04-down $02-left $01-right
+newlyPressedButtons_player2: .res 1 ; $00F6
+heldButtons_player1: .res 1 ; $00F7
+heldButtons_player2: .res 1 ; $00F8
+    .res 2
+joy1Location: .res 1 ; $00FB                    ; normal=0; 1 or 3 for expansion
+ppuScrollY: .res 1 ; $00FC
+ppuScrollX: .res 1 ; $00FD
+currentPpuMask: .res 1 ; $00FE
+currentPpuCtrl: .res 1 ; $00FF
 
-practiseType := $600
-spawnDelay := $601
-dasValueDelay := $602
-dasValuePeriod := $603
-tspinX := $604
-tspinY := $605
-tspinType := $606
-tspinQuantity := $60E ; reusing presetIndex
-parityIndex := $607
-parityCount := $608
-parityColor := $609
-saveStateDirty := $60A
-saveStateSlot := $60B
-saveStateSpriteType := $60C
-saveStateSpriteDelay := $60D
-presetIndex := $60E ; can be mangled in other modes
-pausedOutOfDateRenderFlags := $60F ; 0 - statistics 1 - saveslot
-debugLevelEdit := $610
-debugNextCounter := $611
-paceResult := $612 ; 3 bytes
-paceSign := $615
+.bss
+stack: .res $FF ; $0100
+    .res 1
+oamStaging: .res $100 ; $0200                        ; format: https://wiki.nesdev.com/w/index.php/PPU_programmer_reference#OAM
+    .res $F0
+statsByType: .res $E ; $03F0
+    .res 2
+playfield: .res $c8 ; $0400
+    .res $38
+    .res $100 ; $500 ; 2 player playfield
 
-hzRAM := $616
+practiseType: .res 1 ; $600
+spawnDelay: .res 1 ; $601
+dasValueDelay: .res 1 ; $602
+dasValuePeriod: .res 1 ; $603
+tspinX: .res 1 ; $604
+tspinY: .res 1 ; $605
+tspinQuantity := presetIndex
+tspinType: .res 1 ; $606
+parityIndex: .res 1 ; $607
+parityCount: .res 1 ; $608
+parityColor: .res 1 ; $609
+saveStateDirty: .res 1 ; $60A
+saveStateSlot: .res 1 ; $60B
+saveStateSpriteType: .res 1 ; $60C
+saveStateSpriteDelay: .res 1 ; $60D
+presetIndex: .res 1 ; $60E ; can be mangled in other modes
+pausedOutOfDateRenderFlags: .res 1 ; $60F ; 0 - statistics 1 - saveslot
+debugLevelEdit: .res 1 ; $610
+debugNextCounter: .res 1 ; $611
+paceResult: .res 3 ; $612 ; 3 bytes
+paceSign: .res 1 ; $615
+
+hzRAM: .res 9; $616
 hzTapCounter := hzRAM+0
 hzFrameCounter := hzRAM+1 ; 2 byte
 hzDebounceCounter := hzRAM+3 ; 1 byte
 hzTapDirection := hzRAM+4 ; 1 byte
 hzResult := hzRAM+5 ; 2 byte
-hzSpawnDelay := hzRAM+7 ; 2 byte
+hzSpawnDelay := hzRAM+7 ; 1 byte
 hzPalette := hzRAM+8 ; 1 byte
-inputLogCounter := $60E ; reusing presetIndex
-tqtyCurrent := $621
-tqtyNext := $622
+inputLogCounter := presetIndex ; reusing presetIndex
+    .res 2
+tqtyCurrent: .res 1 ; $621
+tqtyNext: .res 1 ; $622
 
 ; hard drop ram is pretty big, but can be reused in other modes
 ; 22 bytes total
-completedLinesCopy := $623
-lineOffset := $624
-harddropBuffer := $625 ; 20 bytes (!)
+completedLinesCopy: .res 1 ; $623
+lineOffset: .res 1 ; $624
+harddropBuffer: .res $14 ; $625 ; 20 bytes (!)
 
-linecapState := $639 ; 0 if not triggered, 1 + linecapHow otherwise, reset on game init
+linecapState: .res 1 ; $639 ; 0 if not triggered, 1 + linecapHow otherwise, reset on game init
 
-dasOnlyShiftDisabled := $63A
-; ... $63B
-
-; ... $67F
-musicStagingSq1Lo:= $0680
-musicStagingSq1Hi:= $0681
-audioInitialized:= $0682
-musicStagingSq2Lo:= $0684
-musicStagingSq2Hi:= $0685
-musicStagingTriLo:= $0688
-musicStagingTriHi:= $0689
-resetSq12ForMusic:= $068A                   ; 0-off. 1-sq1. 2-sq1 and sq2
-musicStagingNoiseLo:= $068C
-musicStagingNoiseHi:= $068D
-musicDataNoteTableOffset:= $0690            ; AKA start of musicData, of size $0A
-musicDataDurationTableOffset:= $0691
-musicDataChanPtr:= $0692
-musicChanControl:= $069A                    ; high 3 bits are for LO offset behavior. Low 5 bits index into musicChanVolControlTable, minus 1. Technically size 4, but usages of the next variable 'cheat' since that variable's first index is unused
-musicChanVolume := $069D                    ; Must not use first index. First and second index are unused. High nibble always used; low nibble may be used depending on control and frame
-musicDataChanPtrDeref:= $06A0               ; deref'd musicDataChanPtr+musicDataChanPtrOff
-musicDataChanPtrOff:= $06A8
-musicDataChanInstructionOffset:= $06AC
-musicDataChanInstructionOffsetBackup:= $06B0
-musicChanNoteDurationRemaining:= $06B4
-musicChanNoteDuration:= $06B8
-musicChanProgLoopCounter:= $06BC            ; As driven by bytecode instructions
-musicStagingSq1Sweep:= $06C0                ; Used as if size 4, but since Tri/Noise does nothing when written for sweep, the other two entries can have any value without changing behavior
-musicChanNote:= $06C3
-musicChanInhibit:= $06C8                    ; Always zero
-musicTrack_dec  := $06CC                    ; $00-$09
-musicChanVolFrameCounter:= $06CD            ; Pos 0/1 are unused
-musicChanLoFrameCounter:= $06D1             ; Pos 3 unused
-soundEffectSlot0FrameCount:= $06D5          ; Number of frames
-soundEffectSlot0FrameCounter:= $06DA        ; Current frame
-soundEffectSlot0SecondaryCounter:= $06DF    ; nibble index into noiselo_/noisevol_table
-soundEffectSlot1SecondaryCounter:= $06E0
-soundEffectSlot2SecondaryCounter:= $06E1
-soundEffectSlot3SecondaryCounter:= $06E2
-soundEffectSlot0TertiaryCounter:= $06E3
-soundEffectSlot1TertiaryCounter:= $06E4
-soundEffectSlot2TertiaryCounter:= $06E5
-soundEffectSlot3TertiaryCounter:= $06E6
-soundEffectSlot0Tmp:= $06E7
-soundEffectSlot1Tmp:= $06E8
-soundEffectSlot2Tmp:= $06E9
-soundEffectSlot3Tmp:= $06EA
-soundEffectSlot0Init:= $06F0                ; NOISE sound effect. 2-game over curtain. 3-ending rocket. For mapping, see soundEffectSlot0Init_table
-soundEffectSlot1Init:= $06F1                ; SQ1 sound effect. Menu, move, rotate, clear sound effects. For mapping, see soundEffectSlot1Init_table
-soundEffectSlot2Init:= $06F2                ; SQ2 sound effect. For mapping, see soundEffectSlot2Init_table
-soundEffectSlot3Init:= $06F3                ; TRI sound effect. For mapping, see soundEffectSlot3Init_table
-soundEffectSlot4Init:= $06F4                ; Unused. Assume meant for DMC sound effect. Uses some data from slot 2
-musicTrack  := $06F5                        ; $FF turns off music. $00 continues selection. $01-$0A for new selection
-soundEffectSlot0Playing:= $06F8             ; Used if init is zero
-soundEffectSlot1Playing:= $06F9
-soundEffectSlot2Playing:= $06FA
-soundEffectSlot3Playing:= $06FB
-soundEffectSlot4Playing:= $06FC
-currentlyPlayingMusicTrack:= $06FD          ; Copied from musicTrack
-unreferenced_soundRngTmp:= $06FF
-highscores := $700
+dasOnlyShiftDisabled: .res 1 ; $63A
+    .res $45
+musicStagingSq1Lo: .res 1 ; $0680
+musicStagingSq1Hi: .res 1 ; $0681
+audioInitialized: .res 1 ; $0682
+musicPauseSoundEffectLengthCounter: .res 1
+musicStagingSq2Lo: .res 1 ; $0684
+musicStagingSq2Hi: .res 1 ; $0685
+    .res 2
+musicStagingTriLo: .res 1 ; $0688
+musicStagingTriHi: .res 1 ; $0689
+resetSq12ForMusic: .res 1 ; $068A                   ; 0-off. 1-sq1. 2-sq1 and sq2
+musicPauseSoundEffectCounter:
+    .res 1
+musicStagingNoiseLo: .res 1 ; $068C
+musicStagingNoiseHi: .res 1 ; $068D
+    .res 2
+musicDataNoteTableOffset: .res 1 ; $0690            ; AKA start of musicData, of size $ 0A
+musicDataDurationTableOffset: .res 1 ; $0691
+musicDataChanPtr: .res 8 ; $0692
+musicChanControl: .res 3 ; $069A                    ; high 3 bits are for LO offset behavior. Low 5 bits index into musicChanVolControlTable, minus 1. Technically size 4, but usages of the next variable 'cheat' since that variable's first index is unused
+musicChanVolume: .res 3 ; $069D                    ; Must not use first index. First and second index are unused. High nibble always used; low nibble may be used depending on control and frame
+musicDataChanPtrDeref: .res 8 ; $06A0               ; deref'd musicDataChanPtr+musicDataChanPtrOff
+musicDataChanPtrOff: .res 4 ; $06A8
+musicDataChanInstructionOffset: .res 4 ; $06AC
+musicDataChanInstructionOffsetBackup: .res 4 ; $06B0
+musicChanNoteDurationRemaining: .res 4 ; $06B4
+musicChanNoteDuration: .res 4 ; $06B8
+musicChanProgLoopCounter: .res 4 ; $06BC            ; As driven by bytecode instructions
+musicStagingSq1Sweep: .res 2 ; $06C0                ; Used as if size 4, but since Tri/Noise does nothing when written for sweep, the other two entries can have any value without changing behavior
+    .res 1
+musicChanNote: .res 4 ; $06C3
+    .res 1
+musicChanInhibit: .res 3 ; $06C8                    ; Always zero
+    .res 1
+musicTrack_dec: .res 1 ; $06CC                    ; $00-$09
+musicChanVolFrameCounter: .res 4 ; $06CD            ; Pos 0/1 are unused
+musicChanLoFrameCounter: .res 4 ; $06D1             ; Pos 3 unused
+soundEffectSlot0FrameCount: .res 5 ; $06D5          ; Number of frames
+soundEffectSlot0FrameCounter: .res 5 ; $06DA        ; Current frame
+soundEffectSlot0SecondaryCounter: .res 1 ; $06DF    ; nibble index into noiselo_/noisevol_table
+soundEffectSlot1SecondaryCounter: .res 1 ; $06E0
+soundEffectSlot2SecondaryCounter: .res 1 ; $06E1
+soundEffectSlot3SecondaryCounter: .res 1 ; $06E2
+soundEffectSlot0TertiaryCounter: .res 1 ; $06E3
+soundEffectSlot1TertiaryCounter: .res 1 ; $06E4
+soundEffectSlot2TertiaryCounter: .res 1 ; $06E5
+soundEffectSlot3TertiaryCounter: .res 1 ; $06E6
+soundEffectSlot0Tmp: .res 1 ; $06E7
+soundEffectSlot1Tmp: .res 1 ; $06E8
+soundEffectSlot2Tmp: .res 1 ; $06E9
+soundEffectSlot3Tmp: .res 1 ; $06EA
+    .res 5
+soundEffectSlot0Init: .res 1 ; $06F0                ; NOISE sound effect. 2-game over curtain. 3-ending rocket. For mapping, see soundEffectSlot0Init_table
+soundEffectSlot1Init: .res 1 ; $06F1                ; SQ1 sound effect. Menu, move, rotate, clear sound effects. For mapping, see soundEffectSlot1Init_table
+soundEffectSlot2Init: .res 1 ; $06F2                ; SQ2 sound effect. For mapping, see soundEffectSlot2Init_table
+soundEffectSlot3Init: .res 1 ; $06F3                ; TRI sound effect. For mapping, see soundEffectSlot3Init_table
+soundEffectSlot4Init: .res 1 ; $06F4                ; Unused. Assume meant for DMC sound effect. Uses some data from slot 2
+musicTrack: .res 1 ; $06F5                        ; $FF turns off music. $00 continues selection. $01-$0A for new selection
+    .res 2
+soundEffectSlot0Playing: .res 1 ; $06F8             ; Used if init is zero
+soundEffectSlot1Playing: .res 1 ; $06F9
+soundEffectSlot2Playing: .res 1 ; $06FA
+soundEffectSlot3Playing: .res 1 ; $06FB
+soundEffectSlot4Playing: .res 1 ; $06FC
+currentlyPlayingMusicTrack: .res 1 ; $06FD          ; Copied from musicTrack
+    .res 1
+unreferenced_soundRngTmp: .res 1 ; $06FF
+highscores: ; $700
 ; scores are name - score - lines - startlevel - level
 highScoreQuantity := 3
 highScoreNameLength := 8
@@ -385,49 +406,50 @@ highScoreScoreLength := 4
 highScoreLinesLength := 2
 highScoreLevelsLength := 2
 highScoreLength := highScoreNameLength + highScoreScoreLength + highScoreLinesLength + highScoreLevelsLength
-; 48/91 bytes ^
-; .. bunch of unused stuff
-initMagic   := $075B                        ; Initialized to a hard-coded number. When resetting, if not correct number then it knows this is a cold boot
+    .res highScoreQuantity * highScoreLength ; 48 bytes
+    .res 43
+initMagic: .res 5 ; $075B                        ; Initialized to a hard-coded number. When resetting, if not correct number then it knows this is a cold boot
 
-menuRAM := $760
-menuSeedCursorIndex := menuRAM+0
-menuScrollY := menuRAM+1
-menuMoveThrottle := menuRAM+2
-menuThrottleTmp := menuRAM+3
-levelControlMode  := menuRAM+4
-customLevel := menuRAM+5
-classicLevel := menuRAM+6
-heartsAndReady := menuRAM+7 ; high nybble used for ready
-linecapCursorIndex := menuRAM+8
-linecapWhen := menuRAM+9
-linecapHow := menuRAM+10
-linecapLevel := menuRAM+11
-linecapLines := menuRAM+12 ; 2 bytes
-menuVars := $76E
-paceModifier := menuVars+0
-presetModifier := menuVars+1
-typeBModifier := menuVars+2
-floorModifier := menuVars+3
-tapModifier := menuVars+4
-transitionModifier := menuVars+5
-tapqtyModifier := menuVars+6
-checkerModifier := menuVars+7
-garbageModifier := menuVars+8
-droughtModifier := menuVars+9
-dasModifier := menuVars+10
-scoringModifier := menuVars+11
-hzFlag := menuVars+12
-inputDisplayFlag := menuVars+13
-disableFlashFlag := menuVars+14
-disablePauseFlag := menuVars+15
-goofyFlag := menuVars+16
-debugFlag := menuVars+17
-linecapFlag := menuVars+18
-dasOnlyFlag := menuVars+19
-qualFlag := menuVars+20
-palFlag := menuVars+21
+menuRAM:  ; $760
+menuSeedCursorIndex: .res 1
+menuScrollY: .res 1
+menuMoveThrottle: .res 1
+menuThrottleTmp: .res 1
+levelControlMode: .res 1
+customLevel: .res 1
+classicLevel: .res 1
+heartsAndReady: .res 1   ; high nybble used for ready
+linecapCursorIndex: .res 1
+linecapWhen: .res 1
+linecapHow: .res 1
+linecapLevel: .res 1
+linecapLines: .res 2
+menuVars: ; $76E
+paceModifier: .res 1
+presetModifier: .res 1
+typeBModifier: .res 1
+floorModifier: .res 1
+tapModifier: .res 1
+transitionModifier: .res 1
+tapqtyModifier: .res 1
+checkerModifier: .res 1
+garbageModifier: .res 1
+droughtModifier: .res 1
+dasModifier: .res 1
+scoringModifier: .res 1
+hzFlag: .res 1
+inputDisplayFlag: .res 1
+disableFlashFlag: .res 1
+disablePauseFlag: .res 1
+goofyFlag: .res 1
+debugFlag: .res 1
+linecapFlag: .res 1
+dasOnlyFlag: .res 1
+qualFlag: .res 1
+palFlag: .res 1
 
 ; ... $7FF
+
 PPUCTRL     := $2000
 PPUMASK     := $2001
 PPUSTATUS   := $2002
@@ -554,7 +576,7 @@ initRamContinued:
 
 @coldBoot:
         ; zero out config memory
-        lda #0
+        lda #$0
         ldx #$A0
 @loop:
         dex
@@ -9409,25 +9431,25 @@ LE1D8:  lda #$0F
 initAudioAndMarkInited:
         inc audioInitialized
         jsr muteAudio
-        sta $0683
+        sta musicPauseSoundEffectLengthCounter
         rts
 
 handlePausedAudio:  lda audioInitialized
         beq initAudioAndMarkInited
-        lda $0683
+        lda musicPauseSoundEffectLengthCounter
         cmp #$12
         beq LE215
         and #$03
         cmp #$03
         bne LE212
-        inc $068B
+        inc musicPauseSoundEffectCounter
         ldy #$10
-        lda $068B
+        lda musicPauseSoundEffectCounter
         and #$01
         bne LE20F
         ldy #<unknown_sq1_data1
 LE20F:  jsr copyToSq1Channel
-LE212:  inc $0683
+LE212:  inc musicPauseSoundEffectLengthCounter
 LE215:  rts
 
 ; Disables APU frame interrupt
@@ -9439,7 +9461,7 @@ updateAudio:
         beq handlePausedAudio
         lda #$00
         sta audioInitialized
-        sta $068B
+        sta musicPauseSoundEffectCounter
         jsr updateSoundEffectSlot2
         jsr updateSoundEffectSlot0
         jsr updateSoundEffectSlot3

@@ -24,5 +24,5 @@ ld65 -m tetris.map -Ln tetris.lbl --dbgfile tetris.dbg -o tetris.nes -C src/tetr
 : show some stats
 
 sha1sum tetris.nes
-sed -n '19,22p' < tetris.map
+sed -n '23,27p' < tetris.map
 stat -c %s tetris.bps
