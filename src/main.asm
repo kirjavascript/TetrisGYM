@@ -16,300 +16,24 @@
 
 ; incremented to reset MMC1 reg
 initRam:
-        ldx #$00
-        jmp initRamContinued
-nmi:    pha
-        txa
-        pha
-        tya
-        pha
-        lda #$00
-        sta oamStagingLength
-        jsr render
-        dec sleepCounter
-        lda sleepCounter
-        cmp #$FF
-        bne @jumpOverIncrement
-        inc sleepCounter
-@jumpOverIncrement:
-        jsr copyOamStagingToOam
-        lda frameCounter
-        clc
-        adc #$01
-        sta frameCounter
-        lda #$00
-        adc frameCounter+1
-        sta frameCounter+1
-        ldx #rng_seed
-        ldy #$02
-        jsr generateNextPseudorandomNumber
-        jsr copyCurrentScrollAndCtrlToPPU
-        lda #$01
-        sta verticalBlankingInterval
-        jsr pollControllerButtons
-        pla
-        tay
-        pla
-        tax
-        pla
-irq:    rti
 
-render: lda renderMode
-        jsr switch_s_plus_2a
-        .addr   render_mode_static
-        .addr   render_mode_scroll
-        .addr   render_mode_congratulations_screen
-        .addr   render_mode_play_and_demo
-        .addr   render_mode_pause
-        .addr   render_mode_rocket
-        .addr   render_mode_speed_test
-        .addr   render_mode_level_menu
-        .addr   render_mode_linecap_menu
-initRamContinued:
-        ldy #$06
-        sty tmp2
-        ldy #$00
-        sty tmp1
-        lda #$00
-@zeroOutPages:
-        sta (tmp1),y
-        dey
-        bne @zeroOutPages
-        dec tmp2
-        bpl @zeroOutPages
-        lda initMagic
-        cmp #$54
-        bne @coldBoot
-        lda initMagic+1
-        cmp #$2D
-        bne @coldBoot
-        lda initMagic+2
-        cmp #$47
-        bne @coldBoot
-        lda initMagic+3
-        cmp #$59
-        bne @coldBoot
-        lda initMagic+4
-        cmp #$4D
-        bne @coldBoot
-        jmp @continueWarmBootInit
+.include "boot.asm"
 
-@coldBoot:
-        ; zero out config memory
-        lda #$0
-        ldx #$A0
-@loop:
-        dex
-        sta menuRAM, x
-        cpx #0
-        bne @loop
+        jmp mainLoop
 
-        ; default pace to A
-        lda #$A
-        sta paceModifier
+.include "nmi/nmi.asm"
 
-        lda #$10
-        sta dasModifier
-
-        lda #INITIAL_LINECAP_LEVEL
-        sta linecapLevel
-        lda #INITIAL_LINECAP_LINES
-        sta linecapLines
-        lda #INITIAL_LINECAP_LINES_1
-        sta linecapLines+1
-
-        jsr resetScores
-
-.if SAVE_HIGHSCORES
-        jsr detectSRAM
-        beq @noSRAM
-        jsr checkSavedInit
-        jsr copyScoresFromSRAM
-@noSRAM:
-.endif
-
-        lda #$54
-        sta initMagic
-        lda #$2D
-        sta initMagic+1
-        lda #$47
-        sta initMagic+2
-        lda #$59
-        sta initMagic+3
-        lda #$4D
-        sta initMagic+4
-@continueWarmBootInit:
-        ldx #$89
-        stx rng_seed
-        dex
-        stx rng_seed+1
-        ldy #$00
-        sty PPUSCROLL
-        ldy #$00
-        sty PPUSCROLL
-        lda #$90
-        sta currentPpuCtrl
-        sta PPUCTRL
-        lda #$06
-        sta PPUMASK
-        jsr LE006
-        jsr updateAudio2
-        lda #$C0
-        sta stack
-        lda #$80
-        sta stack+1
-        lda #$35
-        sta stack+3
-        lda #$AC
-        sta stack+4
-        jsr updateAudioWaitForNmiAndDisablePpuRendering
-        jsr disableNmi
-        jsr drawBlackBGPalette
-        ; instead of clearing vram like the original, blank out the palette
-        lda #$EF
-        ldx #$04
-        ldy #$04 ; used to be 5, but we dont need to clear 2p playfield
-        jsr memset_page
-        jsr waitForVBlankAndEnableNmi
-        jsr updateAudioWaitForNmiAndResetOamStaging
-        jsr updateAudioWaitForNmiAndEnablePpuRendering
-        jsr updateAudioWaitForNmiAndResetOamStaging
-        lda #$00
-        sta gameModeState
-        sta gameMode
-        lda #$00
-        sta frameCounter+1
-@mainLoop:
+mainLoop:
         jsr branchOnGameMode
         cmp gameModeState
         bne @continue
         jsr updateAudioWaitForNmiAndResetOamStaging
 @continue:
-        jmp @mainLoop
+        jmp mainLoop
 
-resetScores:
-        ldx #$0
-        lda #$0
-@initHighScoreTable:
-        cpx #highScoreLength * highScoreQuantity
-        beq @continue
-        sta highscores,x
-        inx
-        jmp @initHighScoreTable
-@continue:
-        rts
+.include "highscores/util.asm"
 
-.if SAVE_HIGHSCORES
-detectSRAM:
-        lda #$37
-        sta SRAM_hsMagic
-        lda #$64
-        sta SRAM_hsMagic+1
-        lda SRAM_hsMagic
-        cmp #$37
-        bne @noSRAM
-        lda SRAM_hsMagic+1
-        cmp #$64
-        bne @noSRAM
-        lda #1
-        rts
-@noSRAM:
-        lda #0
-        rts
-
-checkSavedInit:
-        lda SRAM_hsMagic+2
-        cmp #$4B
-        bne resetSavedScores
-        lda SRAM_hsMagic+3
-        cmp #$D2
-        bne resetSavedScores
-        rts
-
-resetSavedScores:
-        lda #$4B
-        sta SRAM_hsMagic+2
-        lda #$D2
-        sta SRAM_hsMagic+3
-
-        ldx #$0
-        lda #$0
-@copyLoop:
-        cpx #highScoreLength * highScoreQuantity
-        beq @continue
-        sta SRAM_highscores,x
-        inx
-        jmp @copyLoop
-@continue:
-        rts
-
-copyScoresFromSRAM:
-        ldx #$0
-@copyLoop:
-        cpx #highScoreLength * highScoreQuantity
-        beq @continue
-        lda SRAM_highscores,x
-        sta highscores,x
-        inx
-        jmp @copyLoop
-@continue:
-        rts
-
-copyScoresToSRAM:
-        ldx #$0
-@copyLoop:
-        cpx #highScoreLength * highScoreQuantity
-        beq @continue
-        lda highscores,x
-        sta SRAM_highscores,x
-        inx
-        jmp @copyLoop
-@continue:
-        rts
-
-.endif
-
-checkRegion:
-; region detection via http://forums.nesdev.com/viewtopic.php?p=163258#p163258
-;;; use the power-on wait to detect video system-
-	ldx #0
-        stx palFlag ; extra zeroing
-	ldy #0
-@vwait1:
-	bit $2002
-	bpl @vwait1  ; at this point, about 27384 cycles have passed
-@vwait2:
-	inx
-	bne @noincy
-	iny
-@noincy:
-	bit $2002
-	bpl @vwait2  ; at this point, about 57165 cycles have passed
-
-;;; BUT because of a hardware oversight, we might have missed a vblank flag.
-;;;  so we need to both check for 1Vbl and 2Vbl
-;;; NTSC NES: 29780 cycles / 12.005 -> $9B0 or $1361 (Y:X)
-;;; PAL NES:  33247 cycles / 12.005 -> $AD1 or $15A2
-;;; Dendy:    35464 cycles / 12.005 -> $B8A or $1714
-
-	tya
-	cmp #16
-	bcc @nodiv2
-	lsr
-@nodiv2:
-	clc
-	adc #<-9
-	cmp #3
-	bcc @noclip3
-	lda #3
-@noclip3:
-;;; Right now, A contains 0,1,2,3 for NTSC,PAL,Dendy,Bad
-        cmp #0
-        beq @ntsc
-        lda #1
-        sta palFlag
-@ntsc:
-        rts
+.include "check_region.asm"
 
 gameMode_playAndEndingHighScore_jmp:
         jsr gameMode_playAndEndingHighScore
@@ -11031,7 +10755,6 @@ MMC1_PRG:
 
         .addr   nmi
         .addr   reset
-LFFFF       := * + 1
         .addr   irq
 
 ; End of "VECTORS" segment

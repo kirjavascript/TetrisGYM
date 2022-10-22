@@ -1,4 +1,4 @@
-INES_MAPPER := 1 ; supports 1 and 3
+INES_MAPPER := 1 ; supports 1 and 3 (MMC1 / CNROM)
 PRACTISE_MODE := 1
 NO_MUSIC := 1
 SAVE_HIGHSCORES := 1
