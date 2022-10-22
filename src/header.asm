@@ -7,7 +7,8 @@
 
 .segment "HEADER"
 
-INES_MAPPER = 1 ; 0 = NROM, 1 = MMC1, 3 = CNROM
+.include "constants.asm" ; for INES_HEADER
+
 INES_MIRROR = 0 ; 0 = horizontal mirroring, 1 = vertical mirroring (ignored in MMC1)
 INES_SRAM   = 1 ; 1 = battery backed SRAM at $6000-7FFF
 
