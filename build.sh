@@ -7,9 +7,7 @@ node src/nametables/build.js
 # PNG -> CHR
 
 png2chr() {
-    node tools/png2chr/convert.js src/gfx/title_menu_tileset.png src/gfx/title_menu_tileset.chr
-    node tools/png2chr/convert.js src/gfx/game_tileset.png src/gfx/game_tileset.chr
-    node tools/png2chr/convert.js src/gfx/rocket_tileset.png src/gfx/rocket_tileset.chr
+    node tools/png2chr/convert.js src/gfx
 }
 
 # build CHR if it doesnt already exist
@@ -36,7 +34,7 @@ fi
 # touch this file to store the last modified / checked date
 
 touch src/gfx/*.png
-touch "$0"
+# touch "$0"
 
 # build object files
 
