@@ -4,9 +4,7 @@ node src/nametables/build.js
 
 : PNG -> CHR
 
-node tools/png2chr/convert.js src/gfx/title_menu_tileset.png src/gfx/title_menu_tileset.chr
-node tools/png2chr/convert.js src/gfx/game_tileset.png src/gfx/game_tileset.chr
-node tools/png2chr/convert.js src/gfx/rocket_tileset.png src/gfx/rocket_tileset.chr
+node tools/png2chr/convert.js src/gfx
 
 : build object files
 
