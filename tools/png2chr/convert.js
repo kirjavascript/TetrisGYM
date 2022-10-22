@@ -34,16 +34,12 @@ function png2chr(inFile, outFile) {
         }
     }
 
-    // replace original array
-
-    pixels.splice(0, pixels.length, ...tilePixels);
-
     // convert tiles into bytes
 
     const bytes = [];
 
     for (let cursor = 0; cursor < pixels.length; cursor += 64) {
-        const indices = pixels.slice(cursor, cursor + 64);
+        const indices = tilePixels.slice(cursor, cursor + 64);
         const indicesBin = indices.map((idx) => idx.toString(2).padStart(2, 0));
 
         for (let i = 0; i < 64; i += 8) {
@@ -74,17 +70,17 @@ function png2chr(inFile, outFile) {
     fs.writeFileSync(outFile, Uint8Array.from(bytes));
 }
 
-const [, , inFile, outFile] = process.argv;
+const [, , param0, param1] = process.argv;
 
-if (inFile && outFile) {
+if (param0 && param1) {
     // convert one file
-    png2chr(inFile, outFile);
-} else if (inFile) {
+    png2chr(param0, param1);
+} else if (param0) {
     // convert all PNG in a directory
-    fs.readdirSync(inFile)
+    fs.readdirSync(param0)
         .filter(name => name.endsWith('.png'))
         .forEach(name => {
-            png2chr(inFile + '/' + name, inFile + '/' + name.replace('.png', '.chr'));
+            png2chr(param0 + '/' + name, param0 + '/' + name.replace('.png', '.chr'));
         });
 }
 

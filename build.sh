@@ -34,7 +34,7 @@ fi
 # touch this file to store the last modified / checked date
 
 touch src/gfx/*.png
-# touch "$0"
+touch "$0"
 
 # build object files
 
