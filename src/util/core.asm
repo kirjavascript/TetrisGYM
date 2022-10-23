@@ -1,0 +1,312 @@
+; canon is waitForVerticalBlankingInterval
+updateAudioWaitForNmiAndResetOamStaging:
+        jsr updateAudio_jmp
+        lda #$00
+        sta verticalBlankingInterval
+        nop
+@checkForNmi:
+        lda verticalBlankingInterval
+        beq @checkForNmi
+        lda #$FF
+        ldx #$02
+        ldy #$02
+        jsr memset_page
+        rts
+
+updateAudioAndWaitForNmi:
+        jsr updateAudio_jmp
+        lda #$00
+        sta verticalBlankingInterval
+        nop
+@checkForNmi:
+        lda verticalBlankingInterval
+        beq @checkForNmi
+        rts
+
+updateAudioWaitForNmiAndDisablePpuRendering:
+        jsr updateAudioAndWaitForNmi
+        lda currentPpuMask
+        and #$E1
+_updatePpuMask:
+        sta PPUMASK
+        sta currentPpuMask
+        rts
+
+updateAudioWaitForNmiAndEnablePpuRendering:
+        jsr updateAudioAndWaitForNmi
+        jsr copyCurrentScrollAndCtrlToPPU
+        lda currentPpuMask
+        ora #$1E
+        bne _updatePpuMask
+waitForVBlankAndEnableNmi:
+        lda PPUSTATUS
+        and #$80
+        bne waitForVBlankAndEnableNmi
+        lda currentPpuCtrl
+        ora #$80
+        bne _updatePpuCtrl
+disableNmi:
+        lda currentPpuCtrl
+        and #$7F
+_updatePpuCtrl:
+        sta PPUCTRL
+        sta currentPpuCtrl
+        rts
+
+resetScroll:
+        lda #0
+        sta ppuScrollX
+        sta PPUSCROLL
+        sta ppuScrollY
+        sta PPUSCROLL
+        rts
+
+copyCurrentScrollAndCtrlToPPU:
+        lda ppuScrollX
+        sta PPUSCROLL
+        lda ppuScrollY
+        sta PPUSCROLL
+        lda currentPpuCtrl
+        sta PPUCTRL
+        rts
+
+drawBlackBGPalette:
+        lda #$3F
+        sta PPUADDR
+        lda #$0
+        sta PPUADDR
+        ldx #$10
+@loadPaletteLoop:
+        lda #$F
+        sta PPUDATA
+        dex
+        bne @loadPaletteLoop
+        rts
+
+bulkCopyToPpu:
+        jsr copyAddrAtReturnAddressToTmp_incrReturnAddrBy2
+        jmp copyToPpu
+
+LAA9E:  pha
+        sta PPUADDR
+        iny
+        lda (tmp1),y
+        sta PPUADDR
+        iny
+        lda (tmp1),y
+        asl a
+        pha
+        lda currentPpuCtrl
+        ora #$04
+        bcs LAAB5
+        and #$FB
+LAAB5:  sta PPUCTRL
+        sta currentPpuCtrl
+        pla
+        asl a
+        php
+        bcc LAAC2
+        ora #$02
+        iny
+LAAC2:  plp
+        clc
+        bne LAAC7
+        sec
+LAAC7:  ror a
+        lsr a
+        tax
+LAACA:  bcs LAACD
+        iny
+LAACD:  lda (tmp1),y
+        sta PPUDATA
+        dex
+        bne LAACA
+        pla
+        cmp #$3F
+        bne LAAE6
+        sta PPUADDR
+        stx PPUADDR
+        stx PPUADDR
+        stx PPUADDR
+LAAE6:  sec
+        tya
+        adc tmp1
+        sta tmp1
+        lda #$00
+        adc tmp2
+        sta tmp2
+; Address to read from stored in tmp1/2
+copyToPpu:
+        ldx PPUSTATUS
+        ldy #$00
+        lda (tmp1),y
+        bpl LAAFC
+        rts
+
+LAAFC:  cmp #$60
+        bne LAB0A
+        pla
+        sta tmp2
+        pla
+        sta tmp1
+        ldy #$02
+        bne LAAE6
+LAB0A:  cmp #$4C
+        bne LAA9E
+        lda tmp1
+        pha
+        lda tmp2
+        pha
+        iny
+        lda (tmp1),y
+        tax
+        iny
+        lda (tmp1),y
+        sta tmp2
+        stx tmp1
+        bcs copyToPpu
+copyAddrAtReturnAddressToTmp_incrReturnAddrBy2:
+        tsx
+        lda stack+3,x
+        sta tmpBulkCopyToPpuReturnAddr
+        lda stack+4,x
+        sta tmpBulkCopyToPpuReturnAddr+1
+        ldy #$01
+        lda (tmpBulkCopyToPpuReturnAddr),y
+        sta tmp1
+        iny
+        lda (tmpBulkCopyToPpuReturnAddr),y
+        sta tmp2
+        clc
+        lda #$02
+        adc tmpBulkCopyToPpuReturnAddr
+        sta stack+3,x
+        lda #$00
+        adc tmpBulkCopyToPpuReturnAddr+1
+        sta stack+4,x
+        rts
+
+;reg x: zeropage addr of seed; reg y: size of seed
+generateNextPseudorandomNumber:
+        lda tmp1,x
+        and #$02
+        sta tmp1
+        lda tmp2,x
+        and #$02
+        eor tmp1
+        clc
+        beq @updateNextByteInSeed
+        sec
+@updateNextByteInSeed:
+        ror tmp1,x
+        inx
+        dey
+        bne @updateNextByteInSeed
+        rts
+
+; canon is initializeOAM
+copyOamStagingToOam:
+        lda #$00
+        sta OAMADDR
+        lda #$02
+        sta OAMDMA
+        rts
+
+
+; reg a: value; reg x: start page; reg y: end page (inclusive)
+memset_page:
+        pha
+        txa
+        sty tmp2
+        clc
+        sbc tmp2
+        tax
+        pla
+        ldy #$00
+        sty tmp1
+@setByte:
+        sta (tmp1),y
+        dey
+        bne @setByte
+        dec tmp2
+        inx
+        bne @setByte
+        rts
+
+switch_s_plus_2a:
+        asl a
+        tay
+        iny
+        pla
+        sta tmp1
+        pla
+        sta tmp2
+        lda (tmp1),y
+        tax
+        iny
+        lda (tmp1),y
+        sta tmp2
+        stx tmp1
+        jmp (tmp1)
+
+        sei
+        RESET_MMC1
+        lda #$1A
+        jsr setMMC1Control
+        rts
+
+setMMC1Control:
+.if INES_MAPPER = 1
+        sta MMC1_Control
+        lsr a
+        sta MMC1_Control
+        lsr a
+        sta MMC1_Control
+        lsr a
+        sta MMC1_Control
+        lsr a
+        sta MMC1_Control
+.endif
+        rts
+
+changeCHRBank0:
+.if INES_MAPPER = 1
+        sta MMC1_CHR0
+        lsr a
+        sta MMC1_CHR0
+        lsr a
+        sta MMC1_CHR0
+        lsr a
+        sta MMC1_CHR0
+        lsr a
+        sta MMC1_CHR0
+.endif
+        rts
+
+changeCHRBank1:
+.if INES_MAPPER = 1
+        sta MMC1_CHR1
+        lsr a
+        sta MMC1_CHR1
+        lsr a
+        sta MMC1_CHR1
+        lsr a
+        sta MMC1_CHR1
+        lsr a
+        sta MMC1_CHR1
+.endif
+        rts
+
+changePRGBank:
+.if INES_MAPPER = 1
+        sta MMC1_PRG
+        lsr a
+        sta MMC1_PRG
+        lsr a
+        sta MMC1_PRG
+        lsr a
+        sta MMC1_PRG
+        lsr a
+        sta MMC1_PRG
+.endif
+        rts
