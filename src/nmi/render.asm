@@ -22,6 +22,7 @@ render_mode_static:
 
 .include "render_mode_linecap.asm"
 .include "render_mode_pause.asm"
+.include "render_mode_congratulations_screen.asm"
 .include "render_mode_rocket.asm"
 .include "render_mode_scroll.asm"
 .include "render_mode_speed_test.asm"

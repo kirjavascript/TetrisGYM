@@ -18,8 +18,14 @@ gameModeState_next: ; used to be updatePlayer2
         lda #$1 ; acc should not be equal
         rts
 
+gameModeState_vblankThenRunState2:
+        lda #$02
+        sta gameModeState
+        rts
+
 .include "initbackground.asm"
 .include "initstate.asm"
+.include "handlegameover.asm"
 .include "updatecounters.asm"
 .include "updateplayer1.asm"
 .include "checkforabss.asm"
