@@ -207,3 +207,7 @@ render_mode_play_and_demo:
 .endif
         jsr resetScroll
         rts
+
+pieceToPpuStatAddr:
+        .dbyt   $2186,$21C6,$2206,$2246
+        .dbyt   $2286,$22C6,$2306

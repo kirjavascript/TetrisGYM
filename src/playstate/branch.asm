@@ -23,3 +23,5 @@ playState_incrementPlayState:
         inc playState
 playState_noop:
         rts
+
+.include "active.asm"
