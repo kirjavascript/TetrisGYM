@@ -10,8 +10,17 @@ branchOnGameModeState:
         .addr   gameModeState_updatePlayer1 ; gms: 5 acc: $FF - ne
         .addr   gameModeState_next ; gms: 6 acc: $1 ne
         .addr   gameModeState_checkForResetKeyCombo ; gms: 7 acc: 0 or heldButtons - eq if holding down, left and right
-        .addr   gameModeState_startButtonHandling ; gms: 8 acc: 0/3 - ne
+        .addr   gameModeState_handlePause ; gms: 8 acc: 0/3 - ne
         .addr   gameModeState_vblankThenRunState2 ; gms: 2 acc eq (set to $2)
+
+gameModeState_next: ; used to be updatePlayer2
+        inc gameModeState
+        lda #$1 ; acc should not be equal
+        rts
 
 .include "initbackground.asm"
 .include "initstate.asm"
+.include "updatecounters.asm"
+.include "updateplayer1.asm"
+.include "checkforabss.asm"
+.include "pause.asm"

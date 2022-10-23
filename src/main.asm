@@ -39,31 +39,9 @@ mainLoop:
 .include "gamemodestate/branch.asm"
 
 ; TODO: util with menuThrottle, strings, modeText, etc
+; tree -P "*.asm" src
 
-gameModeState_updatePlayer1:
-        lda #$04
-        sta playfieldAddr+1
-        ; copy controller from mirror
-        lda newlyPressedButtons_player1
-        sta newlyPressedButtons
-        lda heldButtons_player1
-        sta heldButtons
 
-        jsr checkDebugGameplay
-        jsr practiseAdvanceGame
-        jsr practiseGameHUD
-        jsr branchOnPlayStatePlayer1
-        jsr stageSpriteForCurrentPiece
-        jsr stageSpriteForNextPiece
-
-        inc gameModeState ; 5
-        lda #$FF ; acc from stateSpriteForNextPiece
-        rts
-
-gameModeState_next: ; used to be updatePlayer2
-        inc gameModeState
-        lda #$1 ; acc should not be equal
-        rts
 
 branchOnPlayStatePlayer1:
         lda playState
@@ -318,22 +296,6 @@ harddropShift:
         lda #$7
         sta soundEffectSlot1Init
 @ret:
-        rts
-
-gameModeState_updateCountersAndNonPlayerState:
-        ; CHR bank used to be reset to 0 here
-        lda #$00
-        sta oamStagingLength
-        inc fallTimer
-        ; next code makes acc behave as normal
-        ; (dont edit unless you know what you're doing)
-        lda newlyPressedButtons_player1
-        and #$20
-        beq @ret
-        lda displayNextPiece
-        eor #$01
-        sta displayNextPiece
-@ret:   inc gameModeState ; 3
         rts
 
 rotate_tetrimino:
@@ -3129,23 +3091,6 @@ setMusicTrack:
 .endif
 @ret:   rts
 
-; A+B+Select+Start
-gameModeState_checkForResetKeyCombo:
-        lda heldButtons_player1
-        cmp #BUTTON_A+BUTTON_B+BUTTON_START+BUTTON_SELECT
-        beq @reset
-        inc gameModeState
-        ; acc has to be heldButtons_player1 here
-        rts
-
-@reset: jsr updateAudio2
-        lda #$2 ; straight to menu screen
-        sta gameMode
-        lda qualFlag
-        beq @skipLegal
-        dec gameMode ; gameMode_waitScreen
-@skipLegal:
-        rts
 
 ; It looks like the jsr _must_ do nothing, otherwise reg a != gameModeState in mainLoop and there would not be any waiting on vsync
 gameModeState_vblankThenRunState2:
@@ -3600,128 +3545,6 @@ render_mode_congratulations_screen:
         jsr resetScroll
         rts
 
-; Handles pausing and exiting demo
-gameModeState_startButtonHandling:
-        lda gameMode
-        cmp #$05
-        bne @checkIfInGame
-        lda newlyPressedButtons_player1
-        cmp #$10
-        bne @checkIfInGame
-        lda #$01
-        sta gameMode
-        jmp @ret
-
-@checkIfInGame:
-        lda renderMode
-        cmp #$03
-        bne @ret
-
-        lda newlyPressedButtons_player1
-        and #$10
-        beq @ret
-
-@startPressed:
-        ; do nothing if curtain is being lowered
-        lda disablePauseFlag
-        bne @ret
-        lda playState
-        cmp #$0A
-        beq @ret
-        jsr pause
-
-@ret:   inc gameModeState ; 8
-        lda #$0 ; acc must not be equal
-        rts
-
-pause:
-        lda #$05
-        sta musicStagingNoiseHi
-
-        lda qualFlag
-        beq @pauseSetupNotClassic
-
-@pauseSetupClassic:
-        lda #$16
-        sta PPUMASK
-        jmp @pauseSetupPart2
-
-@pauseSetupNotClassic:
-        lda #$04 ; render_mode_pause
-        sta renderMode
-
-@pauseSetupPart2:
-        jsr updateAudioAndWaitForNmi
-        lda #$FF
-        ldx #$02
-        ldy #$02
-        jsr memset_page
-
-@pauseLoop:
-        lda qualFlag
-        beq @pauseLoopNotClassic
-
-@pauseLoopClassic:
-        lda #$70
-        sta spriteXOffset
-        lda #$77
-        sta spriteYOffset
-        jmp @pauseLoopCommon
-
-@pauseLoopNotClassic:
-        lda #$74
-        sta spriteXOffset
-        lda #$58
-        sta spriteYOffset
-
-@pauseLoopCommon:
-        clc
-        lda #$A
-        adc debugFlag
-        sta spriteIndexInOamContentLookup
-        jsr stringSprite
-
-        ; block tool hud - X/Y/Piece
-        lda debugFlag
-        beq @noDebugHUD
-        lda #$70
-        sta spriteXOffset
-        lda #$60
-        sta spriteYOffset
-        lda #tetriminoX
-        sta byteSpriteAddr
-        lda #0
-        sta byteSpriteAddr+1
-        lda #0
-        sta byteSpriteTile
-        lda #3
-        sta byteSpriteLen
-        jsr byteSprite
-@noDebugHUD:
-
-        lda qualFlag
-        bne @pauseCheckStart
-
-        jsr practiseGameHUD
-        jsr debugMode
-        ; debugMode calls stageSpriteForNextPiece, stageSpriteForCurrentPiece
-
-@pauseCheckStart:
-        lda newlyPressedButtons_player1
-        cmp #$10
-        beq @resume
-        jsr updateAudioWaitForNmiAndResetOamStaging
-        jmp @pauseLoop
-
-@resume:
-        lda #$1E
-        sta PPUMASK
-        lda #$00
-        sta musicStagingNoiseHi
-        sta vramRow
-        lda #$03
-        sta renderMode
-        rts
 
 ; canon is waitForVerticalBlankingInterval
 updateAudioWaitForNmiAndResetOamStaging:
