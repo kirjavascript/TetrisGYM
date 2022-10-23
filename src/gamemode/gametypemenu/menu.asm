@@ -1,3 +1,5 @@
+.include "linecap.asm"
+
 gameMode_gameTypeMenu:
 .if NO_MENU
         inc gameMode
@@ -597,7 +599,6 @@ menuItemY16Offset:
         lda tmpY
         sbc #0
         rts
-
 
 bufferScreen:
         lda #$0

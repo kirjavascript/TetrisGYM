@@ -10,13 +10,13 @@ branchOnGameMode:
         .addr   gameMode_playAndEndingHighScore_jmp ; used to be startDemo
         .addr   gameMode_speedTest
 
+.include "bootscreen.asm"
+.include "waitscreen.asm"
+.include "gametypemenu/menu.asm"
+.include "levelmenu.asm"
+
 gameMode_playAndEndingHighScore_jmp:
         jsr branchOnGameModeState
         rts
 
-.include "gamemode_bootscreen.asm"
-.include "gamemode_waitscreen.asm"
-.include "gamemode_gametypemenu.asm"
-.include "gamemode_levelmenu.asm"
-; play and ending
-.include "gamemode_speedtest.asm"
+.include "speedtest.asm"
