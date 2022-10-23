@@ -25,3 +25,9 @@ playState_noop:
         rts
 
 .include "active.asm"
+.include "lock.asm"
+.include "completedrows.asm"
+.include "updatestats.asm"
+.include "preparenext.asm"
+.include "garbage.asm"
+.include "spawnnext.asm"
