@@ -18,19 +18,3 @@ INES_SRAM   = 1 ; 1 = battery backed SRAM at $6000-7FFF
 .byte INES_MIRROR | (INES_SRAM << 1) | ((INES_MAPPER & $f) << 4)
 .byte (INES_MAPPER & %11110000)
 .byte $0, $0, $0, $0, $0, $0, $0, $0 ; padding
-
-
-.segment "CHR"
-
-.if INES_MAPPER = 1
-    .incbin "gfx/title_menu_tileset.chr"
-    .incbin "gfx/game_tileset.chr"
-    .incbin "gfx/rocket_tileset.chr"
-.elseif INES_MAPPER = 3
-    .incbin "gfx/rocket_tileset.chr"
-    .repeat $1000
-    .byte $0
-    .endrepeat
-    .incbin "gfx/title_menu_tileset.chr"
-    .incbin "gfx/game_tileset.chr"
-.endif

@@ -4,7 +4,7 @@ node src/nametables/build.js
 
 : PNG -> CHR
 
-node tools/png2chr/convert.js src/gfx
+node tools/png2chr/convert.js src/chr
 
 : build object files
 

@@ -30,3 +30,5 @@ render_mode_static:
 
 .include "render_hz.asm"
 .include "render_input_log.asm"
+.include "render_score.asm"
+.include "render_util.asm"

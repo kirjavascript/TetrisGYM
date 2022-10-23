@@ -31,3 +31,4 @@ playState_noop:
 .include "preparenext.asm"
 .include "garbage.asm"
 .include "spawnnext.asm"
+.include "gameover_rocket.asm"

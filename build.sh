@@ -7,19 +7,19 @@ node src/nametables/build.js
 # PNG -> CHR
 
 png2chr() {
-    node tools/png2chr/convert.js src/gfx
+    node tools/png2chr/convert.js src/chr
 }
 
 # build CHR if it doesnt already exist
 
-if [ "$(find src/gfx/*.chr 2>/dev/null | wc -l)" = 0 ]; then
+if [ "$(find src/chr/*.chr 2>/dev/null | wc -l)" = 0 ]; then
     echo "building CHR for the first time"
     png2chr
 else
 
     # if it does exist check if the PNG has been modified
 
-    pngTimes=$(stat -c "%Y" src/gfx/*.png)
+    pngTimes=$(stat -c "%Y" src/chr/*.png)
     scriptTime=$(stat -c "%X" "$0")
 
     for pngTime in $pngTimes; do
@@ -33,7 +33,7 @@ fi
 
 # touch this file to store the last modified / checked date
 
-touch src/gfx/*.png
+touch src/chr/*.png
 touch "$0"
 
 # build object files
