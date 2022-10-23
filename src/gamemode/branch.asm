@@ -14,9 +14,9 @@ gameMode_playAndEndingHighScore_jmp:
         jsr branchOnGameModeState
         rts
 
-.include "bootscreen.asm"
-.include "waitscreen.asm"
-.include "gametypemenu.asm"
-.include "levelmenu.asm"
-; play and
-.include "speedtest.asm"
+.include "gamemode_bootscreen.asm"
+.include "gamemode_waitscreen.asm"
+.include "gamemode_gametypemenu.asm"
+.include "gamemode_levelmenu.asm"
+; play and ending
+.include "gamemode_speedtest.asm"

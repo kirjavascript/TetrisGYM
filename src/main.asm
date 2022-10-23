@@ -36,7 +36,7 @@ mainLoop:
 
 .include "check_region.asm"
 
-.include "gamemode/gamemode.asm"
+.include "gamemode/branch.asm"
 
 gameModeState_updatePlayer1:
         lda #$04
@@ -63,7 +63,7 @@ gameModeState_next: ; used to be updatePlayer2
         lda #$1 ; acc should not be equal
         rts
 
-gameMode_playAndEndingHighScore:
+branchOnGameModeState:
         lda gameModeState
         jsr switch_s_plus_2a
         .addr   gameModeState_initGameBackground ; gms: 1 acc: 0 - ne
