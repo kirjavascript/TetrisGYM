@@ -1,9 +1,9 @@
-; TetrisGYM - A Tetris Practise ROM
+;  _____     _       _     _____ __ __ _____
+; |_   _|___| |_ ___|_|___|   __|  |  |     |
+;   | | | -_|  _|  _| |_ -|  |  |_   _| | | |
+;   |_| |___|_| |_| |_|___|_____| |_| |_|_|_|
 ;
-; @author Kirjava
-; @github kirjavascript/TetrisGYM
-; @disassembly CelestialAmber/TetrisNESDisasm
-; @information ejona86/taus
+; TetrisGYM - A Tetris Practise ROM
 
 .include "charmap.asm"
 .include "constants.asm"
@@ -90,13 +90,11 @@ mainLoop:
 
 .code
 
-
 .segment    "PRG_chunk3": absolute
 
 .include "reset.asm"
 
 .code
-
 
 .segment    "VECTORS": absolute
 
