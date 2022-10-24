@@ -1,3 +1,55 @@
+clearPlayfield:
+        lda #EMPTY_TILE
+        ldx #$C8
+@loop:
+        sta $0400, x
+        dex
+        bne @loop
+        rts
+
+drawBlackBGPalette:
+        lda #$3F
+        sta PPUADDR
+        lda #$0
+        sta PPUADDR
+        ldx #$10
+@loadPaletteLoop:
+        lda #$F
+        sta PPUDATA
+        dex
+        bne @loadPaletteLoop
+        rts
+
+resetScroll:
+        lda #0
+        sta ppuScrollX
+        sta PPUSCROLL
+        sta ppuScrollY
+        sta PPUSCROLL
+        rts
+
+random10:
+        ldx #rng_seed
+        ldy #$02
+        jsr generateNextPseudorandomNumber
+        ldx #rng_seed
+        ldy #$02
+        jsr generateNextPseudorandomNumber
+        ldx #rng_seed
+        ldy #$02
+        jsr generateNextPseudorandomNumber
+        ldx #rng_seed
+        ldy #$02
+        jsr generateNextPseudorandomNumber
+        ldx #rng_seed
+        ldy #$02
+        jsr generateNextPseudorandomNumber
+        lda rng_seed
+        and #$0F
+        cmp #$0A
+        bpl random10
+        rts
+
 ; canon is waitForVerticalBlankingInterval
 updateAudioWaitForNmiAndResetOamStaging:
         jsr updateAudio_jmp
@@ -53,14 +105,6 @@ _updatePpuCtrl:
         sta currentPpuCtrl
         rts
 
-resetScroll:
-        lda #0
-        sta ppuScrollX
-        sta PPUSCROLL
-        sta ppuScrollY
-        sta PPUSCROLL
-        rts
-
 copyCurrentScrollAndCtrlToPPU:
         lda ppuScrollX
         sta PPUSCROLL
@@ -68,19 +112,6 @@ copyCurrentScrollAndCtrlToPPU:
         sta PPUSCROLL
         lda currentPpuCtrl
         sta PPUCTRL
-        rts
-
-drawBlackBGPalette:
-        lda #$3F
-        sta PPUADDR
-        lda #$0
-        sta PPUADDR
-        ldx #$10
-@loadPaletteLoop:
-        lda #$F
-        sta PPUDATA
-        dex
-        bne @loadPaletteLoop
         rts
 
 bulkCopyToPpu:
