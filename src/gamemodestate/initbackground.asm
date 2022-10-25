@@ -36,9 +36,9 @@ gameModeState_initGameBackground:
         sta PPUADDR
         lda #$9C
         sta PPUADDR
-        lda tmpZ
-        sta PPUDATA
         lda #$2C
+        sta PPUDATA
+        lda tmpZ
         sta PPUDATA
 @heartEnd:
 

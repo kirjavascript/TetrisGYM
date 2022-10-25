@@ -31,6 +31,12 @@ mainLoop:
 .include "nmi/render.asm"
 .include "nmi/pollcontroller.asm"
 
+.include "gamemode/branch.asm"
+    ; -> playAndEnding
+.include "gamemodestate/branch.asm"
+    ; -> updatePlayer1
+.include "playstate/branch.asm"
+
 .include "highscores/data.asm"
 .include "highscores/util.asm"
 .include "highscores/render_menu.asm"
@@ -47,12 +53,6 @@ mainLoop:
 .include "sprites/loadsprite.asm"
 .include "sprites/drawrect.asm"
 .include "sprites/piece.asm"
-
-.include "gamemode/branch.asm"
-    ; -> playAndEnding
-.include "gamemodestate/branch.asm"
-    ; -> updatePlayer1
-.include "playstate/branch.asm"
 
 .include "data/bytebcd.asm"
 .include "data/orientation.asm"

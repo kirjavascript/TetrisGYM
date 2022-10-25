@@ -3,10 +3,10 @@ controllerInputTiles:
         .byte $D0, $D1, $D2, $D3
         .byte $D4, $D4, $D5, $D5
 controllerInputX:
-        .byte $8, $0, $5, $4
-        .byte $1D, $14, $27, $30
+        .byte $9, $0, $5, $5
+        .byte $1D, $14, $28, $31
 controllerInputY:
-        .byte $FF, $0, $5, $FB
+        .byte $0, $0, $5, $FB
         .byte $0, $0, $FF, $FF
 
 controllerInputDisplay: ; called in events, speedtest
@@ -21,6 +21,7 @@ controllerInputDisplayX:
         and #1
         beq @inputContinue
         ldx oamStagingLength
+        clc
         lda controllerInputY, y
         adc #$4C
         sta oamStaging, x
@@ -32,6 +33,7 @@ controllerInputDisplayX:
         sta oamStaging, x
         inx
         lda controllerInputX, y
+        clc
         adc #$13
         adc tmp3
         sta oamStaging, x

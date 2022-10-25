@@ -139,7 +139,7 @@ CNROM_CHR_ROCKET:
         sta renderMode
         lda #$1
         sta endingSleepCounter
-        lda #$80 ; timed in bizhawk tasstudio to be 1 frame longer than usual
+        lda #$80 ; timed in bizhawk tasstudio to be 1 frame longer than usual (probably a lag frame)
         sta endingSleepCounter+1
 
 endingLoop:

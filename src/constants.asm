@@ -83,6 +83,7 @@ MENU_MAX_Y_SCROLL := $70
 MENU_TOP_MARGIN_SCROLL := 7 ; in blocks
 
 ; menuConfigSizeLookup
+; menu ram is defined at menuRAM in ./ram.asm
 .define MENUSIZES $0, $0, $0, $0, $F, $7, $8, $C, $20, $10, $1F, $8, $4, $12, $10, $0, $0, $0, $0, $4, $1, $1, $1, $1, $1, $1, $1, $1, $1, $1
 
 .macro MODENAMES
