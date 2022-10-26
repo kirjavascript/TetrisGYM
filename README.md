@@ -392,7 +392,7 @@ Dictate if the NTSC or PAL gameplay mechanics should be used. Should automatical
 
 ## Development
 
-To build, you need a copy of `node` and `cc65` installed on your system. There are no other dependencies.
+To build, you need a copy of `node` and `cc65` installed on your system.
 
 Provide a `clean.nes` file of the unpatched ROM and run `sh build.sh` in a shell or `build.bat` on Windows.
 
