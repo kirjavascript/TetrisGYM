@@ -28,6 +28,7 @@ playState_spawnNextTetrimino:
         lda #$00
         sta fallTimer
         sta tetriminoY
+        sta yPos
         lda #$05
         sta tetriminoX
         ldx nextPiece

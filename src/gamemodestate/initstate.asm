@@ -53,6 +53,8 @@ gameModeState_initGameState:
 
         ; OEM stuff (except score stuff now)
         sta tetriminoY
+        sta yPos
+        sta lastYVel
         sta vramRow
         sta fallTimer
         sta pendingGarbage

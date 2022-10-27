@@ -7,7 +7,7 @@ SAVE_HIGHSCORES := 1
 AUTO_WIN := 0 ; press select to end game
 NO_SCORING := 0 ; breaks pace
 NO_SFX := 0
-NO_MENU := 0
+NO_MENU := 1
 
 INITIAL_CUSTOM_LEVEL := 29
 INITIAL_LINECAP_LEVEL := 39
@@ -87,7 +87,7 @@ MENU_TOP_MARGIN_SCROLL := 7 ; in blocks
 .define MENUSIZES $0, $0, $0, $0, $F, $7, $8, $C, $20, $10, $1F, $8, $4, $12, $10, $0, $0, $0, $0, $4, $1, $1, $1, $1, $1, $1, $1, $1, $1, $1
 
 .macro MODENAMES
-    .byte   "TETRIS"
+    .byte   "SMOOTH"
     .byte   "TSPINS"
     .byte   " SEED "
     .byte   "STACKN"

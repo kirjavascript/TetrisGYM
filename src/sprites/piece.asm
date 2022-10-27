@@ -54,7 +54,68 @@ tileModifierForCurrentPiece:
         lda orientationTable,x
         rts
 
+yDisp:
+	.byte $0,$0,$0,$0,$0,$1,$1,$1,$1,$2,$2,$2,$2,$2,$3,$3,$3,$3,$4,$4,$4,$4,$5,$5,$5,$5,$5,$6,$6,$6,$6,$7,$7,$7,$7,$8,$8,$8,$8,$8,$9,$9,$9,$9,$a,$a,$a,$a,$b,$b,$b,$b,$b,$c,$c,$c,$c,$d,$d,$d,$d,$e,$e,$e,$e,$e,$f,$f,$f,$f,$10,$10,$10,$10,$11,$11,$11,$11,$11,$12,$12,$12,$12,$13,$13,$13,$13,$14,$14,$14,$14,$14,$15,$15,$15,$15,$16,$16,$16,$16,$17,$17,$17,$17,$17,$18,$18,$18,$18,$19,$19,$19,$19,$19,$1a,$1a,$1a,$1a,$1b,$1b,$1b,$1b,$1c,$1c,$1c,$1c,$1c,$1d,$1d,$1d,$1d,$1e,$1e,$1e,$1e,$1f,$1f,$1f,$1f,$1f,$20,$20,$20,$20,$21,$21,$21,$21,$22,$22,$22,$22
+
+; tetriminoY 0x13 - 19
+; yPos spriteX
+
+; use lookup
+
+; // seperate one for X, with negative
+
+; spawn
+;     yPos = 0
+
+; frame -
+
+;     displace = (tetriminoY * 8) - yPos // range(0-152)
+
+;     yVel = lookup(displace)
+;     yPos += lastyVel/2 + yVel
+
+
+
+; lookup=Array.from({ length: 152 }, (_, i) => {
+
+;     return (0.23 * (i))
+; })
+
+
+; console.log('\t.byte '+lookup.map(d=>`$${(0|d).toString(16)}`).join`,`);
+
+; lookup=Array.from({ length: 255 }, (_, i) => {
+
+;     return (0.2 * (i))
+; })
+
+
+; console.log('\t.byte '+lookup.map(d=>`$${(0|d).toString(16)}`).join`,`);
+
+
+; https://codesandbox.io/s/vibrant-kepler-v59c0q
+
 stageSpriteForCurrentPiece_actual:
+        lda playState
+        cmp #1
+        beq @no
+        cmp #2
+        beq @no
+        rts
+@no:
+        sec
+        lda tetriminoY
+        rol a
+        rol a
+        rol a
+        sbc yPos
+        tax
+        lda yDisp, x
+        clc
+        adc yPos
+        sta yPos
+
+
         lda tetriminoX
         cmp #TETRIMINO_X_HIDE
         beq stageSpriteForCurrentPiece_return
@@ -64,10 +125,11 @@ stageSpriteForCurrentPiece_actual:
         adc #$60
         sta generalCounter3
         clc
-        lda tetriminoY
-        rol a
-        rol a
-        rol a
+        lda yPos
+        ; lda tetriminoY
+        ; rol a
+        ; rol a
+        ; rol a
         adc #$2F
         sta generalCounter4
         lda currentPiece
