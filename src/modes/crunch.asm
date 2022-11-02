@@ -17,6 +17,8 @@
 ; F - 3 left 3 right
 
 advanceGameCrunch:
+    lda #0
+    sta vramRow
     lda crunchModifier
     lsr a
     lsr a
