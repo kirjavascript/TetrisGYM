@@ -9,10 +9,10 @@ drawFloor:
         ; x10
         lda multBy10Table, x
         tax
-        ; tile to draw is $7B
-        lda #$7B
+        ; draw block tiles ($7B)
+        lda #BLOCK_TILES
 @loop:
-        sta $0446,X
+        sta playfield+$46,X
         inx
         cpx #$82
         bmi @loop

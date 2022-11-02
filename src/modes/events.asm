@@ -44,6 +44,10 @@ practiseAdvanceGame:
         bne @skipFloor
         jmp advanceGameFloor
 @skipFloor:
+        cmp #MODE_CRUNCH
+        bne @skipCrunch
+        jmp advanceGameCrunch
+@skipCrunch:
         cmp #MODE_TAP
         bne @skipTap
         jmp advanceGameTap

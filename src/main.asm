@@ -85,6 +85,7 @@ mainLoop:
 .include "modes/parity.asm"
 .include "modes/preset.asm"
 .include "modes/floor.asm"
+.include "modes/crunch.asm"
 .include "modes/qtap.asm"
 .include "modes/garbage.asm"
 
