@@ -28,6 +28,16 @@ practiseInitGameState:
         bne @skipChecker
         jsr initChecker
 @skipChecker:
+        lda practiseType
+        cmp #MODE_FLOOR
+        bne @skipFloor
+        jsr advanceGameFloor
+@skipFloor:
+        lda practiseType
+        cmp #MODE_CRUNCH
+        bne @skipCrunch
+        jsr advanceGameCrunch
+@skipCrunch:
         rts
 
 practiseAdvanceGame:
@@ -40,14 +50,6 @@ practiseAdvanceGame:
         bne @skipPresets
         jmp advanceGamePreset
 @skipPresets:
-        cmp #MODE_FLOOR
-        bne @skipFloor
-        jmp advanceGameFloor
-@skipFloor:
-        cmp #MODE_CRUNCH
-        bne @skipCrunch
-        jmp advanceGameCrunch
-@skipCrunch:
         cmp #MODE_TAP
         bne @skipTap
         jmp advanceGameTap
