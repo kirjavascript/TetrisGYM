@@ -1,6 +1,6 @@
 # Changelog
 
-## [unreleased]
+## [v5 tournament]
 * Linecap Menu (from CTM Masters September 2022)
     * Trigger from any level or lines
     * Killscreen x2

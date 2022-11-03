@@ -35,10 +35,13 @@
 * [Hz Display](#hz-display)
 * [Input Display](#input-display)
 * [Disable Flash](#disable-flash)
+* [Disable Pause](#disable-pause)
 * [Goofy Foot](#goofy-foot)
 * [Block Tool](#block-tool)
     * [Level Editor](#level-editor)
     * [Savestates](#savestates)
+* [Linecap](#linecap)
+* [DAS Only](#das-only)
 * [Qualifier Mode](#qual-mode)
 * [PAL Mode](#pal-mode)
 * [Development](#development)
@@ -46,7 +49,7 @@
 
 ## Getting Started
 
-TetrisGYM is a modification of NES Tetris.
+TetrisGYM is a practise mod for NES Tetris.
 
 While originally based on the NTSC version of the game, the patched ROM supports PAL and NTSC gameplay types.
 
@@ -254,6 +257,7 @@ Press `right` when on 9 to choose any level to start on with `up` and `down`.
 Press `down` when on 5-9 to select hearts to display with `left` and `right`.
 
 ![Hearts](./assets/screens/hearts.png)
+![Ingame Hearts](./assets/screens/gamehearts.png)
 
 Used for keeping track of wins in local games.
 
@@ -329,6 +333,10 @@ Also shows frames between spawn and first tap, and current tap direction.
 
 Disable the flashing from when you get a tetris.
 
+## Disable Pause
+
+Disable the ability to pause the game.
+
 ## Goofy Foot
 
 Flips A/B, Start/Select, and inverts DPad directions like a Goofy Foot controller.
@@ -387,6 +395,29 @@ Savestates allow you to save and reload playfields as many times as you want. Th
 Savestates require SRAM to work. Tested and working on Everdrive / Emulator / MiSTerFPGA.
 
 Combined with the level editor, savestates are effective for practising specific scenarios.
+
+## Linecap
+
+![Linecap](./assets/screens/linecap.png)
+
+A game-ending linecap can be enabled at any level or linecount.
+
+The linecap effects are;
+
+* __KSx2__ - Pieces fall at two blocks every frame
+* __Floor__ - A new unclearable row appears with each level change
+* __Inviz__ - Pieces turn invisible
+* __Halt__ - Pieces stop spawning
+
+Used in the CTM Masters event.
+
+## DAS Only
+
+Remove the ability to use tapping or rolling to move the pieces.
+
+All DAS behaviours work as normal, including quicktaps and slowtapping.
+
+Created for CTWC DAS 2022
 
 ## Qual Mode
 
