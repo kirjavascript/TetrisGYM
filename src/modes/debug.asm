@@ -291,7 +291,7 @@ renderStateGameplay:
         sta spawnDelay
         lda #$00
         sta tetriminoY
-        lda #$05
+        jsr getXPos
         sta tetriminoX
         rts
 
