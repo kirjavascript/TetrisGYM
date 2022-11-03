@@ -312,7 +312,6 @@ checkerModifier: .res 1
 garbageModifier: .res 1
 droughtModifier: .res 1
 dasModifier: .res 1
-xposModifier: .res 1
 scoringModifier: .res 1
 hzFlag: .res 1
 inputDisplayFlag: .res 1

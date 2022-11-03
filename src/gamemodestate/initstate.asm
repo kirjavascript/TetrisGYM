@@ -10,7 +10,7 @@ gameModeState_initGameState:
         sta $03EF,x
         dex
         bne @initStatsByType
-        jsr getXPos
+        lda #$05
         sta tetriminoX
 
         ; set seed init

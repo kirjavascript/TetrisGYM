@@ -1,4 +1,4 @@
-# TetrisGYM w/ Add-ons
+# TetrisGYM
 
 <div align="center">
     <img src="./assets/screens/menu5.png" alt="Menuscreen">
@@ -24,7 +24,6 @@
     * [Garbage](#garbage)
     * [Drought](#drought)
     * [DAS Delay](#das-delay)
-    * [X-Pos](#x-pos)
     * [Double Killscreen](#double-killscreen)
     * [Invisible](#invisible)
     * [Hard Drop](#hard-drop)
@@ -215,12 +214,6 @@ Create artificially inflated droughts. Increasing the value causes less I pieces
 ### DAS Delay
 
 Change the auto-shift delay rate.
-
-### X-Pos
-
-Change the initial x-position of the active tetrimino.
-
-The x-position will be randomized if set to 8.
 
 ### Double Killscreen
 

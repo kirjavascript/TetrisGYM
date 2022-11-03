@@ -28,7 +28,7 @@ playState_spawnNextTetrimino:
         lda #$00
         sta fallTimer
         sta tetriminoY
-        jsr getXPos
+        lda #$05
         sta tetriminoX
         ldx nextPiece
         lda spawnOrientationFromOrientation,x

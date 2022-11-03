@@ -88,7 +88,6 @@ mainLoop:
 .include "modes/crunch.asm"
 .include "modes/qtap.asm"
 .include "modes/garbage.asm"
-.include "modes/xpos.asm"
 
 .code
 
