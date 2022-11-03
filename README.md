@@ -155,22 +155,9 @@ Setting the height to zero will result in a game mode with burns disabled.
 
 Shrink the width of the playfield to force cramped stacking.
 
-0. 0L 0R
-1. 0L 1R
-2. 0L 2R
-3. 0L 3R
-4. 1L 0R
-5. 1L 1R
-6. 1L 2R
-7. 1L 3R
-8. 2L 0R
-9. 2L 1R
-A. 2L 2R
-B. 2L 3R
-C. 3L 0R
-D. 3L 1R
-E. 3L 2R
-F. 3L 3R
+Every increment of 4 will decrease the width from the left.
+
+Every increment of 1 will decrease the width from the right until it reaches its maximum of 3, where it will be reset to 0.
 
 ### (Quick)Tap
 
