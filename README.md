@@ -1,4 +1,4 @@
-# TetrisGYM
+# TetrisGYM w/ Add-ons
 
 <div align="center">
     <img src="./assets/screens/menu5.png" alt="Menuscreen">
@@ -149,6 +149,29 @@ Fill in the floor to a certain height to force higher stacking. This mode is oft
 
 Setting the height to zero will result in a game mode with burns disabled.
 
+### Crunch
+
+![Crunch](./assets/screens/crunch.png)
+
+Shrink the width of the playfield to force cramped stacking.
+
+0. 0L 0R
+1. 0L 1R
+2. 0L 2R
+3. 0L 3R
+4. 1L 0R
+5. 1L 1R
+6. 1L 2R
+7. 1L 3R
+8. 2L 0R
+9. 2L 1R
+A. 2L 2R
+B. 2L 3R
+C. 3L 0R
+D. 3L 1R
+E. 3L 2R
+F. 3L 3R
+
 ### (Quick)Tap
 
 ![Tap](./assets/screens/tap.png)
@@ -200,6 +223,10 @@ Create artificially inflated droughts. Increasing the value causes less I pieces
 ### DAS Delay
 
 Change the auto-shift delay rate.
+
+### X-Pos
+
+Change the initial x-position of the active tetrimino.
 
 ### Double Killscreen
 

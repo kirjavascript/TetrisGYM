@@ -126,6 +126,14 @@ playState_checkForCompletedRows:
         rts
 @tapQtyEnd:
 
+        ; update top row for crunch
+        lda practiseType
+        cmp #MODE_CRUNCH
+        bne @crunchEnd
+        lda #1
+        jsr advanceSides
+@crunchEnd:
+
         lda completedLines
         beq :+
         lda #$0A

@@ -19,11 +19,17 @@
 advanceGameCrunch:
     lda #0
     sta vramRow
+    lda #20
+advanceSides:
+    pha
+    sta tmp3
     lda crunchModifier
     lsr a
     lsr a
     ldx #0
     jsr advanceSide
+    pla
+    sta tmp3
     lda crunchModifier
     and #%00000011
     pha
@@ -48,8 +54,6 @@ advanceSide:
     sta tmp1
     lda #>playfield
     sta tmp2
-    lda #20
-    sta tmp3
 @rowLoop:
     pla
     pha
