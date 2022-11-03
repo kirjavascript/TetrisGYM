@@ -217,6 +217,8 @@ Change the auto-shift delay rate.
 
 Change the initial x-position of the active tetrimino.
 
+The x-position will be randomized if set to 8.
+
 ### Double Killscreen
 
 The pieces fall by two blocks every frame. It's hard.
