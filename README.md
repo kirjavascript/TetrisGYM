@@ -47,7 +47,7 @@
 
 ## Getting Started
 
-TetrisGYM is a modification of NES Tetris.
+TetrisGYM is a practise mod for NES Tetris.
 
 While originally based on the NTSC version of the game, the patched ROM supports PAL and NTSC gameplay types.
 
