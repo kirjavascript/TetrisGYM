@@ -38,8 +38,8 @@ touch "$0"
 
 # build object files
 
-ca65 -g src/header.asm -o header.o
-ca65 -l tetris.lst -g src/main.asm -o main.o
+ca65 -D INES_MAPPER="${1:-1}" -g src/header.asm -o header.o
+ca65 -D INES_MAPPER="${1:-1}" -l tetris.lst -g src/main.asm -o main.o
 
 # link object files
 

@@ -1,4 +1,7 @@
+.ifndef INES_MAPPER
 INES_MAPPER := 1 ; supports 1 and 3 (MMC1 / CNROM)
+.endif
+
 PRACTISE_MODE := 1
 NO_MUSIC := 1
 SAVE_HIGHSCORES := 1
