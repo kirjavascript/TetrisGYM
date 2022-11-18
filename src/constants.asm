@@ -1,4 +1,4 @@
-.ifndef INES_MAPPER
+.ifndef INES_MAPPER ; is set via ca65 flags
 INES_MAPPER := 1 ; supports 1 and 3 (MMC1 / CNROM)
 .endif
 
