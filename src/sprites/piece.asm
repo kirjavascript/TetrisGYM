@@ -83,7 +83,8 @@ stageSpriteForCurrentPiece_actual:
         ldy oamStagingLength
         lda #$04
         sta generalCounter2
-L8A4B:  lda orientationTable,x
+@stageMino:  
+        lda orientationTable,x
         asl a
         asl a
         asl a
@@ -104,7 +105,7 @@ L8A4B:  lda orientationTable,x
         sta oamStaging,y
         lda originalY
         cmp #$2F
-        bcs L8A84
+        bcs @validYCoordinate
         inc oamStagingLength
         dey
         lda #$FF
@@ -113,9 +114,10 @@ L8A4B:  lda orientationTable,x
         iny
         lda #$00
         sta oamStaging,y
-        jmp L8A93
+        jmp @finishLoop
 
-L8A84:  inc oamStagingLength
+@validYCoordinate:  
+        inc oamStagingLength
         iny
         lda orientationTable,x
         asl a
@@ -124,11 +126,12 @@ L8A84:  inc oamStagingLength
         clc
         adc generalCounter3
         sta oamStaging,y
-L8A93:  inc oamStagingLength
+@finishLoop:  
+        inc oamStagingLength
         iny
         inx
         dec generalCounter2
-        bne L8A4B
+        bne @stageMino
 stageSpriteForCurrentPiece_return:
         rts
 
