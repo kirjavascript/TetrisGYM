@@ -48,16 +48,16 @@ pause:
         beq @pauseLoopNotClassic
 
 @pauseLoopClassic:
-        lda #PAUSE_SPRITE_X
+        lda #$70
         sta spriteXOffset
-        lda #PAUSE_SPRITE_Y
+        lda #$77
         sta spriteYOffset
         jmp @pauseLoopCommon
 
 @pauseLoopNotClassic:
-        lda #$74
+        lda #PAUSE_SPRITE_X
         sta spriteXOffset
-        lda #$58
+        lda #PAUSE_SPRITE_Y
         sta spriteYOffset
 
 @pauseLoopCommon:
