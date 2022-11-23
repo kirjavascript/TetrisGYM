@@ -1,7 +1,9 @@
 playState_checkStartGameOver:
+.if !ALWAYS_CURTAIN
         ; skip curtain / rocket when not qualling
         lda qualFlag
         beq @checkForStartButton
+.endif
 
         lda curtainRow
         cmp #$14
