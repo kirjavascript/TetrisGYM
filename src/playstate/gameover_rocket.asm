@@ -34,6 +34,7 @@ playState_checkStartGameOver:
 @ret:   rts
 
 @curtainFinished:
+.if !ALWAYS_CURTAIN
         lda score+3
         bne @over30kormaxedout
         lda score+2
@@ -51,6 +52,7 @@ playState_checkStartGameOver:
         jsr endingAnimation
 
         jmp @exitGame
+.endif
 
 @checkForStartButton:
         lda newlyPressedButtons_player1

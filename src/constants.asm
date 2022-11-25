@@ -24,9 +24,11 @@ EMPTY_TILE := $EF
 INVISIBLE_TILE := $43
 TETRIMINO_X_HIDE := $EF
 
-; C4/16 for in score box
 PAUSE_SPRITE_X := $74
 PAUSE_SPRITE_Y := $58
+; yobi-style
+; PAUSE_SPRITE_X := $C4
+; PAUSE_SPRITE_Y := $16
 
 BUTTON_DOWN := $4
 BUTTON_UP := $8
