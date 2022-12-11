@@ -109,7 +109,7 @@ pickTetriminoQuickTap:
 		lda quicktapAllPiecesFlag
 		cmp #$00
 		beq pickTetriminoLongbar
-		jmp pickTetriminoSeed
+		bne pickTetriminoSeed
 		rts
 		
 pickTetriminoSeed:

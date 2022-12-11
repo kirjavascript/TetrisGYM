@@ -73,7 +73,7 @@ drawTiles(buffer, lookup, `
 #a    DAS ONLY                d#
 #a    QUAL MODE               d#
 #a    PAL MODE                d#
-#a                            d#
+#a    QUICKTAP ALL PIECES     d#
 #a                            d#
 #a V5                         d#
 #a                            d#
