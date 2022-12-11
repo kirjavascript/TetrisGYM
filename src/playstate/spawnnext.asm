@@ -89,7 +89,7 @@ pickTetriminoPre:
         beq pickTetriminoLongbar
         lda practiseType
         cmp #MODE_TAP
-        beq pickTetriminoLongbar
+        beq pickTetriminoQuickTap
         lda practiseType
         cmp #MODE_PRESETS
         beq pickTetriminoPreset
@@ -104,7 +104,14 @@ pickTetriminoLongbar:
         lda #$12
         sta spawnID
         rts
-
+		
+pickTetriminoQuickTap:
+		lda quicktapAllPiecesFlag
+		cmp #$00
+		beq pickTetriminoLongbar
+		jmp pickTetriminoSeed
+		rts
+		
 pickTetriminoSeed:
         jsr setSeedNextRNG
 

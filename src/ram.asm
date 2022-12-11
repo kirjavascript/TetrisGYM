@@ -322,5 +322,6 @@ linecapFlag: .res 1
 dasOnlyFlag: .res 1
 qualFlag: .res 1
 palFlag: .res 1
+quicktapAllPiecesFlag: .res 1
 
 ; ... $7FF
