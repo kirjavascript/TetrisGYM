@@ -18,5 +18,5 @@ rocket_palette:
         .byte   $FF
 wait_palette:
         .byte   $3F,$11,$1,$30
-        .byte   $3F,$00,$8,$f,$30,$38,$26,$0F,$17,$27,$37
+        .byte   $3F,$00,$8,$f,$17,$27,$26,$0F,$30,$27,$37
         .byte   $FF
