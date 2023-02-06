@@ -18,7 +18,8 @@ checkDebugGameplay:
         and #BUTTON_B
         beq @done
         ldy #0
-        jsr loadSlot ; check slot is empty
+        jsr getSlotPointer
+        lda (pointerAddr), y ; check slot is empty
         beq @done
         jsr loadState
         jsr renderStateGameplay
@@ -241,7 +242,8 @@ checkSaveStateControlsDebug:
         and #BUTTON_B
         beq @notPressedB
         ldy #0
-        jsr loadSlot ; check slot is empty
+        jsr getSlotPointer
+        lda (pointerAddr), y ; check slot is empty
         beq @notPressedB
         jsr loadState
         jsr renderDebugPlayfield

@@ -13,8 +13,8 @@ score: .res 4 ;  $C ; 4 bytes BCD
 rng_seed: .res 2 ; $0017
 spawnID: .res 1 ; $0019
 spawnCount: .res 1 ; $001A
-pointerAddr: .res 2 ; $001B
-pointerAddrB: .res 2 ; $001D
+pointerAddr: .res 2 ; $001B ; used in debug, harddrop
+pointerAddrB: .res 2 ; $001D ; used in harddrop
     .res $14
 
 verticalBlankingInterval: .res 1 ; $0033
