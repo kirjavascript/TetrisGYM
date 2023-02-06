@@ -188,7 +188,7 @@ soundEffectSlot3_unknown1InitData:
 soundEffectSlot3_unknown2InitData:
         .byte   $03,$7F,$3D,$18
 soundEffectSlot1_chirpChirpSq1Vol_table:
-        .byte   $14,$53,$54,$D3
+        .byte   $14,$93,$94,$D3
 ; See getSoundEffectNoiseNibble
 noiselo_table:
         .byte   $7A,$DE,$FF,$EF,$FD,$DF,$FE,$EF
@@ -670,7 +670,7 @@ LE4AC:  sta SQ1_HI
 LE4AF:  rts
 
 sq1vol_unknown2_table:
-        .byte   $5E,$5B,$59,$56,$54,$53,$52,$51
+        .byte   $9E,$9B,$99,$96,$94,$93,$92,$91
         .byte   $00
 unknown1_table:
         .byte   $46,$37,$46,$37,$46,$37,$46,$37
