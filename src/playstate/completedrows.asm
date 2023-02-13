@@ -35,11 +35,15 @@ playState_checkForCompletedRows:
 
         lda practiseType
         cmp #MODE_FLOOR
-        beq @fullRowBurningCheck
+        beq @floorCheck
         lda linecapState
         cmp #LINECAP_FLOOR
         beq @fullRowBurningCheck
         bne @normalRow
+
+@floorCheck:
+        lda floorModifier
+        beq @rowNotComplete
 
 @fullRowBurningCheck:
         ; bugfix to ensure complete rows aren't cleared

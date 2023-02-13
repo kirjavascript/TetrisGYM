@@ -1,5 +1,8 @@
 # Changelog
 
+## [unreleased]
+* Fixed Floor-0 disabled burns
+
 ## [v5 tournament]
 * Linecap Menu (from CTM Masters September 2022)
     * Trigger from any level or lines
