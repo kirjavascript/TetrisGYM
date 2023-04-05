@@ -19,25 +19,10 @@ playState_lockTetrimino:
         sta binScore+1
         jsr setupScoreForRender
 @noChecker:
-
         ; make invisible tiles visible
         lda #$00
+        sta invisibleFlag
         sta vramRow
-        ldx #$C8
-        lda #BLOCK_TILES+3
-@invizLoop:
-        jsr @makeVisible
-        dex
-        bne @invizLoop
-        jsr @makeVisible
-        rts
-
-@makeVisible:
-        ldy playfield, x
-        cpy #INVISIBLE_TILE
-        bne @emptyTile
-        sta playfield, x
-@emptyTile:
         rts
 
 @notGameOver:
@@ -80,16 +65,6 @@ playState_lockTetrimino:
         inx
         lda orientationTable,x
         sta generalCounter5
-        lda linecapState
-        cmp #LINECAP_INVISIBLE
-        beq @inviz
-        lda practiseType
-        cmp #MODE_INVISIBLE
-        bne @notInvisible
-@inviz:
-        lda #INVISIBLE_TILE
-        sta generalCounter5
-@notInvisible:
         inx
         lda orientationTable,x
         clc

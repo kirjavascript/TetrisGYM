@@ -80,11 +80,8 @@ copyPlayfieldRowToVRAM:
         sta PPUADDR
 @copyRow:
         ldx #$0A
-        cpx playState
-        beq @copyByte
-        lda linecapState
-        cmp #LINECAP_INVISIBLE
-        beq @copyRowInviz
+        lda invisibleFlag
+        bne @copyRowInvisible
 @copyByte:
         lda (playfieldAddr),y
         sta PPUDATA
@@ -100,10 +97,10 @@ copyPlayfieldRowToVRAM:
         sta vramRow
 @ret:   rts
 
-@copyRowInviz:
+@copyRowInvisible:
         lda #INVISIBLE_TILE
-@copyByteInviz:
+@copyByteInvisible:
         sta PPUDATA
         dex
-        bne @copyByteInviz
+        bne @copyByteInvisible
         jmp @rowCopied
