@@ -2,6 +2,8 @@
 
 ## [unreleased]
 * Fixed Floor-0 disabled burns
+* Invisible linecap turns entire playfield invisible
+* Invisible mode preserves original piece colors
 
 ## [v5 tournament]
 * Linecap Menu (from CTM Masters September 2022)
