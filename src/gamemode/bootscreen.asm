@@ -15,7 +15,7 @@ gameMode_bootScreen: ; boot
         jsr updateAudioAndWaitForNmi
         jsr checkRegion
 
-.if !QUAL_START
+.if !QUAL_BOOT
         ; check if qualMode is already set
         lda qualFlag
         bne @qualBoot
