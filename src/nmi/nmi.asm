@@ -27,6 +27,7 @@ nmi:    pha
         lda #$01
         sta verticalBlankingInterval
         jsr pollControllerButtons
+        jsr pollKeyboard
         pla
         tay
         pla
