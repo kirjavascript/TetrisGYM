@@ -207,7 +207,9 @@ harddropBuffer: .res $14 ; $625 ; 20 bytes (!)
 linecapState: .res 1 ; $639 ; 0 if not triggered, 1 + linecapHow otherwise, reset on game init
 
 dasOnlyShiftDisabled: .res 1 ; $63A
-    .res $45
+    .res $3C
+    
+keyboardInput: .res 9 ; $0677
 musicStagingSq1Lo: .res 1 ; $0680
 musicStagingSq1Hi: .res 1 ; $0681
 audioInitialized: .res 1 ; $0682
