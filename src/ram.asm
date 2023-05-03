@@ -209,7 +209,17 @@ linecapState: .res 1 ; $639 ; 0 if not triggered, 1 + linecapHow otherwise, rese
 dasOnlyShiftDisabled: .res 1 ; $63A
 
 invisibleFlag: .res 1 ; $63B  ; 0 for normal mode, non-zero for Invisible playfield rendering.  Reset on game init and game over.
-    .res $44
+
+    .res $39
+
+.if KEYBOARD
+newlyPressedKeys: .res 1 ; $0675
+heldKeys: .res 1 ; $0676
+keyboardInput: .res 9 ; $0677
+.else
+    .res $B
+.endif
+
 musicStagingSq1Lo: .res 1 ; $0680
 musicStagingSq1Hi: .res 1 ; $0681
 audioInitialized: .res 1 ; $0682

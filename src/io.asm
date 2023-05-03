@@ -34,6 +34,14 @@ SND_CHN     := $4015
 JOY1        := $4016
 JOY2_APUFC  := $4017                        ; read: bits 0-4 joy data lines (bit 0 being normal controller), bits 6-7 are FC inhibit and mode
 
+; Used by Family Basic Keyboard
+.if KEYBOARD
+KB_INIT := $05
+KB_COL_0 := $04
+KB_COL_1 := $06
+KB_MASK  := $1E
+.endif
+
 MMC1_Control := $8000
 MMC1_CHR0   := $BFFF
 MMC1_CHR1   := $DFFF
