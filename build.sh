@@ -1,11 +1,46 @@
 #!/bin/sh
 
-while getopts 'm:kv' flag; do
+compile_flags=()
+
+help () {
+    echo "Usage: $0 [-v] [-m <1|3>] [-a] [-s] [-k] [-h]"
+    echo "-v  Enable verbose output"  
+    echo "-m  Set mapper.  Valid values are 1 and 3.  Default 1." 
+    echo "-a  Enable pressing select to end game" 
+    echo "-s  Disable saving of high scores" 
+    echo "-k  Enable Famicom Keyboard support" 
+    echo "-h  Print this help and exit" 
+}
+
+while getopts "vm:askh" flag; do
   case "${flag}" in
-    m) ines_mapper=${OPTARG} ;;
-    k) keyboard_arg='-D KEYBOARD' ;;
     v) set -x ;;
-    *) error "Unexpected option ${flag}" ;;
+    
+    m)  
+        if ! [[ "${OPTARG}" =~ ^[13]$ ]]; then
+            echo "Valid INES_MAPPER (-m) options are 1 or 3"
+            exit 1
+        fi
+        compile_flags+=("-D INES_MAPPER=${OPTARG}")
+        echo "INES_MAPPER set to ${OPTARG}"  ;;
+ 
+    a) 
+        compile_flags+=("-D AUTO_WIN_ENABLE")
+        echo "AUTO_WIN enabled"  ;;
+
+    s) 
+        compile_flags+=("-D SAVE_HIGHSCORES_DISABLE")
+        echo "SAVE_HIGHSCORES disabled"  ;;
+
+    k) 
+        compile_flags+=("-D KEYBOARD_ENABLE")
+        echo "KEYBOARD enabled"  ;;
+
+    h) 
+        help; exit ;;
+
+    *) 
+        help; exit 1 ;;
   esac
 done
 
@@ -47,8 +82,8 @@ touch "$0"
 
 # build object files
 
-ca65 -D INES_MAPPER="${ines_mapper:-1}" $keyboard_arg -g src/header.asm -o header.o
-ca65 -D INES_MAPPER="${ines_mapper:-1}" $keyboard_arg -l tetris.lst -g src/main.asm -o main.o
+ca65 ${compile_flags[*]} -g src/header.asm -o header.o
+ca65 ${compile_flags[*]} -l tetris.lst -g src/main.asm -o main.o
 
 # link object files
 

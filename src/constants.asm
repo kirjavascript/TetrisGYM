@@ -2,11 +2,27 @@
 INES_MAPPER := 1 ; supports 1 and 3 (MMC1 / CNROM)
 .endif
 
-NO_MUSIC := 1
+.ifdef SAVE_HIGHSCORES_DISABLE
+SAVE_HIGHSCORES := 0
+.else
 SAVE_HIGHSCORES := 1
+.endif
+
+.ifdef AUTO_WIN_ENABLE
+AUTO_WIN := 1  ; press select to end game
+.else
+AUTO_WIN := 0
+.endif
+
+.ifdef KEYBOARD_ENABLE
+KEYBOARD := 1
+.else
+KEYBOARD := 0
+.endif
+
+NO_MUSIC := 1
 
 ; dev flags
-AUTO_WIN := 0 ; press select to end game
 NO_SCORING := 0 ; breaks pace
 NO_SFX := 0
 NO_MENU := 0
