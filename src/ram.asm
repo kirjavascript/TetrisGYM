@@ -210,7 +210,7 @@ dasOnlyShiftDisabled: .res 1 ; $63A
 
     .res $3A
 
-.ifdef KEYBOARD
+.if KEYBOARD
 newlyPressedKeys: .res 1 ; $0675
 heldKeys: .res 1 ; $0676
 keyboardInput: .res 9 ; $0677

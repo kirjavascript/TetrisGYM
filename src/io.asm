@@ -35,7 +35,7 @@ JOY1        := $4016
 JOY2_APUFC  := $4017                        ; read: bits 0-4 joy data lines (bit 0 being normal controller), bits 6-7 are FC inhibit and mode
 
 ; Used by Family Basic Keyboard
-.ifdef KEYBOARD
+.if KEYBOARD
 KB_INIT := $05
 KB_COL_0 := $04
 KB_COL_1 := $06
