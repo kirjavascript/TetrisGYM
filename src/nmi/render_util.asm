@@ -98,7 +98,7 @@ copyPlayfieldRowToVRAM:
 @ret:   rts
 
 @copyRowInvisible:
-        lda #INVISIBLE_TILE
+        lda #EMPTY_TILE
 @copyByteInvisible:
         sta PPUDATA
         dex
