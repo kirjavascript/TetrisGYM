@@ -27,7 +27,10 @@ nmi:    pha
         lda #$01
         sta verticalBlankingInterval
         jsr pollControllerButtons
+.ifdef KEYBOARD
+; Read Family BASIC Keyboard
         jsr pollKeyboard
+.endif
         pla
         tay
         pla

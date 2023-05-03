@@ -92,10 +92,13 @@ MENU_SPRITE_Y_BASE := $47
 MENU_MAX_Y_SCROLL := $70
 MENU_TOP_MARGIN_SCROLL := 7 ; in blocks
 
+; Used by Family Basic Keyboard
+.ifdef KEYBOARD
 KB_INIT := $05
 KB_COL_0 := $04
 KB_COL_1 := $06
 KB_MASK  := $1E
+.endif
 
 ; menuConfigSizeLookup
 ; menu ram is defined at menuRAM in ./ram.asm

@@ -1,5 +1,14 @@
 #!/bin/sh
 
+while getopts 'm:kv' flag; do
+  case "${flag}" in
+    m) ines_mapper=${OPTARG} ;;
+    k) keyboard_arg='-D KEYBOARD' ;;
+    v) set -x ;;
+    *) error "Unexpected option ${flag}" ;;
+  esac
+done
+
 # build / compress nametables
 
 node src/nametables/build.js
@@ -38,8 +47,8 @@ touch "$0"
 
 # build object files
 
-ca65 -D INES_MAPPER="${1:-1}" -g src/header.asm -o header.o
-ca65 -D INES_MAPPER="${1:-1}" -l tetris.lst -g src/main.asm -o main.o
+ca65 -D INES_MAPPER="${ines_mapper:-1}" $keyboard_arg -g src/header.asm -o header.o
+ca65 -D INES_MAPPER="${ines_mapper:-1}" $keyboard_arg -l tetris.lst -g src/main.asm -o main.o
 
 # link object files
 
