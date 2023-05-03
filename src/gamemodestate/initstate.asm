@@ -39,6 +39,13 @@ gameModeState_initGameState:
         sta linesBCDHigh
         sta linecapState
         sta dasOnlyShiftDisabled
+        sta invisibleFlag
+
+        lda practiseType
+        cmp #MODE_INVISIBLE
+        bne @notInvisible
+        sta invisibleFlag
+@notInvisible:
 
         lda practiseType
         cmp #MODE_TAPQTY

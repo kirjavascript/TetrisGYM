@@ -420,8 +420,8 @@ renderMenuVars:
         ldx #$F
 @v4:
         stx spriteIndexInOamContentLookup
-        clc
-        lda #(MODE_SEED*8) + MENU_SPRITE_Y_BASE
+        sec
+        lda #(MODE_SEED*8) + MENU_SPRITE_Y_BASE + 1
         sbc menuScrollY
         sta spriteYOffset
         lda #$A0

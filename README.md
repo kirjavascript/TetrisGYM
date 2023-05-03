@@ -219,10 +219,6 @@ Change the auto-shift delay rate.
 
 The pieces fall by two blocks every frame. It's hard.
 
-The value multiplied by ten is the number of lines to transition from normal killscreen.
-
-The value controls the transition from normal killscreen (a value of `x` transitions at `10*x` lines)
-
 ### Invisible
 
 ![Invisible](./assets/screens/invisible.png)

@@ -13,8 +13,8 @@ score: .res 4 ;  $C ; 4 bytes BCD
 rng_seed: .res 2 ; $0017
 spawnID: .res 1 ; $0019
 spawnCount: .res 1 ; $001A
-pointerAddr: .res 2 ; $001B
-pointerAddrB: .res 2 ; $001D
+pointerAddr: .res 2 ; $001B ; used in debug, harddrop
+pointerAddrB: .res 2 ; $001D ; used in harddrop
     .res $14
 
 verticalBlankingInterval: .res 1 ; $0033
@@ -207,7 +207,19 @@ harddropBuffer: .res $14 ; $625 ; 20 bytes (!)
 linecapState: .res 1 ; $639 ; 0 if not triggered, 1 + linecapHow otherwise, reset on game init
 
 dasOnlyShiftDisabled: .res 1 ; $63A
-    .res $45
+
+invisibleFlag: .res 1 ; $63B  ; 0 for normal mode, non-zero for Invisible playfield rendering.  Reset on game init and game over.
+
+    .res $39
+
+.if KEYBOARD
+newlyPressedKeys: .res 1 ; $0675
+heldKeys: .res 1 ; $0676
+keyboardInput: .res 9 ; $0677
+.else
+    .res $B
+.endif
+
 musicStagingSq1Lo: .res 1 ; $0680
 musicStagingSq1Hi: .res 1 ; $0681
 audioInitialized: .res 1 ; $0682

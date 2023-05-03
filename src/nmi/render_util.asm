@@ -80,12 +80,15 @@ copyPlayfieldRowToVRAM:
         sta PPUADDR
 @copyRow:
         ldx #$0A
+        lda invisibleFlag
+        bne @copyRowInvisible
 @copyByte:
         lda (playfieldAddr),y
         sta PPUDATA
         iny
         dex
         bne @copyByte
+@rowCopied:
         inc vramRow
         lda vramRow
         cmp #$14
@@ -93,3 +96,11 @@ copyPlayfieldRowToVRAM:
         lda #$20
         sta vramRow
 @ret:   rts
+
+@copyRowInvisible:
+        lda #EMPTY_TILE
+@copyByteInvisible:
+        sta PPUDATA
+        dex
+        bne @copyByteInvisible
+        jmp @rowCopied

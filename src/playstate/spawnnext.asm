@@ -1,9 +1,11 @@
+SPAWN_NEXT_ADDONS := 1
+
 playState_spawnNextTetrimino:
         lda vramRow
         cmp #$20
         bmi @ret
 
-.if PRACTISE_MODE
+.if SPAWN_NEXT_ADDONS
         lda spawnDelay
         beq @notDelaying
         dec spawnDelay
@@ -14,7 +16,7 @@ playState_spawnNextTetrimino:
         lda #$01
         sta playState
 
-.if PRACTISE_MODE
+.if SPAWN_NEXT_ADDONS
         ; savestate patch
         lda saveStateDirty
         beq @noSaveState
@@ -22,9 +24,10 @@ playState_spawnNextTetrimino:
         sta saveStateDirty
         rts
 @noSaveState:
-.endif
 
         jsr hzStart
+.endif
+
         lda #$00
         sta fallTimer
         sta tetriminoY

@@ -1,3 +1,21 @@
+practiseInitGameState:
+        lda practiseType
+        cmp #MODE_CHECKERBOARD
+        bne @skipChecker
+        jsr initChecker
+@skipChecker:
+        jsr practiseEachPiece
+        cmp #MODE_FLOOR
+        bne @skipFloor
+        jmp advanceGameFloor
+@skipFloor:
+        lda practiseType
+        cmp #MODE_CRUNCH
+        bne @skipCrunch
+        jsr advanceGameCrunch
+@skipCrunch:
+        rts
+
 practisePrepareNext:
         lda practiseType
         cmp #MODE_PACE
@@ -12,32 +30,7 @@ practisePrepareNext:
         bne @skipParity
         jmp prepareNextParity
 @skipParity:
-        cmp #MODE_TAPQTY
-        bne @skipTapQuantity
-        jsr prepareNextTapQuantity
-@skipTapQuantity:
-        rts
-practiseInitGameState:
-        lda practiseType
-        cmp #MODE_TAPQTY
-        bne @skipTapQuantity
-        jsr prepareNextTapQuantity
-@skipTapQuantity:
-        lda practiseType
-        cmp #MODE_CHECKERBOARD
-        bne @skipChecker
-        jsr initChecker
-@skipChecker:
-        lda practiseType
-        cmp #MODE_FLOOR
-        bne @skipFloor
-        jsr advanceGameFloor
-@skipFloor:
-        lda practiseType
-        cmp #MODE_CRUNCH
-        bne @skipCrunch
-        jsr advanceGameCrunch
-@skipCrunch:
+        jsr practiseEachPiece
         rts
 
 practiseAdvanceGame:
@@ -46,14 +39,21 @@ practiseAdvanceGame:
         bne @skipTSpins
         jmp advanceGameTSpins
 @skipTSpins:
-        cmp #MODE_PRESETS
-        bne @skipPresets
-        jmp advanceGamePreset
-@skipPresets:
+        rts
+
+practiseEachPiece: ; only used in this file
+        cmp #MODE_TAPQTY
+        bne @skipTapQuantity
+        jsr prepareNextTapQuantity
+@skipTapQuantity:
         cmp #MODE_TAP
         bne @skipTap
         jmp advanceGameTap
 @skipTap:
+        cmp #MODE_PRESETS
+        bne @skipPresets
+        jmp advanceGamePreset
+@skipPresets:
         rts
 
 practiseGameHUD:

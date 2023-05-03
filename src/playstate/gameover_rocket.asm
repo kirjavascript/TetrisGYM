@@ -1,7 +1,9 @@
 playState_checkStartGameOver:
+.if !ALWAYS_CURTAIN
         ; skip curtain / rocket when not qualling
         lda qualFlag
         beq @checkForStartButton
+.endif
 
         lda curtainRow
         cmp #$14
@@ -32,6 +34,10 @@ playState_checkStartGameOver:
 @ret:   rts
 
 @curtainFinished:
+.if ALWAYS_CURTAIN
+        lda qualFlag
+        beq @checkForStartButton
+.endif
         lda score+3
         bne @over30kormaxedout
         lda score+2

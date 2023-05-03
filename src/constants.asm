@@ -1,13 +1,27 @@
+.ifndef INES_MAPPER ; is set via ca65 flags
 INES_MAPPER := 1 ; supports 1 and 3 (MMC1 / CNROM)
-PRACTISE_MODE := 1
-NO_MUSIC := 1
+.endif
+
+.ifndef SAVE_HIGHSCORES
 SAVE_HIGHSCORES := 1
+.endif
+
+.ifndef AUTO_WIN
+AUTO_WIN := 0 ; press select to end game
+.endif
+
+.ifndef KEYBOARD
+KEYBOARD := 0
+.endif
+
+NO_MUSIC := 1
 
 ; dev flags
-AUTO_WIN := 0 ; press select to end game
 NO_SCORING := 0 ; breaks pace
 NO_SFX := 0
 NO_MENU := 0
+ALWAYS_CURTAIN := 0
+QUAL_BOOT := 0
 
 INITIAL_CUSTOM_LEVEL := 29
 INITIAL_LINECAP_LEVEL := 39
@@ -17,8 +31,13 @@ BTYPE_START_LINES := $25 ; bcd
 MENU_HIGHLIGHT_COLOR := $12 ; $12 in gym, $16 in original
 BLOCK_TILES := $7B
 EMPTY_TILE := $EF
-INVISIBLE_TILE := $43
 TETRIMINO_X_HIDE := $EF
+
+PAUSE_SPRITE_X := $74
+PAUSE_SPRITE_Y := $58
+; yobi-style
+; PAUSE_SPRITE_X := $C4
+; PAUSE_SPRITE_Y := $16
 
 BUTTON_DOWN := $4
 BUTTON_UP := $8

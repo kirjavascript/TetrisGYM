@@ -146,6 +146,10 @@ checkLinecap: ; set linecapState
         adc #1
         sta linecapState
 
+        cmp #LINECAP_INVISIBLE
+        bne @linecapEnd
+        sta invisibleFlag
+
 @linecapEnd:
 
         ; floor linecap effect
