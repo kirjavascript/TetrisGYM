@@ -31,7 +31,6 @@ mainLoop:
 .include "nmi/render.asm"
 .include "nmi/pollcontroller.asm"
 .if KEYBOARD
-; Code used to read Family BASIC Keyboard
 .include "nmi/pollkeyboard.asm"
 .endif
 

@@ -2,6 +2,7 @@
 
 ## [unreleased]
 * Fixed Floor-0 disabled burns
+* Famicom Keyboard support
 * Invisible linecap turns entire playfield invisible
 * Invisible mode preserves original piece colors
 
