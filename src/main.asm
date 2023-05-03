@@ -30,8 +30,11 @@ mainLoop:
 .include "nmi/nmi.asm"
 .include "nmi/render.asm"
 .include "nmi/pollcontroller.asm"
-.include "nmi/pollkeyboard.asm"
 
+.ifdef KEYBOARD
+; Code used to read Family BASIC Keyboard
+.include "nmi/pollkeyboard.asm"
+.endif
 .include "gamemode/branch.asm"
     ; -> playAndEnding
 .include "gamemodestate/branch.asm"
