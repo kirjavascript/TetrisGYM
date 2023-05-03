@@ -42,6 +42,7 @@
 
 pollKeyboard:
         ldx #$00
+        stx newlyPressedKeys
         lda #KB_INIT
         sta JOY1
 @rowLoop:
@@ -65,8 +66,120 @@ pollKeyboard:
         asl
         asl
         ora keyboardInput,x
+        eor #$FF
         sta keyboardInput,x
         inx
         cpx #$09
         bne @rowLoop
+
+
+; Bit0  Bit1    Bit2    Bit3      Bit4    Bit5    Bit6     Bit7
+; ] 	[ 	RETURN 	F8 	  STOP 	  ¥ 	  RSHIFT   KANA
+; ; 	: 	@ 	F7 	  ^ 	  - 	  / 	   _
+; K 	L 	O 	F6 	  0 	  P 	  , 	   .
+; J 	U 	I 	F5 	  8 	  9 	  N 	   M
+; H 	G 	Y 	F4 	  6 	  7 	  V 	   B
+; D 	R 	T 	F3 	  4 	  5 	  C 	   F
+; A 	S 	W 	F2 	  3 	  E 	  Z 	   X
+; CTR 	Q 	ESC 	F1 	  2 	  1 	  GRPH 	   LSHIFT
+; LEFT 	RIGHT 	UP 	CLR HOME  INS 	  DEL 	  SPACE    DOWN
+
+; Read keys.  up/down/left/right are mapped directly
+
+        ldy #$08
+        ldx #$02
+        jsr readKey
+        beq @upNotPressed
+        lda newlyPressedKeys
+        ora #BUTTON_UP
+        sta newlyPressedKeys
+@upNotPressed:
+
+        ldy #$08
+        ldx #$07
+        jsr readKey
+        beq @downNotPressed
+        lda newlyPressedKeys
+        ora #BUTTON_DOWN
+        sta newlyPressedKeys
+@downNotPressed:
+
+        ldy #$08
+        ldx #$00
+        jsr readKey
+        beq @leftNotPressed
+        lda newlyPressedKeys
+        ora #BUTTON_LEFT
+        sta newlyPressedKeys
+@leftNotPressed:
+
+        ldy #$08
+        ldx #$01
+        jsr readKey
+        beq @rightNotPressed
+        lda newlyPressedKeys
+        ora #BUTTON_RIGHT
+        sta newlyPressedKeys
+@rightNotPressed: 
+
+        ldy #$07     ; grph -> B
+        ldx #$06
+        jsr readKey
+        beq @bNotPressed
+        lda newlyPressedKeys
+        ora #BUTTON_B
+        sta newlyPressedKeys
+@bNotPressed:
+
+        ldy #$08     ; space -> A
+        ldx #$06
+        jsr readKey
+        beq @aNotPressed
+        lda newlyPressedKeys
+        ora #BUTTON_A
+        sta newlyPressedKeys
+@aNotPressed:
+
+        ldy #$00     ; right shift -> select
+        ldx #$06
+        jsr readKey
+        beq @selectNotPressed
+        lda newlyPressedKeys
+        ora #BUTTON_SELECT
+        sta newlyPressedKeys
+@selectNotPressed:
+
+        ldy #$00     ; return -> start
+        ldx #$02
+        jsr readKey
+        beq @startNotPressed
+        lda newlyPressedKeys
+        ora #BUTTON_START
+        sta newlyPressedKeys
+@startNotPressed:
+
+
+; Separate Newly Pressed from Held 
+        lda newlyPressedKeys
+        tay
+        eor heldKeys
+        and newlyPressedKeys
+        sta newlyPressedKeys
+        sty heldKeys
+
+; Copy to buttons
+        lda newlyPressedButtons_player1
+        ora newlyPressedKeys
+        sta newlyPressedButtons_player1
+
+        lda heldButtons_player1
+        ora heldKeys
+        sta heldButtons_player1
         rts
+
+keyMask:
+        .byte $80,$40,$20,$10,$08,$04,$02,$01
+readKey:
+	lda keyboardInput,y
+	and keyMask,x
+	rts
