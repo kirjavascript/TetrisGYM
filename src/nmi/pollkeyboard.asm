@@ -93,6 +93,7 @@ pollKeyboard:
         lda newlyPressedKeys
         ora #BUTTON_UP
         sta newlyPressedKeys
+        bne @skipDownRead
 @upNotPressed:
 
         ldy #$08
@@ -102,6 +103,7 @@ pollKeyboard:
         lda newlyPressedKeys
         ora #BUTTON_DOWN
         sta newlyPressedKeys
+@skipDownRead:
 @downNotPressed:
 
         ldy #$08
@@ -111,6 +113,7 @@ pollKeyboard:
         lda newlyPressedKeys
         ora #BUTTON_LEFT
         sta newlyPressedKeys
+        bne @skipRightRead
 @leftNotPressed:
 
         ldy #$08
@@ -120,6 +123,7 @@ pollKeyboard:
         lda newlyPressedKeys
         ora #BUTTON_RIGHT
         sta newlyPressedKeys
+@skipRightRead:
 @rightNotPressed: 
 
         ldy #$07     ; grph -> B
