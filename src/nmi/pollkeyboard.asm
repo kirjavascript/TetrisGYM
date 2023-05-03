@@ -67,11 +67,14 @@ pollKeyboard:
         asl
         ora keyboardInput,x
         eor #$FF
+        cmp #$FF
+        beq @ret   ; Assume 8 simultaneously pressed keys means there's no keyboard to be read
         sta keyboardInput,x
         inx
         cpx #$09
         bne @rowLoop
-
+        jsr mapKeysToButtons
+@ret:   rts
 
 ; Bit0  Bit1    Bit2    Bit3      Bit4    Bit5    Bit6     Bit7
 ; ] 	[ 	RETURN 	F8 	  STOP 	  ¥ 	  RSHIFT   KANA
@@ -86,6 +89,8 @@ pollKeyboard:
 
 ; Read keys.  up/down/left/right are mapped directly
 
+
+mapKeysToButtons:
         ldy #$08
         ldx #$02
         jsr readKey
