@@ -1,10 +1,11 @@
 # Changelog
 
 ## [unreleased]
-* Fixed Floor-0 disabled burns
-* Famicom Keyboard support
+* Crunch Mode
 * Invisible linecap turns entire playfield invisible
 * Invisible mode preserves original piece colors
+* Famicom Keyboard support
+* Fixed Floor-0 disabled burns
 
 ## [v5 tournament]
 * Linecap Menu (from CTM Masters September 2022)
