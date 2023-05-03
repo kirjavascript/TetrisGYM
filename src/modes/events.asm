@@ -5,6 +5,15 @@ practiseInitGameState:
         jsr initChecker
 @skipChecker:
         jsr practiseEachPiece
+        cmp #MODE_FLOOR
+        bne @skipFloor
+        jmp advanceGameFloor
+@skipFloor:
+        lda practiseType
+        cmp #MODE_CRUNCH
+        bne @skipCrunch
+        jsr advanceGameCrunch
+@skipCrunch:
         rts
 
 practisePrepareNext:
@@ -45,10 +54,6 @@ practiseEachPiece: ; only used in this file
         bne @skipPresets
         jmp advanceGamePreset
 @skipPresets:
-        cmp #MODE_FLOOR
-        bne @skipFloor
-        jmp advanceGameFloor
-@skipFloor:
         rts
 
 practiseGameHUD:
