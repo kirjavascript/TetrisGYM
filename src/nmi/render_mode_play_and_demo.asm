@@ -214,9 +214,8 @@ updateLineClearingAnimation:
         bne @ret
         ; invisible mode show blocks intead of empty
         ldy #$FF
-        lda practiseType
-        cmp #MODE_INVISIBLE
-        bne @notInvisible
+        lda invisibleFlag
+        beq @notInvisible
         ldy #BLOCK_TILES
 @notInvisible:
         sty tmp3

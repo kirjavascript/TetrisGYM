@@ -3,6 +3,8 @@
 ## [unreleased]
 * Fixed Floor-0 disabled burns
 * Famicom Keyboard support
+* Invisible linecap turns entire playfield invisible
+* Invisible mode preserves original piece colors
 
 ## [v5 tournament]
 * Linecap Menu (from CTM Masters September 2022)
