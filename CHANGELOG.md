@@ -2,6 +2,7 @@
 
 ## [unreleased]
 * Fixed Floor-0 disabled burns
+* Famicom Keyboard support
 
 ## [v5 tournament]
 * Linecap Menu (from CTM Masters September 2022)

@@ -2,21 +2,15 @@
 INES_MAPPER := 1 ; supports 1 and 3 (MMC1 / CNROM)
 .endif
 
-.ifdef SAVE_HIGHSCORES_DISABLE
-SAVE_HIGHSCORES := 0
-.else
+.ifndef SAVE_HIGHSCORES
 SAVE_HIGHSCORES := 1
 .endif
 
-.ifdef AUTO_WIN_ENABLE
-AUTO_WIN := 1  ; press select to end game
-.else
-AUTO_WIN := 0
+.ifndef AUTO_WIN
+AUTO_WIN := 0 ; press select to end game
 .endif
 
-.ifdef KEYBOARD_ENABLE
-KEYBOARD := 1
-.else
+.ifndef KEYBOARD
 KEYBOARD := 0
 .endif
 
