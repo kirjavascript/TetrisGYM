@@ -50,15 +50,20 @@ png2chr() {
 
 # build CHR if it doesnt already exist
 
-if [ "$(find src/chr/*.chr 2>/dev/null | wc -l)" = 0 ]; then
+if [ "$(find src/chr/*.chr 2>/dev/null | wc -l | xargs)" = 0 ]; then
     echo "building CHR for the first time"
     png2chr
 else
 
     # if it does exist check if the PNG has been modified
-
-    pngTimes=$(stat -c "%Y" src/chr/*.png)
-    scriptTime=$(stat -c "%X" "$0")
+    if [[ $(uname) == "Darwin" ]]; then
+        # mac support
+        pngTimes=$(stat -f "%m" src/chr/*.png)
+        scriptTime=$(stat -f "%m" "$0")
+    else
+        pngTimes=$(stat -c "%Y" src/chr/*.png)
+        scriptTime=$(stat -c "%X" "$0")
+    fi
 
     for pngTime in $pngTimes; do
         if [ "$pngTime" -gt "$scriptTime" ]; then
@@ -84,7 +89,9 @@ ca65 ${compile_flags[*]} -l tetris.lst -g src/main.asm -o main.o
 ld65 -m tetris.map -Ln tetris.lbl --dbgfile tetris.dbg -o tetris.nes -C src/tetris.nes.cfg main.o header.o
 
 # create patch
-if [[ -f clean.nes ]]; then
+if [[ -f clean.nes ]] && [[ $(uname) == "Darwin" ]]; then
+    echo "Unable to create patch on mac"
+elif [[ -f clean.nes ]]; then
     ./tools/flips-linux --create clean.nes tetris.nes tetris.bps
 else
     echo "clean.nes not found.  Skipping patch creation."
