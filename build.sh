@@ -50,15 +50,20 @@ png2chr() {
 
 # build CHR if it doesnt already exist
 
-if [ "$(find src/chr/*.chr 2>/dev/null | wc -l)" = 0 ]; then
+if [ "$(find src/chr/*.chr 2>/dev/null | wc -l | xargs)" = 0 ]; then
     echo "building CHR for the first time"
     png2chr
 else
 
     # if it does exist check if the PNG has been modified
-
-    pngTimes=$(stat -c "%Y" src/chr/*.png)
-    scriptTime=$(stat -c "%X" "$0")
+    if [[ $(uname) == "Darwin" ]]; then
+        # mac support
+        pngTimes=$(stat -f "%m" src/chr/*.png)
+        scriptTime=$(stat -f "%m" "$0")
+    else
+        pngTimes=$(stat -c "%Y" src/chr/*.png)
+        scriptTime=$(stat -c "%X" "$0")
+    fi
 
     for pngTime in $pngTimes; do
         if [ "$pngTime" -gt "$scriptTime" ]; then
