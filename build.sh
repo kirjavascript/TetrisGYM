@@ -84,11 +84,29 @@ ca65 ${compile_flags[*]} -l tetris.lst -g src/main.asm -o main.o
 ld65 -m tetris.map -Ln tetris.lbl --dbgfile tetris.dbg -o tetris.nes -C src/tetris.nes.cfg main.o header.o
 
 # create patch
-
-./tools/flips-linux --create clean.nes tetris.nes tetris.bps
+if [[ -f clean.nes ]]; then
+    ./tools/flips-linux --create clean.nes tetris.nes tetris.bps
+else
+    echo "clean.nes not found.  Skipping patch creation."
+fi
 
 # show some stats
+if command -v sha1sum &>/dev/null; then
+    sha1sum tetris.nes
+elif command -v shasum &>/dev/null; then
+    # mac support
+    shasum tetris.nes
+else
+    echo "sha1sum or shasum not found.  Unable to get SHA-1 hash of tetris.nes."
+fi
 
-sha1sum tetris.nes
 sed -n '23,27p' < tetris.map
-stat -c %s tetris.bps
+
+if [[ -f tetris.bps ]]; then
+    # mac support
+    if [[ $(uname) == "Darwin" ]]; then
+        stat -f %z tetris.bps
+    else
+        stat -c %s tetris.bps
+    fi
+fi
