@@ -3,7 +3,7 @@
 compile_flags=()
 
 help () {
-    echo "Usage: $0 [-v] [-m <1|3>] [-a] [-s] [-k] [-h]"
+    echo "Usage: $0 [-v] [-m <1|3|4>] [-a] [-s] [-k] [-h]"
     echo "-v  verbose"
     echo "-m  mapper"
     echo "-a  faster aeppoz + press select to end game"
