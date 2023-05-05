@@ -4,12 +4,12 @@ compile_flags=()
 
 help () {
     echo "Usage: $0 [-v] [-m <1|3>] [-a] [-s] [-k] [-h]"
-    echo "-v  Enable verbose output"
-    echo "-m  Set mapper.  Valid values are 1, 3 and 4.  Default 1."
-    echo "-a  Enable pressing select to end game"
-    echo "-s  Disable saving of high scores"
-    echo "-k  Enable Famicom Keyboard support"
-    echo "-h  Print this help and exit"
+    echo "-v  verbose"
+    echo "-m  mapper"
+    echo "-a  faster aeppoz + press select to end game"
+    echo "-s  disable highscores/SRAM"
+    echo "-k  Famicom Keyboard support"
+    echo "-h  you are here"
 }
 
 while getopts "vm:askh" flag; do
