@@ -7,7 +7,8 @@ SAVE_HIGHSCORES := 1
 .endif
 
 .ifndef AUTO_WIN
-AUTO_WIN := 0 ; press select to end game
+; faster aeppoz + press select to end game
+AUTO_WIN := 0
 .endif
 
 .ifndef KEYBOARD
