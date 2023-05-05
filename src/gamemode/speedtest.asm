@@ -21,7 +21,7 @@ gameMode_speedTest:
         sta PPUADDR
         lda #$30
         sta PPUDATA
-.if INES_MAPPER = 1 || INES_MAPPER = 4
+.if HAS_MMC
         lda #$01
         jsr changeCHRBank0
         lda #$01

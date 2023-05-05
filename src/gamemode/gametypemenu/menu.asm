@@ -11,7 +11,7 @@ gameMode_gameTypeMenu:
         lda #0
         sta displayNextPiece
         RESET_MMC1
-.if INES_MAPPER = 1 || INES_MAPPER = 4
+.if HAS_MMC
         ; switch to blank charmap
         ; (stops glitching when resetting)
         lda #$03

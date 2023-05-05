@@ -2,6 +2,8 @@
 INES_MAPPER := 1 ; supports 1 and 3 (MMC1 / CNROM)
 .endif
 
+HAS_MMC = INES_MAPPER = 1 || INES_MAPPER = 4
+
 .ifndef SAVE_HIGHSCORES
 SAVE_HIGHSCORES := 1
 .endif
