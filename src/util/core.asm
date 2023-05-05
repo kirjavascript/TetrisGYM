@@ -311,6 +311,17 @@ changeCHRBank0:
         sta MMC1_CHR0
         lsr a
         sta MMC1_CHR0
+.elseif INES_MAPPER = 4
+        asl a
+        asl a
+        ldx #$00
+        stx MMC3_BANK_SELECT
+        sta MMC3_BANK_DATA
+        inx
+        clc
+        adc #$02
+        stx MMC3_BANK_SELECT
+        sta MMC3_BANK_DATA
 .endif
         rts
 
@@ -325,6 +336,27 @@ changeCHRBank1:
         sta MMC1_CHR1
         lsr a
         sta MMC1_CHR1
+.elseif INES_MAPPER = 4
+        asl a
+        asl a
+        ldx #$02
+        stx MMC3_BANK_SELECT
+        sta MMC3_BANK_DATA
+        inx
+        clc
+        adc #$01
+        stx MMC3_BANK_SELECT
+        sta MMC3_BANK_DATA
+        inx
+        clc
+        adc #$01
+        stx MMC3_BANK_SELECT
+        sta MMC3_BANK_DATA
+        inx
+        clc
+        adc #$01
+        stx MMC3_BANK_SELECT
+        sta MMC3_BANK_DATA
 .endif
         rts
 
@@ -339,5 +371,16 @@ changePRGBank:
         sta MMC1_PRG
         lsr a
         sta MMC1_PRG
+.elseif INES_MAPPER = 4
+        asl     a
+        asl     a
+        ldx     #$06
+        stx     MMC3_BANK_SELECT
+        sta     MMC3_BANK_DATA
+        inx
+        clc
+        adc     #$01
+        stx     MMC3_BANK_SELECT
+        sta     MMC3_BANK_DATA
 .endif
         rts

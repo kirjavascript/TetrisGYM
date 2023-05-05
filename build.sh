@@ -3,7 +3,7 @@
 compile_flags=()
 
 help () {
-    echo "Usage: $0 [-v] [-m <1|3>] [-a] [-s] [-k] [-h]"
+    echo "Usage: $0 [-v] [-m <1|3|4>] [-a] [-s] [-k] [-h]"
     echo "-v  verbose"
     echo "-m  mapper"
     echo "-a  faster aeppoz + press select to end game"
@@ -16,8 +16,8 @@ while getopts "vm:askh" flag; do
   case "${flag}" in
     v) set -x ;;
     m)
-        if ! [[ "${OPTARG}" =~ ^[13]$ ]]; then
-            echo "Valid INES_MAPPER (-m) options are 1 or 3"
+        if ! [[ "${OPTARG}" =~ ^[134]$ ]]; then
+            echo "Valid INES_MAPPER (-m) options are 1, 3 or 4"
             exit 1
         fi
         compile_flags+=("-D INES_MAPPER=${OPTARG}")
