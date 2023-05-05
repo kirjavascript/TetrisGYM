@@ -6,6 +6,7 @@
 * Invisible mode preserves original piece colors
 * Famicom Keyboard support
 * Fixed Floor-0 disabled burns
+* MMC3 Support
 
 ## [v5 tournament]
 * Linecap Menu (from CTM Masters September 2022)
@@ -61,6 +62,7 @@
     * Transition from Legal to Title screen after 512 frames
     * Hide next box between Curtain and Rocket
     * Persist Qual Mode (and menu config) between reset button presses
+* CNROM support
 
 ### rev01
 
@@ -82,9 +84,6 @@
 * Added letters-based scoring that count 0-9 A-Z then wraps
 * Added input log to Speed Test
 * Fixed a bug where Rocket wouldn't show with a score between 1.0 and 1.03
-
-## [CNROM]
-* CNROM support
 
 ## [v4 classic]
 - Standard Pause in Qual Mode
