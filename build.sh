@@ -5,7 +5,7 @@ compile_flags=()
 help () {
     echo "Usage: $0 [-v] [-m <1|3>] [-a] [-s] [-k] [-h]"
     echo "-v  Enable verbose output"
-    echo "-m  Set mapper.  Valid values are 1 and 3.  Default 1."
+    echo "-m  Set mapper.  Valid values are 1, 3 and 4.  Default 1."
     echo "-a  Enable pressing select to end game"
     echo "-s  Disable saving of high scores"
     echo "-k  Enable Famicom Keyboard support"
@@ -17,7 +17,7 @@ while getopts "vm:askh" flag; do
     v) set -x ;;
     m)
         if ! [[ "${OPTARG}" =~ ^[134]$ ]]; then
-            echo "Valid INES_MAPPER (-m) options are 1 or 3"
+            echo "Valid INES_MAPPER (-m) options are 1, 3 or 4"
             exit 1
         fi
         compile_flags+=("-D INES_MAPPER=${OPTARG}")

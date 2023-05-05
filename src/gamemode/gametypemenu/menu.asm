@@ -18,8 +18,9 @@ gameMode_gameTypeMenu:
         jsr changeCHRBank1
 .endif
 .if INES_MAPPER = 4
+        ; Horizontal mirroring
         lda #$1
-        sta $A000
+        sta MMC3_MIRRORING
 .endif
         lda #%10011 ; used to be $10 (enable horizontal mirroring)
         jsr setMMC1Control

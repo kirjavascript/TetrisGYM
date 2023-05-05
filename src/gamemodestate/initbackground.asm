@@ -47,6 +47,10 @@ gameModeState_initGameBackground:
         lda #%10011000
         sta PPUCTRL
         sta currentPpuCtrl
+.elseif INES_MAPPER = 4
+        ; Vertical mirroring (Prevents screen glitching)
+        lda #$0
+        sta MMC3_MIRRORING
 .endif
         jsr resetScroll
         jsr waitForVBlankAndEnableNmi

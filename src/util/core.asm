@@ -315,13 +315,13 @@ changeCHRBank0:
         asl a
         asl a
         ldx #$00
-        stx $8000
-        sta $8001
+        stx MMC3_BANK_SELECT
+        sta MMC3_BANK_DATA
         inx
         clc
         adc #$02
-        stx $8000
-        sta $8001
+        stx MMC3_BANK_SELECT
+        sta MMC3_BANK_DATA
 .endif
         rts
 
@@ -340,23 +340,23 @@ changeCHRBank1:
         asl a
         asl a
         ldx #$02
-        stx $8000
-        sta $8001
+        stx MMC3_BANK_SELECT
+        sta MMC3_BANK_DATA
         inx
         clc
         adc #$01
-        stx $8000
-        sta $8001
+        stx MMC3_BANK_SELECT
+        sta MMC3_BANK_DATA
         inx
         clc
         adc #$01
-        stx $8000
-        sta $8001
+        stx MMC3_BANK_SELECT
+        sta MMC3_BANK_DATA
         inx
         clc
         adc #$01
-        stx $8000
-        sta $8001
+        stx MMC3_BANK_SELECT
+        sta MMC3_BANK_DATA
 .endif
         rts
 
@@ -375,12 +375,12 @@ changePRGBank:
         asl     a
         asl     a
         ldx     #$06
-        stx     $8000
-        sta     $8001
+        stx     MMC3_BANK_SELECT
+        sta     MMC3_BANK_DATA
         inx
         clc
         adc     #$01
-        stx     $8000
-        sta     $8001
+        stx     MMC3_BANK_SELECT
+        sta     MMC3_BANK_DATA
 .endif
         rts

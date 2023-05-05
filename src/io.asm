@@ -46,6 +46,10 @@ MMC1_Control := $8000
 MMC1_CHR0   := $BFFF
 MMC1_CHR1   := $DFFF
 
+MMC3_BANK_SELECT := $8000
+MMC3_BANK_DATA := $8001
+MMC3_MIRRORING := $A000
+
 .macro RESET_MMC1
 .if INES_MAPPER = 1
         inc $8000 ; initRam
