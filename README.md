@@ -63,7 +63,7 @@ ROM CRC32: 1394F57E
 
 A link to the BPS can be found on the [releases page](https://github.com/kirjavascript/TetrisGYM/releases).
 
-There is also a `CNROM.bps` patch for mapper 3 support. (The original ROM uses MMC1/mapper 1)
+TetrisGYM supports the mappers MMC1, MMC3, and CNROM. The default build is MMC1.
 
 ## Trainers
 
