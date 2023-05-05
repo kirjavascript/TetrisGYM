@@ -11,11 +11,15 @@ gameMode_gameTypeMenu:
         lda #0
         sta displayNextPiece
         RESET_MMC1
-.if INES_MAPPER = 1
+.if INES_MAPPER = 1 || INES_MAPPER = 4
         ; switch to blank charmap
         ; (stops glitching when resetting)
         lda #$03
         jsr changeCHRBank1
+.endif
+.if INES_MAPPER = 4
+        lda #$1
+        sta $A000
 .endif
         lda #%10011 ; used to be $10 (enable horizontal mirroring)
         jsr setMMC1Control

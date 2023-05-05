@@ -1,7 +1,7 @@
 gameModeState_initGameBackground:
         jsr updateAudioWaitForNmiAndDisablePpuRendering
         jsr disableNmi
-.if INES_MAPPER = 1
+.if INES_MAPPER = 1 || INES_MAPPER = 4
         lda #$01
         jsr changeCHRBank0
         lda #$01

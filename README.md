@@ -1,3 +1,5 @@
+Toying with MMC3 in this branch.  Only problem I'm aware of to solve is a screen flicker during initGameBackground.  May come back to this later.
+
 # TetrisGYM
 
 <div align="center">

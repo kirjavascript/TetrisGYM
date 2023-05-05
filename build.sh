@@ -16,7 +16,7 @@ while getopts "vm:askh" flag; do
   case "${flag}" in
     v) set -x ;;
     m)
-        if ! [[ "${OPTARG}" =~ ^[13]$ ]]; then
+        if ! [[ "${OPTARG}" =~ ^[134]$ ]]; then
             echo "Valid INES_MAPPER (-m) options are 1 or 3"
             exit 1
         fi
