@@ -39,6 +39,11 @@ debugSelectMenuControls:
         lda debugLevelEdit
         eor #1
         sta debugLevelEdit
+        ; Don't switch if invalid position
+        bne @skipDebugType
+        jsr isPositionValid
+        beq @skipDebugType
+        inc debugLevelEdit
 @skipDebugType:
 
         jsr checkSaveStateControlsDebug
@@ -108,21 +113,37 @@ debugContinue:
         jsr menuThrottle
         beq @notPressedUp
         dec tetriminoY
+        bpl @notPressedUp
+        lda #$13
+        sta tetriminoY
 @notPressedUp:
         lda #BUTTON_DOWN
         jsr menuThrottle
         beq @notPressedDown
         inc tetriminoY
+        lda tetriminoY
+        cmp #$14
+        bne @notPressedDown
+        lda #$00
+        sta tetriminoY
 @notPressedDown:
         lda #BUTTON_LEFT
         jsr menuThrottle
         beq @notPressedLeft
         dec tetriminoX
+        bpl @notPressedLeft
+        lda #$09
+        sta tetriminoX
 @notPressedLeft:
         lda #BUTTON_RIGHT
         jsr menuThrottle
         beq @notPressedRight
         inc tetriminoX
+        lda tetriminoX
+        cmp #$0A
+        bne @notPressedRight
+        lda #$00
+        sta tetriminoX
 @notPressedRight:
 
         ; check mode
@@ -152,19 +173,21 @@ debugContinue:
         lda newlyPressedButtons_player1
         and #BUTTON_B
         beq @notPressedB
-        lda currentPiece
-        cmp #$1
-        bmi @notPressedB
         dec currentPiece
+        bpl @notPressedB
+        lda #$12
+        sta currentPiece
 @notPressedB:
 
         lda newlyPressedButtons_player1
         and #BUTTON_A
         beq @notPressedA
-        lda currentPiece
-        cmp #$12
-        bpl @notPressedA
         inc currentPiece
+        lda currentPiece
+        cmp #$13
+        bne @notPressedA
+        lda #$00
+        sta currentPiece
 @notPressedA:
 
         ; handle piece
