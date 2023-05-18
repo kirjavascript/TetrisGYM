@@ -96,18 +96,10 @@ pause:
         lda newlyPressedButtons_player1
         cmp #$10
         beq @resume
-@stayPaused:
         jsr updateAudioWaitForNmiAndResetOamStaging
         jmp @pauseLoop
 
 @resume:
-        ; Stay paused if invalid debug position
-        lda debugFlag
-        beq @validPosition
-        jsr isPositionValid
-        beq @validPosition
-        jmp @stayPaused     
-@validPosition:
         lda #$1E
         sta PPUMASK
         lda #$00
