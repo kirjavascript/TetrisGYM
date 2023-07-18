@@ -15,8 +15,6 @@ waitScreenLoad:
 CNROM_CHR_LEGAL:
         lda #0
         sta CNROM_CHR_LEGAL+1
-        lda #%10000000
-        sta PPUCTRL
         sta currentPpuCtrl
 .endif
 
