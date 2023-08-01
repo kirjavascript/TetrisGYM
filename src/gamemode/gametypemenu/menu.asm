@@ -305,7 +305,7 @@ menuConfigControls:
         rts
 
 menuConfigSizeLookup:
-        .byte   MENUSIZES
+        MENUSIZES
 
 assertValues:
         ; make sure you can only have block or qual
