@@ -155,9 +155,9 @@ hzTap:
 
         jsr unsigned_div24 ; hz*100 in dividend
 
-        ldx dividend+1 ; get hz for palette
-        lda hzPaletteGradient, x
-        sta hzPalette
+        ; ldx dividend+1 ; get hz for palette
+        ; lda hzPaletteGradient, x
+        ; sta hzPalette
 
         lda dividend
         sta binary32
@@ -176,6 +176,29 @@ hzTap:
         sta hzResult
 
 @calcEnd:
+
+        ; CTWCDAS palette
+        lda dasOnlyFlag
+        beq :+
+        lda #$30
+        sta hzPalette
+
+        ldx hzTapCounter
+        lda palFlag
+        beq @ntsc
+        clc
+        txa
+        adc #$A
+        tax
+@ntsc:
+        lda dasLimitLookup, x
+        sta $10
+        lda hzFrameCounter
+        cmp $10
+        bpl :+
+        lda #$16
+        sta hzPalette
+:
 
         ; update game UI
         lda outOfDateRenderFlags

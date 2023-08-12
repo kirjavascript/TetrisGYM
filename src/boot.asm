@@ -36,6 +36,9 @@
         cpx #0
         bne @loop
 
+        lda #1
+        sta dasOnlyFlag
+
         ; default pace to A
         lda #$A
         sta paceModifier

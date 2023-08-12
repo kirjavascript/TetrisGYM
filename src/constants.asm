@@ -1,5 +1,5 @@
 .ifndef INES_MAPPER ; is set via ca65 flags
-INES_MAPPER := 1 ; supports 1, 3 and 4 (MMC1 / CNROM / MMC3)
+INES_MAPPER := 3 ; supports 1, 3 and 4 (MMC1 / CNROM / MMC3)
 .endif
 
 HAS_MMC = INES_MAPPER = 1 || INES_MAPPER = 4
@@ -31,7 +31,7 @@ INITIAL_LINECAP_LEVEL := 39
 INITIAL_LINECAP_LINES := $30 ; bcd
 INITIAL_LINECAP_LINES_1 := 3 ; hex (lol)
 BTYPE_START_LINES := $25 ; bcd
-MENU_HIGHLIGHT_COLOR := $12 ; $12 in gym, $16 in original
+MENU_HIGHLIGHT_COLOR := $27 ; $12 in gym, $16 in original
 BLOCK_TILES := $7B
 EMPTY_TILE := $EF
 TETRIMINO_X_HIDE := $EF
@@ -110,7 +110,7 @@ MENU_TOP_MARGIN_SCROLL := 7 ; in blocks
 .define MENUSIZES $0, $0, $0, $0, $F, $7, $8, $C, $F, $20, $10, $1F, $8, $4, $12, $10, $0, $0, $0, $0, $4, $1, $1, $1, $1, $1, $1, $1, $1, $1, $1
 
 .macro MODENAMES
-    .byte   "TETRIS"
+    .byte   "CT DAS"
     .byte   "TSPINS"
     .byte   " SEED "
     .byte   "STACKN"
