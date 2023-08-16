@@ -37,30 +37,30 @@ drawTiles(buffer, lookup, `
 ################################
 #qwwwwwwwwwwwwwwwwwwwwwwwwwwwwe#
 #a                            d#
+#a  GOOD GAME                 d#
+#a                            d#
+#a  YOU ARE A TETRIS MASTER   d#
 #a                            d#
 #a                            d#
 #a                            d#
-#a         GOOD GAME          d#
 #a                            d#
 #a                            d#
 #a                            d#
-#a         YOU ARE A          d#
-#a                            d#
-#a       TETRIS MASTER#       d#
 #a                            d#
 #a                            d#
-#a   PLEASE ENTER YOUR NAME   d#
 #a                            d#
-#a rtttttttttttttttttttttttty d#
-#a fNAME     SCORE   LNS  LVh d#
-#a jbbbbbbbbbbbbbbbbbbbbbbbbl d#
-#a f                        h d#
-#a f                        h d#
-#a f                        h d#
-#a f                        h d#
-#a f                        h d#
-#a f                        h d#
-#a vbbbbbbbbbbbbbbbbbbbbbbbbn d#
+#a                            d#
+#a                            d#
+#a                            d#
+#a                            d#
+#a                            d#
+#a                            d#
+#a                            d#
+#a                            d#
+#a                            d#
+#a                            d#
+#a                            d#
+#a                            d#
 #a                            d#
 #zxxxxxxxxxxxxxxxxxxxxxxxxxxxxc#
 ################################

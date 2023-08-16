@@ -41,7 +41,7 @@ drawTiles(buffer, lookup, `
 #a                            d#
 #a                            d#
 #a                            d#
-#a                            d#
+#a                       2023 d#
 #a    TETRIS                  d#
 #a    T-SPINS                 d#
 #a    SEED                    d#
