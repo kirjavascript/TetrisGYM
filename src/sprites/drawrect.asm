@@ -1,14 +1,12 @@
 spriteCathedral:
-        .byte $20, $0, $1, $1, $20, $30
-        .byte $8, $8, $7, $1, $20, $31
-        .byte $0, $10, $8, $6, $20, $40
+        .byte $15, $0, $3, $7, $20, $38
         .byte $FF
 
 spriteCathedralFire0:
-        .byte $8, $0, $2, $1, $1, $A0, $FF
+        .byte $8, $F0, $2, $1, $1, $A0, $FF
 
 spriteCathedralFire1:
-        .byte $0, $0, $4, $2, $1, $A2, $FF
+        .byte $0, $F0, $4, $2, $1, $A2, $FF
 
 rectBuffer := generalCounter
 rectX := rectBuffer+0

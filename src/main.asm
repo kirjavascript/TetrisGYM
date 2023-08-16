@@ -19,6 +19,8 @@ initRam:
 
 .include "boot.asm"
 
+    jmp endingAnimation
+
 mainLoop:
         jsr branchOnGameMode
         cmp gameModeState

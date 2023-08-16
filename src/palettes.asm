@@ -13,7 +13,7 @@ menu_palette:
         .byte   $17,$27,$37,$0F,$30,MENU_HIGHLIGHT_COLOR,$00,$0F
         .byte   $16,$2A,$28,$0F,$16,$26,$27,$0f,$2A,$FF
 rocket_palette:
-        .byte   $3F,$11,$7,$16,$2A,$28,$0f,$37,$18,$38 ; sprite
+        .byte   $3F,$11,$7,$16,$28,$20,$0f,$37,$18,$38 ; sprite
         .byte   $3F,$00,$8,$0f,$3C,$38,$00,$0F,$20,$12,$15 ; bg
         .byte   $FF
 wait_palette:
