@@ -97,7 +97,7 @@ drawTiles(buffer, lookup, `
 `);
 
 
-drawRect(buffer, 8, 2, 10, 5, 0xB0); // draw logo
+drawRect(buffer, 8, 2, 12, 6, 0x92); // draw logo
 // drawRect(extra, 20, 0, 5, 5, 0x9A); // draw QR code
 
 const urlX = 3;
@@ -107,9 +107,9 @@ drawRect(extra, urlX+12, urlY, 12, 1, 0x84);
 
 drawAttrs(buffer, [`
     2222222222222222
-    2222211111122222
-    2222211111122222
-    2222211111122222
+    2222211111111222
+    2222211111111222
+    2222211111111222
     2222222222222222
     2222222222222222
     2222222222222222
