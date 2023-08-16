@@ -62,12 +62,7 @@ showHighScores:
         lda #$FF
         sta PPUDATA
 
-        ; levels
-        lda highscores,y ; startlevel
-        jsr renderByteBCD
-        iny
-
-        ; update PPUADDR for start level
+        ; update PPUADDR for start lines
         lda generalCounter2
         asl a
         tax
@@ -75,8 +70,13 @@ showHighScores:
         sta PPUADDR
         inx
         lda highScorePpuAddrTable,x
-        adc #$35
+        adc #$29
         sta PPUADDR
+
+        ; levels
+        lda highscores,y ; startlevel
+        jsr renderByteBCD
+        iny
 
         ; level
         lda highscores,y

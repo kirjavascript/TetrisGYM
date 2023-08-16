@@ -57,30 +57,30 @@ drawTiles(buffer, lookup, `
 ################################
 #qwwwwwwwwwwwwwwwwwwwwwwwwwwwwe#
 #a                            d#
-#a                   qwwwwwwe d#
-#a                   a      d d#
-#a                   zxxxxxxc d#
-#a                            d#
-#a      ╄╅╅╅╅╅╆               d#
-#a      ╇LEVEL╈               d#
-#a      ╉╊╊╊╊╊╋               d#
-#a    rtututututy             d#
-#a    f0f1f2f3f4h   rttty     d#
-#a    jbkbkbkbkbl   f   h     d#
-#a    f5f6f7f8f9h   vbbbn     d#
-#a    vbibibibibn             d#
 #a                            d#
 #a                            d#
-#a rtttttttttttttttttttttttty d#
-#a fNAME     SCORE   LNS  LVh d#
-#a jbbbbbbbbbbbbbbbbbbbbbbbbl d#
-#a f                        h d#
-#a f                        h d#
-#a f                        h d#
-#a f                        h d#
-#a f                        h d#
-#a f                        h d#
-#a vbbbbbbbbbbbbbbbbbbbbbbbbn d#
+#a                            d#
+#a          HIGHSCORES        d#
+#a                            d#
+#a                            d#
+#a                            d#
+#a                            d#
+#a                            d#
+#a                            d#
+#a                            d#
+#a                            d#
+#a                            d#
+#a                            d#
+#a                      LEVEL d#
+#a                            d#
+#a                            d#
+#a                      rttty d#
+#a                      f   h d#
+#a                      vbbbn d#
+#a                            d#
+#a                            d#
+#a                            d#
+#a                            d#
 #a                            d#
 #zxxxxxxxxxxxxxxxxxxxxxxxxxxxxc#
 ################################
@@ -92,16 +92,16 @@ drawAttrs(buffer, [`
     2222222222222222
     2222222222222222
     2222222222222222
-    2223333333333222
-    2223333333333222
-    2223333333333222
+    2222222222222222
+    2222222222222222
+    2222222222222222
 `,`
-    2000000000000002
-    2000000000000002
-    2000000000000002
-    2000000000000002
-    2000000000000002
-    2000000000000002
+    2222222222222222
+    2222222222222222
+    2222222222222222
+    2222222222222222
+    2222222222222222
+    2222222222222222
     2222222222222222
     2222222222222222
 `]);

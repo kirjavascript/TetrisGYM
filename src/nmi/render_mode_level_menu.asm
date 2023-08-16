@@ -2,9 +2,9 @@ render_mode_level_menu:
         lda outOfDateRenderFlags
         and #1
         beq @noCustomLevel
-        lda #$21
+        lda #$2E
         sta PPUADDR
-        lda #$95
+        lda #$B9
         sta PPUADDR
         lda customLevel
         jsr renderByteBCD

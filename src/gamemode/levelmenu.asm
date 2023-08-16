@@ -20,9 +20,9 @@ gameMode_levelMenu:
         .addr   menu_palette
         jsr copyRleNametableToPpu
         .addr   level_menu_nametable
-        lda #$20
+        lda #$21
         sta tmp1
-        lda #$96 ; $6D is OEM position
+        lda #$18 ; $6D is OEM position
         sta tmp2
         jsr displayModeText
         jsr showHighScores
@@ -53,7 +53,7 @@ gameMode_levelMenu:
 levelMenuLinecapInfo:
         lda #$20
         sta PPUADDR
-        lda #$F5
+        lda #$63
         sta PPUADDR
         clc
         lda #LINECAP_WHEN_STRING_OFFSET
@@ -61,9 +61,9 @@ levelMenuLinecapInfo:
         sta stringIndexLookup
         jsr stringBackground
 
-        lda #$21
+        lda #$20
         sta PPUADDR
-        lda #$15
+        lda #$83
         sta PPUADDR
         clc
         lda #LINECAP_HOW_STRING_OFFSET
@@ -73,7 +73,7 @@ levelMenuLinecapInfo:
 
         lda #$20
         sta PPUADDR
-        lda #$FA
+        lda #$88
         sta PPUADDR
         jsr render_linecap_level_lines
         rts
@@ -100,6 +100,8 @@ gameMode_levelMenu_processPlayer1Navigation:
         jmp gameMode_levelMenu
 @notClearingHighscores:
 .endif
+        lda #1
+        sta levelControlMode ; CTUK
 
         jsr levelControl
         jsr levelMenuRenderHearts
@@ -251,9 +253,9 @@ levelControlCustomLevel:
         lda frameCounter
         and #$03
         beq @indicatorEnd
-        lda #$4E
+        lda #$96
         sta spriteYOffset
-        lda #$B0
+        lda #$D2
         sta spriteXOffset
         lda #$21
         sta spriteIndexInOamContentLookup
@@ -476,9 +478,9 @@ levelMenuRenderReady:
         lda heartsAndReady
         and #$F0
         beq @notReady
-        lda #$4f
+        lda #$A7
         sta spriteYOffset
-        lda #$88
+        lda #$78
         sta spriteXOffset
         lda #$20
         sta spriteIndexInOamContentLookup

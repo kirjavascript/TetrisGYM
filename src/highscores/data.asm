@@ -1,5 +1,8 @@
+hPATStart := $2103
+hPATInc := $80
+
 highScorePpuAddrTable:
-        .dbyt   $2284,$22C4,$2304
+        .dbyt   hPATStart,hPATStart+(hPATInc*1),hPATStart+(hPATInc*2),hPATStart+(hPATInc*3),hPATStart+(hPATInc*4)
 highScoreCharToTile:
         .byte   $FF,$0A,$0B,$0C,$0D,$0E,$0F,$10
         .byte   $11,$12,$13,$14,$15,$16,$17,$18

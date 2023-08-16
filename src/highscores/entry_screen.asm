@@ -132,9 +132,9 @@ highScoreEntryScreen:
         jsr copyRleNametableToPpu
         .addr   enter_high_score_nametable
         jsr showHighScores
-        lda #$21
+        lda #$20
         sta tmp1
-        lda #$89
+        lda #$AE
         sta tmp2
         jsr displayModeText
         lda #$02
@@ -162,7 +162,7 @@ highScoreEntryScreen:
         asl
         asl
         asl
-        adc #$20
+        adc #$18
         sta spriteXOffset
         lda #$0E
         sta spriteIndexInOamContentLookup
@@ -288,6 +288,6 @@ highScoreEntryScreen:
         rts
 
 highScorePosToY:
-        .byte   $9F,$AF,$BF
+        .byte   $3F,$5F,$7F
 highScoreEntryRowOffsetLookup:
         .byte   $0, highScoreLength, highScoreLength*2
