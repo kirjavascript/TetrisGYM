@@ -371,16 +371,5 @@ changePRGBank:
         sta MMC1_PRG
         lsr a
         sta MMC1_PRG
-.elseif INES_MAPPER = 4
-        asl     a
-        asl     a
-        ldx     #$06
-        stx     MMC3_BANK_SELECT
-        sta     MMC3_BANK_DATA
-        inx
-        clc
-        adc     #$01
-        stx     MMC3_BANK_SELECT
-        sta     MMC3_BANK_DATA
 .endif
         rts
