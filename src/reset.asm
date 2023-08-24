@@ -41,6 +41,8 @@ mmc3Init:
         iny
         stx     MMC3_BANK_SELECT
         sty     MMC3_BANK_DATA
+        lda     #$80 ; enable PRG RAM
+        sta     MMC3_PRG_RAM
         rts
 .endif
 
