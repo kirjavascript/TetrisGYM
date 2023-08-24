@@ -1,5 +1,5 @@
 ; incremented to reset MMC1 reg
-reset:    cld
+reset:  cld
         sei
         ldx #$00
         stx PPUCTRL
