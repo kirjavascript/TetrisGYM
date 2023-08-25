@@ -7,6 +7,10 @@
 * Famicom Keyboard support
 * Fixed Floor-0 disabled burns
 * MMC3 Support
+* MMC5 Support
+* Fixed CNROM legal screen CHR bank
+* Fixed CNROM legal to title flicker
+* Block Tool pieces wrap around
 
 ## [v5 tournament]
 * Linecap Menu (from CTM Masters September 2022)
