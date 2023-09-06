@@ -306,6 +306,12 @@ __Capped__
 
 Cap your score at 999999.
 
+__Hidden__
+
+![Hidden](./assets/screens/score-hidden.png)
+
+Hides score until game over.
+
 ## Hz Display
 
 ![Hz Display](./assets/screens/hz.png)

@@ -7,6 +7,7 @@
 * Famicom Keyboard support
 * Fixed Floor-0 disabled burns
 * MMC3 Support
+* Added hidden score option
 
 ## [v5 tournament]
 * Linecap Menu (from CTM Masters September 2022)

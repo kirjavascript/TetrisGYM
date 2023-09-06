@@ -91,6 +91,13 @@ render_mode_play_and_demo:
 
         ; scorecap
         lda scoringModifier
+        cmp #SCORING_HIDDEN
+        bne @notHidden
+        lda playState
+        cmp #$0A
+        beq @noFloat ; render classic score at game over
+        jmp @clearScoreRenderFlags
+@notHidden:
         cmp #SCORING_SCORECAP
         bne @noScoreCap
         jsr renderScoreCap

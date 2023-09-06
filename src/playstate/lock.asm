@@ -2,6 +2,9 @@ playState_lockTetrimino:
         jsr isPositionValid
         beq @notGameOver
 ; gameOver:
+        lda outOfDateRenderFlags ; Flag needed to reveal hidden score
+        ora #$04
+        sta outOfDateRenderFlags
         lda #$02
         sta soundEffectSlot0Init
         lda #$0A ; playState_checkStartGameOver
