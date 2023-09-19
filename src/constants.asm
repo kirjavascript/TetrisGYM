@@ -94,6 +94,7 @@ SCORING_LETTERS := 1
 SCORING_SEVENDIGIT := 2
 SCORING_FLOAT := 3
 SCORING_SCORECAP := 4
+SCORING_HIDDEN := 5
 
 LINECAP_KILLX2 := 1
 LINECAP_FLOOR := 2
@@ -130,7 +131,7 @@ MENU_TOP_MARGIN_SCROLL := 7 ; in blocks
     .byte $0    ; MODE_INVISIBLE
     .byte $0    ; MODE_HARDDROP
     .byte $0    ; MODE_SPEED_TEST
-    .byte $4    ; MODE_SCORE_DISPLAY
+    .byte $5    ; MODE_SCORE_DISPLAY
     .byte $1    ; MODE_HZ_DISPLAY
     .byte $1    ; MODE_INPUT_DISPLAY
     .byte $1    ; MODE_DISABLE_FLASH

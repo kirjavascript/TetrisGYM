@@ -11,6 +11,7 @@
 * Fixed CNROM legal screen CHR bank
 * Fixed CNROM legal to title flicker
 * Block Tool pieces wrap around
+* Added hidden score option
 
 ## [v5 tournament]
 * Linecap Menu (from CTM Masters September 2022)

@@ -84,7 +84,19 @@ scoringBackground:
         sta PPUADDR
         lda #$16
         sta PPUDATA
+        jmp @noSevenDigit
 @noFloat:
+        cmp #SCORING_HIDDEN
+        bne @notHidden
+        jsr scoreSetupPPU
+        lda #$FF
+        ldx #$6
+@hiddenScoreLoop:
+        sta PPUDATA
+        dex
+        bne @hiddenScoreLoop
+        jmp @noSevenDigit
+@notHidden:
         cmp #SCORING_SEVENDIGIT
         bne @noSevenDigit
         jsr bulkCopyToPpu
