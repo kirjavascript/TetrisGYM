@@ -51,6 +51,10 @@ gameModeState_initGameBackground:
         ; Vertical mirroring (Prevents screen glitching)
         lda #$0
         sta MMC3_MIRRORING
+.elseif INES_MAPPER = 5
+        ; Single screen (Prevents screen glitching)
+        lda #$0
+        sta MMC5_NT_MAPPING
 .endif
         jsr resetScroll
         jsr waitForVBlankAndEnableNmi
