@@ -57,6 +57,7 @@ MODE_TETRIS
 MODE_TSPINS
 MODE_SEED
 MODE_PARITY
+MODE_MARATHON
 MODE_PACE
 MODE_PRESETS
 MODE_TYPEB
@@ -115,6 +116,7 @@ MENU_TOP_MARGIN_SCROLL := 7 ; in blocks
     .byte $0    ; MODE_TSPINS
     .byte $0    ; MODE_SEED
     .byte $0    ; MODE_PARITY
+    .byte $0    ; MODE_MARATHON
     .byte $F    ; MODE_PACE
     .byte $7    ; MODE_PRESETS
     .byte $8    ; MODE_TYPEB
@@ -149,6 +151,7 @@ MENU_TOP_MARGIN_SCROLL := 7 ; in blocks
     .byte   "TSPINS"
     .byte   " SEED "
     .byte   "STACKN"
+    .byte   "MARTHN"
     .byte   " PACE "
     .byte   "SETUPS"
     .byte   "B-TYPE"

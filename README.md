@@ -124,6 +124,10 @@ This can be adjusted for transition or PAL games;
 | E | 706051 |
 | F | 752310 |
 
+### Marathon
+
+Play as long as you are able to surive at a consistent speed.  While the level will increase normally, the drop rate and the points rewarded will remain fixed based on the starting level.  
+
 ### Setups
 
 ![Setups](./assets/screens/setups.png)

@@ -12,6 +12,7 @@
 * Fixed CNROM legal to title flicker
 * Block Tool pieces wrap around
 * Added hidden score option
+* Added marathon mode
 
 ## [v5 tournament]
 * Linecap Menu (from CTM Masters September 2022)
