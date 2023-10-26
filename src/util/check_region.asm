@@ -1,3 +1,4 @@
+.align $100
 checkRegion:
 ; region detection via http://forums.nesdev.com/viewtopic.php?p=163258#p163258
 ;;; use the power-on wait to detect video system-
