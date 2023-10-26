@@ -46,7 +46,6 @@ drawTiles(buffer, lookup, `
 #a    T-SPINS                 d#
 #a    SEED                    d#
 #a    STACKING                d#
-#a    MARATHON                d#
 #a    PACE                    d#
 #a    SETUPS                  d#
 #a    B-TYPE                  d#
@@ -54,6 +53,7 @@ drawTiles(buffer, lookup, `
 #a    CRUNCH                  d#
 #a    (QUICK)TAP              d#
 #a    TRANSITION              d#
+#a    MARATHON                d#
 #a    TAP QUANTITY            d#
 #a    CHECKERBOARD            d#
 #a    GARBAGE                 d#

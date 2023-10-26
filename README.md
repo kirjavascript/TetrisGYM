@@ -124,10 +124,6 @@ This can be adjusted for transition or PAL games;
 | E | 706051 |
 | F | 752310 |
 
-### Marathon
-
-Play as long as you are able to surive at a consistent speed.  While the level will increase normally, the drop rate and the points rewarded will remain fixed based on the starting level.  
-
 ### Setups
 
 ![Setups](./assets/screens/setups.png)
@@ -196,6 +192,10 @@ Uses custom scoring.
 Puts you ten lines before transition. The value given will be added to your score, so set this to 5 and start on level 18 for a 'maxout trainer' style mode.
 
 Setting the value to G causes the mode to act identical to the game genie code `SXTOKL`
+
+### Marathon
+
+Play as long as you are able to surive at a consistent speed.  While the level will increase normally, the drop rate and the points rewarded will remain fixed based on the starting level.
 
 ### Garbage
 

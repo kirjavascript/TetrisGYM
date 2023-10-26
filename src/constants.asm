@@ -57,7 +57,6 @@ MODE_TETRIS
 MODE_TSPINS
 MODE_SEED
 MODE_PARITY
-MODE_MARATHON
 MODE_PACE
 MODE_PRESETS
 MODE_TYPEB
@@ -65,6 +64,7 @@ MODE_FLOOR
 MODE_CRUNCH
 MODE_TAP
 MODE_TRANSITION
+MODE_MARATHON
 MODE_TAPQTY
 MODE_CHECKERBOARD
 MODE_GARBAGE
@@ -116,7 +116,6 @@ MENU_TOP_MARGIN_SCROLL := 7 ; in blocks
     .byte $0    ; MODE_TSPINS
     .byte $0    ; MODE_SEED
     .byte $0    ; MODE_PARITY
-    .byte $0    ; MODE_MARATHON
     .byte $F    ; MODE_PACE
     .byte $7    ; MODE_PRESETS
     .byte $8    ; MODE_TYPEB
@@ -124,6 +123,7 @@ MENU_TOP_MARGIN_SCROLL := 7 ; in blocks
     .byte $F    ; MODE_CRUNCH
     .byte $20   ; MODE_TAP
     .byte $10   ; MODE_TRANSITION
+    .byte $0    ; MODE_MARATHON
     .byte $1F   ; MODE_TAPQTY
     .byte $8    ; MODE_CHECKERBOARD
     .byte $4    ; MODE_GARBAGE
@@ -151,7 +151,6 @@ MENU_TOP_MARGIN_SCROLL := 7 ; in blocks
     .byte   "TSPINS"
     .byte   " SEED "
     .byte   "STACKN"
-    .byte   "MARTHN"
     .byte   " PACE "
     .byte   "SETUPS"
     .byte   "B-TYPE"
@@ -159,6 +158,7 @@ MENU_TOP_MARGIN_SCROLL := 7 ; in blocks
     .byte   "CRUNCH"
     .byte   "QCKTAP"
     .byte   "TRNSTN"
+    .byte   "MARTHN"
     .byte   "TAPQTY"
     .byte   "CKRBRD"
     .byte   "GARBGE"
