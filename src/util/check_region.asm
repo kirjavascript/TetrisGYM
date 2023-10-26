@@ -1,4 +1,6 @@
-.align $100
+; aligning prevents the branches in @vwait1/2 from crossing a page boundary
+; If that occurs, the additional cycles corrupt the result
+.align $100 
 checkRegion:
 ; region detection via http://forums.nesdev.com/viewtopic.php?p=163258#p163258
 ;;; use the power-on wait to detect video system-
