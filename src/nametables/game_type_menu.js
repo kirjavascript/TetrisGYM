@@ -53,6 +53,7 @@ drawTiles(buffer, lookup, `
 #a    CRUNCH                  d#
 #a    (QUICK)TAP              d#
 #a    TRANSITION              d#
+#a    MARATHON                d#
 #a    TAP QUANTITY            d#
 #a    CHECKERBOARD            d#
 #a    GARBAGE                 d#
@@ -62,8 +63,8 @@ drawTiles(buffer, lookup, `
 #a    INVISIBLE               d#
 #a    HARD DROP               d#
 #a    TAP/ROLL SPEED          d#
-#a    SCORING                 d#
 `);drawTiles(extra, lookup, `
+#a    SCORING                 d#
 #a    HZ DISPLAY              d#
 #a    INPUT DISPLAY           d#
 #a    DISABLE FLASH           d#
@@ -93,7 +94,6 @@ drawTiles(buffer, lookup, `
 #a                            d#
 #a                            d#
 #a                            d#
-#a                            d#
 `);
 
 
@@ -101,7 +101,7 @@ drawRect(buffer, 8, 2, 10, 5, 0xB0); // draw logo
 // drawRect(extra, 20, 0, 5, 5, 0x9A); // draw QR code
 
 const urlX = 3;
-const urlY = 12;
+const urlY = 13;
 drawRect(extra, urlX, urlY, 12, 1, 0x74);
 drawRect(extra, urlX+12, urlY, 12, 1, 0x84);
 
