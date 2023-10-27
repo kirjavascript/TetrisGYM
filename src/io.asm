@@ -62,6 +62,6 @@ MMC5_CHR_BANK1 := $5127
 
 .macro RESET_MMC1
 .if INES_MAPPER = 1
-        inc $8000 ; initRam
+        inc $8000 ; checkRegion
 .endif
 .endmacro
