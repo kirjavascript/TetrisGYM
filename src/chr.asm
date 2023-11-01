@@ -1,6 +1,6 @@
 .segment "CHR"
 
-.if INES_MAPPER = 1
+.if HAS_MMC
     .incbin "chr/title_menu_tileset.chr"
     .incbin "chr/game_tileset.chr"
     .incbin "chr/rocket_tileset.chr"

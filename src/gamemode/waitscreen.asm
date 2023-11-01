@@ -6,14 +6,15 @@ waitScreenLoad:
         sta renderMode
         jsr updateAudioWaitForNmiAndDisablePpuRendering
         jsr disableNmi
-.if INES_MAPPER = 1
+.if HAS_MMC
         lda #$02
         jsr changeCHRBank0
         lda #$02
         jsr changeCHRBank1
 .elseif INES_MAPPER = 3
-        lda #%10000000
-        sta PPUCTRL
+CNROM_CHR_LEGAL:
+        lda #0
+        sta CNROM_CHR_LEGAL+1
         sta currentPpuCtrl
 .endif
 

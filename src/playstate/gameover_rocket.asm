@@ -76,7 +76,7 @@ sleep_gameplay:
 endingAnimation: ; rocket_screen
         jsr updateAudioWaitForNmiAndDisablePpuRendering
         jsr disableNmi
-.if INES_MAPPER = 1
+.if HAS_MMC
         lda #$02
         jsr changeCHRBank0
         lda #$02

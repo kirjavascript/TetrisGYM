@@ -16,6 +16,7 @@
     * [Setups](#setups)
     * [B-Type](#b-type)
     * [Floor](#floor)
+    * [Crunch](#crunch)
     * [(Quick)Tap](#quicktap)
     * [Tap Quantity](#tap-quantity)
     * [Checkerboard](#checkerboard)
@@ -62,7 +63,7 @@ ROM CRC32: 1394F57E
 
 A link to the BPS can be found on the [releases page](https://github.com/kirjavascript/TetrisGYM/releases).
 
-There is also a `CNROM.bps` patch for mapper 3 support. (The original ROM uses MMC1/mapper 1)
+TetrisGYM supports the mappers MMC1, MMC3, and CNROM. The default build is MMC1.
 
 ## Trainers
 
@@ -151,6 +152,16 @@ Same gameplay as B-Type in the original, except heights up to 8 are supported.
 Fill in the floor to a certain height to force higher stacking. This mode is often referred to as 'handicap'.
 
 Setting the height to zero will result in a game mode with burns disabled.
+
+### Crunch
+
+![Crunch](./assets/screens/crunch.png)
+
+Shrink the width of the playfield to force cramped stacking.
+
+Every increment of 4 will decrease the width from the left.
+
+Every increment of 1 will decrease the width from the right until it reaches its maximum of 3, where it will be reset to 0.
 
 ### (Quick)Tap
 

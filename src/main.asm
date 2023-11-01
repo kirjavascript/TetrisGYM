@@ -30,6 +30,9 @@ mainLoop:
 .include "nmi/nmi.asm"
 .include "nmi/render.asm"
 .include "nmi/pollcontroller.asm"
+.if KEYBOARD
+.include "nmi/pollkeyboard.asm"
+.endif
 
 .include "gamemode/branch.asm"
     ; -> playAndEnding
@@ -85,6 +88,7 @@ mainLoop:
 .include "modes/parity.asm"
 .include "modes/preset.asm"
 .include "modes/floor.asm"
+.include "modes/crunch.asm"
 .include "modes/qtap.asm"
 .include "modes/garbage.asm"
 

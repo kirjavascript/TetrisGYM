@@ -1,7 +1,7 @@
 gameModeState_initGameBackground:
         jsr updateAudioWaitForNmiAndDisablePpuRendering
         jsr disableNmi
-.if INES_MAPPER = 1
+.if HAS_MMC
         lda #$01
         jsr changeCHRBank0
         lda #$01
@@ -47,6 +47,10 @@ gameModeState_initGameBackground:
         lda #%10011000
         sta PPUCTRL
         sta currentPpuCtrl
+.elseif INES_MAPPER = 4
+        ; Vertical mirroring (Prevents screen glitching)
+        lda #$0
+        sta MMC3_MIRRORING
 .endif
         jsr resetScroll
         jsr waitForVBlankAndEnableNmi

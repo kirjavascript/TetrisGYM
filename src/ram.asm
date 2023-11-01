@@ -207,7 +207,19 @@ harddropBuffer: .res $14 ; $625 ; 20 bytes (!)
 linecapState: .res 1 ; $639 ; 0 if not triggered, 1 + linecapHow otherwise, reset on game init
 
 dasOnlyShiftDisabled: .res 1 ; $63A
-    .res $45
+
+invisibleFlag: .res 1 ; $63B  ; 0 for normal mode, non-zero for Invisible playfield rendering.  Reset on game init and game over.
+
+    .res $39
+
+.if KEYBOARD
+newlyPressedKeys: .res 1 ; $0675
+heldKeys: .res 1 ; $0676
+keyboardInput: .res 9 ; $0677
+.else
+    .res $B
+.endif
+
 musicStagingSq1Lo: .res 1 ; $0680
 musicStagingSq1Hi: .res 1 ; $0681
 audioInitialized: .res 1 ; $0682
@@ -304,6 +316,7 @@ paceModifier: .res 1
 presetModifier: .res 1
 typeBModifier: .res 1
 floorModifier: .res 1
+crunchModifier: .res 1
 tapModifier: .res 1
 transitionModifier: .res 1
 tapqtyModifier: .res 1
