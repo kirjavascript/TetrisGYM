@@ -193,6 +193,10 @@ Puts you ten lines before transition. The value given will be added to your scor
 
 Setting the value to G causes the mode to act identical to the game genie code `SXTOKL`
 
+### Marathon
+
+Play as long as you are able to surive at a consistent speed.  While the level will increase normally, the drop rate and the points rewarded will remain fixed based on the starting level.
+
 ### Garbage
 
 ![Garbage](./assets/screens/garbage.png)
@@ -305,6 +309,12 @@ __Capped__
 ![Capped](./assets/screens/score-capped.png)
 
 Cap your score at 999999.
+
+__Hidden__
+
+![Hidden](./assets/screens/score-hidden.png)
+
+Hides score until game over.
 
 ## Hz Display
 

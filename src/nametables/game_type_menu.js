@@ -53,6 +53,7 @@ drawTiles(buffer, lookup, `
 #a    CRUNCH                  d#
 #a    (QUICK)TAP              d#
 #a    TRANSITION              d#
+#a    MARATHON                d#
 #a    TAP QUANTITY            d#
 #a    CHECKERBOARD            d#
 #a    GARBAGE                 d#
@@ -62,8 +63,8 @@ drawTiles(buffer, lookup, `
 #a    INVISIBLE               d#
 #a    HARD DROP               d#
 #a    TAP/ROLL SPEED          d#
-#a    SCORING                 d#
 `);drawTiles(extra, lookup, `
+#a    SCORING                 d#
 #a    HZ DISPLAY              d#
 #a    INPUT DISPLAY           d#
 #a    DISABLE FLASH           d#
@@ -77,7 +78,6 @@ drawTiles(buffer, lookup, `
 #a                            d#
 #a                            d#
 #a    TETRIS GYM              d#
-#a                            d#
 #a                            d#
 #a                            d#
 #a                            d#

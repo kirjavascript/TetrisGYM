@@ -80,10 +80,13 @@ typeBEndingStuffEnd:
         lda #$4
         sta soundEffectSlot1Init
 
-        lda #$30
-        jsr sleep_gameplay_nextSprite
+        lda outOfDateRenderFlags ; Flag needed to reveal hidden score
+        ora #$4
+        sta outOfDateRenderFlags
         lda #$0A ; playState_checkStartGameOver
         sta playState
+        lda #$30
+        jsr sleep_gameplay_nextSprite
         rts
 
 sleep_gameplay_nextSprite:
