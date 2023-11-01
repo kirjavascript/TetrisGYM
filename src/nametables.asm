@@ -15,7 +15,7 @@ legal_nametable: ; RLE
 speedtest_nametable: ; RLE
         .incbin "nametables/speedtest_nametable.bin"
 title_nametable_patch: ; stripe
-        .byte $21, $69, $5, $1D, $12, $1D, $15, $E
+        .byte $2A, $8E, $5, $1D, $12, $1D, $15, $E
         .byte $FF
 rocket_nametable_patch: ; stripe
         .byte $20, $83, 5, $19, $1B, $E, $1c, $1c
