@@ -101,7 +101,7 @@ gameTypeLoopCheckStart:
         lda set_seed_input
         bne @checkSelectable
         lda set_seed_input+1
-        and #$FE
+        and #$FE ; treat 0001 like 0000
         beq gameTypeLoopNext
 
 @checkSelectable:
@@ -415,7 +415,7 @@ renderMenuVars:
         lda set_seed_input
         bne @renderIndicator
         lda set_seed_input+1
-        and #$FE
+        and #$FE ; treat 0001 like 0000
         beq @cursorFinished
 @renderIndicator:
         ldx #$E
