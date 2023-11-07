@@ -62,6 +62,7 @@ MMC5_CHR_BANK1 := $5127
 
 .macro RESET_MMC1
 .if INES_MAPPER = 1
-        inc $8000 ; checkRegion
+:       inc :-  ; increments inc ($aa), writing a negative value to prg
+                ; https://www.nesdev.org/wiki/MMC1#Reset
 .endif
 .endmacro
