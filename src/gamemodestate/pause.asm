@@ -38,10 +38,7 @@ pause:
 
 @pauseSetupPart2:
         jsr updateAudioAndWaitForNmi
-        lda #$FF
-        ldx #$02
-        ldy #$02
-        jsr memset_page
+        jsr resetOAMStaging
 
 @pauseLoop:
         lda qualFlag
