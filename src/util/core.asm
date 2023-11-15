@@ -50,6 +50,16 @@ random10:
         bpl random10
         rts
 
+; canon is waitForVerticalBlankingInterval
+updateAudioWaitForNmiAndResetOamStaging:
+        jsr updateAudio_jmp
+        lda #$00
+        sta verticalBlankingInterval
+        nop
+@checkForNmi:
+        lda verticalBlankingInterval
+        beq @checkForNmi
+
 resetOAMStaging:
 ; Hide a sprite by moving it down offscreen, by writing any values between #$EF-#$FF here. 
 ; Sprites are never displayed on the first line of the picture, and it is impossible to place 
@@ -66,18 +76,6 @@ resetOAMStaging:
         bne @hideY
         rts
 
-
-; canon is waitForVerticalBlankingInterval
-updateAudioWaitForNmiAndResetOamStaging:
-        jsr updateAudio_jmp
-        lda #$00
-        sta verticalBlankingInterval
-        nop
-@checkForNmi:
-        lda verticalBlankingInterval
-        beq @checkForNmi
-        jsr resetOAMStaging
-        rts
 
 updateAudioAndWaitForNmi:
         jsr updateAudio_jmp
