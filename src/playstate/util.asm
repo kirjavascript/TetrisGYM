@@ -118,15 +118,13 @@ checkIfAboveLoStackLine:
         lda multBy10Table,x
         tay
         ldx #$0A
+        clc
 @checkForBlockInRow:
         lda playfield,y
-        cmp #EMPTY_TILE
-        bne @foundBlockInRow
+        bpl @foundBlockInRow
         iny
         dex
         bne @checkForBlockInRow
-        clc
-        rts
 @foundBlockInRow:
         sec
         rts
