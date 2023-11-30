@@ -86,21 +86,19 @@ copyGraphicToPlayfield:
         ldy #$00
 @copySuccessGraphic:
         lda (generalCounter),y
-        cmp #$80
         beq @graphicCopied
         sta playfield+$5C,y
         iny
         bne @copySuccessGraphic
-@graphicCopied:
-        lda #$00
+@graphicCopied: ; 0 in accumulator
         sta vramRow
         rts
 
 ; $28 is ! in game tileset
 lowStackFail:
-        .byte   "F","A","I","L",$FF,$28,$80
+        .byte   "F","A","I","L",$FF,$28,$00
 haltEndingGraphic:
-        .byte   $FF,"G","G",$FF,$28,$80
+        .byte   $FF,"G","G",$FF,$28,$00
 typebSuccessGraphic:
-        .byte   "N","I","C","E",$FF,$28,$80
+        .byte   "N","I","C","E",$FF,$28,$00
 
