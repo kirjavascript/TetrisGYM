@@ -1,7 +1,7 @@
 playState_lockTetrimino:
         jsr isPositionValid
         beq @notGameOver
-; gameOver:
+@gameOver:
         lda outOfDateRenderFlags ; Flag needed to reveal hidden score
         ora #$04
         sta outOfDateRenderFlags
@@ -79,6 +79,13 @@ playState_lockTetrimino:
         inx
         dec generalCounter3
         bne @lockSquare
+        lda practiseType
+        cmp #MODE_LOSTACK
+        bne @notAboveLowStack
+        jsr checkIfAboveLoStackLine
+        bcc @notAboveLowStack
+        jmp @gameOver
+@notAboveLowStack:
         lda #$00
         sta lineIndex
         jsr updatePlayfield

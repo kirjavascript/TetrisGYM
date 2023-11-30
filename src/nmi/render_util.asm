@@ -51,6 +51,7 @@ render_playfield:
         jsr copyPlayfieldRowToVRAM
         jsr copyPlayfieldRowToVRAM
         jsr copyPlayfieldRowToVRAM
+        jsr copyLowStackRowToVram
         rts
 
 vramPlayfieldRows:
@@ -59,6 +60,27 @@ vramPlayfieldRows:
         .word   $21C6,$21E6,$2206,$2226
         .word   $2246,$2266,$2286,$22A6
         .word   $22C6,$22E6,$2306,$2326
+
+copyLowStackRowToVram:
+        lda practiseType
+        cmp #MODE_LOSTACK
+        bne @rts
+        lda lowStackRow
+        asl
+        tax
+        lda vramPlayfieldRows+1,x
+        sta PPUADDR
+        lda vramPlayfieldRows,x
+        clc
+        adc #$06
+        sta PPUADDR
+        ldx #$0A
+        lda #LOW_STACK_LINE
+@drawLine:
+        sta PPUDATA
+        dex
+        bne @drawLine
+@rts:   rts
 
 copyPlayfieldRowToVRAM:
         ldx vramRow

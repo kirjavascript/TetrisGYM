@@ -112,6 +112,26 @@ updateMusicSpeed:
 @ret:   rts
 
 
+checkIfAboveLoStackLine:
+; carry set - block found
+        ldx lowStackRow
+        lda multBy10Table,x
+        tay
+        ldx #$0A
+@checkForBlockInRow:
+        lda playfield,y
+        cmp #EMPTY_TILE
+        bne @foundBlockInRow
+        iny
+        dex
+        bne @checkForBlockInRow
+        clc
+        rts
+@foundBlockInRow:
+        sec
+        rts
+
+
 ; canon is adjustMusicSpeed
 setMusicTrack:
 .if !NO_MUSIC
