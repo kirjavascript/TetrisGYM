@@ -44,36 +44,18 @@ playState_prepareNext:
         lda linecapState
         cmp #LINECAP_HALT
         bne @linecapHaltEnd
-        lda #'G'
-        sta playfield+$67
-        sta playfield+$68
-        lda #$28
-        sta playfield+$6A
-        lda #0
-        sta vramRow
-        jsr typeBEndingStuffEnd
-        rts
+        ldx #<haltEndingGraphic
+        ldy #>haltEndingGraphic
+        jmp copyGraphic
 @linecapHaltEnd:
-
         jsr practisePrepareNext
         inc playState
         rts
-
 typeBEndingStuff:
-        ; copy success graphic
-        ldx #$5C
-        ldy #$0
-@copySuccessGraphic:
-        lda typebSuccessGraphic,y
-        cmp #$80
-        beq @graphicCopied
-        sta playfield,x
-        inx
-        iny
-        jmp @copySuccessGraphic
-@graphicCopied:
-        lda #$00
-        sta vramRow
+        ldx #<typebSuccessGraphic
+        ldy #>typebSuccessGraphic
+copyGraphic:
+        jsr copyGraphicToPlayfield
 
 typeBEndingStuffEnd:
         ; play sfx
@@ -98,5 +80,27 @@ sleep_gameplay_nextSprite:
         bne @loop
         rts
 
+copyGraphicToPlayfield:
+        stx generalCounter
+        sty generalCounter2
+        ldy #$00
+@copySuccessGraphic:
+        lda (generalCounter),y
+        cmp #$80
+        beq @graphicCopied
+        sta playfield+$5C,y
+        iny
+        bne @copySuccessGraphic
+@graphicCopied:
+        lda #$00
+        sta vramRow
+        rts
+
+; $28 is ! in game tileset
+lowStackFail:
+        .byte   "F","A","I","L",$FF,$28,$80
+haltEndingGraphic:
+        .byte   $FF,"G","G",$FF,$28,$80
 typebSuccessGraphic:
-        .byte   $17,$12,$0C,$0E,$FF,$28,$80
+        .byte   "N","I","C","E",$FF,$28,$80
+

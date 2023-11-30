@@ -84,6 +84,9 @@ playState_lockTetrimino:
         bne @notAboveLowStack
         jsr checkIfAboveLoStackLine
         bcc @notAboveLowStack
+        ldx #<lowStackFail
+        ldy #>lowStackFail
+        jsr copyGraphicToPlayfield
         jmp @gameOver
 @notAboveLowStack:
         lda #$00
