@@ -237,11 +237,6 @@ updateLineClearingAnimation:
         tay
         lda vramPlayfieldRows,y
         sta generalCounter
-        lda generalCounter
-        clc
-        adc #$06
-        sta generalCounter
-
         iny
         lda vramPlayfieldRows,y
         sta generalCounter2
