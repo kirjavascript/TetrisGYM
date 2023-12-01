@@ -86,7 +86,18 @@ playState_lockTetrimino:
         bcc @notAboveLowStack
         ldx #<lowStackNope
         ldy #>lowStackNope
-        jsr copyGraphicToPlayfield
+        lda lowStackRow
+        cmp #$09
+        bcs @drawOnUpperHalf
+; draw on lower half
+        clc
+        adc #$03
+        bne @copyGraphic
+@drawOnUpperHalf:
+        sec
+        sbc #$04
+@copyGraphic:
+        jsr copyGraphicToPlayfieldAtCustomRow
         jmp @gameOver
 @notAboveLowStack:
         lda #$00

@@ -81,13 +81,21 @@ sleep_gameplay_nextSprite:
         rts
 
 copyGraphicToPlayfield:
+        lda #$09 ; default row
+copyGraphicToPlayfieldAtCustomRow:
         stx generalCounter
         sty generalCounter2
+        tax
+        lda multBy10Table,x
+        clc
+        adc #$02 ; indent
+        tax
         ldy #$00
 @copySuccessGraphic:
         lda (generalCounter),y
         beq @graphicCopied
-        sta playfield+$5C,y
+        sta playfield,x
+        inx
         iny
         bne @copySuccessGraphic
 @graphicCopied: ; 0 in accumulator
