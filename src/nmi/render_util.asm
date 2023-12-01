@@ -51,8 +51,11 @@ render_playfield:
         jsr copyPlayfieldRowToVRAM
         jsr copyPlayfieldRowToVRAM
         jsr copyPlayfieldRowToVRAM
-        jsr copyLowStackRowToVram
-        rts
+        lda practiseType
+        cmp #MODE_LOSTACK
+        bne @ret
+        jmp copyLowStackRowToVram
+@ret:   rts
 
 vramPlayfieldRows:
         .word   $20CC,$20EC,$210C,$212C
@@ -62,9 +65,6 @@ vramPlayfieldRows:
         .word   $22CC,$22EC,$230C,$232C
 
 copyLowStackRowToVram:
-        lda practiseType
-        cmp #MODE_LOSTACK
-        bne @rts
         lda lowStackRow
         asl
         tax
@@ -78,7 +78,7 @@ copyLowStackRowToVram:
         sta PPUDATA
         dex
         bne @drawLine
-@rts:   rts
+        rts
 
 copyPlayfieldRowToVRAM:
         ldx vramRow
