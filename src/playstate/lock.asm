@@ -90,12 +90,10 @@ playState_lockTetrimino:
         cmp #$09
         bcs @drawOnUpperHalf
 ; draw on lower half
-        clc
-        adc #$03
+        adc #$03 ; carry already clear
         bne @copyGraphic
 @drawOnUpperHalf:
-        sec
-        sbc #$04
+        sbc #$04 ; carry already set
 @copyGraphic:
         jsr copyGraphicToPlayfieldAtCustomRow
         jmp @gameOver
