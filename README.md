@@ -226,7 +226,6 @@ Change the auto-shift delay rate.
 
 Choose a height limit for your stack and stay below or else it's game over.  
 
-
 ### Double Killscreen
 
 The pieces fall by two blocks every frame. It's hard.
