@@ -90,7 +90,7 @@ ld65 -m tetris.map -Ln tetris.lbl --dbgfile tetris.dbg -o tetris.nes -C src/tetr
 
 # create patch
 if [[ -f clean.nes ]] && [[ $(uname) == "Darwin" ]]; then
-    echo "Unable to create patch on mac"
+    echo "Unable to create patch on mac.  Skipping patch creation."
 elif [[ -f clean.nes ]]; then
     ./tools/flips-linux --create clean.nes tetris.nes tetris.bps
 else
