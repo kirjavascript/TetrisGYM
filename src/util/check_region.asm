@@ -1,4 +1,6 @@
 checkRegion:
+.assert >@vwait1 = >@endVWait, error, "Region detection code crosses page boundary"
+
 ; region detection via http://forums.nesdev.com/viewtopic.php?p=163258#p163258
 ;;; use the power-on wait to detect video system-
 	ldx #0
@@ -14,6 +16,7 @@ checkRegion:
 @noincy:
 	bit $2002
 	bpl @vwait2  ; at this point, about 57165 cycles have passed
+@endVWait:
 
 ;;; BUT because of a hardware oversight, we might have missed a vblank flag.
 ;;;  so we need to both check for 1Vbl and 2Vbl

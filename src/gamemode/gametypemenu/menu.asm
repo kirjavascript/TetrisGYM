@@ -21,6 +21,10 @@ gameMode_gameTypeMenu:
         ; Horizontal mirroring
         lda #$1
         sta MMC3_MIRRORING
+.elseif INES_MAPPER = 5
+        ; Horizontal mirroring
+        lda #$50
+        sta MMC5_NT_MAPPING
 .endif
         lda #%10011 ; used to be $10 (enable horizontal mirroring)
         jsr setMMC1Control
@@ -97,6 +101,7 @@ gameTypeLoopCheckStart:
         lda set_seed_input
         bne @checkSelectable
         lda set_seed_input+1
+        and #$FE ; treat 0001 like 0000
         beq gameTypeLoopNext
 
 @checkSelectable:
@@ -305,7 +310,7 @@ menuConfigControls:
         rts
 
 menuConfigSizeLookup:
-        .byte   MENUSIZES
+        MENUSIZES
 
 assertValues:
         ; make sure you can only have block or qual
@@ -410,6 +415,7 @@ renderMenuVars:
         lda set_seed_input
         bne @renderIndicator
         lda set_seed_input+1
+        and #$FE ; treat 0001 like 0000
         beq @cursorFinished
 @renderIndicator:
         ldx #$E

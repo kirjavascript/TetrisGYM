@@ -59,10 +59,21 @@ updateAudioWaitForNmiAndResetOamStaging:
 @checkForNmi:
         lda verticalBlankingInterval
         beq @checkForNmi
+
+resetOAMStaging:
+; Hide a sprite by moving it down offscreen, by writing any values between #$EF-#$FF here. 
+; Sprites are never displayed on the first line of the picture, and it is impossible to place 
+; a sprite partially off the top of the screen. 
+; https://www.nesdev.org/wiki/PPU_OAM
+        ldx #$00
         lda #$FF
-        ldx #$02
-        ldy #$02
-        jsr memset_page
+@hideY:
+        sta oamStaging,x
+        inx
+        inx
+        inx
+        inx
+        bne @hideY
         rts
 
 updateAudioAndWaitForNmi:
@@ -322,6 +333,8 @@ changeCHRBank0:
         adc #$02
         stx MMC3_BANK_SELECT
         sta MMC3_BANK_DATA
+.elseif INES_MAPPER = 5
+        sta MMC5_CHR_BANK0
 .endif
         rts
 
@@ -357,6 +370,8 @@ changeCHRBank1:
         adc #$01
         stx MMC3_BANK_SELECT
         sta MMC3_BANK_DATA
+.elseif INES_MAPPER = 5
+        sta MMC5_CHR_BANK1
 .endif
         rts
 
@@ -371,16 +386,5 @@ changePRGBank:
         sta MMC1_PRG
         lsr a
         sta MMC1_PRG
-.elseif INES_MAPPER = 4
-        asl     a
-        asl     a
-        ldx     #$06
-        stx     MMC3_BANK_SELECT
-        sta     MMC3_BANK_DATA
-        inx
-        clc
-        adc     #$01
-        stx     MMC3_BANK_SELECT
-        sta     MMC3_BANK_DATA
 .endif
         rts

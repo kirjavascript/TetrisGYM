@@ -323,6 +323,11 @@ addLineClearPoints:
         sta factorA24+1
         sta factorA24+2
         lda levelNumber
+        ldy practiseType
+        cpy #MODE_MARATHON
+        bne @notMarathon
+        lda startLevel
+@notMarathon:
         cmp #$FF
         bne @noverflow
         lda #1

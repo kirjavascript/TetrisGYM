@@ -369,6 +369,11 @@ drop_tetrimino_actual:
 lookupDropSpeed:
         lda #$01
         ldx levelNumber
+        ldy practiseType
+        cpy #MODE_MARATHON
+        bne @notMarathon
+        ldx startLevel
+@notMarathon:
         cpx #$1D
         bcs @noTableLookup
         lda framesPerDropTableNTSC,x
