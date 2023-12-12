@@ -196,7 +196,7 @@ Setting the value to G causes the mode to act identical to the game genie code `
 
 ### Marathon
 
-Play as long as you are able to surive at a consistent speed.  While the level will increase normally, the drop rate and the points rewarded will remain fixed based on the starting level.
+Play as long as you are able to survive at a consistent speed.  While the level will increase normally, the drop rate and the points rewarded will remain fixed based on the starting level.
 
 ### Garbage
 
