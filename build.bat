@@ -17,7 +17,7 @@ ld65 -m tetris.map -Ln tetris.lbl --dbgfile tetris.dbg -o tetris.nes -C src/tetr
 
 : create patch
 
-"./tools/flips-windows" --create clean.nes tetris.nes tetris.bps
+node ./tools/patch/create.js clean.nes tetris.nes tetris.bps
 
 : show some stats
 
