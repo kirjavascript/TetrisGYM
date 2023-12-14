@@ -378,7 +378,7 @@ lookupDropSpeed:
         bcs @noTableLookup
         lda framesPerDropTableNTSC,x
         ldy palFlag
-        cpy #0
+        ; cpy #0 ; ldy sets z flag
         beq @noTableLookup
         lda framesPerDropTablePAL,x
 @noTableLookup:
@@ -433,7 +433,7 @@ shift_tetrimino:
         lda #$A
         sta dasValuePeriod
         ldy palFlag
-        cpy #0
+        ; cpy #0 ; ldy sets z flag
         beq @shiftTetrimino
         lda #$0C
         sta dasValueDelay

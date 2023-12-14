@@ -42,7 +42,7 @@ CNROM_CHR_LEGAL:
 
         lda #$FF
         ldx palFlag
-        cpx #0
+        ; cpx #0 ; ldx sets z flag
         beq @notPAL
         lda #$CC
 @notPAL:

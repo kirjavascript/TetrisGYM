@@ -300,7 +300,7 @@ L884A:
         lda #EMPTY_TILE
 L885D:  sta playfield,y
         dey
-        cpy #$0
+        ; cpy #$0 ; dey sets z flag
         bne L885D
         lda #$00
         sta vramRow

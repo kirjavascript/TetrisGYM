@@ -7,7 +7,7 @@ gameModeState_handleGameOver:
         lda #$05
         sta generalCounter2
         lda playState
-        cmp #$00
+        ; cmp #$00 ; lda sets z flag
         beq @gameOver
         jmp @ret
 @gameOver:
