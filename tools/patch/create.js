@@ -1,15 +1,12 @@
 const { MarcFile, createBPSFromFiles } = require('./bps.js');
 const fs = require('fs');
-const { join: pathJoin } = require('path');
 
-const [, , param0, param1, param2] = process.argv;
+module.exports = function patch(original, modified, destination) {
+    const patch = createBPSFromFiles(
+        new MarcFile(original),
+        new MarcFile(modified),
+        true,
+    ).export('')._u8array;
 
-const cwd = process.cwd();
-
-const patch = createBPSFromFiles(
-    new MarcFile(pathJoin(cwd, param0)),
-    new MarcFile(pathJoin(cwd, param1)),
-    true,
-).export('')._u8array;
-
-fs.writeFileSync(pathJoin(cwd, param2), patch);
+    fs.writeFileSync(destination, patch);
+}
