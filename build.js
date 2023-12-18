@@ -13,12 +13,13 @@ const mappers = [1, 3, 4, 5];
 const args = process.argv.slice(2);
 
 if (args.includes('-h')) {
-    console.log(`usage: node [-h] [-v] [-m<${mappers.join('|')}>] [-a] [-s] [-k]
+    console.log(`usage: node [-h] [-v] [-m<${mappers.join('|')}>] [-a] [-s] [-k] [-w]
 
 -m  mapper
 -a  faster aeppoz + press select to end game
 -s  disable highscores/SRAM
 -k  Famicom Keyboard support
+-w  force WASM compiler
 -h  you are here
 `);
     process.exit(0);
@@ -28,9 +29,13 @@ const compileFlags = [];
 
 // compiler options
 
-const nativeCC65 = process.env.PATH.split(path.delimiter).some((dir) =>
-    fs.statSync(path.join(dir, 'cc65'), { throwIfNoEntry: false })?.isFile(),
-);
+const nativeCC65 = args.includes('-w')
+    ? false
+    : process.env.PATH.split(path.delimiter).some((dir) =>
+          fs
+              .statSync(path.join(dir, 'cc65'), { throwIfNoEntry: false })
+              ?.isFile(),
+      );
 
 console.log(`using ${nativeCC65 ? 'system' : 'wasm'} ca65/ld65`);
 
@@ -106,7 +111,7 @@ function handleSpawn(exe, ...args) {
     }
 }
 
-const ca65bin = nativeCC65 ? ['ca65'] : ['node', './tools/assemble/ca65.js'];
+const ca65bin = nativeCC65 ? ['ca65'] : ['node', './tools/assemble/ca65'];
 
 console.time('assemble');
 
@@ -126,7 +131,7 @@ console.timeEnd('assemble');
 
 // link object files
 
-const ld65bin = nativeCC65 ? ['ld65'] : ['node', './tools/assemble/ld65.js'];
+const ld65bin = nativeCC65 ? ['ld65'] : ['node', './tools/assemble/ld65'];
 
 console.time('link');
 
@@ -157,7 +162,7 @@ console.log();
 if (fs.existsSync('tetris.map')) {
     const memMap = fs.readFileSync('tetris.map', 'utf8');
 
-    console.log((memMap.match(/PRG_chunk\d+\s+0.+$/gm) ?? []).join('\n'));
+    console.log((memMap.match(/PRG_chunk\d+\s+0.+$/gm) || []).join('\n'));
 }
 
 function hashFile(filename) {
