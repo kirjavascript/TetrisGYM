@@ -169,7 +169,8 @@ function hashFile(filename) {
     if (fs.existsSync(filename)) {
         const shasum = crypto.createHash('sha1');
         shasum.update(fs.readFileSync(filename));
-        console.log(`${filename} => ${shasum.digest('hex')}`);
+        console.log(`\n${filename} => ${shasum.digest('hex')}`);
+        console.log(`${fs.statSync(filename).size} bytes`);
     }
 }
 
