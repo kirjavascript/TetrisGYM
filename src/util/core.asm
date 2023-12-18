@@ -311,8 +311,11 @@ setMMC1Control:
 .endif
         rts
 
-changeCHRBank0:
+changeCHRBanks:
+        ; accum should be 0 or 2
+        sta     generalCounter
 .if INES_MAPPER = 1
+        RESET_MMC1
         sta MMC1_CHR0
         lsr a
         sta MMC1_CHR0
@@ -322,6 +325,22 @@ changeCHRBank0:
         sta MMC1_CHR0
         lsr a
         sta MMC1_CHR0
+        inc generalCounter
+        lda generalCounter
+        RESET_MMC1
+        sta MMC1_CHR1
+        lsr a
+        sta MMC1_CHR1
+        lsr a
+        sta MMC1_CHR1
+        lsr a
+        sta MMC1_CHR1
+        lsr a
+        sta MMC1_CHR1
+.elseif INES_MAPPER = 3
+        lsr
+        tax
+        sta cnromBanks,x
 .elseif INES_MAPPER = 4
         asl a
         asl a
@@ -333,23 +352,8 @@ changeCHRBank0:
         adc #$02
         stx MMC3_BANK_SELECT
         sta MMC3_BANK_DATA
-.elseif INES_MAPPER = 5
-        sta MMC5_CHR_BANK0
-.endif
-        rts
-
-changeCHRBank1:
-.if INES_MAPPER = 1
-        sta MMC1_CHR1
-        lsr a
-        sta MMC1_CHR1
-        lsr a
-        sta MMC1_CHR1
-        lsr a
-        sta MMC1_CHR1
-        lsr a
-        sta MMC1_CHR1
-.elseif INES_MAPPER = 4
+        inc generalCounter
+        lda generalCounter
         asl a
         asl a
         ldx #$02
@@ -371,9 +375,13 @@ changeCHRBank1:
         stx MMC3_BANK_SELECT
         sta MMC3_BANK_DATA
 .elseif INES_MAPPER = 5
+        sta MMC5_CHR_BANK0
+        inc generalCounter
+        lda generalCounter
         sta MMC5_CHR_BANK1
 .endif
         rts
+
 
 changePRGBank:
 .if INES_MAPPER = 1
@@ -388,3 +396,8 @@ changePRGBank:
         sta MMC1_PRG
 .endif
         rts
+
+.if INES_MAPPER = 3
+cnromBanks:
+        .byte $00,$01
+.endif

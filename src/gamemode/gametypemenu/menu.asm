@@ -14,10 +14,11 @@ gameMode_gameTypeMenu:
 .if HAS_MMC
         ; switch to blank charmap
         ; (stops glitching when resetting)
-        lda #$03
-        jsr changeCHRBank1
+        ; lda #$03
+        ; jsr changeCHRBank1 ; should this be all or nothing?
 .endif
-.if INES_MAPPER = 4
+
+.if INES_MAPPER = 4   ; centralize mirroring
         ; Horizontal mirroring
         lda #$1
         sta MMC3_MIRRORING
@@ -41,14 +42,9 @@ gameMode_gameTypeMenu:
         jsr copyRleNametableToPpuOffset
         .addr   game_type_menu_nametable_extra
         lda #$00
-        jsr changeCHRBank0
-        lda #$00
-        jsr changeCHRBank1
-.if INES_MAPPER = 3
-CNROM_CHR_MENU:
-        lda #1
-        sta CNROM_CHR_MENU+1
-.endif
+        jsr changeCHRBanks
+        lda #$80
+        sta currentPpuCtrl
         jsr waitForVBlankAndEnableNmi
         jsr updateAudioWaitForNmiAndResetOamStaging
         jsr updateAudioWaitForNmiAndEnablePpuRendering

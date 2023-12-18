@@ -119,14 +119,10 @@ highScoreEntryScreen:
         jsr updateAudioWaitForNmiAndDisablePpuRendering
         jsr disableNmi
         lda #$00
-        jsr changeCHRBank0
-        lda #$00
-        jsr changeCHRBank1
-.if INES_MAPPER = 3
-        lda #%10000000
+        jsr changeCHRBanks
+        lda #%10000000 ; should this be all or nothing?
         sta PPUCTRL
         sta currentPpuCtrl
-.endif
         jsr bulkCopyToPpu
         .addr   menu_palette
         jsr copyRleNametableToPpu

@@ -22,9 +22,7 @@ reset:  cld
         lda #$10
         jsr setMMC1Control
         lda #$00
-        jsr changeCHRBank0
-        lda #$00
-        jsr changeCHRBank1
+        jsr changeCHRBanks
         lda #$00
         jsr changePRGBank
         jmp initRam

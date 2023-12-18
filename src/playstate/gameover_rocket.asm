@@ -76,16 +76,10 @@ sleep_gameplay:
 endingAnimation: ; rocket_screen
         jsr updateAudioWaitForNmiAndDisablePpuRendering
         jsr disableNmi
-.if HAS_MMC
-        lda #$02
-        jsr changeCHRBank0
-        lda #$02
-        jsr changeCHRBank1
-.elseif INES_MAPPER = 3
-CNROM_CHR_ROCKET:
-        lda #0
-        sta CNROM_CHR_ROCKET+1
-.endif
+        lda #$00
+        jsr changeCHRBanks
+        lda #%10011000
+        sta currentPpuCtrl
         jsr copyRleNametableToPpu
         .addr rocket_nametable
         jsr bulkCopyToPpu

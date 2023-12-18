@@ -6,18 +6,9 @@ waitScreenLoad:
         sta renderMode
         jsr updateAudioWaitForNmiAndDisablePpuRendering
         jsr disableNmi
-.if HAS_MMC
-        lda #$02
-        jsr changeCHRBank0
-        lda #$02
-        jsr changeCHRBank1
-.elseif INES_MAPPER = 3
-CNROM_CHR_LEGAL:
-        lda #0
-        sta CNROM_CHR_LEGAL+1
-        sta currentPpuCtrl
-.endif
-
+        lda #$00
+        sta currentPpuCtrl  ; all or nothing?
+        jsr changeCHRBanks
         jsr bulkCopyToPpu
         .addr wait_palette
         jsr copyRleNametableToPpu

@@ -1,12 +1,8 @@
 gameModeState_initGameBackground:
         jsr updateAudioWaitForNmiAndDisablePpuRendering
         jsr disableNmi
-.if HAS_MMC
-        lda #$01
-        jsr changeCHRBank0
-        lda #$01
-        jsr changeCHRBank1
-.endif
+        lda #$02
+        jsr changeCHRBanks
         jsr bulkCopyToPpu
         .addr   game_palette
         jsr copyRleNametableToPpu
@@ -43,11 +39,11 @@ gameModeState_initGameBackground:
 @heartEnd:
 
 
-.if INES_MAPPER = 3
-        lda #%10011000
+; .if INES_MAPPER = 3
+        lda #%10000000
         sta PPUCTRL
         sta currentPpuCtrl
-.elseif INES_MAPPER = 4
+.if INES_MAPPER = 4
         ; Vertical mirroring (Prevents screen glitching)
         lda #$0
         sta MMC3_MIRRORING
