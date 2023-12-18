@@ -111,7 +111,7 @@ function handleSpawn(exe, ...args) {
     }
 }
 
-const ca65bin = nativeCC65 ? ['ca65'] : ['node', './tools/assemble/ca65'];
+const ca65bin = nativeCC65 ? ['ca65'] : ['node', './tools/assemble/ca65.js'];
 
 console.time('assemble');
 
@@ -131,7 +131,7 @@ console.timeEnd('assemble');
 
 // link object files
 
-const ld65bin = nativeCC65 ? ['ld65'] : ['node', './tools/assemble/ld65'];
+const ld65bin = nativeCC65 ? ['ld65'] : ['node', './tools/assemble/ld65.js'];
 
 console.time('link');
 
