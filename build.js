@@ -13,13 +13,14 @@ const mappers = [1, 3, 4, 5];
 const args = process.argv.slice(2);
 
 if (args.includes('-h')) {
-    console.log(`usage: node [-h] [-v] [-m<${mappers.join('|')}>] [-a] [-s] [-k] [-w]
+    console.log(`usage: node build.js [-h] [-v] [-m<${mappers.join('|')}>] [-a] [-s] [-k] [-w]
 
 -m  mapper
 -a  faster aeppoz + press select to end game
 -s  disable highscores/SRAM
 -k  Famicom Keyboard support
 -w  force WASM compiler
+-c  force PNG to CHR conversion
 -h  you are here
 `);
     process.exit(0);
@@ -92,9 +93,18 @@ const dir = path.join(__dirname, 'src', 'chr');
 fs.readdirSync(dir)
     .filter((name) => name.endsWith('.png'))
     .forEach((name) => {
-        const chr = png2chr(fs.readFileSync(path.join(dir, name)));
-        const dst = path.join(dir, name.replace('.png', '.chr'));
-        fs.writeFileSync(dst, chr);
+        const png = path.join(dir, name);
+        const chr = path.join(dir, name.replace('.png', '.chr'));
+
+        const pngStat = fs.statSync(png, { throwIfNoEntry: false });
+        const chrStat = fs.statSync(chr, { throwIfNoEntry: false });
+
+        const staleCHR = !chrStat || chrStat.mtime < pngStat.mtime;
+
+        if (staleCHR || args.includes('-c')) {
+            console.log(`${name} => ${path.basename(chr)}`);
+            fs.writeFileSync(chr, png2chr(fs.readFileSync(png)));
+        }
     });
 
 console.timeEnd('CHR');
