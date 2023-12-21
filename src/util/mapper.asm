@@ -107,20 +107,6 @@ changeCHRBanks:
 .endif
         rts
 
-changePRGBank:
-.if INES_MAPPER = 0 .or INES_MAPPER = 1
-        RESET_MMC1
-        sta MMC1_PRG
-        lsr a
-        sta MMC1_PRG
-        lsr a
-        sta MMC1_PRG
-        lsr a
-        sta MMC1_PRG
-        lsr a
-        sta MMC1_PRG
-.endif
-        rts
 
 setHorizontalMirroring:
 ; autodetect

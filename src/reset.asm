@@ -31,7 +31,6 @@ reset:  cld
 
         dex ; $FF for stack pointer
         txs
-        jsr changePRGBank ; 0 in accumulator
         jsr mapperInit
         jsr setVerticalMirroring
         lda #CHRBankSet0
@@ -51,6 +50,16 @@ not_mmc1:
 ; MMC1
 .elseif INES_MAPPER = 1
         RESET_MMC1
+        lda #$00
+        sta MMC1_PRG
+        lsr a
+        sta MMC1_PRG
+        lsr a
+        sta MMC1_PRG
+        lsr a
+        sta MMC1_PRG
+        lsr a
+        sta MMC1_PRG
 
 ; CNROM (no init)
 .elseif INES_MAPPER = 3
