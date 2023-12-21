@@ -6,14 +6,14 @@ const { spawnSync } = require('child_process');
 console.log('TetrisGYM buildscript');
 console.time('build');
 
-const mappers = [1, 3, 4, 5];
+const mappers = [0, 1, 3, 4, 5];
 
 // options handling
 
 const args = process.argv.slice(2);
 
 if (args.includes('-h')) {
-    console.log(`usage: node build.js [-h] [-v] [-m<${mappers.join('|')}>] [-a] [-s] [-k] [-w]
+    console.log(`usage: node build.js [-h] [-v] [-m<${mappers.join('|')}>] [-a] [-s] [-k] [-w] [-c] [-o]
 
 -m  mapper
 -a  faster aeppoz + press select to end game
@@ -21,6 +21,7 @@ if (args.includes('-h')) {
 -k  Famicom Keyboard support
 -w  force WASM compiler
 -c  force PNG to CHR conversion
+-o  override autodetect mmc1 header with cnrom
 -h  you are here
 `);
     process.exit(0);
@@ -42,7 +43,7 @@ console.log(`using ${nativeCC65 ? 'system' : 'wasm'} ca65/ld65`);
 
 // mapper options
 
-const mapper = args.find((d) => d.startsWith('-m'))?.slice(2) ?? 1;
+const mapper = args.find((d) => d.startsWith('-m'))?.slice(2) ?? 0;
 
 if (!mappers.includes(+mapper)) {
     console.error(
@@ -72,6 +73,11 @@ if (args.includes('-k')) {
 if (args.includes('-s')) {
     compileFlags.push('-D', 'SAVE_HIGHSCORES=0');
     console.log('highscore saving disabled');
+}
+
+if (args.includes('-o')) {
+    compileFlags.push('-D', 'CNROM_OVERRIDE=1');
+    console.log('cnrom override for autodetect');
 }
 
 console.log();
