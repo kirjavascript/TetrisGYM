@@ -138,6 +138,8 @@ setHorizontalMirroring:
         rts
 
 setVerticalMirroring:
+; Unused except during mapper detect for INES_MAPPER 0 
+
 ; autodetect
 .if INES_MAPPER = 0
         lda mapperId

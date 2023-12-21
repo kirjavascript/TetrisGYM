@@ -41,7 +41,6 @@ gameModeState_initGameBackground:
         lda #NMIEnable
         sta PPUCTRL
         sta currentPpuCtrl
-        jsr setVerticalMirroring
         jsr resetScroll
         jsr waitForVBlankAndEnableNmi
         jsr updateAudioWaitForNmiAndResetOamStaging

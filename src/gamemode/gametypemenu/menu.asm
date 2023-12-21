@@ -10,7 +10,6 @@ gameMode_gameTypeMenu:
         sta menuScrollY
         lda #0
         sta displayNextPiece
-        jsr setHorizontalMirroring
         lda #$1
         sta renderMode
         jsr updateAudioWaitForNmiAndDisablePpuRendering
@@ -50,7 +49,6 @@ gameTypeLoopCheckStart:
         lda practiseType
         cmp #MODE_KILLX2
         bne @checkSpeedTest
-        jsr setVerticalMirroring
         lda #29
         sta startLevel
         sta levelNumber

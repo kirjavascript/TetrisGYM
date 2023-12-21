@@ -109,7 +109,6 @@ copyHighscore:
         rts
 
 highScoreEntryScreen:
-        jsr setVerticalMirroring
         lda #$09
         jsr setMusicTrack
         lda #$02

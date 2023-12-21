@@ -32,7 +32,7 @@ reset:  cld
         dex ; $FF for stack pointer
         txs
         jsr mapperInit
-        jsr setVerticalMirroring
+        jsr setHorizontalMirroring
         lda #CHRBankSet0
         jsr changeCHRBanks
         jmp initRam
@@ -40,9 +40,9 @@ reset:  cld
 mapperInit:
 ; autodetect
 .if INES_MAPPER = 0
-        jsr testHorizontalMirroring
-        bne not_mmc1
         jsr testVerticalMirroring
+        bne not_mmc1 ; cnrom should bail here
+        jsr testHorizontalMirroring ; Test again in case of cnrom miswire
         bne not_mmc1
         inc mapperId ; 1 for MMC1, otherwise 0 for CNROM
 not_mmc1:

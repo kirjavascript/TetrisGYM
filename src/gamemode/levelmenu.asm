@@ -1,5 +1,4 @@
 gameMode_levelMenu:
-        jsr setVerticalMirroring
         lda currentPpuCtrl
         and #NMIEnable
         sta currentPpuCtrl
