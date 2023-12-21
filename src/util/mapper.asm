@@ -99,6 +99,8 @@ changeCHRBanks:
         adc #$01
         stx MMC3_BANK_SELECT
         sta MMC3_BANK_DATA
+
+; MMC5
 .elseif INES_MAPPER = 5
         sta MMC5_CHR_BANK0
         inc generalCounter
