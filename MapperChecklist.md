@@ -1,145 +1,27 @@
-Reset this if anything changes
+^v: ✅
 
-# MMC1 Mesen
-
-- [x] qual legal/title
-- [x] qual rocket screen game
-- [x] qual reset
-- [x] regular high score game
-- [x] reset
-- [x] tap roll screen
-
-# MMC1 Everdrive
-
-- [ ] qual legal/title
-- [ ] qual rocket screen game
-- [ ] qual reset
-- [ ] regular high score game
-- [ ] reset
-- [ ] tap roll screen
-
-# MMC1 Krzysio
-
-- [ ] qual legal/title
-- [ ] qual rocket screen game
-- [ ] qual reset
-- [ ] regular high score game
-- [ ] reset
-- [ ] tap roll screen
-
-# CNROM Mesen
-
-- [x] qual legal/title
-- [x] qual rocket screen game
-- [x] qual reset
-- [x] regular high score game
-- [x] reset
-- [x] tap roll screen
-
-# CNROM Everdrive
-
-- [ ] qual legal/title
-- [ ] qual rocket screen game
-- [ ] qual reset
-- [ ] regular high score game
-- [ ] reset
-- [ ] tap roll screen
-
-# CNROM Krzysio
-
-- [ ] qual legal/title
-- [ ] qual rocket screen game
-- [ ] qual reset
-- [ ] regular high score game
-- [ ] reset
-- [ ] tap roll screen
-
-# CNROM PCB
-
-- [ ] qual legal/title
-- [ ] qual rocket screen game
-- [ ] qual reset
-- [ ] regular high score game
-- [ ] reset
-- [ ] tap roll screen
-
-# CNROM Allen
-
-- [ ] qual legal/title
-- [ ] qual rocket screen game
-- [ ] qual reset
-- [ ] regular high score game
-- [ ] reset
-- [ ] tap roll screen
-
-# CNROM Eric
-
-- [ ] qual legal/title
-- [ ] qual rocket screen game
-- [ ] qual reset
-- [ ] regular high score game
-- [ ] reset
-- [ ] tap roll screen
-
-# CNROM Gunter
-
-- [ ] qual legal/title
-- [ ] qual rocket screen game
-- [ ] qual reset
-- [ ] regular high score game
-- [ ] reset
-- [ ] tap roll screen
-
-# MMC3 Mesen
-
-- [x] qual legal/title
-- [x] qual rocket screen game
-- [x] qual reset
-- [x] regular high score game
-- [x] reset
-- [x] tap roll screen
-
-# MMC3 Everdrive
-
-- [ ] qual legal/title
-- [ ] qual rocket screen game
-- [ ] qual reset
-- [ ] regular high score game
-- [ ] reset
-- [ ] tap roll screen
-
-# MMC3 Krzysio
-
-- [ ] qual legal/title
-- [ ] qual rocket screen game
-- [ ] qual reset
-- [ ] regular high score game
-- [ ] reset
-- [ ] tap roll screen
-
-# MMC5 Mesen
-
-- [x] qual legal/title
-- [x] qual rocket screen game
-- [x] qual reset
-- [x] regular high score game
-- [x] reset
-- [x] tap roll screen
-
-# MMC5 Everdrive
-
-- [ ] qual legal/title
-- [ ] qual rocket screen game
-- [ ] qual reset
-- [ ] regular high score game
-- [ ] reset
-- [ ] tap roll screen
-
-# MMC5 Krzysio
-
-- [ ] qual legal/title
-- [ ] qual rocket screen game
-- [ ] qual reset
-- [ ] regular high score game
-- [ ] reset
-- [ ] tap roll screen
+| Mapper                 | Menu | Level | Game | Rocket | High Score | Legal/Title | Reset | Tap/Roll | Save Scores |
+|------------------------|:----:|:-----:|:----:|:------:|:----------:|:-------------:|:---:|:--------:|:-----------:|
+| auto mesen             |  ✅  |   ✅  |  ✅  |   ✅   |    ✅     |       ✅       |  ✅ |    ✅   |      ✅      |
+| auto mesen cnrom       |   ✅ |  ✅   |  ✅  |  ✅    |   ✅       |    ✅         |  ✅|    ✅     |   ✅        |
+| auto everdrive         |      |       |      |        |            |               |     |          |             |
+| auto everdrive cnrom   |      |       |      |        |            |               |     |          |             |
+| auto krzysio           |      |       |      |        |            |               |     |          |             |
+| auto krzysio cnrom     |      |       |      |        |            |               |     |          |             |
+| auto cnrom pcb         |      |       |      |        |            |               |     |     N/A  |             |
+| auto eric pcb          |      |       |      |        |            |               |     |          |             |
+| auto gunter pcb        |      |       |      |        |            |               |     |          |             |
+| auto allen             |      |       |      |        |            |               |     |          |             |
+| auto non pro everdrive |      |       |      |        |            |               |     |          |             |
+| mmc1 mesen             |      |       |      |        |            |               |     |          |             |
+| cnrom mesen            |      |       |      |        |            |               |     |          |             |
+| mmc3 mesen             |      |       |      |        |            |               |     |          |             |
+| mmc5 mesen             |      |       |      |        |            |               |     |          |             |
+| mmc1 everdrive         |      |       |      |        |            |               |     |          |             |
+| cnrom everdrive        |      |       |      |        |            |               |     |          |             |
+| mmc3 everdrive         |      |       |      |        |            |               |     |          |             |
+| mmc5 everdrive         |      |       |      |        |            |               |     |          |             |
+| mmc1 krzysio           |      |       |      |        |            |               |     |          |             |
+| cnrom krzysio          |      |       |      |        |            |               |     |          |             |
+| mmc3 krzysio           |      |       |      |        |            |               |     |          |             |
+| mmc5 krzysio           |      |       |      |        |            |               |     |          |             |
