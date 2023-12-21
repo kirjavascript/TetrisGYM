@@ -76,9 +76,9 @@ sleep_gameplay:
 endingAnimation: ; rocket_screen
         jsr updateAudioWaitForNmiAndDisablePpuRendering
         jsr disableNmi
-        lda #$00
+        lda #CHRBankSet0
         jsr changeCHRBanks
-        lda #%10011000
+        lda #NMIEnable|BGPattern1|SpritePattern1
         sta currentPpuCtrl
         jsr copyRleNametableToPpu
         .addr rocket_nametable

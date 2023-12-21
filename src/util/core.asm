@@ -291,14 +291,9 @@ switch_s_plus_2a:
         stx tmp1
         jmp (tmp1)
 
-        sei
-        RESET_MMC1
-        lda #$1A
-        jsr setMMC1Control
-        rts
-
 setMMC1Control:
 .if INES_MAPPER = 1
+        RESET_MMC1
         sta MMC1_Control
         lsr a
         sta MMC1_Control
@@ -312,7 +307,7 @@ setMMC1Control:
         rts
 
 changeCHRBanks:
-        ; accum should be 0 or 2
+        ; accum should be 0 or 2 (CHRBankset0 or CHRBankset1)
         sta     generalCounter
 .if INES_MAPPER = 1
         RESET_MMC1
@@ -382,7 +377,6 @@ changeCHRBanks:
 .endif
         rts
 
-
 changePRGBank:
 .if INES_MAPPER = 1
         sta MMC1_PRG
@@ -394,6 +388,33 @@ changePRGBank:
         sta MMC1_PRG
         lsr a
         sta MMC1_PRG
+.endif
+        rts
+
+setHorizontalMirroring:
+.if INES_MAPPER = 1
+        lda #%10011 ; used to be $10 (enable horizontal mirroring)
+        jmp setMMC1Control
+.elseif INES_MAPPER = 4
+        lda #$1
+        sta MMC3_MIRRORING
+.elseif INES_MAPPER = 5
+        lda #$50
+        sta MMC5_NT_MAPPING
+.endif
+        rts
+
+
+setVerticalMirroring:
+.if INES_MAPPER = 1
+        lda #%10000
+        jmp setMMC1Control
+.elseif INES_MAPPER = 4
+        lda #$0
+        sta MMC3_MIRRORING
+.elseif INES_MAPPER = 5
+        lda #$44
+        sta MMC5_NT_MAPPING
 .endif
         rts
 

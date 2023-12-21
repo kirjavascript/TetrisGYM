@@ -198,11 +198,6 @@ render_mode_play_and_demo:
         bne @noFlash
         stx PPUDATA
 @noFlash:
-; .if INES_MAPPER = 3
-        lda #%10000000
-        sta PPUCTRL
-        sta currentPpuCtrl
-; .endif
         jsr resetScroll
         rts
 

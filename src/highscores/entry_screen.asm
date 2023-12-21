@@ -109,18 +109,16 @@ copyHighscore:
         rts
 
 highScoreEntryScreen:
-        RESET_MMC1
-        lda #$10
-        jsr setMMC1Control
+        jsr setVerticalMirroring
         lda #$09
         jsr setMusicTrack
         lda #$02
         sta renderMode
         jsr updateAudioWaitForNmiAndDisablePpuRendering
         jsr disableNmi
-        lda #$00
+        lda #CHRBankSet0
         jsr changeCHRBanks
-        lda #%10000000 ; should this be all or nothing?
+        lda #NMIEnable
         sta PPUCTRL
         sta currentPpuCtrl
         jsr bulkCopyToPpu

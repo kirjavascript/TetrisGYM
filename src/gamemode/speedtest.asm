@@ -21,7 +21,7 @@ gameMode_speedTest:
         sta PPUADDR
         lda #$30
         sta PPUDATA
-        lda #$02
+        lda #CHRBankSet1
         jsr changeCHRBanks
 
         jsr waitForVBlankAndEnableNmi

@@ -13,15 +13,14 @@ reset:  cld
         dex
         txs
 .if INES_MAPPER = 1
-        inc reset
+        RESET_MMC1
 .elseif INES_MAPPER = 4 
         jsr mmc3Init
 .elseif INES_MAPPER = 5
         jsr mmc5Init
 .endif
-        lda #$10
-        jsr setMMC1Control
-        lda #$00
+        jsr setVerticalMirroring
+        lda #CHRBankSet0
         jsr changeCHRBanks
         lda #$00
         jsr changePRGBank

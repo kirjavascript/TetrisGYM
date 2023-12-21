@@ -66,3 +66,10 @@ MMC5_CHR_BANK1 := $5127
                 ; https://www.nesdev.org/wiki/MMC1#Reset
 .endif
 .endmacro
+
+NMIEnable = $80
+BGPattern1 = $10
+SpritePattern1 = $08
+
+CHRBankSet0 = $00
+CHRBankSet1 = $02

@@ -6,8 +6,9 @@ waitScreenLoad:
         sta renderMode
         jsr updateAudioWaitForNmiAndDisablePpuRendering
         jsr disableNmi
-        lda #$00
-        sta currentPpuCtrl  ; all or nothing?
+        lda #NMIEnable|BGPattern1|SpritePattern1
+        sta currentPpuCtrl
+        lda #CHRBankSet0
         jsr changeCHRBanks
         jsr bulkCopyToPpu
         .addr wait_palette

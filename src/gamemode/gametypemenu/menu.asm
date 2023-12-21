@@ -10,25 +10,7 @@ gameMode_gameTypeMenu:
         sta menuScrollY
         lda #0
         sta displayNextPiece
-        RESET_MMC1
-.if HAS_MMC
-        ; switch to blank charmap
-        ; (stops glitching when resetting)
-        ; lda #$03
-        ; jsr changeCHRBank1 ; should this be all or nothing?
-.endif
-
-.if INES_MAPPER = 4   ; centralize mirroring
-        ; Horizontal mirroring
-        lda #$1
-        sta MMC3_MIRRORING
-.elseif INES_MAPPER = 5
-        ; Horizontal mirroring
-        lda #$50
-        sta MMC5_NT_MAPPING
-.endif
-        lda #%10011 ; used to be $10 (enable horizontal mirroring)
-        jsr setMMC1Control
+        jsr setHorizontalMirroring
         lda #$1
         sta renderMode
         jsr updateAudioWaitForNmiAndDisablePpuRendering
@@ -41,9 +23,9 @@ gameMode_gameTypeMenu:
         sta tmp3
         jsr copyRleNametableToPpuOffset
         .addr   game_type_menu_nametable_extra
-        lda #$00
+        lda #CHRBankSet0
         jsr changeCHRBanks
-        lda #$80
+        lda #NMIEnable
         sta currentPpuCtrl
         jsr waitForVBlankAndEnableNmi
         jsr updateAudioWaitForNmiAndResetOamStaging
@@ -68,8 +50,7 @@ gameTypeLoopCheckStart:
         lda practiseType
         cmp #MODE_KILLX2
         bne @checkSpeedTest
-        lda #$10
-        jsr setMMC1Control
+        jsr setVerticalMirroring
         lda #29
         sta startLevel
         sta levelNumber
