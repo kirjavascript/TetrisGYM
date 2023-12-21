@@ -2,8 +2,8 @@
 
 | Mapper                 | Menu | Level | Game | Rocket | High Score | Legal/Title | Reset | Tap/Roll | Save Scores |
 |------------------------|:----:|:-----:|:----:|:------:|:----------:|:-------------:|:---:|:--------:|:-----------:|
-| auto mesen             |  ✅  |   ✅  |  ✅  |   ✅   |    ✅     |       ✅       |  ✅ |    ✅   |      ✅      |
-| auto mesen cnrom       |   ✅ |  ✅   |  ✅  |  ✅    |   ✅       |    ✅         |  ✅|    ✅     |   ✅        |
+| auto mesen             |      |       |      |        |            |               |     |          |             |
+| auto mesen cnrom       |      |       |      |        |            |               |     |          |             |
 | auto everdrive         |      |       |      |        |            |               |     |          |             |
 | auto everdrive cnrom   |      |       |      |        |            |               |     |          |             |
 | auto krzysio           |      |       |      |        |            |               |     |          |             |
