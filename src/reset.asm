@@ -55,9 +55,11 @@ mapperInit:
 ; autodetect
 .if INES_MAPPER = 0
         setMMC1PRG ; initialize mmc1 just in case
+        ; cnrom can pass one of these tests but not both.
+        ; Start with the one it's supposed to fail.
         jsr testVerticalMirroring
-        bne not_mmc1 ; cnrom should bail here
-        jsr testHorizontalMirroring ; Test again in case of cnrom miswire
+        bne not_mmc1
+        jsr testHorizontalMirroring
         bne not_mmc1
         inc mapperId ; 1 for MMC1, otherwise 0 for CNROM
 not_mmc1:
@@ -99,9 +101,3 @@ not_mmc1:
         stx MMC5_RAM_PROTECT1 ; 2: enable PRG RAM
 .endif
         rts
-
-
-MMC1_PRG:
-        .byte   $00,$00,$00,$00,$00,$00,$00,$00
-        .byte   $00
-        .byte   $00
