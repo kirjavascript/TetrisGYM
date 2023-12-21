@@ -37,18 +37,7 @@ reset:  cld
         jsr changeCHRBanks
         jmp initRam
 
-mapperInit:
-; autodetect
-.if INES_MAPPER = 0
-        jsr testVerticalMirroring
-        bne not_mmc1 ; cnrom should bail here
-        jsr testHorizontalMirroring ; Test again in case of cnrom miswire
-        bne not_mmc1
-        inc mapperId ; 1 for MMC1, otherwise 0 for CNROM
-not_mmc1:
-
-; MMC1
-.elseif INES_MAPPER = 1
+.macro setMMC1PRG
         RESET_MMC1
         lda #$00
         sta MMC1_PRG
@@ -60,6 +49,22 @@ not_mmc1:
         sta MMC1_PRG
         lsr a
         sta MMC1_PRG
+.endmacro
+
+mapperInit:
+; autodetect
+.if INES_MAPPER = 0
+        setMMC1PRG ; initialize mmc1 just in case
+        jsr testVerticalMirroring
+        bne not_mmc1 ; cnrom should bail here
+        jsr testHorizontalMirroring ; Test again in case of cnrom miswire
+        bne not_mmc1
+        inc mapperId ; 1 for MMC1, otherwise 0 for CNROM
+not_mmc1:
+
+; MMC1
+.elseif INES_MAPPER = 1
+        setMMC1PRG
 
 ; CNROM (no init)
 .elseif INES_MAPPER = 3
