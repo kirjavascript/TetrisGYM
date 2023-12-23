@@ -21,7 +21,8 @@ renderByteBCDStart:
         sbc #100
         jmp @byte
 @not100:
-        cpx #0
+        ; cpx #0
+        txa ; either branch clobbers accumulator.  txa sets z, saves 1 byte.
         bne @main
         lda #$EF
         sta PPUDATA

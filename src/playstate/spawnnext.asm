@@ -84,16 +84,16 @@ pickTetriminoPre:
         lda practiseType
         cmp #MODE_TSPINS
         beq pickTetriminoT
-        lda practiseType
+        ; lda practiseType ; accumulator is still practiseType
         cmp #MODE_SEED
         beq pickTetriminoSeed
-        lda practiseType
+        ; lda practiseType
         cmp #MODE_TAPQTY
         beq pickTetriminoLongbar
-        lda practiseType
+        ; lda practiseType
         cmp #MODE_TAP
         beq pickTetriminoLongbar
-        lda practiseType
+        ; lda practiseType
         cmp #MODE_PRESETS
         beq pickTetriminoPreset
         jmp pickRandomTetrimino
@@ -120,7 +120,7 @@ pickTetriminoSeed:
         ror
         and #$F
         ; v3
-        cmp #0
+        ; cmp #0 ; and sets z flag
         bne @notZero
         lda #$10
 @notZero:
@@ -128,6 +128,8 @@ pickTetriminoSeed:
         ; cmp #0
         ; beq @compatMode
 
+; without cmp #0, carry bit is unknown and needs set.
+        sec
         adc #1
         sta tmp3 ; step + 1 in tmp3
 @loop:

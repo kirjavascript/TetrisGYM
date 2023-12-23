@@ -14,7 +14,7 @@ prepareNextTapQuantity:
         lda tapqtyModifier
         and #$F
         tax
-        cpx #0
+        ; cpx #0 ; tax sets z flag
         bne @notZero
         ldx #4 ; default to four
 @notZero:

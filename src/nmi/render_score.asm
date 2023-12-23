@@ -152,7 +152,8 @@ renderClassicHighByte:
         stx tmpX
         sty tmpY
 
-        cpx #0
+        ; cpx #0
+        txa ; either branch clobbers accumulator.  txa sets z, saves 1 byte.
         bne @startWrap
         lda tmpY ; score+2
         jsr twoDigsToPPU
@@ -206,7 +207,8 @@ renderLettersHighByte:
         stx tmpX
         sty tmpY
 
-        cpx #0
+        ; cpx #0
+        txa ; either branch clobbers accumulator.  txa sets z, saves 1 byte.
         bne @startWrap
         lda tmpY ; score+2
         jsr twoDigsToPPU

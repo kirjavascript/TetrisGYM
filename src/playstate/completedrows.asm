@@ -36,7 +36,7 @@ playState_checkForCompletedRows:
         cmp #MODE_TSPINS
         beq @rowNotComplete
 
-        lda practiseType
+        ; lda practiseType ; accumulator is still practiseType
         cmp #MODE_FLOOR
         beq @floorCheck
         lda linecapState
@@ -122,7 +122,7 @@ playState_checkForCompletedRows:
         cmp #MODE_TAPQTY
         bne @tapQtyEnd
         lda completedLines
-        cmp #0
+        ; cmp #0 ; lda sets z flag
         beq @tapQtyEnd
         ; mark as complete
         lda tqtyNext
