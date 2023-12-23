@@ -6,14 +6,19 @@ const { spawnSync } = require('child_process');
 console.log('TetrisGYM buildscript');
 console.time('build');
 
-const mappers = [1, 3, 4, 5];
+const mappers = { // https://www.nesdev.org/wiki/Mapper
+    1: 'MMC1',
+    3: 'CNROM',
+    4: 'MMC3',
+    5: 'MMC5',
+};
 
 // options handling
 
 const args = process.argv.slice(2);
 
 if (args.includes('-h')) {
-    console.log(`usage: node build.js [-h] [-v] [-m<${mappers.join('|')}>] [-a] [-s] [-k] [-w]
+    console.log(`usage: node build.js [-h] [-v] [-m<${Object.keys(mappers).join('|')}>] [-a] [-s] [-k] [-w]
 
 -m  mapper
 -a  faster aeppoz + press select to end game
@@ -44,9 +49,9 @@ console.log(`using ${nativeCC65 ? 'system' : 'wasm'} ca65/ld65`);
 
 const mapper = args.find((d) => d.startsWith('-m'))?.slice(2) ?? 1;
 
-if (!mappers.includes(+mapper)) {
+if (!mappers[mapper]) {
     console.error(
-        `Invalid INES_MAPPER - options are ${mappers
+        `invalid INES_MAPPER - options are ${Object.keys(mappers)
             .map((d) => `-m${d}`)
             .join(', ')}`,
     );
@@ -57,7 +62,7 @@ if (!mappers.includes(+mapper)) {
 
 compileFlags.push('-D', `INES_MAPPER=${mapper}`);
 
-console.log(`using mapper ${mapper}`);
+console.log(`using ${mappers[mapper]}`);
 
 if (args.includes('-a')) {
     compileFlags.push('-D', 'AUTO_WIN=1');
