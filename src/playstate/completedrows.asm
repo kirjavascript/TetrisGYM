@@ -1,3 +1,5 @@
+activeFloorMode := generalCounter5
+
 playState_checkForCompletedRows:
         lda vramRow
         cmp #$20
@@ -23,8 +25,9 @@ playState_checkForCompletedRows:
         adc generalCounter
         sta generalCounter
         tay
+        lda #$00
+        sta activeFloorMode ; Don't draw floor unless active
         ldx #$0A
-
 @checkIfRowComplete:
 .if AUTO_WIN
         jmp @rowIsComplete
@@ -46,23 +49,13 @@ playState_checkForCompletedRows:
         beq @rowNotComplete
 
 @fullRowBurningCheck:
-        ; bugfix to ensure complete rows aren't cleared
-        ; used in floor / linecap floor
-        lda currentPiece_copy
-        beq @IJLTedge
-        cmp #5
-        beq @IJLTedge
-        cmp #$10
-        beq @IJLTedge
-        cmp #$12
-        beq @IJLTedge
-        bne @normalRow
-@IJLTedge:
-        lda lineIndex
-        cmp #3
-        bcs @rowNotComplete
+        inc activeFloorMode ; Floor is active
+        lda #$13
+        sec
+        sbc generalCounter2 ; contains current row being checked
+        cmp floorModifier
+        bcc @rowNotComplete ; ignore floor rows
 @normalRow:
-
 
 @checkIfRowCompleteLoopStart:
         lda (playfieldAddr),y
@@ -99,6 +92,23 @@ playState_checkForCompletedRows:
         bne @clearRowTopRow
         lda #$13
         sta currentPiece
+
+; draw surface of floor in case of top line clear
+        lda activeFloorMode
+        beq @incrementLineIndex
+        lda #$14
+        sec
+        sbc floorModifier
+        tax
+        ldy multBy10Table,x
+        ldx #$0A
+        lda #BLOCK_TILES
+@drawFloorSurface:
+        sta playfield,y
+        iny
+        dex
+        bne @drawFloorSurface
+
         jmp @incrementLineIndex
 
 @rowNotComplete:
