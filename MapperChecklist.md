@@ -6,8 +6,8 @@
 | auto mesen cnrom       |     |     |     |     |     |     |     |     |     |     |
 | auto everdrive         | ✅  | ✅  | ✅  |  ✅ | ✅  | ✅  | ✅  | ✅  | ✅  | ✅ |
 | auto everdrive cnrom   | ✅  | ✅  |  ✅ | ✅  | ✅  | ✅  | ✅  | ✅  | ✅  | ✅ |
-| auto krzysio           |     |     |     |     |     |     |     |     |     |     |
-| auto krzysio cnrom     |     |     |     |     |     |     |     |     |     |     |
+| auto krzysio           | ✅  | ✅  | ✅  | ✅  | ✅  | ✅  | ✅  | ✅  | ✅  | ✅ |
+| auto krzysio cnrom     | ✅  | ✅  | ✅  | ✅  | ✅  | ✅  | ✅  | ✅  | ✅  | ✅ |
 | auto cnrom pcb         | ✅  | ✅  | ✅  |  ✅ | ✅  | ✅  | ✅ |  ✅ |  ✅ | N/A |
 | auto eric              |     |     |     |     |     |     |     |     |     |     |
 | auto gunter            |     |     |     |     |     |     |     |     |     |     |
@@ -21,7 +21,7 @@
 | cnrom everdrive        |     |     |     |     |     |     |     |     |     |     |
 | mmc3 everdrive         |     |     |     |     |     |     |     |     |     |     |
 | mmc5 everdrive         |     |     |     |     |     |     |     |     |     |     |
-| mmc1 krzysio           |     |     |     |     |     |     |     |     |     |     |
-| cnrom krzysio          |     |     |     |     |     |     |     |     |     |     |
-| mmc3 krzysio           |     |     |     |     |     |     |     |     |     |     |
-| mmc5 krzysio           |     |     |     |     |     |     |     |     |     |     |
+| mmc1 krzysio           | ✅  | ✅  | ✅  | ✅  | ✅  |  ✅ | ✅  |  ✅ | ✅  | ✅ |
+| cnrom krzysio          | ✅  | ✅  | ✅  | ✅  | ✅  | ✅  | ✅  | ✅  | ✅ | ✅ |
+| mmc3 krzysio           | ✅  | ✅  | ✅  | ✅  | ✅  | ✅  | ✅  | ✅  | ✅  | ✅  |
+| mmc5 krzysio           | N/A | N/A | N/A | N/A | N/A | N/A | N/A | N/A | N/A | N/A |
