@@ -4,8 +4,8 @@
 |------------------------|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
 | auto mesen             |     |     |     |     |     |     |     |     |     |     |
 | auto mesen cnrom       |     |     |     |     |     |     |     |     |     |     |
-| auto everdrive         |     |     |     |     |     |     |     |     |     |     |
-| auto everdrive cnrom   |     |     |     |     |     |     |     |     |     |     |
+| auto everdrive         | ✅  | ✅  | ✅  |  ✅ | ✅  | ✅  | ✅  | ✅  | ✅  | ✅ |
+| auto everdrive cnrom   | ✅  | ✅  |  ✅ | ✅  | ✅  | ✅  | ✅  | ✅  | ✅  | ✅ |
 | auto krzysio           |     |     |     |     |     |     |     |     |     |     |
 | auto krzysio cnrom     |     |     |     |     |     |     |     |     |     |     |
 | auto cnrom pcb         |     |     |     |     |     |     |     |     |     | N/A |
