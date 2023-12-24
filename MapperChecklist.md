@@ -17,10 +17,10 @@
 | cnrom mesen            |     |     |     |     |     |     |     |     |     |     |
 | mmc3 mesen             |     |     |     |     |     |     |     |     |     |     |
 | mmc5 mesen             |     |     |     |     |     |     |     |     |     |     |
-| mmc1 everdrive         |     |     |     |     |     |     |     |     |     |     |
-| cnrom everdrive        |     |     |     |     |     |     |     |     |     |     |
-| mmc3 everdrive         |     |     |     |     |     |     |     |     |     |     |
-| mmc5 everdrive         |     |     |     |     |     |     |     |     |     |     |
+| mmc1 everdrive         | ✅  | ✅  | ✅  | ✅  | ✅  | ✅  | ✅  | ✅  | ✅  | ✅  |
+| cnrom everdrive        |  ✅ | ✅  | ✅  | ✅  | ✅  | ✅  | ✅  |  ✅ | ✅ | ✅  |
+| mmc3 everdrive         | ✅  | ✅  | ✅  | ✅  |✅   | ✅  | ✅  |  ✅ | ✅ | ✅  |
+| mmc5 everdrive         | ✅  | ✅  | ✅  | ✅  | ✅  |  ✅ |  ✅ | ✅  | ✅  | ✅  |
 | mmc1 krzysio           | ✅  | ✅  | ✅  | ✅  | ✅  |  ✅ | ✅  |  ✅ | ✅  | ✅ |
 | cnrom krzysio          | ✅  | ✅  | ✅  | ✅  | ✅  | ✅  | ✅  | ✅  | ✅ | ✅ |
 | mmc3 krzysio           | ✅  | ✅  | ✅  | ✅  | ✅  | ✅  | ✅  | ✅  | ✅  | ✅  |
