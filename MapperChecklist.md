@@ -2,8 +2,8 @@
 
 | Mapper                 |Menu |Level|Game |Rcket| DKS |Score|Legal|Reset|TpRll|Save |
 |------------------------|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
-| auto mesen             |     |     |     |     |     |     |     |     |     |     |
-| auto mesen cnrom       |     |     |     |     |     |     |     |     |     |     |
+| auto mesen             | ✅  |  ✅ | ✅  | ✅  | ✅  | ✅  | ✅  | ✅  | ✅  | ✅ |
+| auto mesen cnrom       | ✅  |  ✅ | ✅  | ✅  | ✅  | ✅  | ✅  | ✅  | ✅  | ✅ |
 | auto everdrive         | ✅  | ✅  | ✅  |  ✅ | ✅  | ✅  | ✅  | ✅  | ✅  | ✅ |
 | auto everdrive cnrom   | ✅  | ✅  |  ✅ | ✅  | ✅  | ✅  | ✅  | ✅  | ✅  | ✅ |
 | auto krzysio           | ✅  | ✅  | ✅  | ✅  | ✅  | ✅  | ✅  | ✅  | ✅  | ✅ |
