@@ -8,7 +8,10 @@ tmpZ: .res 1 ;  $0005
 tmpBulkCopyToPpuReturnAddr: .res 2 ;  $0006 ; 2 bytes
 binScore: .res 4 ;  $8 ; 4 bytes binary
 score: .res 4 ;  $C ; 4 bytes BCD
-    .res 7
+nmiReturnAddr: .res 1 ; $0010
+crashFlag: .res 1 ; $0011
+cycleCount: .res 2 ; $0012 ; 2 bytes
+    .res 3
 
 rng_seed: .res 2 ; $0017
 spawnID: .res 1 ; $0019
