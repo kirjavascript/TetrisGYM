@@ -6,7 +6,7 @@ const { spawnSync } = require('child_process');
 console.log('TetrisGYM buildscript');
 console.time('build');
 
-const mappers = [0, 1, 3, 4, 5];
+const mappers = [255, 1, 3, 4, 5];
 
 // options handling
 
@@ -43,7 +43,7 @@ console.log(`using ${nativeCC65 ? 'system' : 'wasm'} ca65/ld65`);
 
 // mapper options
 
-const mapper = args.find((d) => d.startsWith('-m'))?.slice(2) ?? 0;
+const mapper = args.find((d) => d.startsWith('-m'))?.slice(2) ?? 255;
 
 if (!mappers.includes(+mapper)) {
     console.error(

@@ -12,8 +12,8 @@
 INES_MIRROR = 0 ; 0 = horizontal mirroring, 1 = vertical mirroring (ignored in MMC1)
 INES_SRAM   = 1 ; 1 = battery backed SRAM at $6000-7FFF
 
-; Override INES_MAPPER for mode 0 (auto detect)
-.if INES_MAPPER = 0
+; Override INES_MAPPER for mode 255 (auto detect)
+.if INES_MAPPER = 255
     .if CNROM_OVERRIDE
     _INES_MAPPER = 3 ; Test CNROM on Emulator/Flashcart
     .else

@@ -55,7 +55,7 @@ mainLoop:
 .include "util/menuthrottle.asm"
 .include "util/modetext.asm"
 .include "util/mapper.asm"
-.if INES_MAPPER = 0
+.if INES_MAPPER = 255
 .include "util/autodetect.asm"
 .endif
 

@@ -30,7 +30,6 @@
 .endmacro
 
 _setMMC1Control:
-.if INES_MAPPER = 0 .or INES_MAPPER = 1
         RESET_MMC1
         sta MMC1_Control
         lsr a
@@ -41,7 +40,6 @@ _setMMC1Control:
         sta MMC1_Control
         lsr a
         sta MMC1_Control
-.endif
         rts
 
 changeCHRBanks:
@@ -49,7 +47,7 @@ changeCHRBanks:
         sta     generalCounter
 
 ; autodetect
-.if INES_MAPPER = 0
+.if INES_MAPPER = 255
         ldx     mapperId
         beq     @cnrom
         changeCHRBanksMMC1
@@ -112,7 +110,7 @@ changeCHRBanks:
 
 setHorizontalMirroring:
 ; autodetect
-.if INES_MAPPER = 0
+.if INES_MAPPER = 255
         lda mapperId
         beq @cnrom
         lda #%10011
@@ -140,10 +138,10 @@ setHorizontalMirroring:
         rts
 
 setVerticalMirroring:
-; Unused except during mapper detect for INES_MAPPER 0 
+; Unused except during mapper detect for INES_MAPPER 255
 
 ; autodetect
-.if INES_MAPPER = 0
+.if INES_MAPPER = 255
         lda mapperId
         beq @cnrom
         lda #%10010
@@ -170,7 +168,7 @@ setVerticalMirroring:
 .endif
         rts
 
-.if INES_MAPPER = 0 .or INES_MAPPER = 3
+.if INES_MAPPER = 3 .or INES_MAPPER = 255
 ; bus conflict workaround
 cnromBanks:
         .byte $00,$01

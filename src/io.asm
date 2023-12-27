@@ -62,7 +62,7 @@ MMC5_CHR_BANK0 := $5123 ; 4kb page index
 MMC5_CHR_BANK1 := $5127
 
 .macro RESET_MMC1
-.if INES_MAPPER = 0 .or INES_MAPPER = 1
+.if INES_MAPPER = 1 .or INES_MAPPER = 255
 :       inc :-  ; increments inc ($aa), writing a negative value to prg
                 ; https://www.nesdev.org/wiki/MMC1#Reset
 .endif

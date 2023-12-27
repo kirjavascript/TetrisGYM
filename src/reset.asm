@@ -53,7 +53,7 @@ reset:  cld
 
 mapperInit:
 ; autodetect
-.if INES_MAPPER = 0
+.if INES_MAPPER = 255
         setMMC1PRG ; initialize mmc1 just in case
         ; cnrom can pass one of these tests but not both.
         ; Start with the one it's supposed to fail.
