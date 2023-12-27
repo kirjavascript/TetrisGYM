@@ -23,7 +23,7 @@
 @loop:
         dex
         sta menuRAM, x
-        cpx #0
+        ; cpx #0 ; dex sets z flag
         bne @loop
 
         ; default pace to A

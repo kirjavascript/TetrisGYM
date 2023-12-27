@@ -46,7 +46,7 @@ render_mode_play_and_demo:
         cmp #MODE_TYPEB
         beq @renderLevelTypeB
 
-        lda practiseType
+        ; lda practiseType ; accumulator is still practiseType
         cmp #MODE_CHECKERBOARD
         beq @renderLevelCheckerboard
 

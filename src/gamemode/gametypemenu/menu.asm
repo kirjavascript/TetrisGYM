@@ -210,7 +210,7 @@ seedControls:
         clc
         tay
         and #$F
-        cmp #$0
+        ; cmp #$0 ; and sets z flag
         bne @noWrapDown
         tya
         and #$F0
@@ -259,7 +259,7 @@ menuConfigControls:
         beq @skipLeftConfig
         ; check if zero
         lda menuVars, x
-        cmp #0
+        ; cmp #0 ; lda sets z flag
         beq @skipLeftConfig
         ; dec value
         dec menuVars, x

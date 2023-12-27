@@ -1,7 +1,7 @@
 advanceGameTap:
         jsr clearPlayfield
         ldx tapModifier
-        cpx #0
+        ; cpx #0 ; ldx sets z flag
         beq @skip ; skip if zero
         ldy #$BF ; left side
         cpx #$11

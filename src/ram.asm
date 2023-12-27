@@ -39,7 +39,7 @@ lines: .res 2 ; $0050
 rowY: .res 1 ; $0052
 linesBCDHigh: .res 1 ; $53
 linesTileQueue: .res 1 ; $54
-currentPiece_copy: .res 1 ; $55 ; used in floor code checking
+    .res 1
 completedLines: .res 1 ; $0056
 lineIndex: .res 1 ; $0057                        ; Iteration count of playState_checkForCompletedRows
 startHeight: .res 1 ; $0058
