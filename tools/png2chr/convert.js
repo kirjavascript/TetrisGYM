@@ -1,8 +1,7 @@
 const { PNG } = require('./png.js');
-const fs = require('fs');
 
-function png2chr(inFile, outFile) {
-    const png = PNG.sync.read(fs.readFileSync(inFile));
+module.exports = function png2chr(file) {
+    const png = PNG.sync.read(file);
 
     const palettes = png.palette.map((arr) => String(arr));
 
@@ -67,21 +66,5 @@ function png2chr(inFile, outFile) {
         }
     }
 
-    fs.writeFileSync(outFile, Uint8Array.from(bytes));
+    return Uint8Array.from(bytes);
 }
-
-const [, , param0, param1] = process.argv;
-
-if (param0 && param1) {
-    // convert one file
-    png2chr(param0, param1);
-} else if (param0) {
-    // convert all PNG in a directory
-    fs.readdirSync(param0)
-        .filter(name => name.endsWith('.png'))
-        .forEach(name => {
-            png2chr(param0 + '/' + name, param0 + '/' + name.replace('.png', '.chr'));
-        });
-}
-
-module.exports = png2chr;

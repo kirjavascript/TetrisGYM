@@ -47,7 +47,7 @@ playState_checkStartGameOver:
 
         lda #$80
         ldx palFlag
-        cpx #0
+        ; cpx #0 ; ldx sets z flag
         beq @notPAL
         lda #$66
 @notPAL:

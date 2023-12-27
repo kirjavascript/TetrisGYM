@@ -2,7 +2,6 @@ const {
     writeRLE,
     drawTiles,
     flatLookup,
-    drawRect,
     drawAttrs,
 } = require('./nametables');
 

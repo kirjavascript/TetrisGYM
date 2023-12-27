@@ -14,6 +14,7 @@
 * Added hidden score option
 * Added marathon mode
 * 0001 seeds are ignored
+* Floor no longer gobbled up by top line clear
 * Added low stack mode
 
 ## [v5 tournament]

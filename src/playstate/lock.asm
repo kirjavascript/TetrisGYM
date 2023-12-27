@@ -42,7 +42,6 @@ playState_lockTetrimino:
         adc tetriminoX
         sta generalCounter
         lda currentPiece
-        sta currentPiece_copy
         asl a
         asl a
         sta generalCounter2

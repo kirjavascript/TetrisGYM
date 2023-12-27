@@ -47,10 +47,10 @@ function drawRect(buffer, x, y, w, h, offset) {
 
 function drawAttrs(buffer, attrs) {
     const palettes = p => p.trim().match(/.+\n.+$/gm)
-        .flatMap(line=>(
-            [t,b]=line.split('\n'),
-            t.trim().match(r=/../g).map((d,i)=>d+b.trim().match(r)[i])
-        ))
+        .flatMap(line=>{
+            const [t,b]=line.split('\n');
+            return t.trim().match(r=/../g).map((d,i)=>d+b.trim().match(r)[i])
+        })
         .map(d=>+('0b'+[...d].reverse().map(d=>(+d).toString(2).padStart(2,0)).join``));
 
     [

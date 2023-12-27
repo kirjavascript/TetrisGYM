@@ -178,7 +178,7 @@ addPointsRaw:
         cmp #MODE_TAPQTY
         bne @notTapQuantity
         lda completedLines
-        cmp #0
+        ; cmp #0 ; lda sets z flag
         bne @continueStreak
         jsr clearPoints
         lda outOfDateRenderFlags
