@@ -1,4 +1,4 @@
-cc65 binaries ported to WebAssembly for TetrisGYM
+cc65 binaries built as WebAssembly for TetrisGYM
 
 generated with emscripten 
 
