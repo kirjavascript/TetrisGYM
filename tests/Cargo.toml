@@ -1,0 +1,7 @@
+[package]
+name = "gym-tests"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+rusticnes-core = { git = "https://github.com/zeta0134/rusticnes-core.git", version = "0.2.0" }
