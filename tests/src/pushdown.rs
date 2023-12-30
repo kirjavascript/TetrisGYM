@@ -4,17 +4,20 @@ pub fn test() {
     let mut emu = util::emulator(None);
 
     for pushdown in 2..15 {
-        for score in 24500..25500 {
-            emu.registers.pc = labels::get(".addPushDownPoints");
-            emu.memory.iram_raw[labels::get(".holdDownPoints") as usize] = pushdown;
+        [0..1000, 24500..25500].into_iter().for_each(|range| {
+            for score in range {
+                util::set_score(&mut emu, score);
 
-            util::set_score(&mut emu, score);
-            util::run_to_return(&mut emu, false);
+                emu.registers.pc = labels::get("addPushDownPoints");
+                emu.memory.iram_raw[labels::get("holdDownPoints") as usize] = pushdown;
 
-            let reference = pushdown_impl(pushdown, score as u16) as u32;
+                util::run_to_return(&mut emu, false);
 
-            assert_eq!(reference, util::get_score(&mut emu) - score);
-        }
+                let reference = pushdown_impl(pushdown, score as u16) as u32;
+
+                assert_eq!(reference, util::get_score(&mut emu) - score);
+            }
+        });
     }
 }
 
