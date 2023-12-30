@@ -1,5 +1,26 @@
+use crate::{labels, util};
+
+pub fn test() {
+    let mut emu = util::emulator(None);
+
+    for pushdown in 2..15 {
+        for score in 24500..25500 {
+            emu.registers.pc = labels::get(".addPushDownPoints");
+            emu.memory.iram_raw[labels::get(".holdDownPoints") as usize] = pushdown;
+
+            util::set_score(&mut emu, score);
+            util::run_to_return(&mut emu, false);
+
+            let reference = pushdown_impl(pushdown, score as u16) as u32;
+
+            assert_eq!(reference, util::get_score(&mut emu) - score);
+        }
+    }
+}
+
 // reference implementation - tested against the original game
-fn pushdown(pushdown: u8, score: u16) -> u16 {
+// may seem weird - designed to be translated to assembly
+fn pushdown_impl(pushdown: u8, score: u16) -> u16 {
     let ones = score % 10;
     let hundredths = score % 100;
     let mut newscore = ones as u8 + (pushdown - 1);
@@ -17,15 +38,5 @@ fn pushdown(pushdown: u8, score: u16) -> u16 {
         newscore = nextscore;
     }
 
-    newscore + (score-hundredths) - score
-}
-
-use crate::{ labels, util };
-
-pub fn test() {
-    let mut emu = util::emulator(None);
-
-    emu.registers.pc = labels::get(".addPushDownPoints");
-
-    util::run_to_return(&mut emu);
+    newscore + (score - hundredths) - score
 }
