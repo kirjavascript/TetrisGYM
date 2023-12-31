@@ -33,17 +33,10 @@ nmi:    pha
 .endif
         pla
         tay
-        pla
-        sta tmp1
-        pla
-        sta tmp2
+        tsx
+        lda stack+5,x
+        sta nmiReturnAddr
         pla
         tax
         pla
-        sta nmiReturnAddr
-        pha
-        txa
-        pha
-        ldx tmp1
-        lda tmp2
 irq:    rti
