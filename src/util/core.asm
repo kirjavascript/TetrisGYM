@@ -244,6 +244,12 @@ generateNextPseudorandomNumber:
         inx
         dey
         bne @updateNextByteInSeed
+		lda #$00
+		adc oneThirdPRNG
+		cmp #$03
+		bne @not3
+		lda #$00
+@not3:	sta oneThirdPRNG		
         rts
 
 ; canon is initializeOAM
