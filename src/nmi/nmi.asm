@@ -34,7 +34,7 @@ nmi:    pha
         pla
         tay
         tsx
-        lda stack+5,x
+        lda stack+4,x
         sta nmiReturnAddr
         pla
         tax
