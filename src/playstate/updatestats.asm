@@ -692,7 +692,7 @@ testCrash:
 		bcs @continue
 		lda #$F0
 		sta crashFlag
-		bne @allegroClear
+		bne @crashGraphics
 @continue:
 		cmp #$36
 		bcc @nextSwitch
@@ -700,7 +700,7 @@ testCrash:
 		bcs @nextSwitch
 		lda #$F0
 		sta crashFlag
-		bne @allegroClear
+		bne @crashGraphics
 		
 @nextSwitch:
 		lda switchTable-2,x ; adding cycles to advance to next switch routine
@@ -711,6 +711,15 @@ testCrash:
 @allegroClear:
 		lda #$00
 		sta allegroIndex
+		rts
+@crashGraphics:
+		lda #$00
+		sta allegroIndex
+		lda outOfDateRenderFlags
+		ora #$04
+		sta outOfDateRenderFlags
+		lda #$02
+        sta soundEffectSlot0Init
 		rts
 	
 factorTable:

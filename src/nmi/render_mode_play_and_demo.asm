@@ -90,6 +90,16 @@ render_mode_play_and_demo:
         ; 3 added in float
 
         ; scorecap
+		lda crashFlag
+		cmp #$F0
+		bne @noCrash
+		lda #$20
+		sta PPUADDR
+		lda #$FD
+		sta PPUADDR
+		lda #$D8
+		sta PPUDATA
+@noCrash:		
         lda scoringModifier
         cmp #SCORING_HIDDEN
         bne @notHidden
