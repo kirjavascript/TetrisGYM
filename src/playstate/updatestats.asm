@@ -14,6 +14,9 @@ playState_updateLinesAndStatistics:
         and #$0F
         cmp #$0A
         bmi @noCarry
+		lda crashFlag
+		ora #$04
+		sta crashFlag
         lda lineClearStatsByType,x
         clc
         adc #$06
@@ -56,6 +59,9 @@ incrementLines:
         and #$0F
         cmp #$0A
         bmi checkLevelUp
+		lda crashFlag
+		ora #$01
+		sta crashFlag
         lda lines
         clc
         adc #$06
@@ -67,6 +73,9 @@ incrementLines:
         and #$0F
         sta lines
         inc lines+1
+		lda crashFlag
+		ora #$02
+		sta crashFlag
 
 checkLevelUp:
         jsr calcBCDLinesAndTileQueue
