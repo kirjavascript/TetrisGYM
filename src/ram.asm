@@ -11,9 +11,9 @@ score: .res 4 ;  $C ; 4 bytes BCD
 nmiReturnAddr: .res 1 ; $0010 ; used for crash
 crashFlag: .res 1 ; $0011 ; used for crash
 cycleCount: .res 2 ; $0012 ; 2 bytes ; used for crash
-oneThirdPRNG: .res 1 ; $0013 ; used for crash
-switchTmp1	.res 1
-switchTmp2    .res 1
+oneThirdPRNG: .res 1 ; $0014 ; used for crash
+switchTmp1:	.res 1 ; $0015 ; for switch_s_plus_2a
+switchTmp2: .res 1 ; $0016
 
 rng_seed: .res 2 ; $0017
 spawnID: .res 1 ; $0019
