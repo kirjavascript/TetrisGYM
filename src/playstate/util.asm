@@ -90,6 +90,7 @@ updateMusicSpeed:
         dex
         bne @checkForBlockInRow
         lda allegro
+		sta wasAllegro
         beq @ret
         lda #$00
         sta allegro

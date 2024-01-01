@@ -113,6 +113,9 @@ checkLevelUp:
 
 @nextLevel:
         inc levelNumber
+		lda crashFlag
+		ora #$08
+		sta crashFlag
         lda #$06 ; checked in floor linecap stuff, just below
         sta soundEffectSlot1Init
         lda outOfDateRenderFlags
@@ -198,7 +201,8 @@ addPointsRaw:
         lda #4
         sta completedLines
 @notTapQuantity:
-        lda holdDownPoints
+        jsr testCrash
+		lda holdDownPoints
         cmp #$02
         bmi @noPushDown
         jsr addPushDownPoints
@@ -450,3 +454,268 @@ calcBCDLinesAndTileQueue:
         sta linesTileQueue
 @ret:
         rts
+testCrash:
+		lda #$1C ; setting all cycles which always happen
+		sta cycleCount
+		lda #$6F
+		sta cycleCount+1 ;low byte at +1
+	
+		lda completedLines
+		beq @linesNotCleared
+		ldx #$04 ;setting loop to run 4x
+@clearedLine:
+		lda completedRow-1, x
+		beq @noneThisRow ; adds no cycles if lines not cleared
+		cmp #$0B
+		lda #$00
+		bcc @sub11
+		lda #$02 ;97 cycles if row is above 11
+		clc
+@sub11: adc #$5F ;95 cycles
+		adc cycleCount+1
+		sta cycleCount+1
+		lda cycleCount
+		adc #$00 ; dealing with carry
+		sta cycleCount
+@noneThisRow:
+		dex
+		bne @clearedLine 
+		
+@linesNotCleared:
+		lda displayNextPiece
+		and #BUTTON_SELECT
+		beq @nextOff
+		lda #$8A ; add 394 cycles for nextbox
+		adc cycleCount+1
+		sta cycleCount+1
+		lda cycleCount
+		adc #$01 ; high byte of 18A
+		sta cycleCount
+		
+@nextOff:
+		lda allegroIndex
+		bne @allegro
+		lda #$95 ; 149 in decimal.
+		clc
+		ldx wasAllegro ; FF is no allegro. 00 is allegro.
+		bne @addMusicCycles
+		adc #$26 ;add 38 cycles for disabling allegro
+@addMusicCycles:
+		adc cycleCount+1
+		sta cycleCount+1
+		lda cycleCount
+		adc #$00
+		sta cycleCount
+		bne @linesCycles
+@allegro:
+		sec 
+		sbc #$32 ; subtract 50, allegro index already loaded
+		asl
+		asl
+		asl
+		asl ;multiply by 16
+		tax ; save low byte result
+		lda cycleCount
+		adc #$00 ; add high byte carry
+		sta cycleCount
+		txa
+		adc cycleCount+1
+		sta cycleCount+1
+		lda cycleCount
+		adc #$00 ; add carry again
+		sta cycleCount
+		lda wasAllegro
+		beq @linesCycles ; 00 is allegro
+		lda #$29 ; add 41 cycles for changing to allegro
+		adc cycleCount+1
+		sta cycleCount+1
+		lda cycleCount
+		adc #$00
+		sta cycleCount
+		
+@linesCycles:
+
+		lda #$00
+		sta allegroIndex ;will be reusing to store small amounts of cycles and add at the end.
+	
+		lda newlyPressedButtons_player1
+		and #BUTTON_SELECT
+		beq @digit1
+		lda #$07 ; add 7 cycles for select
+		adc allegroIndex
+		sta allegroIndex
+@digit1:		
+		lda crashFlag
+		and #$01
+		beq @digit2
+		lda #$4F ; add 79 cycles for 10s place
+		adc allegroIndex
+		sta allegroIndex
+@digit2:
+		lda crashFlag
+		and #$02
+		beq @clearStats
+		lda #$0C ; add 12 cycles for 100s place
+		adc allegroIndex
+		sta allegroIndex
+@clearStats:
+		lda crashFlag
+		and #$04
+		beq @newLevel
+		lda #$0B ; 11 cycles for clearcount 10s place
+		adc allegroIndex
+		sta allegroIndex
+@newLevel:
+		lda crashFlag
+		and #$08
+		beq @pushDown
+		lda #$12 ; 18 cycles for levelup
+		adc allegroIndex
+		sta allegroIndex
+@pushDown:
+		lda holdDownPoints
+		cmp #$02
+		bcc @single
+		cmp #$08
+		bcs @over7
+		lda #$09 ; 1-6 costs 9 
+		adc allegroIndex
+		sta allegroIndex
+@over7: 
+		clc
+		lda #$5A ; add 90 cycles for pushdown
+		adc allegroIndex
+		sta allegroIndex
+		bcc @scoreCycles
+@single: 
+		lda completedLines
+		cmp #$01
+		bne @notsingle
+		lda #$52 ; 53 for singles, carry is set
+		adc allegroIndex
+		sta allegroIndex
+@notsingle:
+		bcc @scoreCycles
+		lda #$41 ; 42 for clears over a single, carry is set
+		adc allegroIndex
+		sta allegroIndex
+@scoreCycles:
+		ldx completedLines
+		beq @not0
+		inc cycleCount ; no cleared lines is +737, adding 256 twice and rest is covered by sumTable
+		inc cycleCount		
+@not0:	lda sumTable, x ; constant amount of cycles added for each line clear
+		clc
+		adc cycleCount+1
+		sta cycleCount+1
+		lda cycleCount
+		adc #$00
+		sta cycleCount
+		lda factorTable,x ; linear amount of cycles added for each line clear
+		sta factorB24
+		lda levelNumber 
+		sta factorA24
+		lda #$00
+		sta factorA24+1 ;overkill 24-bit multiplication, both factors are 8 bit.
+		sta factorA24+2
+		sta factorB24+1
+		sta factorB24+2
+		sta crashFlag ; done with flags and can now reuse variable
+		jsr unsigned_mul24 ; result in product24
+		clc
+		lda product24
+		adc cycleCount+1
+		sta cycleCount+1
+		lda product24+1
+		adc cycleCount
+		sta cycleCount
+		lda completedLines
+		cmp #$04
+		bne @currentPieceCheck
+		lda frameCounter
+		and #$07 ; check if frame counter is 0%8
+		bne @currentPieceCheck
+		lda #$04 ; would be 5, but carry is set by cmp #$04
+		adc allegroIndex
+		sta allegroIndex
+@currentPieceCheck:
+		lda currentPiece
+		cmp #$08
+		bne @not8
+		clc
+		adc allegroIndex
+		sta allegroIndex
+@not8:	bcc @randomFactors
+		lda #$0B ; would be 12 but carry is set
+		adc allegroIndex
+		sta allegroIndex
+@randomFactors:
+		lda oneThirdPRNG ; RNG for which cycle of the last instruction the game returns to
+		adc allegroIndex
+		sta allegroIndex
+		lda frameCounter
+		and #$01 ; RNG for frame length
+		adc allegroIndex
+		sta allegroIndex
+		lda rng_seed ; RNG for RNG
+		asl
+		bcc @newBit0
+		inc allegroIndex
+@newBit0:
+		lda nmiReturnAddr
+		cmp <updateAudioWaitForNmiAndResetOamStaging+10
+		beq @returnLate ; RNG for which instruction returned to
+		lda #$03
+		clc
+		adc allegroIndex
+		sta allegroIndex
+@returnLate:
+		lda rng_seed+1 ; RNG for OAMDMA
+		lsr
+		bcc @noDMA
+		inc allegroIndex
+@noDMA:	
+		ldx #$08
+@loop:	lda cycleCount ; adding stockpiled
+		clc
+		adc allegroIndex
+		sta cycleCount+1
+		lda cycleCount
+		adc #$00
+		sta cycleCount
+;crash should occur on cycle count results 29734-29739, 29745-29763 = $7426-742B, $7431-7443
+		cmp #$74 ;high byte of cycle count is already loaded
+		bne @nextSwitch
+		lda cycleCount+1
+		cmp #$26 ; minimum crash
+		bcc @nextSwitch
+		cmp #$2C ; gap
+		bcs @continue
+		lda #$FF
+		sta crashFlag
+		bne @allegroClear
+@continue:
+		cmp #$31
+		bcc @nextSwitch
+		cmp #$44
+		bcs @nextSwitch
+		lda $FF
+		sta crashFlag
+		
+@nextSwitch:
+		lda switchTable-1,x ; adding cycles to advance to next switch routine
+		sta allegroIndex
+		dex 
+		bne @loop
+		
+@allegroClear:
+		lda #$00
+		sta allegroIndex
+		rts
+	
+factorTable:
+	.byte $53, $88, $7D, $7D, $7D
+sumTable:
+	.byte $E1, $1C, $38, $54, $80 ; tetris is 4*28+16 = 128
+switchTable:
+	.byte $3C, $77, $3C, $65, $3C, $66, $3C;60 119 60 101 60 102 60 gets read in reverse
