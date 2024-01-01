@@ -469,7 +469,7 @@ testCrash:
 		cmp #$0B
 		lda #$00
 		bcc @sub11
-		lda #$02 ;97 cycles if row is above 11
+		lda #$02 ;97 cycles if row is below 11; higher numbers are lower on the board
 		clc
 @sub11: adc #$5F ;95 cycles
 		adc cycleCount+1
@@ -483,8 +483,7 @@ testCrash:
 		
 @linesNotCleared:
 		lda displayNextPiece
-		and #BUTTON_SELECT
-		beq @nextOff
+		bne @nextOff
 		lda #$8A ; add 394 cycles for nextbox
 		adc cycleCount+1
 		sta cycleCount+1
@@ -497,8 +496,8 @@ testCrash:
 		bne @allegro
 		lda #$95 ; 149 in decimal.
 		clc
-		ldx wasAllegro ; FF is no allegro. 00 is allegro.
-		bne @addMusicCycles
+		ldx wasAllegro ; FF is allegro. 00 is no allegro.
+		beq @addMusicCycles
 		adc #$26 ;add 38 cycles for disabling allegro
 @addMusicCycles:
 		adc cycleCount+1
@@ -525,7 +524,7 @@ testCrash:
 		adc #$00 ; add carry again
 		sta cycleCount
 		lda wasAllegro
-		beq @linesCycles ; 00 is allegro
+		bne @linesCycles ; FF is allegro
 		lda #$29 ; add 41 cycles for changing to allegro
 		adc cycleCount+1
 		sta cycleCount+1
@@ -591,17 +590,17 @@ testCrash:
 		lda completedLines
 		cmp #$01
 		bne @notsingle
-		lda #$52 ; 53 for singles, carry is set
+		lda #$34 ; 53 for singles, carry is set
 		adc allegroIndex
 		sta allegroIndex
 @notsingle:
 		bcc @scoreCycles
-		lda #$41 ; 42 for clears over a single, carry is set
+		lda #$29 ; 42 for clears over a single, carry is set
 		adc allegroIndex
 		sta allegroIndex
 @scoreCycles:
 		ldx completedLines
-		beq @not0
+		bne @not0
 		inc cycleCount ; no cleared lines is +737, adding 256 twice and rest is covered by sumTable
 		inc cycleCount		
 @not0:	lda sumTable, x ; constant amount of cycles added for each line clear
@@ -663,7 +662,7 @@ testCrash:
 		inc allegroIndex
 @newBit0:
 		lda nmiReturnAddr
-		cmp <updateAudioWaitForNmiAndResetOamStaging+10
+		cmp #<updateAudioWaitForNmiAndResetOamStaging+10
 		beq @returnLate ; RNG for which instruction returned to
 		lda #$03
 		clc
@@ -676,34 +675,35 @@ testCrash:
 		inc allegroIndex
 @noDMA:	
 		ldx #$08
-@loop:	lda cycleCount ; adding stockpiled
+@loop:	lda cycleCount+1 ; adding stockpiled
 		clc
 		adc allegroIndex
 		sta cycleCount+1
 		lda cycleCount
 		adc #$00
 		sta cycleCount
-;crash should occur on cycle count results 29734-29739, 29745-29763 = $7426-742B, $7431-7443
+;crash should occur on cycle count results 29739-29744, 29750-29768 = $742B-7430, $7436-7448
 		cmp #$74 ;high byte of cycle count is already loaded
 		bne @nextSwitch
 		lda cycleCount+1
-		cmp #$26 ; minimum crash
+		cmp #$2B ; minimum crash
 		bcc @nextSwitch
-		cmp #$2C ; gap
+		cmp #$31 ; gap
 		bcs @continue
-		lda #$FF
+		lda #$F0
 		sta crashFlag
 		bne @allegroClear
 @continue:
-		cmp #$31
+		cmp #$36
 		bcc @nextSwitch
-		cmp #$44
+		cmp #$49
 		bcs @nextSwitch
-		lda $FF
+		lda #$F0
 		sta crashFlag
+		bne @allegroClear
 		
 @nextSwitch:
-		lda switchTable-1,x ; adding cycles to advance to next switch routine
+		lda switchTable-2,x ; adding cycles to advance to next switch routine
 		sta allegroIndex
 		dex 
 		bne @loop
