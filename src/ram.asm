@@ -20,7 +20,9 @@ spawnID: .res 1 ; $0019
 spawnCount: .res 1 ; $001A
 pointerAddr: .res 2 ; $001B ; used in debug, harddrop
 pointerAddrB: .res 2 ; $001D ; used in harddrop
-    .res $14
+allegroIndex: .res 1 ; $001F for crash
+wasAllegro: .res 1 ; $0020 for crash
+    .res $12
 
 verticalBlankingInterval: .res 1 ; $0033
 set_seed: .res 3 ; $0034 ; rng_seed, rng_seed+1, spawnCount

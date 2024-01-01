@@ -99,7 +99,9 @@ updateMusicSpeed:
         jmp @ret
 
 @foundBlockInRow:
+		sty allegroIndex
         lda allegro
+		sta wasAllegro
         bne @ret
         lda #$FF
         sta allegro
