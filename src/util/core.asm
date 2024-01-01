@@ -286,16 +286,16 @@ switch_s_plus_2a:
         tay
         iny
         pla
-        sta tmp1
+        sta switchTmp1
         pla
-        sta tmp2
-        lda (tmp1),y
+        sta switchTmp2
+        lda (switchTmp1),y
         tax
         iny
-        lda (tmp1),y
-        sta tmp2
-        stx tmp1
-        jmp (tmp1)
+        lda (switchTmp1),y
+        sta switchTmp2
+        stx switchTmp1
+        jmp (switchTmp1)
 
         sei
         RESET_MMC1

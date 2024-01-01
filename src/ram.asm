@@ -12,7 +12,8 @@ nmiReturnAddr: .res 1 ; $0010 ; used for crash
 crashFlag: .res 1 ; $0011 ; used for crash
 cycleCount: .res 2 ; $0012 ; 2 bytes ; used for crash
 oneThirdPRNG: .res 1 ; $0013 ; used for crash
-    .res 2
+switchTmp1	.res 1
+switchTmp2    .res 1
 
 rng_seed: .res 2 ; $0017
 spawnID: .res 1 ; $0019
