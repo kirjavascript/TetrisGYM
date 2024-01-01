@@ -90,9 +90,13 @@ render_mode_play_and_demo:
         ; 3 added in float
 
         ; scorecap
+		lda crashMode
+		cmp #CRASH_SHOW
+		bne @noCrash
 		lda crashFlag
 		cmp #$F0
 		bne @noCrash
+		
 		lda #$20
 		sta PPUADDR
 		lda #$FD

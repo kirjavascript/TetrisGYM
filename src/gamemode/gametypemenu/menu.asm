@@ -487,6 +487,9 @@ menuYTmp := tmp2
         lda menuCounter
         cmp #MODE_SCORE_DISPLAY
         beq @renderScoreName
+		
+        cmp #MODE_CRASH
+        beq @renderCrashMode
 
         ldx oamStagingLength
 
@@ -540,6 +543,28 @@ menuYTmp := tmp2
         lda scoringModifier
         sta spriteIndexInOamContentLookup
         lda #(MODE_SCORE_DISPLAY*8) + MENU_SPRITE_Y_BASE + 1
+        sbc menuScrollY
+        sta spriteYOffset
+        lda #$e9
+        sta spriteXOffset
+        jsr stringSpriteAlignRight
+        jmp @loopNext
+
+@renderCrashMode:
+		lda menuScrollY
+		cmp #$58
+		bcs @doRender
+		jmp @loopNext
+@doRender:
+        lda crashMode
+		cmp #CRASH_OFF
+		bne @notOff
+		lda #$F1
+@notOff:
+		adc #$16
+		sta spriteIndexInOamContentLookup
+        lda #(MODE_CRASH*8)-256 + MENU_SPRITE_Y_BASE + 1
+		sec
         sbc menuScrollY
         sta spriteYOffset
         lda #$e9

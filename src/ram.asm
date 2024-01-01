@@ -22,7 +22,8 @@ pointerAddr: .res 2 ; $001B ; used in debug, harddrop
 pointerAddrB: .res 2 ; $001D ; used in harddrop
 allegroIndex: .res 1 ; $001F for crash
 wasAllegro: .res 1 ; $0020 for crash
-    .res $12
+startParity: .res 1 ; $0021 for crash
+    .res $11
 
 verticalBlankingInterval: .res 1 ; $0033
 set_seed: .res 3 ; $0034 ; rng_seed, rng_seed+1, spawnCount
@@ -342,5 +343,6 @@ linecapFlag: .res 1
 dasOnlyFlag: .res 1
 qualFlag: .res 1
 palFlag: .res 1
+crashMode: .res 1
 
 ; ... $7FF

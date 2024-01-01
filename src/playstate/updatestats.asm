@@ -654,16 +654,17 @@ testCrash:
 		sta allegroIndex
 		lda frameCounter
 		and #$01 ; RNG for frame length
+		ora startParity ; set to 0 or 1 at start of game, so result isn't always 0
 		adc allegroIndex
 		sta allegroIndex
-		lda rng_seed ; RNG for RNG
+		lda rng_seed ; checking whether PRNG had extra cycle
 		asl
 		bcc @newBit0
 		inc allegroIndex
 @newBit0:
 		lda nmiReturnAddr
 		cmp #<updateAudioWaitForNmiAndResetOamStaging+10
-		beq @returnLate ; RNG for which instruction returned to
+		beq @returnLate ; checking which instruction returned to
 		lda #$03
 		clc
 		adc allegroIndex
@@ -715,13 +716,31 @@ testCrash:
 @crashGraphics:
 		lda #$00
 		sta allegroIndex
+		lda crashMode
+		bne @otherMode
 		lda outOfDateRenderFlags
 		ora #$04
 		sta outOfDateRenderFlags
 		lda #$02
         sta soundEffectSlot0Init
 		rts
-	
+@otherMode:
+		cmp #CRASH_CRASH
+		bcc @topout
+		bne @allegroClear
+		.byte 02
+@topout:
+		lda outOfDateRenderFlags ; Flag needed to reveal hidden score
+        ora #$04
+        sta outOfDateRenderFlags
+        lda #$02
+        sta soundEffectSlot0Init
+        lda #$0A ; playState_checkStartGameOver
+        sta playState
+        lda #$F0
+        sta curtainRow
+        jsr updateAudio2
+		rts
 factorTable:
 	.byte $53, $88, $7D, $7D, $7D
 sumTable:
