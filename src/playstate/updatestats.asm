@@ -53,15 +53,17 @@ playState_updateLinesAndStatistics:
 @notTypeB:
 
         ldx completedLines
+		lda lines
+		sta lines_old
+		lda lines+1
+		sta lines_old+1
 incrementLines:
         inc lines
         lda lines
         and #$0F
         cmp #$0A
         bmi checkLevelUp
-		lda crashFlag
-		ora #$01
-		sta crashFlag
+		inc crashFlag
         lda lines
         clc
         adc #$06
@@ -112,6 +114,8 @@ checkLevelUp:
         bpl @lineLoop
 
 @nextLevel:
+		lda levelNumber
+		sta level_old
         inc levelNumber
 		lda crashFlag
 		ora #$08
@@ -688,6 +692,11 @@ testCrash:
 		adc #$00
 		sta cycleCount
 ;crash should occur on cycle count results 29739-29744, 29750-29768 = $742B-7430, $7436-7448
+;confettiA should occur on cycle count when switch1 = 29768+75 = 29843-30192
+;level lag is +195 from line lag
+;level lag to RTS is +70 rts +6 jsr +6 +41 to beginning of confettiA = 123 = 30315+ line lag
+;line lag = 30510+
+;confettiB = 30765-31193
 		cmp #$74 ;high byte of cycle count is already loaded
 		bne @nextSwitch
 		lda cycleCount+1
@@ -697,7 +706,7 @@ testCrash:
 		bcs @continue
 		lda #$F0
 		sta crashFlag
-		bne @crashGraphics
+		jmp @crashGraphics
 @continue:
 		cmp #$36
 		bcc @nextSwitch
@@ -705,18 +714,96 @@ testCrash:
 		bcs @nextSwitch
 		lda #$F0
 		sta crashFlag
-		bne @crashGraphics
+		jmp @crashGraphics
 		
 @nextSwitch:
 		lda switchTable-2,x ; adding cycles to advance to next switch routine
 		sta allegroIndex
 		dex 
-		bne @loop
-		
+		bne @loop		
+		;562 has been added to the cycle count
+		;confettiA at 30405-30754 76C5-7822
+		lda displayNextPiece
+		beq @nextOn
+		lda cycleCount+1 ; add 394 cycles for nextbox if not added earlier
+		adc #$8A
+		sta cycleCount+1
+		lda cycleCount
+		adc #$01 ; high byte of 18A
+		sta cycleCount
+		bne @nextCheck
+@nextOn:		
+		lda cycleCount
+		cmp #$76
+		bcc @allegroClear
+		bne @not76
+		lda cycleCount+1
+		cmp #$C5
+		bcc @allegroClear
+		bcs @confettiA
+@not76: cmp #$78
+		bcc @confettiA
+		bne @nextCheck
+		lda cycleCount+1
+		cmp #$23
+		bcs @nextCheck
+@confettiA:
+		lda #$E0
+		sta crashFlag
+		jmp confettiHandler
+@nextCheck:
+		;levellag at 30877 789D
+		lda cycleCount
+		cmp #$78
+		bcc @allegroClear
+		bne @levelLag
+		lda cycleCount+1
+		cmp #$9D
+		bcc @allegroClear
+@levelLag:
+		lda #$01
+		sta lagFlag
+		;linelag at 31072 7960
+		lda cycleCount
+		cmp #$79
+		bcc @allegroClear
+		bne @lineLag
+		lda cycleCount+1
+		cmp #$60
+		bcc @allegroClear
+@lineLag:
+		lda #$03
+		sta lagFlag
+		;confettiB at 31327-31755 7A5F-7C0B
+		lda cycleCount
+		cmp #$7A
+		bcc @allegroClear
+		bne @not7A
+		lda cycleCount+1
+		cmp #$5F
+		bcc @allegroClear
+		bcs @confettiB
+@not7A: cmp #$7C
+		bcc @confettiB
+		bne @allegroClear
+		lda cycleCount+1
+		cmp #$0C
+		bcs @allegroClear
+@confettiB:
+		lda #$D0
+		sta crashFlag
+		jmp confettiHandler
 @allegroClear:
 		lda #$00
 		sta allegroIndex
-		rts
+		lda lagFlag
+		beq @noLag
+		lda #$00
+		sta verticalBlankingInterval
+@checkForNmi:
+        lda verticalBlankingInterval
+        beq @checkForNmi
+@noLag:	rts
 @crashGraphics:
 		lda #$00
 		sta allegroIndex
@@ -743,3 +830,38 @@ sumTable:
 	.byte $E1, $1C, $38, $54, $80 ; tetris is 4*28+16 = 128
 switchTable:
 	.byte $3C, $77, $3C, $65, $3C, $66, $3C;60 119 60 101 60 102 60 gets read in reverse
+confettiHandler:
+		lda crashFlag ;E0 = confetti exits if [framecounter = 255 && controller != BDLR] or controller = AS
+		cmp #$E0
+		bne @infiniteConfetti
+		lda heldButtons_player1
+		and #$A0 ; A, Select
+		bne @endConfetti
+		lda frameCounter
+		cmp #$FF
+		bne @drawConfetti
+		lda heldButtons_player1
+		and #$47 ; B, Down, Left, Right
+		beq @endConfetti
+@drawConfetti:
+		sta spriteYOffset
+		lda #$A8
+		sta spriteXOffset
+		lda #$19
+		sta spriteIndexInOamContentLookup
+		jsr stringSpriteAlignRight
+		lda #$00
+		sta verticalBlankingInterval
+@checkForNmi:
+        lda verticalBlankingInterval
+        beq @checkForNmi
+		jmp confettiHandler
+@infiniteConfetti:
+		lda heldButtons_player1
+		adc #$80
+		cmp #$80
+		beq @drawConfetti
+@endConfetti:
+		lda #$00
+	    sta allegroIndex
+        rts

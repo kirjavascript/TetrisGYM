@@ -19,14 +19,20 @@ render_mode_play_and_demo:
         lda outOfDateRenderFlags
         and #$01
         beq @renderLevel
-
+		
+		ldx #lines_old-lines
+		lda lagFlag
+		and #$02
+		bne @doLinesRender
+		ldx #$00
+@doLinesRender:
         lda #$20
         sta PPUADDR
         lda #$73
         sta PPUADDR
-        lda lines+1
+        lda lines+1,x
         sta PPUDATA
-        lda lines
+        lda lines,x
         jsr twoDigsToPPU
         jmp @doneRenderingLines
 
@@ -54,7 +60,13 @@ render_mode_play_and_demo:
         sta PPUADDR
         lda #$B9
         sta PPUADDR
-        lda levelNumber
+		ldx #level_old-levelNumber
+		lda lagFlag
+		and #$01
+		bne @doLevelRender
+		ldx #$00
+@doLevelRender:
+        lda levelNumber,x
         jsr renderByteBCD
         jmp @renderLevelEnd
 
@@ -300,7 +312,13 @@ rightColumns:
         .byte   $05,$06,$07,$08,$09
 ; Set Background palette 2 and Sprite palette 2
 updatePaletteForLevel:
-        lda levelNumber
+		ldx #level_old-levelNumber
+		lda lagFlag
+		and #$01
+		bne @loadLevelNumber
+		ldx #$00
+@loadLevelNumber:
+        lda levelNumber,x
 @mod10: cmp #$0A
         bmi @copyPalettes ; bcc fixes the colour bug
         sec

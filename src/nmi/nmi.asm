@@ -27,6 +27,8 @@ nmi:    pha
         lda #$01
         sta verticalBlankingInterval
         jsr pollControllerButtons
+		lda #$00
+		sta lagFlag ; clear flag after lag frame achieved
 .if KEYBOARD
 ; Read Family BASIC Keyboard
         jsr pollKeyboard

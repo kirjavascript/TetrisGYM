@@ -23,7 +23,8 @@ pointerAddrB: .res 2 ; $001D ; used in harddrop
 allegroIndex: .res 1 ; $001F for crash
 wasAllegro: .res 1 ; $0020 for crash
 startParity: .res 1 ; $0021 for crash
-    .res $11
+lagFlag: .res 1 ; $0022 for lagged lines & score
+    .res $10
 
 verticalBlankingInterval: .res 1 ; $0033
 set_seed: .res 3 ; $0034 ; rng_seed, rng_seed+1, spawnCount
@@ -55,7 +56,8 @@ garbageHole: .res 1 ; $0059                        ; Position of hole in receive
 garbageDelay: .res 1 ; $005A
 pieceTileModifier: .res 1 ; $005B ; above $80 - use a single one, below - use an offset
 curtainRow: .res 1 ; $5C
-    .res 3
+lines_old: .res 2 ; $5D-E ; used for delayed draw at high levels
+level_old: .res 1 ; $5F 
 
 mathRAM: .res $12
 binary32 := mathRAM+$0
