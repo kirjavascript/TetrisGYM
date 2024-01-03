@@ -201,7 +201,11 @@ addPointsRaw:
         lda #4
         sta completedLines
 @notTapQuantity:
+		lda crashMode
+		cmp #CRASH_OFF
+		beq @crashDisabled
         jsr testCrash
+@crashDisabled:
 		lda holdDownPoints
         cmp #$02
         bmi @noPushDown
@@ -730,16 +734,8 @@ testCrash:
 		bne @allegroClear
 		.byte 02
 @topout:
-		lda outOfDateRenderFlags ; Flag needed to reveal hidden score
-        ora #$04
-        sta outOfDateRenderFlags
-        lda #$02
-        sta soundEffectSlot0Init
-        lda #$0A ; playState_checkStartGameOver
-        sta playState
-        lda #$F0
-        sta curtainRow
-        jsr updateAudio2
+		lda #LINECAP_HALT
+        sta linecapState
 		rts
 factorTable:
 	.byte $53, $88, $7D, $7D, $7D

@@ -44,11 +44,29 @@ playState_prepareNext:
         lda linecapState
         cmp #LINECAP_HALT
         bne @linecapHaltEnd
+		lda crashFlag
+		cmp #$F0
+		bne @gg
+		lda #'C'
+		sta playfield+$66
+		lda #'R'
+		sta playfield+$67
+		lda #'A'
+		sta playfield+$68
+		lda #'S'
+		sta playfield+$69
+		lda #'H'
+		sta playfield+$6A
+		lda #$28
+        sta playfield+$6B
+		bne @finish
+@gg:
         lda #'G'
         sta playfield+$67
         sta playfield+$68
         lda #$28
         sta playfield+$6A
+@finish:
         lda #0
         sta vramRow
         jsr typeBEndingStuffEnd
