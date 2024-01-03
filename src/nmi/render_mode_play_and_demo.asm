@@ -103,6 +103,12 @@ render_mode_play_and_demo:
 		sta PPUADDR
 		lda #$D8
 		sta PPUDATA
+		lda #$3F
+		sta PPUADDR
+		lda #$0D
+		sta PPUADDR
+		lda #$3D
+		sta PPUDATA
 @noCrash:		
         lda scoringModifier
         cmp #SCORING_HIDDEN

@@ -136,8 +136,12 @@ stageSpriteForCurrentPiece_return:
         rts
 
 stageSpriteForNextPiece:
-        lda qualFlag
+        lda crashMode
+		cmp #CRASH_OFF
+        bne @sometimesNextBox
+		lda qualFlag
         beq @alwaysNextBox
+@sometimesNextBox:
         lda displayNextPiece
         bne @ret
 

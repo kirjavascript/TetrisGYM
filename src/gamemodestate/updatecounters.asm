@@ -6,7 +6,7 @@ gameModeState_updateCountersAndNonPlayerState:
         ; next code makes acc behave as normal
         ; (dont edit unless you know what you're doing)
         lda newlyPressedButtons_player1
-        and #$20
+        and #BUTTON_SELECT
         beq @ret
         lda displayNextPiece
         eor #$01
