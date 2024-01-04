@@ -2,14 +2,23 @@ mod labels;
 mod pushdown;
 mod util;
 mod block;
+mod sps;
 
 use gumdrop::Options;
+
+fn parse_hex(s: &str) -> Result<u32, std::num::ParseIntError> {
+    u32::from_str_radix(s, 16)
+}
 
 #[derive(Debug, Options)]
 struct TestOptions {
     help: bool,
     #[options(help = "run tests")]
     test: bool,
+    #[options(help = "set SPS seed", parse(try_from_str = "parse_hex"))]
+    sps_seed: u32,
+    #[options(help = "print SPS pieces")]
+    sps_qty: u32,
 }
 
 fn main() {
@@ -20,26 +29,19 @@ fn main() {
         println!("pushdown works!");
     }
 
-    let mut emu = util::emulator(None);
+    if options.sps_qty > 0 {
+        let mut blocks = sps::SPS::new();
 
-    let seed_0 = 0x88;
-    let seed_1 = 0x88;
-    let seed_2 = 0x88;
+        blocks.set_input((
+            ((options.sps_seed >> 16) & 0xFF) as u8,
+            ((options.sps_seed >> 8) & 0xFF) as u8,
+            (options.sps_seed& 0xFF) as u8,
+        ));
 
-    emu.memory.iram_raw[(labels::get("set_seed_input") + 0) as usize] = seed_0;
-    emu.memory.iram_raw[(labels::get("set_seed") + 0) as usize] = seed_0;
-    emu.memory.iram_raw[(labels::get("set_seed_input") + 1) as usize] = seed_1;
-    emu.memory.iram_raw[(labels::get("set_seed") + 1) as usize] = seed_1;
-    emu.memory.iram_raw[(labels::get("set_seed_input") + 2) as usize] = seed_2;
-    emu.memory.iram_raw[(labels::get("set_seed") + 2) as usize] = seed_2;
-
-
-    for i in 0..12 {
-        emu.registers.pc = labels::get("pickTetriminoSeed");
-        util::run_to_return(&mut emu, false);
-
-        let block: block::Block = emu.memory.iram_raw[labels::get("spawnID") as usize].into();
-
-        println!("{:#?}", block);
+        for i in 0..options.sps_qty {
+            print!("{:?}", blocks.next());
+        }
     }
+
+    // TODO: cycle counts for modes
 }
