@@ -17,3 +17,18 @@ impl From<u8> for Block {
         }
     }
 }
+
+impl From<char> for Block {
+    fn from(value: char) -> Self {
+        match value {
+            'T' => Block::T,
+            'J' => Block::J,
+            'Z' => Block::Z,
+            'O' => Block::O,
+            'S' => Block::S,
+            'L' => Block::L,
+            'I' => Block::I,
+            _ => Block::Unknown(value as u8),
+        }
+    }
+}

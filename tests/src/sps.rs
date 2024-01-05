@@ -1,5 +1,5 @@
+use crate::{block, labels, util};
 use rusticnes_core::nes::NesState;
-use crate::{labels, util, block};
 
 pub struct SPS {
     emu: NesState,
@@ -28,4 +28,28 @@ impl SPS {
 
         self.emu.memory.iram_raw[labels::get("spawnID") as usize].into()
     }
+}
+
+pub fn test() {
+    let mut blocks = SPS::new();
+
+    blocks.set_input((0x10, 0x10, 0x10));
+    "ZJOTLTZJLZJSZISIJOLITJSILZJILITSISZOITIZSZJLLTIOZJZSZISIJZTIZJTSOJSJISJOOTSJTOTZSZTZSLTZTOTSIZJZIJIL".chars().for_each(|block| {
+        assert_eq!(blocks.next(), block.into());
+    });
+
+    blocks.set_input((0x12, 0x34, 0x56));
+    "ZTZIJIJOZTSOSZJZOSLIOIJIJSTZSTTJISSTOIZJITJOZJITSOSZSJLTISJOITTLSLJTZTZOZSLJTJZSLTSOTLOJLSJSJTJILOJS".chars().for_each(|block| {
+        assert_eq!(blocks.next(), block.into());
+    });
+
+    blocks.set_input((0x87, 0xAB, 0x12));
+    "OZIJSOTZSJTSTJZLOLJOJISOZOIOZJITILSSJZLOIJSTITLSOJILTSOOLZOOIJOZLTLSISIJIJTOLSIJILSLOLJLTOSOSLOIZSIS".chars().for_each(|block| {
+        assert_eq!(blocks.next(), block.into());
+    });
+
+    blocks.set_input((0x13, 0x37, 0x02));
+    "OJSTZSIOLSIJTSZILJZJJLZLISISJTLZTSZTJOJOSJSZLITJOIOTITILTOSTJSZTSOOIOJSIITLJOZSIOJOTZTLJLIOJLITSSLSLIJIIOLOISLZJLIJJTIZIJOJISLTIJTOTZIOILSTTLTZIZJSOLOZOZOLOTZTZOTZOSIOTJJTSIZSOLTOLIZSOZOTZISLJTSZLOISO".chars().for_each(|block| {
+        assert_eq!(blocks.next(), block.into());
+    });
 }

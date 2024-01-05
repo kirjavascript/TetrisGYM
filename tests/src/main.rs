@@ -24,11 +24,15 @@ struct TestOptions {
 fn main() {
     let options = TestOptions::parse_args_default_or_exit();
 
+    // run SPS tests
     if options.test {
+        sps::test();
+        println!("sps works!");
         pushdown::test();
         println!("pushdown works!");
     }
 
+    // print SPS sequences
     if options.sps_qty > 0 {
         let mut blocks = sps::SPS::new();
 
