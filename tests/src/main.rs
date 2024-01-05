@@ -24,10 +24,10 @@ struct TestOptions {
 fn main() {
     let options = TestOptions::parse_args_default_or_exit();
 
-    // run SPS tests
+    // run tests
     if options.test {
         sps::test();
-        println!("sps works!");
+        println!("sps is the same!");
         pushdown::test();
         println!("pushdown works!");
     }
