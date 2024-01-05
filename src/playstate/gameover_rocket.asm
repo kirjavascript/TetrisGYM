@@ -76,9 +76,12 @@ sleep_gameplay:
 endingAnimation: ; rocket_screen
         jsr updateAudioWaitForNmiAndDisablePpuRendering
         jsr disableNmi
-        lda #CHRBankSet0
+.if INES_MAPPER <> 0
+        ; NROM will use a smaller ufo in the game tileset
+        lda #CHRBankSet1
+.endif
         jsr changeCHRBanks
-        lda #NMIEnable|BGPattern1|SpritePattern1
+        lda #NMIEnable
         sta currentPpuCtrl
         jsr copyRleNametableToPpu
         .addr rocket_nametable
@@ -221,12 +224,14 @@ handleRocket:
         sta $1
         jsr loadRectIntoOamStaging
 
+.if INES_MAPPER <> 0 ; leave offsets the same when using smaller nrom ufo
         lda #$3F
         adc spriteYOffset
         sta spriteYOffset
         lda #$78
         adc endingRocketX
         sta spriteXOffset
+.endif
         lda #<spriteCathedralFire0
         sta $0
         lda #>spriteCathedralFire0

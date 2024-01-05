@@ -6,9 +6,14 @@ waitScreenLoad:
         sta renderMode
         jsr updateAudioWaitForNmiAndDisablePpuRendering
         jsr disableNmi
-        lda #NMIEnable|BGPattern1|SpritePattern1
+        lda #NMIEnable
         sta currentPpuCtrl
-        lda #CHRBankSet0
+.if INES_MAPPER <> 0
+; NROM (and possibly FDS in the future) won't load the 2nd bankset
+; and will instead use the title/menu chrset letters.  This won't be noticeable
+; unless a graphic is added 
+        lda #CHRBankSet1
+.endif
         jsr changeCHRBanks
         jsr bulkCopyToPpu
         .addr wait_palette

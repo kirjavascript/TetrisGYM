@@ -1,7 +1,7 @@
 gameModeState_initGameBackground:
         jsr updateAudioWaitForNmiAndDisablePpuRendering
         jsr disableNmi
-        lda #CHRBankSet1
+        lda #CHRBankSet0
         jsr changeCHRBanks
         jsr bulkCopyToPpu
         .addr   game_palette
@@ -38,7 +38,7 @@ gameModeState_initGameBackground:
         sta PPUDATA
 @heartEnd:
 
-        lda #NMIEnable
+        lda #NMIEnable|BGPattern1|SpritePattern1
         sta PPUCTRL
         sta currentPpuCtrl
         jsr resetScroll

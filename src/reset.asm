@@ -64,6 +64,9 @@ mapperInit:
         inc mapperId ; 1 for MMC1, otherwise 0 for CNROM
 not_mmc1:
 
+; NROM (no init)
+.elseif INES_MAPPER = 0
+
 ; MMC1
 .elseif INES_MAPPER = 1
         setMMC1PRG

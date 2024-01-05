@@ -55,6 +55,9 @@ changeCHRBanks:
 @cnrom:
         changeCHRBanksCNRom
 
+; NROM (no action)
+.elseif INES_MAPPER = 0
+
 ; MMC1
 .elseif INES_MAPPER = 1
         changeCHRBanksMMC1
@@ -117,6 +120,9 @@ setHorizontalMirroring:
         jmp _setMMC1Control
 @cnrom:
 
+; NROM (no action)
+.elseif INES_MAPPER = 0
+
 ; MMC1
 .elseif INES_MAPPER = 1
         lda #%10011
@@ -147,6 +153,9 @@ setVerticalMirroring:
         lda #%10010
         jmp _setMMC1Control
 @cnrom:
+
+; NROM (no action)
+.elseif INES_MAPPER = 0
 
 ; MMC1
 .elseif INES_MAPPER = 1

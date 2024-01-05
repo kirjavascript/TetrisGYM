@@ -7,6 +7,7 @@ console.log('TetrisGYM buildscript');
 console.time('build');
 
 const mappers = { // https://www.nesdev.org/wiki/Mapper
+    0: 'NROM',
     1: 'MMC1',
     3: 'CNROM',
     4: 'MMC3',
