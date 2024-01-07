@@ -1,4 +1,4 @@
-use minifb::{Key, Window, WindowOptions};
+use minifb::{Window, WindowOptions};
 
 const WIDTH: usize = 256;
 const HEIGHT: usize = 240;
