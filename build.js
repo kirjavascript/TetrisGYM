@@ -166,8 +166,9 @@ if (!fs.existsSync('clean.nes')) {
 } else {
     console.time('patch');
     const patcher = require('./tools/patch/create');
-    patcher('clean.nes', 'tetris.nes', 'tetris.bps');
+    const pct = patcher('clean.nes', 'tetris.nes', 'tetris.bps');
     console.timeEnd('patch');
+    console.log(`using ${pct}% of original file`);
 }
 
 // stats

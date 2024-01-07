@@ -2,19 +2,19 @@
 
 ## [unreleased]
 * Crunch Mode
-* Invisible linecap turns entire playfield invisible
-* Invisible mode preserves original piece colors
+* Marathon Mode
+* Added hidden score option
 * Famicom Keyboard support
-* Fixed Floor-0 disabled burns
 * MMC3 Support
 * MMC5 Support
+* Invisible linecap turns entire playfield invisible
+* Invisible mode preserves original piece colors
+* Floor no longer gobbled up by top line clear
+* Floor 0 has original no-burns behaviour again
 * Fixed CNROM legal screen CHR bank
 * Fixed CNROM legal to title flicker
 * Block Tool pieces wrap around
-* Added hidden score option
-* Added marathon mode
 * 0001 seeds are ignored
-* Floor no longer gobbled up by top line clear
 
 ## [v5 tournament]
 * Linecap Menu (from CTM Masters September 2022)
