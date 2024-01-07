@@ -26,6 +26,9 @@ pub fn run_to_return(emu: &mut NesState, print: bool) {
             break;
         }
     }
+
+    opcodes::pop(emu);
+    opcodes::pop(emu);
 }
 
 pub fn print_step(emu: &mut NesState) {

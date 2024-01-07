@@ -1,7 +1,7 @@
 use minifb::{Window, WindowOptions};
 
-const WIDTH: usize = 256;
-const HEIGHT: usize = 240;
+pub const WIDTH: usize = 256;
+pub const HEIGHT: usize = 240;
 
 pub struct Video {
     pub window: Window,
@@ -9,13 +9,15 @@ pub struct Video {
 
 impl Video {
     pub fn new() -> Self {
-        let window = Window::new(
+        let mut window = Window::new(
             "video",
             WIDTH,
             HEIGHT,
             WindowOptions::default(),
         )
             .unwrap_or_else(|e| { panic!("{}", e); });
+
+        window.set_position(20, 30);
 
         Self {
             window

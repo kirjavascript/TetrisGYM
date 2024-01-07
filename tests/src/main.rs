@@ -48,7 +48,7 @@ fn main() {
         blocks.set_input((
             ((options.sps_seed >> 16) & 0xFF) as u8,
             ((options.sps_seed >> 8) & 0xFF) as u8,
-            (options.sps_seed& 0xFF) as u8,
+            (options.sps_seed & 0xFF) as u8,
         ));
 
         for _ in 0..options.sps_qty {
@@ -57,31 +57,55 @@ fn main() {
         println!("");
     }
 
-    // other stuff
-
     if options.rng_seeds {
         println!("{:?}", rng::seeds());
     }
+
+    // other stuff
+
+    let rng_seed = labels::get("rng_seed") as usize;
+    let main_loop = labels::get("mainLoop");
+    let practise_type = labels::get("practiseType") as usize;
+    let game_mode = labels::get("gameMode") as usize;
+    let level_number = labels::get("levelNumber") as usize;
+    let b_modifier = labels::get("typeBModifier") as usize;
+    let mode_typeb = labels::get("MODE_TYPEB") as u8;
 
     if options.foo {
         let mut emu = util::emulator(None);
         let mut view = video::Video::new();
 
-        // spend a few frames bootstrapping
-        for _ in 0..3 { emu.run_until_vblank(); }
 
-        emu.memory.iram_raw[labels::get("practiseType") as usize] = labels::get("MODE_TYPEB") as _;
-        emu.memory.iram_raw[labels::get("gameMode") as usize] = 4;
-        emu.memory.iram_raw[labels::get("levelNumber") as usize] = 18;
-        emu.memory.iram_raw[labels::get("typeBModifier") as usize] = 5;
-        let label = labels::get("mainLoop");
-        rusticnes_core::opcodes::push(&mut emu, (label >> 8) as u8);
-        rusticnes_core::opcodes::push(&mut emu, label as u8);
+        rng::seeds().iter().for_each(|seed| {
 
-        for _ in 0..10 {
-            emu.run_until_vblank();
-            emu.ppu.render_ntsc(256);
-            view.update(&emu.ppu.filtered_screen);
+            emu.reset();
+
+            // spend a few frames bootstrapping
+            for _ in 0..3 { emu.run_until_vblank(); }
+
+            emu.memory.iram_raw[practise_type] = mode_typeb;
+            emu.memory.iram_raw[game_mode] = 4;
+            emu.memory.iram_raw[level_number] = 18;
+            emu.memory.iram_raw[b_modifier] = 5;
+
+            emu.memory.iram_raw[rng_seed] = (seed >> 8) as u8;
+            emu.memory.iram_raw[rng_seed + 1] = *seed as u8;
+
+            rusticnes_core::opcodes::push(&mut emu, (main_loop >> 8) as u8);
+            rusticnes_core::opcodes::push(&mut emu, main_loop as u8);
+
+            for _ in 0..23 {
+                emu.run_until_vblank();
+            }
+
+            emu.ppu.render_ntsc(video::WIDTH);
+
+
+            // for _ in 0..5 {
+                view.update(&emu.ppu.filtered_screen);
+            // }
+        });
+        loop {
         }
     }
 }
