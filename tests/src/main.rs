@@ -33,6 +33,8 @@ fn main() {
 
     // run tests
     if options.test {
+        rng::test();
+        println!("rng seeds are the same!");
         sps::test();
         println!("sps is the same!");
         pushdown::test();
