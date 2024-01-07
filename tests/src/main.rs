@@ -99,11 +99,7 @@ fn main() {
             }
 
             emu.ppu.render_ntsc(video::WIDTH);
-
-
-            // for _ in 0..5 {
-                view.update(&emu.ppu.filtered_screen);
-            // }
+            view.update(&emu.ppu.filtered_screen);
         });
         loop {
         }
