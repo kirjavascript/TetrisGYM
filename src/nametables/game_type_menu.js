@@ -77,8 +77,8 @@ drawTiles(buffer, lookup, `
 #a    PAL MODE                d#
 #a    CRASH MODE              d#
 #a                            d#
-#a V5                         d#
 #a                            d#
+#a V5                         d#
 #a                            d#
 #a                            d#
 #a                            d#
@@ -101,7 +101,7 @@ drawRect(buffer, 8, 2, 10, 5, 0xB0); // draw logo
 // drawRect(extra, 20, 0, 5, 5, 0x9A); // draw QR code
 
 const urlX = 3;
-const urlY = 13;
+const urlY = 14;
 drawRect(extra, urlX, urlY, 12, 1, 0x74);
 drawRect(extra, urlX+12, urlY, 12, 1, 0x84);
 
@@ -134,8 +134,8 @@ drawAttrs(extra, [`
     2222222222222222
     2222222222222222
     2222222222222222
-    2333333333333332
     2222222222222222
+    2333333333333332
 `, screen]);
 
 writeRLE(

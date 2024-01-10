@@ -103,7 +103,7 @@ LINECAP_FLOOR := 2
 LINECAP_INVISIBLE := 3
 LINECAP_HALT := 4
 
-CRASH_SHOW := 0 
+CRASH_SHOW := 0
 CRASH_TOPOUT := 1
 CRASH_CRASH := 2
 CRASH_OFF := 3
@@ -112,12 +112,12 @@ LINECAP_WHEN_STRING_OFFSET := $10
 LINECAP_HOW_STRING_OFFSET := $12
 
 MENU_SPRITE_Y_BASE := $47
-MENU_MAX_Y_SCROLL := $78
+MENU_MAX_Y_SCROLL := $80
 MENU_TOP_MARGIN_SCROLL := 7 ; in blocks
 
 ; menuConfigSizeLookup
 ; menu ram is defined at menuRAM in ./ram.asm
-.macro MENUSIZES 
+.macro MENUSIZES
     .byte $0    ; MODE_TETRIS
     .byte $0    ; MODE_TSPINS
     .byte $0    ; MODE_SEED

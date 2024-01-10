@@ -487,19 +487,18 @@ menuYTmp := tmp2
         lda menuCounter
         cmp #MODE_SCORE_DISPLAY
         beq @renderScoreName
-		
+
         cmp #MODE_CRASH
         beq @renderCrashMode
 
+
+        lda menuCounter
+        jsr menuItemY16Offset
+        bne @loopNext
+        txa
+
         ldx oamStagingLength
 
-        ; get Y offset
-        lda menuCounter
-        asl
-        asl
-        asl
-        adc #MENU_SPRITE_Y_BASE + 1
-        sbc menuScrollY
         sta oamStaging, x
         inx
         lda menuVars, y
