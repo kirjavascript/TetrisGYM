@@ -691,7 +691,9 @@ testCrash:
 		lda cycleCount
 		adc #$00
 		sta cycleCount
-;crash should occur on cycle count results 29739-29744, 29750-29768 = $742B-7430, $7436-7448
+;crash should occur on cycle count results 29739-29744, 29750-29768 = $742B-7430, $7436-7448 | red crash on 7448 7447 7446 7445 7444 7443
+;x8 sw1 | x7 sw2 | x6 sw3 | x5 sw4 | x4 sw5 | x3 sw6 | x2 sw7 | x1 sw8
+;switch routine is reversed. 
 ;confettiA should occur on cycle count when switch1 = 29768+75 = 29843-30192
 ;level lag is +195 from line lag
 ;level lag to RTS is +70 rts +6 jsr +6 +41 to beginning of confettiA = 123 = 30315+ line lag
@@ -712,6 +714,18 @@ testCrash:
 		bcc @nextSwitch
 		cmp #$49
 		bcs @nextSwitch
+		cmp #$43
+		bcc @notRed
+		cpx #$07
+		beq @nextSwitch
+		cpx #$03
+		bne @notRed
+		ldx #$FF
+		ldy #$00
+		lda #$81
+		jsr satanSpawn
+		jmp @allegroClear
+@notRed:
 		lda #$F0
 		sta crashFlag
 		jmp @crashGraphics
@@ -864,4 +878,42 @@ confettiHandler:
 @endConfetti:
 		lda #$00
 	    sta allegroIndex
+        rts
+satanSpawn:
+		sta     tmp1
+        stx     tmp2
+        sty     tmp3
+        lda     PPUSTATUS
+        lda     currentPpuCtrl
+        and     #$FB
+        sta     PPUCTRL
+        sta     currentPpuCtrl
+        lda     tmp1
+        sta     PPUADDR
+        ldy     #$00
+        sty     PPUADDR
+        ldx     #$04
+        cmp     #$20
+        bcs     LAC40
+        ldx     tmp3
+LAC40:  ldy     #$00
+        lda     tmp2
+LAC44:  sta     PPUDATA
+        dey
+        bne     LAC44
+        dex
+        bne     LAC44
+        ldy     tmp3
+        lda     tmp1
+        cmp     #$20
+        bcc     LAC67
+        adc     #$02
+        sta     PPUADDR
+        lda     #$C0
+        sta     PPUADDR
+        ldx     #$40
+LAC61:  sty     PPUDATA
+        dex
+        bne     LAC61
+LAC67:  ldx     tmp2
         rts
