@@ -463,12 +463,12 @@ calcBCDLinesAndTileQueue:
 @ret:
         rts
 testCrash:
-		lda #$1C ; setting all cycles which always happen
+		lda #$1C ; setting all cycles which always happen. for optimizing, this can be removed if all compared numbers are reduced by $6F1C.
 		sta cycleCount
 		lda #$6F
 		sta cycleCount+1 ;low byte at +1
 	
-		lda completedLines
+		lda completedLines ; checking if lines cleared
 		beq @linesNotCleared
 		ldx #$04 ;setting loop to run 4x
 @clearedLine:
@@ -490,7 +490,7 @@ testCrash:
 		bne @clearedLine 
 		
 @linesNotCleared:
-		lda displayNextPiece
+		lda displayNextPiece ;00 is nextbox enabled
 		bne @nextOff
 		lda #$8A ; add 394 cycles for nextbox
 		adc cycleCount+1
@@ -504,7 +504,7 @@ testCrash:
 		bne @allegro
 		lda #$95 ; 149 in decimal.
 		clc
-		ldx wasAllegro ; FF is allegro. 00 is no allegro.
+		ldx wasAllegro ; FF is allegro. 00 is no allegro. wasAllegro contains allegro status prior to this frame
 		beq @addMusicCycles
 		adc #$26 ;add 38 cycles for disabling allegro
 @addMusicCycles:
@@ -520,7 +520,7 @@ testCrash:
 		asl
 		asl
 		asl
-		asl ;multiply by 16
+		asl ;multiply by 16 cycles per cell checked
 		tax ; save low byte result
 		lda cycleCount
 		adc #$00 ; add high byte carry
@@ -555,14 +555,14 @@ testCrash:
 		lda crashFlag
 		and #$01
 		beq @digit2
-		lda #$4F ; add 79 cycles for 10s place
+		lda #$4F ; add 79 cycles for lines 10s place
 		adc allegroIndex
 		sta allegroIndex
 @digit2:
 		lda crashFlag
 		and #$02
 		beq @clearStats
-		lda #$0C ; add 12 cycles for 100s place
+		lda #$0C ; add 12 cycles for lines 100s place
 		adc allegroIndex
 		sta allegroIndex
 @clearStats:
@@ -585,7 +585,7 @@ testCrash:
 		bcc @single
 		cmp #$08
 		bcs @over7
-		lda #$09 ; 1-6 costs 9 
+		lda #$09 ; 1-6 pushdown costs 9 add'l cycles
 		adc allegroIndex
 		sta allegroIndex
 @over7: 
@@ -627,7 +627,7 @@ testCrash:
 		sta factorA24+2
 		sta factorB24+1
 		sta factorB24+2
-		sta crashFlag ; done with flags and can now reuse variable
+		sta crashFlag ; unrelated to current routine, just needed to clear the flag and $00 was loaded.
 		jsr unsigned_mul24 ; result in product24
 		clc
 		lda product24
@@ -650,10 +650,10 @@ testCrash:
 		cmp #$08
 		bne @not8
 		clc
-		adc allegroIndex
+		adc allegroIndex ; adds 8 cycles for current piece = 8 (horizontal Z)
 		sta allegroIndex
-@not8:	bcc @randomFactors
-		lda #$0B ; would be 12 but carry is set
+@not8:	bcc @randomFactors ; adc above means branch always when entered after it. piece < 8 adds 0 cycles.
+		lda #$0B ; would be 12 but carry is set. for piece > 8
 		adc allegroIndex
 		sta allegroIndex
 @randomFactors:
@@ -672,13 +672,13 @@ testCrash:
 @newBit0:
 		lda nmiReturnAddr
 		cmp #<updateAudioWaitForNmiAndResetOamStaging+10
-		beq @returnLate ; checking which instruction returned to
+		beq @returnLate ; checking which instruction returned to. if so, add 3 cycles
 		lda #$03
 		clc
 		adc allegroIndex
 		sta allegroIndex
 @returnLate:
-		lda rng_seed+1 ; RNG for OAMDMA
+		lda rng_seed+1 ; RNG for OAMDMA, add 1 cycle for syncing
 		lsr
 		bcc @noDMA
 		inc allegroIndex
@@ -707,39 +707,39 @@ testCrash:
 		cmp #$31 ; gap
 		bcs @continue
 		lda #$F0
-		sta crashFlag
-		jmp @crashGraphics
+		sta crashFlag ; F0 means standard crash.
+		jmp @crashGraphics ;too far to branch
 @continue:
 		cmp #$36
 		bcc @nextSwitch
 		cmp #$49
-		bcs @nextSwitch
+		bcs @nextSwitch ;between 7436 & 7448
 		cmp #$43
-		bcc @notRed
-		cpx #$07
-		beq @nextSwitch
+		bcc @notRed ;checking if crash is during first crashable instruction
+		cpx #$07 ; checking which switch routine is active. 
+		beq @nextSwitch ;continues crashless if sw2
 		cpx #$03
-		bne @notRed
-		ldx #$FF
+		bne @notRed ; runs graphics corruption if sw6
+		ldx #$FF ; these are normally set by the code it would jump to after NMI.
 		ldy #$00
-		lda #$81
+		lda #$81 ; value normally held at this point in sw6
 		jsr satanSpawn
-		jmp @allegroClear
+		jmp @allegroClear ;allegroClear is basically return, just clears the variable first.
 @notRed:
 		lda #$F0
 		sta crashFlag
-		jmp @crashGraphics
+		jmp @crashGraphics ;triggering crash in all other cases
 		
 @nextSwitch:
 		lda switchTable-2,x ; adding cycles to advance to next switch routine
-		sta allegroIndex
+		sta allegroIndex ; reusing code at the beginning of the loop that added the accumulated allegroIndex to the main cycle count
 		dex 
 		bne @loop		
 		;562 has been added to the cycle count
 		;confettiA at 30405-30754 76C5-7822
 		lda displayNextPiece
 		beq @nextOn
-		lda cycleCount+1 ; add 394 cycles for nextbox if not added earlier
+		lda cycleCount+1 ; add 394 cycles for nextbox if not added earlier. Necessary because we're checking for pre-nextbox NMI now.
 		adc #$8A
 		sta cycleCount+1
 		lda cycleCount
@@ -747,101 +747,101 @@ testCrash:
 		sta cycleCount
 		bne @nextCheck
 @nextOn:		
-		lda cycleCount
-		cmp #$76
+		lda cycleCount ;testing for limited confetti
+		cmp #$76 ;high byte min
 		bcc @allegroClear
 		bne @not76
 		lda cycleCount+1
-		cmp #$C5
+		cmp #$C5 ;low byte min
 		bcc @allegroClear
 		bcs @confettiA
-@not76: cmp #$78
+@not76: cmp #$78 ;high byte max
 		bcc @confettiA
 		bne @nextCheck
 		lda cycleCount+1
-		cmp #$23
+		cmp #$23 ;low byte max
 		bcs @nextCheck
 @confettiA:
-		lda #$E0
+		lda #$E0 ;E0 = limited confetti
 		sta crashFlag
 		jmp confettiHandler
 @nextCheck:
-		;levellag at 30877 789D
+		;levellag at 30877 = 0x789D
 		lda cycleCount
-		cmp #$78
+		cmp #$78 ;high byte min
 		bcc @allegroClear
 		bne @levelLag
 		lda cycleCount+1
-		cmp #$9D
+		cmp #$9D;low byte min
 		bcc @allegroClear
 @levelLag:
 		lda #$01
 		sta lagFlag
-		;linelag at 31072 7960
+		;linelag at 31072 = 0x7960
 		lda cycleCount
-		cmp #$79
+		cmp #$79;high byte min
 		bcc @allegroClear
 		bne @lineLag
 		lda cycleCount+1
-		cmp #$60
+		cmp #$60;low byte min
 		bcc @allegroClear
 @lineLag:
 		lda #$03
 		sta lagFlag
 		;confettiB at 31327-31755 7A5F-7C0B
 		lda cycleCount
-		cmp #$7A
+		cmp #$7A ;high byte min
 		bcc @allegroClear
 		bne @not7A
 		lda cycleCount+1
-		cmp #$5F
+		cmp #$5F ;low byte min
 		bcc @allegroClear
 		bcs @confettiB
-@not7A: cmp #$7C
+@not7A: cmp #$7C ;high byte max
 		bcc @confettiB
 		bne @allegroClear
 		lda cycleCount+1
-		cmp #$0C
+		cmp #$0C ;low byte max
 		bcs @allegroClear
 @confettiB:
-		lda #$D0
+		lda #$D0 ;D0 = infinite confetti
 		sta crashFlag
 		jmp confettiHandler
 @allegroClear:
-		lda #$00
+		lda #$00 ;reset allegro flag and return to program execution, no crash
 		sta allegroIndex
 		lda lagFlag
-		beq @noLag
+		beq @noLag ;if lag should happen, wait a frame here so that sprite staging doesn't happen.
 		lda #$00
 		sta verticalBlankingInterval
 @checkForNmi:
-        lda verticalBlankingInterval
+        lda verticalBlankingInterval ;busyloop
         beq @checkForNmi
 @noLag:	rts
 @crashGraphics:
 		lda #$00
-		sta allegroIndex
+		sta allegroIndex ; resetting variable
 		lda crashMode
 		bne @otherMode
-		lda outOfDateRenderFlags
+		lda outOfDateRenderFlags ; if mode = 0, tell score to update (might not be necessary?) so that crash info is printed
 		ora #$04
 		sta outOfDateRenderFlags
 		lda #$02
-        sta soundEffectSlot0Init
+        sta soundEffectSlot0Init ; play topout sfx
 		rts
 @otherMode:
-		cmp #CRASH_CRASH
+		cmp #CRASH_CRASH ;if crash mode, crash
 		bcc @topout
 		bne @allegroClear
-		.byte 02
+		.byte 02 ; stp
 @topout:
-		lda #LINECAP_HALT
+		lda #LINECAP_HALT ;if topout, activate linecap
         sta linecapState
 		rts
 factorTable:
-	.byte $53, $88, $7D, $7D, $7D
+	.byte $53, $88, $7D, $7D, $7D ;0 single double triple tetris
 sumTable:
-	.byte $E1, $1C, $38, $54, $80 ; tetris is 4*28+16 = 128
+	.byte $E1, $1C, $38, $54, $80 ; 0 single double triple tetris. tetris is 4*28+16 = 128
 switchTable:
 	.byte $3C, $77, $3C, $65, $3C, $66, $3C;60 119 60 101 60 102 60 gets read in reverse
 confettiHandler:
@@ -851,35 +851,35 @@ confettiHandler:
 		lda heldButtons_player1
 		and #$A0 ; A, Select
 		bne @endConfetti
-		lda frameCounter
+		lda frameCounter ;use framecounter for Y coordinate of text, like original confetti but without the offset
 		cmp #$FF
 		bne @drawConfetti
 		lda heldButtons_player1
 		and #$47 ; B, Down, Left, Right
 		beq @endConfetti
 @drawConfetti:
-		sta spriteYOffset
-		lda #$A8
+		sta spriteYOffset ;either frameCounter or 80 loaded to A depending on confetti type
+		lda #$A8 ;center of playfield
 		sta spriteXOffset
-		lda #$19
+		lda #$19 ;ID for "confetti" text
 		sta spriteIndexInOamContentLookup
-		jsr stringSpriteAlignRight
+		jsr stringSpriteAlignRight ;draw to screen
 		lda #$00
-		sta verticalBlankingInterval
+		sta verticalBlankingInterval ;wait until next frame
 @checkForNmi:
-        lda verticalBlankingInterval
+        lda verticalBlankingInterval ;busyloop
         beq @checkForNmi
 		jmp confettiHandler
 @infiniteConfetti:
 		lda heldButtons_player1
-		adc #$80
+		adc #$80 ; loading 80 as Y coordinate of confetti text if nothing is held.
 		cmp #$80
-		beq @drawConfetti
+		beq @drawConfetti ; if any button is pressed, exit confetti
 @endConfetti:
 		lda #$00
 	    sta allegroIndex
         rts
-satanSpawn:
+satanSpawn: ; copied from routine vanilla game's memset_ppu_page_and_more which is no longer present in gym
 		sta     tmp1
         stx     tmp2
         sty     tmp3
