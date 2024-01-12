@@ -42,3 +42,25 @@ pub fn print_step(emu: &mut NesState) {
 
     println!("{}", opcode_info::disassemble_instruction(emu.cpu.opcode, 0, 0).0);
 }
+
+pub const fn _ppu_addr_to_xy(ppu_addr: u16) -> (u8, u8) {
+    const SCREEN_WIDTH: u16 = 256 / 8;
+    const SCREEN_HEIGHT: u16 = 240 / 8;
+
+    let base_address = ppu_addr & 0x2C00;
+
+    let (base_x, base_y) = match base_address {
+        0x2000 => (0, 0),
+        0x2400 => (1, 0),
+        0x2800 => (0, 1),
+        0x2C00 => (1, 1),
+        _ => panic!("Invalid PPU address"),
+    };
+
+    let offset = ppu_addr - base_address;
+
+    let x = base_x * SCREEN_WIDTH + (offset % 32);
+    let y = base_y * SCREEN_HEIGHT + (offset / 32);
+
+    (x as _, y as _)
+}

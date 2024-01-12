@@ -34,12 +34,14 @@ fn main() {
 
     // run tests
     if options.test {
+        score::test_render();
+        println!("score rendering works!");
+        pushdown::test();
+        println!("pushdown works!");
         rng::test();
         println!("rng seeds are the same!");
         sps::test();
         println!("sps is the same!");
-        pushdown::test();
-        println!("pushdown works!");
     }
 
     // print SPS sequences
