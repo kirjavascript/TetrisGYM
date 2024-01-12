@@ -1,6 +1,16 @@
 use crate::{util, labels};
 use std::collections::HashSet;
 
+pub fn test() {
+    assert_eq!(
+        seeds(),
+        include_str!("./rng_seeds.txt")
+            .split(',')
+            .map(|s| s.trim().parse::<u16>().expect(s))
+            .collect::<HashSet<_>>()
+    );
+}
+
 pub fn seeds() -> HashSet<u16> {
     let mut emu = util::emulator(None);
     let rng_seed = labels::get("rng_seed");
@@ -32,14 +42,4 @@ pub fn seeds() -> HashSet<u16> {
     }
 
     seeds
-}
-
-pub fn test() {
-    assert_eq!(
-        seeds(),
-        include_str!("./rng_seeds.txt")
-            .split(',')
-            .map(|s| s.trim().parse::<u16>().expect(s))
-            .collect::<HashSet<_>>()
-    );
 }
