@@ -13,6 +13,7 @@
 * Floor 0 has original no-burns behaviour again
 * Fixed CNROM legal screen CHR bank
 * Fixed CNROM legal to title flicker
+* Fixed ingame score display at 8million with Classic Scoring
 * Block Tool pieces wrap around
 * 0001 seeds are ignored
 
