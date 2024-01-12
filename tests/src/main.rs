@@ -3,6 +3,7 @@ mod input;
 mod labels;
 mod pushdown;
 mod rng;
+mod score;
 mod sps;
 mod util;
 mod video;
@@ -33,12 +34,14 @@ fn main() {
 
     // run tests
     if options.test {
+        score::test_render();
+        println!("score rendering works!");
+        pushdown::test();
+        println!("pushdown works!");
         rng::test();
         println!("rng seeds are the same!");
         sps::test();
         println!("sps is the same!");
-        pushdown::test();
-        println!("pushdown works!");
     }
 
     // print SPS sequences
@@ -63,18 +66,17 @@ fn main() {
 
     // other stuff
 
-    let rng_seed = labels::get("rng_seed") as usize;
-    let main_loop = labels::get("mainLoop");
-    let practise_type = labels::get("practiseType") as usize;
-    let game_mode = labels::get("gameMode") as usize;
-    let level_number = labels::get("levelNumber") as usize;
-    let b_modifier = labels::get("typeBModifier") as usize;
-    let mode_typeb = labels::get("MODE_TYPEB") as u8;
-
     if options.foo {
         let mut emu = util::emulator(None);
         let mut view = video::Video::new();
 
+        let rng_seed = labels::get("rng_seed") as usize;
+        let main_loop = labels::get("mainLoop");
+        let practise_type = labels::get("practiseType") as usize;
+        let game_mode = labels::get("gameMode") as usize;
+        let level_number = labels::get("levelNumber") as usize;
+        let b_modifier = labels::get("typeBModifier") as usize;
+        let mode_typeb = labels::get("MODE_TYPEB") as u8;
 
         rng::seeds().iter().for_each(|seed| {
 
