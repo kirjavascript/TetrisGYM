@@ -196,6 +196,7 @@ getScoreDiv100k:
         lsr
         lsr
         lsr
+        clc
         tax
         lda multBy100Table, x
         adc tmpZ
