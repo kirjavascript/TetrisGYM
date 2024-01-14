@@ -26,6 +26,7 @@ if (args.includes('-h')) {
 -k  Famicom Keyboard support
 -w  force WASM compiler
 -c  force PNG to CHR conversion
+-t  run tests
 -h  you are here
 `);
     process.exit(0);
@@ -196,3 +197,8 @@ hashFile('tetris.bps');
 console.log();
 
 console.timeEnd('build');
+
+if (args.includes('-t')) {
+    console.log('\nrunning tests');
+    handleSpawn('cargo', ...'run --release --manifest-path tests/Cargo.toml -- -t'.split(' '));
+}

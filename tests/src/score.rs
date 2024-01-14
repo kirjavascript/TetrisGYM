@@ -24,13 +24,34 @@ pub fn test_render() {
         assert_eq!((i % 16) as u8, rendered_score(&mut emu)[0]);
     }
 
+    // check letter score rendering works
+
+    // for i in 250..262 {
+    //     let score = i * 100000;
+
+    //     score::set(&mut emu, score);
+    //     emu.registers.pc = labels::get("renderLettersScore");
+    //     util::run_to_return(&mut emu, false);
+
+    //     // TODO: fix breaking at 25.5m
+    //     println!("{} {} {}", i, (i % 36) as u8, rendered_score(&mut emu)[0]);
+    // }
+
     // check score cap works
 
-    let score = 8952432;
-    score::set(&mut emu, score);
-    emu.registers.pc = labels::get("renderScoreCap");
-    util::run_to_return(&mut emu, false);
-    assert_eq!(vec![9, 9, 9, 9, 9, 9], rendered_score(&mut emu));
+    for score in [8952432, 999999, 1000000, 1000010, 10000000, 100000000] {
+        score::set(&mut emu, score);
+        emu.registers.pc = labels::get("renderScoreCap");
+        util::run_to_return(&mut emu, false);
+        assert_eq!(vec![9, 9, 9, 9, 9, 9], rendered_score(&mut emu));
+    }
+
+    for score in [100000, 512345, 999998] {
+        score::set(&mut emu, score);
+        emu.registers.pc = labels::get("renderScoreCap");
+        util::run_to_return(&mut emu, false);
+        assert_ne!(vec![9, 9, 9, 9, 9, 9], rendered_score(&mut emu));
+    }
 }
 
 pub fn set(emu: &mut NesState, score: u32) {
