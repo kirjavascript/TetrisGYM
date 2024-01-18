@@ -26,7 +26,7 @@ if (args.includes('-h')) {
 -k  Famicom Keyboard support
 -w  force WASM compiler
 -c  force PNG to CHR conversion
--t  run tests
+-t  run tests (requires cargo)
 -h  you are here
 `);
     process.exit(0);
