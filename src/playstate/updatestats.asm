@@ -6,21 +6,10 @@ playState_updateLinesAndStatistics:
 
 @linesCleared:
         tax
-        dex
-        lda lineClearStatsByType,x
-        clc
-        adc #$01
-        sta lineClearStatsByType,x
-        and #$0F
-        cmp #$0A
-        bmi @noCarry
-		lda crashFlag
-		ora #$04
-		sta crashFlag
-        lda lineClearStatsByType,x
-        clc
-        adc #$06
-        sta lineClearStatsByType,x
+        dec     lineClearStatsByType-1,x
+        bpl     @noCarry
+		lda     #$09
+		sta     lineClearStatsByType-1,x
 @noCarry:
         lda outOfDateRenderFlags
         ora #$01
@@ -561,15 +550,8 @@ testCrash:
 @digit2:
 		lda crashFlag
 		and #$02
-		beq @clearStats
-		lda #$0C ; add 12 cycles for lines 100s place
-		adc allegroIndex
-		sta allegroIndex
-@clearStats:
-		lda crashFlag
-		and #$04
 		beq @newLevel
-		lda #$0B ; 11 cycles for clearcount 10s place
+		lda #$0C ; add 12 cycles for lines 100s place
 		adc allegroIndex
 		sta allegroIndex
 @newLevel:
@@ -596,6 +578,15 @@ testCrash:
 		bcc @scoreCycles
 @single: 
 		lda completedLines
+		beq @dontClearCount
+		tax
+		ldy lineClearStatsByType-1,x
+		beq @dontClearCount
+		lda #$0B ; 11 cycles for clearcount 10s place
+		adc allegroIndex
+		sta allegroIndex
+		txa
+@dontClearCount:
 		cmp #$01
 		bne @notsingle
 		lda #$34 ; 53 for singles, carry is set
