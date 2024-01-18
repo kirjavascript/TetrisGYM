@@ -1,4 +1,5 @@
 mod block;
+mod drought;
 mod input;
 mod labels;
 mod pushdown;
@@ -7,7 +8,6 @@ mod score;
 mod sps;
 mod util;
 mod video;
-
 
 use gumdrop::Options;
 
@@ -26,6 +26,8 @@ struct TestOptions {
     sps_qty: u32,
     #[options(help = "list RNG seeds")]
     rng_seeds: bool,
+    #[options(help = "list drought mode probabilities")]
+    drought_probs: bool,
     foo: bool,
 }
 
@@ -64,6 +66,10 @@ fn main() {
         println!("{:?}", rng::seeds());
     }
 
+    if options.drought_probs {
+        drought::print_probabilities();
+    }
+
     // other stuff
 
     if options.foo {
@@ -79,11 +85,12 @@ fn main() {
         let mode_typeb = labels::get("MODE_TYPEB") as u8;
 
         rng::seeds().iter().for_each(|seed| {
-
             emu.reset();
 
             // spend a few frames bootstrapping
-            for _ in 0..3 { emu.run_until_vblank(); }
+            for _ in 0..3 {
+                emu.run_until_vblank();
+            }
 
             emu.memory.iram_raw[practise_type] = mode_typeb;
             emu.memory.iram_raw[game_mode] = 4;
@@ -103,7 +110,7 @@ fn main() {
             emu.ppu.render_ntsc(video::WIDTH);
             view.update(&emu.ppu.filtered_screen);
         });
-        loop {
-        }
+        loop {}
     }
+
 }
