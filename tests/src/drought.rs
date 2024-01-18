@@ -6,13 +6,14 @@ pub fn print_probabilities() {
     let drought_modifier = labels::get("droughtModifier");
     let next_rng = labels::get("pickRandomTetrimino");
 
-    let seed = 0x8988;
-    emu.memory.iram_raw[(rng_seed + 0) as usize] = (seed >> 8) as _;
-    emu.memory.iram_raw[(rng_seed + 1) as usize] = seed as u8;
     emu.memory.iram_raw[labels::get("practiseType") as usize] = labels::get("MODE_DROUGHT") as u8;
 
     for modifier in 0..19 {
         emu.memory.iram_raw[drought_modifier as usize] = modifier;
+
+        let seed = 0x8988;
+        emu.memory.iram_raw[(rng_seed + 0) as usize] = (seed >> 8) as _;
+        emu.memory.iram_raw[(rng_seed + 1) as usize] = seed as u8;
 
         let mut longbars = 0;
         let mut total = 0;
