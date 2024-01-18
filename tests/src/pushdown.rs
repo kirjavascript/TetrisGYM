@@ -1,4 +1,4 @@
-use crate::{labels, util};
+use crate::{labels, util, score};
 
 pub fn test() {
     let mut emu = util::emulator(None);
@@ -6,7 +6,7 @@ pub fn test() {
     for pushdown in 2..15 {
         [0..1000, 24500..25500].into_iter().for_each(|range| {
             for score in range {
-                util::set_score(&mut emu, score);
+                score::set(&mut emu, score);
 
                 emu.registers.pc = labels::get("addPushDownPoints");
                 emu.memory.iram_raw[labels::get("holdDownPoints") as usize] = pushdown;
@@ -15,7 +15,7 @@ pub fn test() {
 
                 let reference = pushdown_impl(pushdown, score as u16) as u32;
 
-                assert_eq!(reference, util::get_score(&mut emu) - score);
+                assert_eq!(reference, score::get(&mut emu) - score);
             }
         });
     }
