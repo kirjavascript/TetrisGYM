@@ -177,82 +177,82 @@ SUBTBL:
 
 ; source: https://codebase64.org/doku.php?id=base:24bit_multiplication_24bit_product
 unsigned_mul24:
-	lda #$00			; set product to zero
-	sta product24
-	sta product24+1
-	sta product24+2
+    lda #$00			; set product to zero
+    sta product24
+    sta product24+1
+    sta product24+2
 
 @loop:
-	lda factorB24                   ; while factorB24 !=0
-	bne @nz
-	lda factorB24+1
-	bne @nz
-	lda factorB24+2
-	bne @nz
-	rts
+    lda factorB24                   ; while factorB24 !=0
+    bne @nz
+    lda factorB24+1
+    bne @nz
+    lda factorB24+2
+    bne @nz
+    rts
 @nz:
-	lda factorB24; if factorB24 isodd
-	and #$01
-	beq @skip
+    lda factorB24; if factorB24 isodd
+    and #$01
+    beq @skip
 
-	lda factorA24			; product24 += factorA24
-	clc
-	adc product24
-	sta product24
+    lda factorA24			; product24 += factorA24
+    clc
+    adc product24
+    sta product24
 
-	lda factorA24+1
-	adc product24+1
-	sta product24+1
+    lda factorA24+1
+    adc product24+1
+    sta product24+1
 
-	lda factorA24+2
-	adc product24+2
-	sta product24+2			; end if
+    lda factorA24+2
+    adc product24+2
+    sta product24+2			; end if
 
 @skip:
-	asl factorA24			; << factorA24
-	rol factorA24+1
-	rol factorA24+2
-	lsr factorB24+2			; >> factorB24
-	ror factorB24+1
-	ror factorB24
+    asl factorA24			; << factorA24
+    rol factorA24+1
+    rol factorA24+2
+    lsr factorB24+2			; >> factorB24
+    ror factorB24+1
+    ror factorB24
 
-	jmp @loop			; end while
+    jmp @loop			; end while
 
 unsigned_div24:
         lda #0	        ;preset remainder to 0
-	sta remainder
-	sta remainder+1
-	sta remainder+2
-	ldx #24	        ;repeat for each bit: ...
+    sta remainder
+    sta remainder+1
+    sta remainder+2
+    ldx #24	        ;repeat for each bit: ...
 
 @divloop:
         asl dividend	;dividend lb & hb*2, msb -> Carry
-	rol dividend+1
-	rol dividend+2
-	rol remainder	;remainder lb & hb * 2 + msb from carry
-	rol remainder+1
-	rol remainder+2
-	lda remainder
-	sec
-	sbc divisor	;substract divisor to see if it fits in
-	tay	        ;lb result -> Y, for we may need it later
-	lda remainder+1
-	sbc divisor+1
-	sta pztemp
-	lda remainder+2
-	sbc divisor+2
-	bcc @skip	;if carry=0 then divisor didn't fit in yet
+    rol dividend+1
+    rol dividend+2
+    rol remainder	;remainder lb & hb * 2 + msb from carry
+    rol remainder+1
+    rol remainder+2
+    lda remainder
+    sec
+    sbc divisor	;substract divisor to see if it fits in
+    tay	        ;lb result -> Y, for we may need it later
+    lda remainder+1
+    sbc divisor+1
+    sta pztemp
+    lda remainder+2
+    sbc divisor+2
+    bcc @skip	;if carry=0 then divisor didn't fit in yet
 
-	sta remainder+2	;else save substraction result as new remainder,
-	lda pztemp
-	sta remainder+1
-	sty remainder
-	inc dividend 	;and INCrement result cause divisor fit in 1 times
+    sta remainder+2	;else save substraction result as new remainder,
+    lda pztemp
+    sta remainder+1
+    sty remainder
+    inc dividend 	;and INCrement result cause divisor fit in 1 times
 
 @skip:
         dex
-	bne @divloop
-	rts
+    bne @divloop
+    rts
 
 ; from http://forum.6502.org/viewtopic.php?p=5789&sid=46a88a49579252ae3edcf53c0cd54f68#p5789
 ;----------------------------------------------------------------
