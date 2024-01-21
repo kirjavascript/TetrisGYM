@@ -31,6 +31,27 @@ pub fn run_to_return(emu: &mut NesState, print: bool) {
     opcodes::pop(emu);
 }
 
+pub fn cycles_to_return(emu: &mut NesState) -> u32 {
+    opcodes::push(emu, 0);
+    opcodes::push(emu, 0);
+
+    let mut cycles = 0;
+
+    loop {
+        cycles += 1;
+        emu.cycle();
+
+        if emu.registers.pc < 3 {
+            break;
+        }
+    }
+
+    opcodes::pop(emu);
+    opcodes::pop(emu);
+
+    cycles
+}
+
 pub fn print_step(emu: &mut NesState) {
     if let Some(label) = labels::from_addr(emu.registers.pc) {
         println!("{}:", label);
@@ -63,4 +84,21 @@ pub const fn _ppu_addr_to_xy(ppu_addr: u16) -> (u8, u8) {
     let y = base_y * SCREEN_HEIGHT + (offset / 32);
 
     (x as _, y as _)
+}
+
+pub const fn _xy_to_ppu_addr(x: u16, y: u16) -> u16 {
+    const SCREEN_WIDTH: u16 = 256 / 8;
+    const SCREEN_HEIGHT: u16 = 240 / 8;
+
+    let offset = (y * 32) + x;
+
+    let base_address = match (x / SCREEN_WIDTH, y / SCREEN_HEIGHT) {
+        (0, 0) => 0x2000,
+        (1, 0) => 0x2400,
+        (0, 1) => 0x2800,
+        (1, 1) => 0x2C00,
+        _ => panic!("Invalid (x, y) position"),
+    };
+
+    base_address + offset
 }

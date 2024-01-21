@@ -1,4 +1,5 @@
 mod block;
+mod cycle_count;
 mod drought;
 mod input;
 mod labels;
@@ -20,6 +21,8 @@ struct TestOptions {
     help: bool,
     #[options(help = "run tests")]
     test: bool,
+    #[options(help = "count cycles")]
+    cycles: bool,
     #[options(help = "set SPS seed", parse(try_from_str = "parse_hex"))]
     sps_seed: u32,
     #[options(help = "print SPS pieces")]
@@ -46,6 +49,11 @@ fn main() {
         println!("rng seeds are the same!");
         sps::test();
         println!("sps is the same!");
+    }
+
+    // count cycles
+    if options.cycles {
+        cycle_count::count_cycles();
     }
 
     // print SPS sequences

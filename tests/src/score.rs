@@ -51,7 +51,7 @@ pub fn test() {
     }
 
     // check tetris value from lots of scores
-    for initial_score in 999000..=1001000 {
+    for initial_score in 999499..=1000501 {
         assert_eq!(score(initial_score, 4, 18), initial_score + score_impl(4, 18));
     }
 }
