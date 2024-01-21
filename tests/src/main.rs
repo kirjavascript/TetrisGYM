@@ -36,6 +36,8 @@ fn main() {
 
     // run tests
     if options.test {
+        score::test();
+        println!("score works!");
         score::test_render();
         println!("score rendering works!");
         pushdown::test();

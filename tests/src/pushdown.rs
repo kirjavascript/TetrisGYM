@@ -5,7 +5,6 @@ pub fn test() {
 
     for pushdown in 2..15 {
         [0..1000, 24500..25500, 60000..65536].into_iter().for_each(|range| {
-        // [0..65535].into_iter().for_each(|range| {
             for score in range {
                 score::set(&mut emu, score);
 

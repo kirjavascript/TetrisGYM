@@ -5,7 +5,8 @@ pub fn test() {
     assert_eq!(
         seeds(),
         include_str!("./rng_seeds.txt")
-            .split(',')
+            .trim()
+            .split('\n')
             .map(|s| s.trim().parse::<u16>().expect(s))
             .collect::<HashSet<_>>()
     );
