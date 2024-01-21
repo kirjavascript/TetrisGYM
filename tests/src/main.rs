@@ -1,4 +1,6 @@
 mod block;
+mod cycle_count;
+mod drought;
 mod input;
 mod labels;
 mod pushdown;
@@ -7,7 +9,6 @@ mod score;
 mod sps;
 mod util;
 mod video;
-
 
 use gumdrop::Options;
 
@@ -20,12 +21,16 @@ struct TestOptions {
     help: bool,
     #[options(help = "run tests")]
     test: bool,
+    #[options(help = "count cycles")]
+    cycles: bool,
     #[options(help = "set SPS seed", parse(try_from_str = "parse_hex"))]
     sps_seed: u32,
     #[options(help = "print SPS pieces")]
     sps_qty: u32,
     #[options(help = "list RNG seeds")]
     rng_seeds: bool,
+    #[options(help = "list drought mode probabilities")]
+    drought_probs: bool,
     foo: bool,
 }
 
@@ -34,6 +39,8 @@ fn main() {
 
     // run tests
     if options.test {
+        score::test();
+        println!("score works!");
         score::test_render();
         println!("score rendering works!");
         pushdown::test();
@@ -42,6 +49,11 @@ fn main() {
         println!("rng seeds are the same!");
         sps::test();
         println!("sps is the same!");
+    }
+
+    // count cycles
+    if options.cycles {
+        cycle_count::count_cycles();
     }
 
     // print SPS sequences
@@ -64,6 +76,10 @@ fn main() {
         println!("{:?}", rng::seeds());
     }
 
+    if options.drought_probs {
+        drought::print_probabilities();
+    }
+
     // other stuff
 
     if options.foo {
@@ -79,11 +95,12 @@ fn main() {
         let mode_typeb = labels::get("MODE_TYPEB") as u8;
 
         rng::seeds().iter().for_each(|seed| {
-
             emu.reset();
 
             // spend a few frames bootstrapping
-            for _ in 0..3 { emu.run_until_vblank(); }
+            for _ in 0..3 {
+                emu.run_until_vblank();
+            }
 
             emu.memory.iram_raw[practise_type] = mode_typeb;
             emu.memory.iram_raw[game_mode] = 4;
@@ -103,7 +120,7 @@ fn main() {
             emu.ppu.render_ntsc(video::WIDTH);
             view.update(&emu.ppu.filtered_screen);
         });
-        loop {
-        }
+        loop {}
     }
+
 }
