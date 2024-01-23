@@ -79,7 +79,7 @@ updatePlayfield:
 
 updateMusicSpeed:
         ldx #$05
-        lda multBy10Table,x
+        lda multBy10Table,x ;this piece of code is parameterized for no reason but the crash checking code relies on the index being 50-59 so if you ever optimize this part out of the code please also adjust the crash test, specifically the part which handles cycles for allegro.
         tay
         ldx #$0A
 @checkForBlockInRow:
