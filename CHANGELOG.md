@@ -4,6 +4,7 @@
 * Crunch Mode
 * Marathon Mode
 * Added hidden score option
+* M Scoring changed to just add a millions counter to Classic Scoring
 * Famicom Keyboard support
 * MMC3 Support
 * MMC5 Support

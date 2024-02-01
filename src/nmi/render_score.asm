@@ -80,7 +80,6 @@ renderFloat:
         ror
         ror
         sta PPUDATA
-        jsr renderBCDScore
         rts
 
 renderLevelDash:
