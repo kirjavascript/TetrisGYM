@@ -209,7 +209,7 @@ linecapState: .res 1 ; $639 ; 0 if not triggered, 1 + linecapHow otherwise, rese
 dasOnlyShiftDisabled: .res 1 ; $63A
 
 invisibleFlag: .res 1 ; $63B  ; 0 for normal mode, non-zero for Invisible playfield rendering.  Reset on game init and game over.
-currentFloor: .res 1 ; floorModifier is copied here at game init.  Set to #$14 for linecap floor and decremented during scoring.
+currentFloor: .res 1 ; floorModifier is copied here at game init.  Set to 0 otherwise and incremented when linecap floor.
 
     .res $38
 
