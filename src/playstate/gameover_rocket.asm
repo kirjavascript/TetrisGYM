@@ -237,7 +237,11 @@ handleRocket:
         lda #>spriteCathedralFire0
         sta $1
         lda frameCounter
-        and #1
+.if INES_MAPPER = 0 
+        and #8 ; Every 8 frames for ufo
+.else
+        and #1 ; Every other frame for cathedral
+.endif
         beq @otherFrame
         lda #<spriteCathedralFire1
         sta $0
