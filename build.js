@@ -12,7 +12,7 @@ const mappers = { // https://www.nesdev.org/wiki/Mapper
     3: 'CNROM',
     4: 'MMC3',
     5: 'MMC5',
-    255: 'Autodetect MMC1/CNROM',
+    1000: 'Autodetect MMC1/CNROM',
 };
 
 // options handling
@@ -51,7 +51,7 @@ console.log(`using ${nativeCC65 ? 'system' : 'wasm'} ca65/ld65`);
 
 // mapper options
 
-const mapper = args.find((d) => d.startsWith('-m'))?.slice(2) ?? 255;
+const mapper = args.find((d) => d.startsWith('-m'))?.slice(2) ?? 1000;
 
 if (!mappers[mapper]) {
     console.error(

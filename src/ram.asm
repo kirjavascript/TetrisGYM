@@ -210,7 +210,7 @@ dasOnlyShiftDisabled: .res 1 ; $63A
 
 invisibleFlag: .res 1 ; $63B  ; 0 for normal mode, non-zero for Invisible playfield rendering.  Reset on game init and game over.
 
-mapperId: .res 1 ; $63C ; For INES_MAPPER 255 (autodetect).  0 = CNROM.  1 = MMC1.  
+mapperId: .res 1 ; $63C ; For INES_MAPPER 1000 (autodetect).  0 = CNROM.  1 = MMC1.  
 
     .res $38
 

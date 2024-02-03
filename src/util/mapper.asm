@@ -47,7 +47,7 @@ changeCHRBanks:
         sta     generalCounter
 
 ; autodetect
-.if INES_MAPPER = 255
+.if INES_MAPPER = 1000
         ldx     mapperId
         beq     @cnrom
         changeCHRBanksMMC1
@@ -113,7 +113,7 @@ changeCHRBanks:
 
 setHorizontalMirroring:
 ; autodetect
-.if INES_MAPPER = 255
+.if INES_MAPPER = 1000
         lda mapperId
         beq @cnrom
         lda #%10011
@@ -144,10 +144,10 @@ setHorizontalMirroring:
         rts
 
 setVerticalMirroring:
-; Unused except during mapper detect for INES_MAPPER 255
+; Unused except during mapper detect for INES_MAPPER 1000
 
 ; autodetect
-.if INES_MAPPER = 255
+.if INES_MAPPER = 1000
         lda mapperId
         beq @cnrom
         lda #%10010
@@ -177,7 +177,7 @@ setVerticalMirroring:
 .endif
         rts
 
-.if INES_MAPPER = 3 .or INES_MAPPER = 255
+.if INES_MAPPER = 3 .or INES_MAPPER = 1000
 ; bus conflict workaround
 cnromBanks:
         .byte $00,$01

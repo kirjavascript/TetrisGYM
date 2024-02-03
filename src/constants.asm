@@ -1,5 +1,5 @@
 .ifndef INES_MAPPER ; is set via ca65 flags
-INES_MAPPER := 255 ; 1 (MMC1), 3 (CNROM), 4 (MMC3), 5 (MMC5),  and 255 (autodetect 1/3)
+INES_MAPPER := 1000 ; 1 (MMC1), 3 (CNROM), 4 (MMC3), 5 (MMC5),  and 1000 (autodetect 1/3)
 .endif
 
 .ifndef SAVE_HIGHSCORES
