@@ -21,9 +21,9 @@ gameMode_speedTest:
         sta PPUADDR
         lda #$30
         sta PPUDATA
-        lda #CHRBankSet0
         lda #NMIEnable|BGPattern1|SpritePattern1
         sta currentPpuCtrl
+        lda #CHRBankSet0
         jsr changeCHRBanks
 
         jsr waitForVBlankAndEnableNmi
