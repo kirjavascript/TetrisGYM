@@ -29,6 +29,7 @@ if (args.includes('-h')) {
 -w  force WASM compiler
 -c  force PNG to CHR conversion
 -o  override autodetect mmc1 header with cnrom
+-t  run tests (requires cargo)
 -h  you are here
 `);
     process.exit(0);
@@ -174,8 +175,9 @@ if (!fs.existsSync('clean.nes')) {
 } else {
     console.time('patch');
     const patcher = require('./tools/patch/create');
-    patcher('clean.nes', 'tetris.nes', 'tetris.bps');
+    const pct = patcher('clean.nes', 'tetris.nes', 'tetris.bps');
     console.timeEnd('patch');
+    console.log(`using ${pct}% of original file`);
 }
 
 // stats
@@ -203,3 +205,8 @@ hashFile('tetris.bps');
 console.log();
 
 console.timeEnd('build');
+
+if (args.includes('-t')) {
+    console.log('\nrunning tests');
+    handleSpawn('cargo', ...'run --release --manifest-path tests/Cargo.toml -- -t'.split(' '));
+}

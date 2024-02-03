@@ -123,7 +123,6 @@ render_mode_play_and_demo:
         cmp #SCORING_FLOAT
         bne @noFloat
         jsr renderFloat
-        jmp @clearScoreRenderFlags
 @noFloat:
 
         jsr renderClassicScore
