@@ -164,6 +164,7 @@ checkLinecap: ; set linecapState
         sta garbageHole
         lda #1
         sta pendingGarbage
+        inc currentFloor
 @floorLinecapEnd:
 
 addPoints:

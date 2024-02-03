@@ -1,5 +1,5 @@
 advanceGameFloor:
-        lda floorModifier
+        lda currentFloor
 drawFloor:
         ; get correct offset
         sta tmp1
