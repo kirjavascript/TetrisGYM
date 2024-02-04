@@ -209,10 +209,10 @@ linecapState: .res 1 ; $639 ; 0 if not triggered, 1 + linecapHow otherwise, rese
 dasOnlyShiftDisabled: .res 1 ; $63A
 
 invisibleFlag: .res 1 ; $63B  ; 0 for normal mode, non-zero for Invisible playfield rendering.  Reset on game init and game over.
+currentFloor: .res 1 ; $63C floorModifier is copied here at game init.  Set to 0 otherwise and incremented when linecap floor.
+mapperId: .res 1 ; $63D ; For INES_MAPPER 1000 (autodetect).  0 = CNROM.  1 = MMC1.
 
-mapperId: .res 1 ; $63C ; For INES_MAPPER 1000 (autodetect).  0 = CNROM.  1 = MMC1.  
-
-    .res $38
+    .res $37
 
 .if KEYBOARD
 newlyPressedKeys: .res 1 ; $0675

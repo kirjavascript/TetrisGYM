@@ -207,7 +207,6 @@ seedControls:
         jmp @skipSeedDown
 @lowNybbleDown:
         lda set_seed_input, x
-        clc
         tay
         and #$F
         ; cmp #$0 ; and sets z flag
@@ -220,6 +219,7 @@ seedControls:
         jmp @skipSeedDown
 @noWrapDown:
         tya
+        sec
         sbc #1
         sta set_seed_input, x
 @skipSeedDown:

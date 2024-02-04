@@ -40,7 +40,7 @@ TETRIMINO_X_HIDE := $EF
 
 PAUSE_SPRITE_X := $74
 PAUSE_SPRITE_Y := $58
-; yobi-style
+; jazzthief-style
 ; PAUSE_SPRITE_X := $C4
 ; PAUSE_SPRITE_Y := $16
 
