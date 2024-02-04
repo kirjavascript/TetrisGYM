@@ -15,6 +15,8 @@
 * Block Tool pieces wrap around
 * 0001 seeds are ignored
 * Famicom Keyboard support
+* Autodetect MMC1/CNROM
+* NROM Support
 * MMC3 Support
 * MMC5 Support
 
