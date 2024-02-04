@@ -45,7 +45,7 @@ playState_checkForCompletedRows:
         bne @normalRow
 
 @floorCheck:
-        lda floorModifier
+        lda currentFloor
         beq @rowNotComplete
 
 @fullRowBurningCheck:
@@ -53,7 +53,7 @@ playState_checkForCompletedRows:
         lda #$13
         sec
         sbc generalCounter2 ; contains current row being checked
-        cmp floorModifier
+        cmp currentFloor
         bcc @rowNotComplete ; ignore floor rows
 @normalRow:
 
@@ -98,7 +98,7 @@ playState_checkForCompletedRows:
         beq @incrementLineIndex
         lda #$14
         sec
-        sbc floorModifier
+        sbc currentFloor
         tax
         ldy multBy10Table,x
         ldx #$0A

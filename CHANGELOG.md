@@ -2,20 +2,22 @@
 
 ## [unreleased]
 * Crunch Mode
+* Marathon Mode
+* Hidden Score Mode
+* Low Stack Mode
+* M Score changed to Classic Scoring + Millions counter
 * Invisible linecap turns entire playfield invisible
 * Invisible mode preserves original piece colors
-* Famicom Keyboard support
-* Fixed Floor-0 disabled burns
-* MMC3 Support
-* MMC5 Support
+* Floor no longer gobbled up by top line clear
+* Floor 0 has original no-burns behaviour again
+* Fixed ingame score display at 8 million with Classic Scoring
 * Fixed CNROM legal screen CHR bank
 * Fixed CNROM legal to title flicker
 * Block Tool pieces wrap around
-* Added hidden score option
-* Added marathon mode
 * 0001 seeds are ignored
-* Floor no longer gobbled up by top line clear
-* Added low stack mode
+* Famicom Keyboard support
+* MMC3 Support
+* MMC5 Support
 
 ## [v5 tournament]
 * Linecap Menu (from CTM Masters September 2022)

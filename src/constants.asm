@@ -39,7 +39,7 @@ TETRIMINO_X_HIDE := $EF
 
 PAUSE_SPRITE_X := $74
 PAUSE_SPRITE_Y := $58
-; yobi-style
+; jazzthief-style
 ; PAUSE_SPRITE_X := $C4
 ; PAUSE_SPRITE_Y := $16
 
@@ -113,7 +113,7 @@ MENU_TOP_MARGIN_SCROLL := 7 ; in blocks
 
 ; menuConfigSizeLookup
 ; menu ram is defined at menuRAM in ./ram.asm
-.macro MENUSIZES 
+.macro MENUSIZES
     .byte $0    ; MODE_TETRIS
     .byte $0    ; MODE_TSPINS
     .byte $0    ; MODE_SEED

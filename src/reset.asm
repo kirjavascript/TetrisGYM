@@ -14,7 +14,7 @@ reset:  cld
         txs
 .if INES_MAPPER = 1
         inc reset
-.elseif INES_MAPPER = 4 
+.elseif INES_MAPPER = 4
         jsr mmc3Init
 .elseif INES_MAPPER = 5
         jsr mmc5Init

@@ -83,7 +83,7 @@ stageSpriteForCurrentPiece_actual:
         ldy oamStagingLength
         lda #$04
         sta generalCounter2
-@stageMino:  
+@stageMino:
         lda orientationTable,x
         asl a
         asl a
@@ -116,7 +116,7 @@ stageSpriteForCurrentPiece_actual:
         sta oamStaging,y
         jmp @finishLoop
 
-@validYCoordinate:  
+@validYCoordinate:
         inc oamStagingLength
         iny
         lda orientationTable,x
@@ -126,7 +126,7 @@ stageSpriteForCurrentPiece_actual:
         clc
         adc generalCounter3
         sta oamStaging,y
-@finishLoop:  
+@finishLoop:
         inc oamStagingLength
         iny
         inx
