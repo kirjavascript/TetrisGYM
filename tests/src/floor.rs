@@ -43,7 +43,7 @@ fn test_floor() {
         emu.memory.iram_raw[labels::get("autorepeatY") as usize] = 0;
         emu.memory.iram_raw[labels::get("vramRow") as usize] = 0;
 
-        playfield::set_str(&mut emu,r##"
+        playfield::set_str(&mut emu, r##"
 ##### ####
 ##### ####
 ##### ####
@@ -57,6 +57,11 @@ fn test_floor() {
     for i in 0..40 {
         assert_eq!(emu.memory.iram_raw[i + labels::get("playfield") as usize], 0xEF);
     }
+
+    // check the floor is there
+    assert_ne!(playfield::get(&mut emu, 0, 19), 0xEF);
+    // but the row above isn't
+    assert_eq!(playfield::get(&mut emu, 0, 18), 0xEF);
 }
 
 fn test_floor0() {
@@ -93,7 +98,7 @@ fn test_floor0() {
     emu.memory.iram_raw[labels::get("autorepeatY") as usize] = 0;
     emu.memory.iram_raw[labels::get("vramRow") as usize] = 0;
 
-    playfield::set_str(&mut emu,r##"
+    playfield::set_str(&mut emu, r##"
 ##### ####
 ##### ####
 ##### ####
