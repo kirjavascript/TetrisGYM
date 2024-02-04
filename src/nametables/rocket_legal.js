@@ -3,7 +3,6 @@ const {
     drawTiles,
     flatLookup,
     drawAttrs,
-    drawRect,
 } = require('./nametables');
 
 const legal = Array.from({ length: 1024 }, () => 0xFF);
@@ -96,8 +95,6 @@ drawTiles(legal, lookup, `
 ################################
 `);
 
-drawRect(legal, 7, 5, 10, 5, 0xA6);
-
 drawAttrs(rocket, [`
     1111111111111111
     1111111111111111
@@ -121,9 +118,9 @@ drawAttrs(rocket, [`
 drawAttrs(legal, [`
     0000000000000000
     0000000000000000
-    0000011111000000
-    0000011111000000
-    0000011111000000
+    0000000000000000
+    0000000000000000
+    0000000000000000
     0000000000000000
     0000000000000000
     0000000000000000
