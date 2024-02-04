@@ -57,9 +57,7 @@ fn test_floor() {
 fn test_floor_linecap() {
     let mut emu = util::emulator(None);
 
-    for _ in 0..3 {
-        emu.run_until_vblank();
-    }
+    for _ in 0..3 { emu.run_until_vblank(); }
 
     let practise_type = labels::get("practiseType") as usize;
     let game_mode = labels::get("gameMode") as usize;
@@ -76,9 +74,7 @@ fn test_floor_linecap() {
 
     emu.registers.pc = main_loop;
 
-    for _ in 0..5 {
-        emu.run_until_vblank();
-    }
+    for _ in 0..5 { emu.run_until_vblank(); }
 
     // get some tetrises
 
@@ -96,9 +92,7 @@ fn test_floor_linecap() {
 ##### ####
 ##### ####"##);
 
-        for _ in 0..40 {
-            emu.run_until_vblank();
-        }
+        for _ in 0..40 { emu.run_until_vblank(); }
     }
 
     // check rows aren't pulled from the top in linecap floor mode
@@ -132,9 +126,7 @@ fn test_floor0() {
 
     emu.registers.pc = main_loop;
 
-    for _ in 0..5 {
-        emu.run_until_vblank();
-    }
+    for _ in 0..5 { emu.run_until_vblank(); }
 
     // setup a tetris
 
@@ -150,9 +142,7 @@ fn test_floor0() {
 ##### ####
 ##### ####"##);
 
-    for _ in 0..40 {
-        emu.run_until_vblank();
-    }
+    for _ in 0..40 { emu.run_until_vblank(); }
 
     // check floor 0 doesnt burn lines
     assert_ne!(playfield::get(&mut emu, 0, 19), 0xEF);
