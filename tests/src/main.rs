@@ -1,14 +1,17 @@
 mod block;
 mod cycle_count;
-mod drought;
 mod input;
 mod labels;
+mod playfield;
+mod util;
+mod video;
+
+mod drought;
+mod floor;
 mod pushdown;
 mod rng;
 mod score;
 mod sps;
-mod util;
-mod video;
 
 use gumdrop::Options;
 
@@ -39,6 +42,8 @@ fn main() {
 
     // run tests
     if options.test {
+        floor::test();
+        println!("floor 0 works!");
         score::test();
         println!("score works!");
         score::test_render();
