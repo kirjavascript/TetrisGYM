@@ -43,7 +43,7 @@ fn main() {
     // run tests
     if options.test {
         floor::test();
-        println!("floor 0 works!");
+        println!("floor works!");
         score::test();
         println!("score works!");
         score::test_render();
