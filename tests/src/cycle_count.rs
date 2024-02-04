@@ -31,37 +31,34 @@ pub fn count_cycles() {
 
     println!("scoring routine most cycles: {}", highest);
 
-    use crate::video;
+    // use crate::video;
 
     // check clock cycles frames in each mode
 
     let mut emu = util::emulator(None);
-    let mut view = video::Video::new();
 
-    for _ in 0..3 { emu.run_until_vblank(); }
+    for mode in 0..labels::get("MODE_GAME_QUANTITY") {
 
-    let practise_type = labels::get("practiseType") as usize;
-    let game_mode = labels::get("gameMode") as usize;
-    let main_loop = labels::get("mainLoop");
-    let level_number = labels::get("levelNumber") as usize;
+        emu.reset();
+
+        for _ in 0..3 { emu.run_until_vblank(); }
+
+        let practise_type = labels::get("practiseType") as usize;
+        let game_mode = labels::get("gameMode") as usize;
+        let main_loop = labels::get("mainLoop");
+        let level_number = labels::get("levelNumber") as usize;
 
 
-    emu.memory.iram_raw[practise_type] = labels::get("MODE_TRANSITION") as _;
-    emu.memory.iram_raw[level_number] = 18;
-    emu.memory.iram_raw[game_mode] = 4;
-    emu.registers.pc = main_loop;
+        emu.memory.iram_raw[practise_type] = mode as _;
+        emu.memory.iram_raw[level_number] = 235;
+        emu.memory.iram_raw[game_mode] = 4;
+        emu.registers.pc = main_loop;
 
-    for _ in 0..5 { emu.run_until_vblank(); }
+        for _ in 0..5 { emu.run_until_vblank(); }
 
-    let (mut highest, mut level, mut lines) = (0, 0, 0);
-
-    for _ in 0..10 {
+        let (mut highest, mut _level, mut lines) = (0, 0, 0);
 
         for line in 0..5 {
-            emu.memory.iram_raw[labels::get("currentPiece") as usize] = 0x11;
-            emu.memory.iram_raw[labels::get("tetriminoX") as usize] = 0x5;
-            emu.memory.iram_raw[labels::get("tetriminoY") as usize] = 0x11;
-            emu.memory.iram_raw[labels::get("autorepeatY") as usize] = 0;
             emu.memory.iram_raw[labels::get("vramRow") as usize] = 0;
 
             playfield::clear(&mut emu);
@@ -75,40 +72,29 @@ pub fn count_cycles() {
                 _ => unreachable!("line"),
             });
 
-            emu.run_until_vblank();
+            emu.memory.iram_raw[labels::get("currentPiece") as usize] = 0x11;
+            emu.memory.iram_raw[labels::get("tetriminoX") as usize] = 0x5;
+            emu.memory.iram_raw[labels::get("tetriminoY") as usize] = 0x12;
+            emu.memory.iram_raw[labels::get("autorepeatY") as usize] = 0;
 
-            for _ in 0..[44, 47, 47, 46, 45][line] {
-
+            for _ in 0..45 {
                 let cycles = cycles_to_hblank(&mut emu);
 
                 if cycles > highest {
                     highest = cycles;
-                    level = emu.memory.iram_raw[level_number];
+                    _level = emu.memory.iram_raw[level_number];
                     lines = line;
                 }
-
-                println!("{}/{} ({} {})", highest, cycles, lines, level);
-
-                // std::thread::sleep(std::time::Duration::from_millis(50));
-
             }
-
-                emu.ppu.render_ntsc(video::WIDTH);
-                view.update(&emu.ppu.filtered_screen);
-
         }
+
+        println!("cycles {} lines {} mode {}", highest, lines, mode);
     }
-
-    // println!("{:#?}", (highest, level, lines));
-
-
-    loop {}
 
 }
 
 fn cycles_to_hblank(emu: &mut NesState) -> u32 {
-    let nmi_wait_start = labels::get("nmiWaitStart");
-    let nmi_wait_end = labels::get("nmiWaitEnd");
+    let vblank = labels::get("verticalBlankingInterval") as usize;
     let mut cycles = 0;
     let mut done = false;
 
@@ -116,8 +102,8 @@ fn cycles_to_hblank(emu: &mut NesState) -> u32 {
         emu.cycle();
         if !done {
             cycles += 1;
-            if emu.registers.pc >= nmi_wait_start && emu.registers.pc <= nmi_wait_end {
-                done = true
+            if emu.memory.iram_raw[vblank] == 1 {
+                done = true;
             }
         }
         let mut i = 0;
@@ -125,8 +111,8 @@ fn cycles_to_hblank(emu: &mut NesState) -> u32 {
             emu.cycle();
             if !done {
                 cycles += 1;
-                if emu.registers.pc >= nmi_wait_start && emu.registers.pc <= nmi_wait_end {
-                    done = true
+                if emu.memory.iram_raw[vblank] == 1 {
+                    done = true;
                 }
             }
             i += 1;
@@ -136,12 +122,14 @@ fn cycles_to_hblank(emu: &mut NesState) -> u32 {
             emu.last_frame = emu.ppu.current_frame;
         }
     }
+    emu.memory.iram_raw[vblank] = 1;
+    done = false;
     while emu.ppu.current_scanline != 242 {
         emu.cycle();
         if !done {
             cycles += 1;
-            if emu.registers.pc >= nmi_wait_start && emu.registers.pc <= nmi_wait_end {
-                done = true
+            if emu.memory.iram_raw[vblank] == 0 {
+                done = true;
             }
         }
         let mut i = 0;
@@ -149,8 +137,8 @@ fn cycles_to_hblank(emu: &mut NesState) -> u32 {
             emu.cycle();
             if !done {
                 cycles += 1;
-                if emu.registers.pc >= nmi_wait_start && emu.registers.pc <= nmi_wait_end {
-                    done = true
+                if emu.memory.iram_raw[vblank] == 0 {
+                    done = true;
                 }
             }
             i += 1;

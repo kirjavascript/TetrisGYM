@@ -24,13 +24,13 @@ nmi:    pha
         ldy #$02
         jsr generateNextPseudorandomNumber
         jsr copyCurrentScrollAndCtrlToPPU
-        lda #$01
-        sta verticalBlankingInterval
         jsr pollControllerButtons
 .if KEYBOARD
 ; Read Family BASIC Keyboard
         jsr pollKeyboard
 .endif
+        lda #$01
+        sta verticalBlankingInterval
         pla
         tay
         pla
