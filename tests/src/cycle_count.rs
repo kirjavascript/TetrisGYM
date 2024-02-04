@@ -31,8 +31,6 @@ pub fn count_cycles() {
 
     println!("scoring routine most cycles: {}", highest);
 
-    // use crate::video;
-
     // check clock cycles frames in each mode
 
     let mut emu = util::emulator(None);
@@ -78,7 +76,7 @@ pub fn count_cycles() {
             emu.memory.iram_raw[labels::get("autorepeatY") as usize] = 0;
 
             for _ in 0..45 {
-                let cycles = cycles_to_hblank(&mut emu);
+                let cycles = cycles_to_vblank(&mut emu);
 
                 if cycles > highest {
                     highest = cycles;
@@ -93,7 +91,7 @@ pub fn count_cycles() {
 
 }
 
-fn cycles_to_hblank(emu: &mut NesState) -> u32 {
+fn cycles_to_vblank(emu: &mut NesState) -> u32 {
     let vblank = labels::get("verticalBlankingInterval") as usize;
     let mut cycles = 0;
     let mut done = false;
