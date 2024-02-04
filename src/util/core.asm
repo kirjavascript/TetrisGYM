@@ -50,6 +50,8 @@ random10:
         bpl random10
         rts
 
+nmiWaitStart: ; used in tests
+
 ; canon is waitForVerticalBlankingInterval
 updateAudioWaitForNmiAndResetOamStaging:
         jsr updateAudio_jmp
@@ -85,6 +87,8 @@ updateAudioAndWaitForNmi:
         lda verticalBlankingInterval
         beq @checkForNmi
         rts
+
+nmiWaitEnd:
 
 updateAudioWaitForNmiAndDisablePpuRendering:
         jsr updateAudioAndWaitForNmi
