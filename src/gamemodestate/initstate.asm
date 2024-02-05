@@ -45,6 +45,15 @@ gameModeState_initGameState:
         sta linecapState
         sta dasOnlyShiftDisabled
         sta invisibleFlag
+        sta currentFloor
+
+; initialize currentFloor if necessary
+        lda practiseType
+        cmp #MODE_FLOOR
+        bne @notFloor
+        lda floorModifier
+        sta currentFloor
+@notFloor:
 
         lda practiseType
         cmp #MODE_INVISIBLE

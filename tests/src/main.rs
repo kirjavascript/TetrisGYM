@@ -1,14 +1,18 @@
 mod block;
 mod cycle_count;
-mod drought;
 mod input;
 mod labels;
+mod playfield;
+mod util;
+mod video;
+
+mod drought;
+mod floor;
 mod pushdown;
 mod rng;
 mod score;
 mod sps;
-mod util;
-mod video;
+mod toprow;
 
 use gumdrop::Options;
 
@@ -39,16 +43,20 @@ fn main() {
 
     // run tests
     if options.test {
+        floor::test();
+        println!(">> floor ✅");
+        toprow::test();
+        println!(">> top row bug ✅");
         score::test();
-        println!("score works!");
+        println!(">> score ✅");
         score::test_render();
-        println!("score rendering works!");
+        println!(">> score rendering ✅");
         pushdown::test();
-        println!("pushdown works!");
+        println!(">> pushdown ✅");
         rng::test();
-        println!("rng seeds are the same!");
+        println!(">> rng seeds ✅");
         sps::test();
-        println!("sps is the same!");
+        println!(">> sps ✅");
     }
 
     // count cycles

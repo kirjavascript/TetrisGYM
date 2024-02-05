@@ -24,8 +24,6 @@ nmi:    pha
         ldy #$02
         jsr generateNextPseudorandomNumber
         jsr copyCurrentScrollAndCtrlToPPU
-        lda #$01
-        sta verticalBlankingInterval
         jsr pollControllerButtons
 		lda #$00
 		sta lagFlag ; clear flag after lag frame achieved
@@ -33,6 +31,8 @@ nmi:    pha
 ; Read Family BASIC Keyboard
         jsr pollKeyboard
 .endif
+        lda #$01
+        sta verticalBlankingInterval
         pla
         tay
         tsx
