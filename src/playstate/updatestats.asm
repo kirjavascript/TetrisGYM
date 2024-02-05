@@ -489,7 +489,7 @@ testCrash:
 		sta cycleCount
 		
 @nextOff:
-		lda allegroIndex
+		lda allegroIndex ;the allegro checking routine uses offsets of 50-59 [0x32-0x3B], meaning even when the first block triggers allegro, the bne will work properly.
 		bne @allegro
 		lda #$95 ; 149 in decimal.
 		clc
@@ -505,16 +505,11 @@ testCrash:
 		bne @linesCycles
 @allegro:
 		sec 
-		sbc #$32 ; subtract 50, allegro index already loaded
+		sbc #$32 ; subtract 50 from the index, as the offset is from the start of board data.
 		asl
 		asl
 		asl
-		asl ;multiply by 16 cycles per cell checked
-		tax ; save low byte result
-		lda cycleCount
-		adc #$00 ; add high byte carry
-		sta cycleCount
-		txa
+		asl ;multiply by 16 cycles per cell checked. 0-indexed.
 		adc cycleCount+1
 		sta cycleCount+1
 		lda cycleCount
