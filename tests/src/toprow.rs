@@ -269,7 +269,7 @@ pub fn test() {
 #  # # # #
 #  ### ###"##);
 
-    for _ in 0..39 {
+    for _ in 0..40 {
         emu.run_until_vblank();
     }
 
@@ -293,4 +293,40 @@ pub fn test() {
 ## # # # #
 #  # # # #
 #  ### ###"##, playfield::get_str(&emu));
+
+    // flat I should burn
+
+    emu.memory.iram_raw[labels::get("currentPiece") as usize] = 0x12;
+    emu.memory.iram_raw[labels::get("tetriminoX") as usize] = 0x5;
+    emu.memory.iram_raw[labels::get("tetriminoY") as usize] = 0x0f;
+    emu.memory.iram_raw[labels::get("autorepeatY") as usize] = 0;
+    emu.memory.iram_raw[labels::get("vramRow") as usize] = 0;
+
+    playfield::clear(&mut emu);
+    playfield::set_str(&mut emu, r##"##########"##);
+
+    for _ in 0..48 {
+        emu.run_until_vblank();
+    }
+
+    assert_eq!(r##"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ####"##, playfield::get_str(&emu));
 }
