@@ -550,20 +550,20 @@ menuYTmp := tmp2
         jmp @loopNext
 
 @renderCrashMode:
-		lda menuScrollY
-		cmp #$58
-		bcs @doRender
-		jmp @loopNext
+        lda menuScrollY
+        cmp #$58
+        bcs @doRender
+        jmp @loopNext
 @doRender:
         lda crashMode
-		cmp #CRASH_OFF
-		bne @notOff
-		lda #$F1
+        cmp #CRASH_OFF
+        bne @notOff
+        lda #$F1
 @notOff:
-		adc #$16
-		sta spriteIndexInOamContentLookup
+        adc #$16
+        sta spriteIndexInOamContentLookup
         lda #(MODE_CRASH*8)-256 + MENU_SPRITE_Y_BASE + 1
-		sec
+        sec
         sbc menuScrollY
         sta spriteYOffset
         lda #$e9

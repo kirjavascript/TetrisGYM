@@ -25,8 +25,8 @@ nmi:    pha
         jsr generateNextPseudorandomNumber
         jsr copyCurrentScrollAndCtrlToPPU
         jsr pollControllerButtons
-		lda #$00
-		sta lagFlag ; clear flag after lag frame achieved
+        lda #$00
+        sta lagFlag ; clear flag after lag frame achieved
 .if KEYBOARD
 ; Read Family BASIC Keyboard
         jsr pollKeyboard

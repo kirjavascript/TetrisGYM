@@ -90,7 +90,7 @@ updateMusicSpeed:
         dex
         bne @checkForBlockInRow
         lda allegro
-		sta wasAllegro
+        sta wasAllegro
         beq @ret
         lda #$00
         sta allegro
@@ -100,9 +100,9 @@ updateMusicSpeed:
         jmp @ret
 
 @foundBlockInRow:
-		sty allegroIndex
+        sty allegroIndex
         lda allegro
-		sta wasAllegro
+        sta wasAllegro
         bne @ret
         lda #$FF
         sta allegro

@@ -19,12 +19,12 @@ render_mode_play_and_demo:
         lda outOfDateRenderFlags
         and #$01
         beq @renderLevel
-		
-		ldx #lines_old-lines
-		lda lagFlag
-		and #$02
-		bne @doLinesRender
-		ldx #$00
+
+        ldx #lines_old-lines
+        lda lagFlag
+        and #$02
+        bne @doLinesRender
+        ldx #$00
 @doLinesRender:
         lda #$20
         sta PPUADDR
@@ -60,11 +60,11 @@ render_mode_play_and_demo:
         sta PPUADDR
         lda #$B9
         sta PPUADDR
-		ldx #level_old-levelNumber
-		lda lagFlag
-		and #$01
-		bne @doLevelRender
-		ldx #$00
+        ldx #level_old-levelNumber
+        lda lagFlag
+        and #$01
+        bne @doLevelRender
+        ldx #$00
 @doLevelRender:
         lda levelNumber,x
         jsr renderByteBCD
@@ -102,26 +102,26 @@ render_mode_play_and_demo:
         ; 3 added in float
 
         ; scorecap
-		lda crashMode
-		cmp #CRASH_SHOW
-		bne @noCrash
-		lda crashFlag
-		cmp #$F0
-		bne @noCrash
-		
-		lda #$20
-		sta PPUADDR
-		lda #$FD
-		sta PPUADDR
-		lda #$D8
-		sta PPUDATA
-		lda #$3F
-		sta PPUADDR
-		lda #$0D
-		sta PPUADDR
-		lda #$3D
-		sta PPUDATA
-@noCrash:		
+        lda crashMode
+        cmp #CRASH_SHOW
+        bne @noCrash
+        lda crashFlag
+        cmp #$F0
+        bne @noCrash
+
+        lda #$20
+        sta PPUADDR
+        lda #$FD
+        sta PPUADDR
+        lda #$D8
+        sta PPUDATA
+        lda #$3F
+        sta PPUADDR
+        lda #$0D
+        sta PPUADDR
+        lda #$3D
+        sta PPUDATA
+@noCrash:
         lda scoringModifier
         cmp #SCORING_HIDDEN
         bne @notHidden
@@ -311,11 +311,11 @@ rightColumns:
         .byte   $05,$06,$07,$08,$09
 ; Set Background palette 2 and Sprite palette 2
 updatePaletteForLevel:
-		ldx #level_old-levelNumber
-		lda lagFlag
-		and #$01
-		bne @loadLevelNumber
-		ldx #$00
+        ldx #level_old-levelNumber
+        lda lagFlag
+        and #$01
+        bne @loadLevelNumber
+        ldx #$00
 @loadLevelNumber:
         lda levelNumber,x
 @mod10: cmp #$0A

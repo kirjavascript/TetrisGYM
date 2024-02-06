@@ -57,7 +57,7 @@ garbageDelay: .res 1 ; $005A
 pieceTileModifier: .res 1 ; $005B ; above $80 - use a single one, below - use an offset
 curtainRow: .res 1 ; $5C
 lines_old: .res 2 ; $5D-E ; used for delayed draw at high levels
-level_old: .res 1 ; $5F 
+level_old: .res 1 ; $5F
 
 mathRAM: .res $12
 binary32 := mathRAM+$0
