@@ -170,7 +170,8 @@ oamStaging: .res $100 ; $0200                        ; format: https://wiki.nesd
 statsByType: .res $E ; $03F0
     .res 2
 playfield: .res $c8 ; $0400
-    .res $38
+    .res $38 ; still technically part of playfield
+
     .res $100 ; $500 ; 2 player playfield
 
 practiseType: .res 1 ; $600

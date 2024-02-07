@@ -174,10 +174,6 @@ checkLinecap: ; set linecapState
 
 addPoints:
         inc playState
-addPointsRaw:
-.if NO_SCORING
-        rts
-.endif
         lda practiseType
         cmp #MODE_CHECKERBOARD
         beq handlePointsCheckerboard
@@ -195,11 +191,18 @@ addPointsRaw:
         lda #4
         sta completedLines
 @notTapQuantity:
+
         lda crashMode
         cmp #CRASH_OFF
         beq @crashDisabled
         jsr testCrash
 @crashDisabled:
+
+addPointsRaw:
+.if NO_SCORING
+        rts
+.endif
+
         lda holdDownPoints
         cmp #$02
         bmi @noPushDown
