@@ -65,7 +65,7 @@ advanceGameTSpins_actual:
 @notSuccessful:
         ; check if a tspin is setup
         lda tspinX
-        ; cmp #0 ; lda sets z flag
+        cmp #0
         bne renderTSpin
 
 generateNewTSpin:
@@ -117,7 +117,7 @@ renderTSpin:
         sta $03c7, x
         sta $03b3, x
         ldy tspinType
-        ; cpy #0 ; ldy sets z flag
+        cpy #0
         bne @noInc
         inx
         inx
