@@ -13,6 +13,7 @@ mod rng;
 mod score;
 mod sps;
 mod toprow;
+mod tspins;
 
 use gumdrop::Options;
 
@@ -45,6 +46,8 @@ fn main() {
     if options.test {
         floor::test();
         println!(">> floor ✅");
+        tspins::test();
+        println!(">> tspins ✅");
         toprow::test();
         println!(">> top row bug ✅");
         score::test();
@@ -125,8 +128,7 @@ fn main() {
                 emu.run_until_vblank();
             }
 
-            emu.ppu.render_ntsc(video::WIDTH);
-            view.update(&emu.ppu.filtered_screen);
+            view.render(&mut emu);
         });
         loop {}
     }

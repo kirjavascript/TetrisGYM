@@ -1,3 +1,4 @@
+use rusticnes_core::nes::NesState;
 use minifb::{Window, WindowOptions};
 
 pub const WIDTH: usize = 256;
@@ -24,7 +25,8 @@ impl Video {
         }
     }
 
-    pub fn update(&mut self, screen: &Vec<u32>) {
-        self.window.update_with_buffer(screen, WIDTH, HEIGHT).unwrap();
+    pub fn render(&mut self, emu: &mut NesState) {
+        emu.ppu.render_ntsc(WIDTH);
+        self.window.update_with_buffer(&emu.ppu.filtered_screen, WIDTH, HEIGHT).unwrap();
     }
 }
