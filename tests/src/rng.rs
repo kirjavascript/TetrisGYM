@@ -4,12 +4,27 @@ use std::collections::HashSet;
 pub fn test() {
     assert_eq!(
         seeds(),
-        include_str!("./rng_seeds.txt")
-            .trim()
-            .split('\n')
-            .map(|s| s.trim().parse::<u16>().expect(s))
-            .collect::<HashSet<_>>()
+        seeds_impl(),
     );
+}
+
+pub fn seeds_impl() -> HashSet<u16> {
+    let mut seeds: HashSet<u16> = HashSet::new();
+
+    let mut seed = 0x8988;
+
+    loop {
+        seeds.insert(seed);
+
+        let new_bit = ((seed >> 9) ^ (seed >> 1)) & 1;
+        seed = (new_bit << 15) | (seed >> 1);
+
+        if seed == 0x8988 {
+            break;
+        }
+    }
+
+    seeds
 }
 
 pub fn seeds() -> HashSet<u16> {
