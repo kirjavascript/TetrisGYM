@@ -550,10 +550,8 @@ menuYTmp := tmp2
         jmp @loopNext
 
 @renderCrashMode:
-        lda menuScrollY
-        cmp #$58
-        bcs @doRender
-        jmp @loopNext
+        jsr menuItemY16Offset
+        bne @loopNext
 @doRender:
         lda crashMode
         cmp #CRASH_OFF

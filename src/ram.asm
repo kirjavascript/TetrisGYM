@@ -5,6 +5,9 @@ tmp3: .res 1
 tmpX: .res 1 ;  $0003
 tmpY: .res 1 ;  $0004
 tmpZ: .res 1 ;  $0005
+switchTmp1 := tmpX ; for switch_s_plus_2a
+switchTmp2 := tmpY
+
 tmpBulkCopyToPpuReturnAddr: .res 2 ;  $0006 ; 2 bytes
 binScore: .res 4 ;  $8 ; 4 bytes binary
 score: .res 4 ;  $C ; 4 bytes BCD
@@ -12,8 +15,7 @@ nmiReturnAddr: .res 1 ; $0010 ; used for crash
 crashFlag: .res 1 ; $0011 ; used for crash
 cycleCount: .res 2 ; $0012 ; 2 bytes ; used for crash
 oneThirdPRNG: .res 1 ; $0014 ; used for crash
-switchTmp1:	.res 1 ; $0015 ; for switch_s_plus_2a
-switchTmp2: .res 1 ; $0016
+    .res $2
 
 rng_seed: .res 2 ; $0017
 spawnID: .res 1 ; $0019

@@ -143,7 +143,7 @@ stringHalt:
 stringNull:
         .byte $0
 stringShown:
-        .byte $5,'S','H','O','W','N'
+        .byte $4,'S','H','O','W'
 stringTopout:
         .byte $6,'T','O','P','O','U','T'
 stringCrash:
