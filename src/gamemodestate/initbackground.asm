@@ -283,10 +283,7 @@ drawDarkMode:
         bne @darkTiles
         inx
         bne @darkLoop
-@ret:   
-        lda currentPpuCtrl
-        sta PPUCTRL
-        rts
+@ret:   rts
 
 
 drawHorz = $00
