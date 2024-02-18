@@ -12,7 +12,10 @@ gameModeState_initGameBackground:
         jsr copyRleNametableToPpu
         .addr   game_nametable
         jsr scoringBackground
+        lda darkMode
+        beq @notDarkMode
         jsr drawDarkMode
+@notDarkMode:
 
         lda hzFlag
         beq @noHz
@@ -291,31 +294,31 @@ drawVert = $01
 
 darkmode_stripes:
         .byte  $20,$00
-        .byte  75 << 1 | drawHorz
+        .byte  $4B << 1 | drawHorz
         .byte  $20,$60
-        .byte  24 << 1  | drawVert
+        .byte  $18 << 1 | drawVert
         .byte  $20,$61
-        .byte  03 << 1  | drawVert
+        .byte  $03 << 1 | drawVert
         .byte  $20,$6A
-        .byte  05 << 1  | drawVert
+        .byte  $05 << 1 | drawVert
         .byte  $20,$5F
-        .byte  21 << 1  | drawVert
+        .byte  $15 << 1 | drawVert
         .byte  $20,$C1
-        .byte  09 << 1  | drawHorz
+        .byte  $09 << 1 | drawHorz
         .byte  $20,$E1
-        .byte  09 << 1  | drawHorz
+        .byte  $09 << 1 | drawHorz
         .byte  $21,$77
-        .byte  08 << 1  | drawHorz
+        .byte  $08 << 1 | drawHorz
         .byte  $21,$9D
-        .byte  07 << 1  | drawVert
+        .byte  $07 << 1 | drawVert
         .byte  $21,$7E
-        .byte  12 << 1  | drawVert
+        .byte  $0C << 1 | drawVert
         .byte  $22,$F7
-        .byte  09 << 1  | drawHorz
+        .byte  $09 << 1 | drawHorz
         .byte  $23,$17
-        .byte  09 << 1  | drawHorz
+        .byte  $09 << 1 | drawHorz
         .byte  $23,$37
-        .byte  09 << 1  | drawHorz
+        .byte  $09 << 1 | drawHorz
         .byte  $23,$57
-        .byte  105 << 1  | drawHorz
+        .byte  $69 << 1 | drawHorz
         .byte  $00
