@@ -492,7 +492,6 @@ menuYTmp := tmp2
         beq @renderCrashMode
 
 
-        lda menuCounter
         jsr menuItemY16Offset
         bne @loopNext
         txa
