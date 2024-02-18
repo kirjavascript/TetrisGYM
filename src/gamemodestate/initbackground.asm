@@ -12,6 +12,7 @@ gameModeState_initGameBackground:
         jsr copyRleNametableToPpu
         .addr   game_nametable
         jsr scoringBackground
+        jsr drawDarkMode
 
         lda hzFlag
         beq @noHz
@@ -249,3 +250,72 @@ savestate_nametable_patch:
         .byte   $23,$17,$3B,$1C,$15,$18,$1D,$FF,$FF,$3C,$FE
         .byte   $23,$37,$3B,$FF,$FF,$FF,$FF,$FF,$FF,$3C,$FE
         .byte   $23,$57,$3D,$3E,$3E,$3E,$3E,$3E,$3E,$3F,$FD
+
+drawDarkMode:
+        lda currentPpuCtrl
+        and #%11111011
+        sta tmp1
+        ldx #$00
+@darkLoop:
+        lda darkmode_stripes,x
+        beq @ret
+        sta PPUADDR
+        inx
+        lda darkmode_stripes,x
+        sta PPUADDR
+        inx
+        lda darkmode_stripes,x
+        lsr
+        tay
+        lda #$00
+        rol
+        asl
+        asl
+        ora tmp1
+        sta PPUCTRL
+        lda #$FF
+@darkTiles:
+        sta PPUDATA
+        dey
+        bne @darkTiles
+        inx
+        bne @darkLoop
+@ret:   
+        lda currentPpuCtrl
+        sta PPUCTRL
+        rts
+
+
+drawHorz = $00
+drawVert = $01
+
+darkmode_stripes:
+        .byte  $20,$00
+        .byte  75 << 1 | drawHorz
+        .byte  $20,$60
+        .byte  24 << 1  | drawVert
+        .byte  $20,$61
+        .byte  03 << 1  | drawVert
+        .byte  $20,$6A
+        .byte  05 << 1  | drawVert
+        .byte  $20,$5F
+        .byte  21 << 1  | drawVert
+        .byte  $20,$C1
+        .byte  09 << 1  | drawHorz
+        .byte  $20,$E1
+        .byte  09 << 1  | drawHorz
+        .byte  $21,$77
+        .byte  08 << 1  | drawHorz
+        .byte  $21,$9D
+        .byte  07 << 1  | drawVert
+        .byte  $21,$7E
+        .byte  12 << 1  | drawVert
+        .byte  $22,$F7
+        .byte  09 << 1  | drawHorz
+        .byte  $23,$17
+        .byte  09 << 1  | drawHorz
+        .byte  $23,$37
+        .byte  09 << 1  | drawHorz
+        .byte  $23,$57
+        .byte  105 << 1  | drawHorz
+        .byte  $00
