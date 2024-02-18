@@ -4,6 +4,7 @@
 * Crunch Mode
 * Marathon Mode
 * Hidden Score Mode
+* Dark Mode
 * M Score changed to Classic Scoring + Millions counter
 * Invisible linecap turns entire playfield invisible
 * Invisible mode preserves original piece colors
