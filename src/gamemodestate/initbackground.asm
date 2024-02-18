@@ -255,9 +255,6 @@ savestate_nametable_patch:
         .byte   $23,$57,$3D,$3E,$3E,$3E,$3E,$3E,$3E,$3F,$FD
 
 drawDarkMode:
-        lda currentPpuCtrl
-        and #%11111011
-        sta tmp1
         ldx #$00
 @darkLoop:
         lda darkmode_stripes,x
@@ -274,7 +271,7 @@ drawDarkMode:
         rol
         asl
         asl
-        ora tmp1
+        ora currentPpuCtrl
         sta PPUCTRL
         lda #$FF
 @darkTiles:
