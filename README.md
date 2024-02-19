@@ -25,6 +25,7 @@
     * [Garbage](#garbage)
     * [Drought](#drought)
     * [DAS Delay](#das-delay)
+    * [Low Stack](#low-stack)
     * [Double Killscreen](#double-killscreen)
     * [Invisible](#invisible)
     * [Hard Drop](#hard-drop)
@@ -223,6 +224,12 @@ Create artificially inflated droughts. Increasing the value causes less I pieces
 ### DAS Delay
 
 Change the auto-shift delay rate.
+
+### Low Stack
+
+![Low-Stack](./assets/screens/lowstack.png)
+
+Choose a height limit for your stack and stay below or else it's game over.  
 
 ### Double Killscreen
 

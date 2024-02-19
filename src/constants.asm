@@ -34,6 +34,7 @@ BTYPE_START_LINES := $25 ; bcd
 MENU_HIGHLIGHT_COLOR := $12 ; $12 in gym, $16 in original
 BLOCK_TILES := $7B
 EMPTY_TILE := $EF
+LOW_STACK_LINE := $DF
 TETRIMINO_X_HIDE := $EF
 
 PAUSE_SPRITE_X := $74
@@ -70,6 +71,7 @@ MODE_CHECKERBOARD
 MODE_GARBAGE
 MODE_DROUGHT
 MODE_DAS
+MODE_LOWSTACK
 MODE_KILLX2
 MODE_INVISIBLE
 MODE_HARDDROP
@@ -135,6 +137,7 @@ MENU_TOP_MARGIN_SCROLL := 7 ; in blocks
     .byte $4    ; MODE_GARBAGE
     .byte $12   ; MODE_DROUGHT
     .byte $10   ; MODE_DAS
+    .byte $0F   ; MODE_LOWSTACK
     .byte $0    ; MODE_KILLX2
     .byte $0    ; MODE_INVISIBLE
     .byte $0    ; MODE_HARDDROP
@@ -171,6 +174,7 @@ MENU_TOP_MARGIN_SCROLL := 7 ; in blocks
     .byte   "GARBGE"
     .byte   "LOBARS"
     .byte   "DASDLY"
+    .byte   "LOSTAK"
     .byte   "KILLX2"
     .byte   "INVZBL"
     .byte   "HRDDRP"
