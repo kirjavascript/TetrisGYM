@@ -10,8 +10,9 @@ gameMode_speedTest:
         jsr hzStart
         jsr updateAudioWaitForNmiAndDisablePpuRendering
         jsr disableNmi
-        jsr copyRleNametableToPpu
-        .addr speedtest_nametable
+        jsr clearNametable
+        jsr bulkCopyToPpu
+        .addr speedtest_nametable_patch
         jsr bulkCopyToPpu
         .addr game_palette
         ; patch color

@@ -4,9 +4,15 @@
 *.o
 *.chr
 *.pyc
+*.bin
 tetris.lst
 tetris.lbl
 tetris.map
 tetris.dbg
 release/*
 target
+
+!src/nametables/enter_high_score_nametable.bin
+!src/nametables/game_nametable.bin
+!src/nametables/game_type_menu_nametable.bin
+!src/nametables/level_menu_nametable.bin

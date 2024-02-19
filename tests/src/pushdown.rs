@@ -35,6 +35,7 @@ fn pushdown_impl(pushdown: u8, score: u16) -> u16 {
     let low = added & 0xF;
     let high = (added >> 4) * 10;
 
+    // you can dedupe the `- ones` here and just subtract it from `high` instead
     if high + low + hundredths - ones <= 100 {
         high + low - ones
     } else {

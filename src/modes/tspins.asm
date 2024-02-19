@@ -97,7 +97,8 @@ renderTSpin:
         jsr clearPlayfield
 
         lda tspinY
-        adc #1
+        clc
+        adc #2
         jsr drawFloor
 
         ; get tspin offset

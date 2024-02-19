@@ -12,6 +12,8 @@ mod pushdown;
 mod rng;
 mod score;
 mod sps;
+mod toprow;
+mod tspins;
 
 use gumdrop::Options;
 
@@ -43,17 +45,21 @@ fn main() {
     // run tests
     if options.test {
         floor::test();
-        println!("floor 0 works!");
+        println!(">> floor ✅");
+        tspins::test();
+        println!(">> tspins ✅");
+        toprow::test();
+        println!(">> top row bug ✅");
         score::test();
-        println!("score works!");
+        println!(">> score ✅");
         score::test_render();
-        println!("score rendering works!");
+        println!(">> score rendering ✅");
         pushdown::test();
-        println!("pushdown works!");
+        println!(">> pushdown ✅");
         rng::test();
-        println!("rng seeds are the same!");
+        println!(">> rng seeds ✅");
         sps::test();
-        println!("sps is the same!");
+        println!(">> sps ✅");
     }
 
     // count cycles
@@ -122,8 +128,7 @@ fn main() {
                 emu.run_until_vblank();
             }
 
-            emu.ppu.render_ntsc(video::WIDTH);
-            view.update(&emu.ppu.filtered_screen);
+            view.render(&mut emu);
         });
         loop {}
     }
