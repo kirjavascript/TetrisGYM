@@ -196,7 +196,11 @@ Setting the value to G causes the mode to act identical to the game genie code `
 
 ### Marathon
 
-Play as long as you are able to survive at a consistent speed.  While the level will increase normally, the drop rate and the points rewarded will remain fixed based on the starting level.
+Play as long as you are able to survive at a consistent speed.
+
+0. Level transitions do not happen, game remains on the same level for as long as you are able to survive.
+1. Levels will transition normally, but speed and points will remain fixed based on your starting level.
+2. Similar to 1, speed and points will remain fixed based on the starting level you choose, but actual game will begin at level 0.
 
 ### Garbage
 
