@@ -7,6 +7,24 @@ clearPlayfield:
         bne @loop
         rts
 
+clearNametable:
+        lda #$20
+        sta PPUADDR
+        lda #$0
+        sta PPUADDR
+        lda #EMPTY_TILE
+        ldx #4
+        ldy #$BF
+@clearTile:
+        sta PPUDATA
+        dey
+        bne @clearTile
+        sta PPUDATA
+        ldy #$FF
+        dex
+        bne @clearTile
+        rts
+
 drawBlackBGPalette:
         lda #$3F
         sta PPUADDR

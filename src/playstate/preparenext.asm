@@ -44,54 +44,27 @@ playState_prepareNext:
         lda linecapState
         cmp #LINECAP_HALT
         bne @linecapHaltEnd
-        lda crashFlag
-        cmp #$F0
-        bne @gg
-        lda #'C'
-        sta playfield+$66
-        lda #'R'
-        sta playfield+$67
-        lda #'A'
-        sta playfield+$68
-        lda #'S'
-        sta playfield+$69
-        lda #'H'
-        sta playfield+$6A
-        lda #$28
-        sta playfield+$6B
-        bne @finish
-@gg:
-        lda #'G'
-        sta playfield+$67
-        sta playfield+$68
-        lda #$28
-        sta playfield+$6A
-@finish:
-        lda #0
-        sta vramRow
-        jsr typeBEndingStuffEnd
-        rts
-@linecapHaltEnd:
+        ldx #<haltEndingGraphic
+        ldy #>haltEndingGraphic
 
+        lda crashFlag ; LINECAP_HALT set in testCrash
+        cmp #$F0
+        bne @nonCrash
+        ldx #<crashGraphic
+        ldy #>crashGraphic
+@nonCrash:
+        jmp copyGraphic
+
+@linecapHaltEnd:
         jsr practisePrepareNext
         inc playState
         rts
 
 typeBEndingStuff:
-        ; copy success graphic
-        ldx #$5C
-        ldy #$0
-@copySuccessGraphic:
-        lda typebSuccessGraphic,y
-        cmp #$80
-        beq @graphicCopied
-        sta playfield,x
-        inx
-        iny
-        jmp @copySuccessGraphic
-@graphicCopied:
-        lda #$00
-        sta vramRow
+        ldx #<typebSuccessGraphic
+        ldy #>typebSuccessGraphic
+copyGraphic:
+        jsr copyGraphicToPlayfield
 
 typeBEndingStuffEnd:
         ; play sfx
@@ -116,5 +89,32 @@ sleep_gameplay_nextSprite:
         bne @loop
         rts
 
+copyGraphicToPlayfield:
+        lda #$09 ; default row
+copyGraphicToPlayfieldAtCustomRow:
+        stx generalCounter
+        sty generalCounter2
+        tax
+        lda multBy10Table,x
+        clc
+        adc #$02 ; indent
+        tax
+        ldy #$00
+@copySuccessGraphic:
+        lda (generalCounter),y
+        beq @graphicCopied
+        sta playfield,x
+        inx
+        iny
+        bne @copySuccessGraphic
+@graphicCopied: ; 0 in accumulator
+        sta vramRow
+        rts
+
+; $28 is ! in game tileset
+haltEndingGraphic:
+        .byte   $FF,'G','G',$FF,$28,$00
 typebSuccessGraphic:
-        .byte   $17,$12,$0C,$0E,$FF,$28,$80
+        .byte   'N','I','C','E',$FF,$28,$00
+crashGraphic:
+        .byte   'C','R','A','S','H',$28,$00
