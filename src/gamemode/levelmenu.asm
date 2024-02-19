@@ -1,6 +1,5 @@
 gameMode_levelMenu:
-        lda currentPpuCtrl
-        and #NMIEnable
+        lda #NMIEnable
         sta currentPpuCtrl
         jsr updateAudio2
         lda #$7
