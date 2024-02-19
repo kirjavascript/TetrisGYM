@@ -23,6 +23,7 @@ clearNametable:
         ldy #$FF
         dex
         bne @clearTile
+        rts
 
 drawBlackBGPalette:
         lda #$3F
