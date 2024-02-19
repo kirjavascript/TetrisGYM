@@ -33,8 +33,10 @@ reset:  cld
         txs
         jsr mapperInit
         jsr setHorizontalMirroring
+.if INES_MAPPER <> 0
         lda #CHRBankSet0
         jsr changeCHRBanks
+.endif
         jmp initRam
 
 .macro setMMC1PRG

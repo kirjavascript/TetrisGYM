@@ -7,8 +7,10 @@ gameMode_levelMenu:
         sta renderMode
         jsr updateAudioWaitForNmiAndDisablePpuRendering
         jsr disableNmi
+.if INES_MAPPER <> 0
         lda #CHRBankSet0
         jsr changeCHRBanks
+.endif
         jsr bulkCopyToPpu
         .addr   menu_palette
         jsr copyRleNametableToPpu

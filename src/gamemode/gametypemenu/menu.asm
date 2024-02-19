@@ -22,8 +22,10 @@ gameMode_gameTypeMenu:
         sta tmp3
         jsr copyRleNametableToPpuOffset
         .addr   game_type_menu_nametable_extra
+.if INES_MAPPER <> 0
         lda #CHRBankSet0
         jsr changeCHRBanks
+.endif
         lda #NMIEnable
         sta currentPpuCtrl
         jsr waitForVBlankAndEnableNmi

@@ -79,8 +79,8 @@ endingAnimation: ; rocket_screen
 .if INES_MAPPER <> 0
         ; NROM will use a smaller ufo in the game tileset
         lda #CHRBankSet1
-.endif
         jsr changeCHRBanks
+.endif
         lda #NMIEnable
         sta currentPpuCtrl
         jsr copyRleNametableToPpu
@@ -237,7 +237,7 @@ handleRocket:
         lda #>spriteCathedralFire0
         sta $1
         lda frameCounter
-.if INES_MAPPER = 0 
+.if INES_MAPPER = 0
         and #8 ; Every 8 frames for ufo
 .else
         and #1 ; Every other frame for cathedral

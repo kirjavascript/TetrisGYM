@@ -13,8 +13,8 @@ waitScreenLoad:
 ; and will instead use the title/menu chrset letters.  This won't be noticeable
 ; unless a graphic is added 
         lda #CHRBankSet1
-.endif
         jsr changeCHRBanks
+.endif
         jsr bulkCopyToPpu
         .addr wait_palette
         jsr copyRleNametableToPpu

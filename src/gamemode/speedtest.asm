@@ -23,8 +23,10 @@ gameMode_speedTest:
         sta PPUDATA
         lda #NMIEnable|BGPattern1|SpritePattern1
         sta currentPpuCtrl
+.if INES_MAPPER <> 0
         lda #CHRBankSet0
         jsr changeCHRBanks
+.endif
 
         jsr waitForVBlankAndEnableNmi
         jsr updateAudioWaitForNmiAndResetOamStaging

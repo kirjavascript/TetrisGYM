@@ -1,8 +1,10 @@
 gameModeState_initGameBackground:
         jsr updateAudioWaitForNmiAndDisablePpuRendering
         jsr disableNmi
+.if INES_MAPPER <> 0
         lda #CHRBankSet0
         jsr changeCHRBanks
+.endif
         jsr bulkCopyToPpu
         .addr   game_palette
         jsr copyRleNametableToPpu
