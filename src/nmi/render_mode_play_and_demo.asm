@@ -20,8 +20,8 @@ render_mode_play_and_demo:
         and #$01
         beq @renderLevel
 
-        ldx #lines_old-lines
-        lda lagFlag
+        ldx #linesPrev-lines
+        lda lagState
         and #$02
         bne @doLinesRender
         ldx #$00
@@ -60,8 +60,8 @@ render_mode_play_and_demo:
         sta PPUADDR
         lda #$B9
         sta PPUADDR
-        ldx #level_old-levelNumber
-        lda lagFlag
+        ldx #levelPrev-levelNumber
+        lda lagState
         and #$01
         bne @doLevelRender
         ldx #$00
@@ -102,10 +102,10 @@ render_mode_play_and_demo:
         ; 3 added in float
 
         ; scorecap
-        lda crashMode
+        lda crashModifier
         cmp #CRASH_SHOW
         bne @noCrash
-        lda crashFlag
+        lda crashState
         cmp #$F0
         bne @noCrash
 
@@ -307,8 +307,8 @@ rightColumns:
         .byte   $05,$06,$07,$08,$09
 ; Set Background palette 2 and Sprite palette 2
 updatePaletteForLevel:
-        ldx #level_old-levelNumber
-        lda lagFlag
+        ldx #levelPrev-levelNumber
+        lda lagState
         and #$01
         bne @loadLevelNumber
         ldx #$00

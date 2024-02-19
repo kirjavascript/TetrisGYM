@@ -552,7 +552,7 @@ menuYTmp := tmp2
         jsr menuItemY16Offset
         bne @loopNext
 @doRender:
-        lda crashMode
+        lda crashModifier
         cmp #CRASH_OFF
         bne @notOff
         lda #$F1

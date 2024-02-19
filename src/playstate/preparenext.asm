@@ -47,7 +47,7 @@ playState_prepareNext:
         ldx #<haltEndingGraphic
         ldy #>haltEndingGraphic
 
-        lda crashFlag ; LINECAP_HALT set in testCrash
+        lda crashState ; LINECAP_HALT set in testCrash
         cmp #$F0
         bne @nonCrash
         ldx #<crashGraphic

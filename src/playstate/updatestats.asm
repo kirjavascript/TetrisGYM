@@ -43,16 +43,16 @@ playState_updateLinesAndStatistics:
 
         ldx completedLines
         lda lines
-        sta lines_old
+        sta linesPrev
         lda lines+1
-        sta lines_old+1
+        sta linesPrev+1
 incrementLines:
         inc lines
         lda lines
         and #$0F
         cmp #$0A
         bmi checkLevelUp
-        inc crashFlag
+        inc crashState
         lda lines
         clc
         adc #$06
@@ -64,9 +64,9 @@ incrementLines:
         and #$0F
         sta lines
         inc lines+1
-        lda crashFlag
+        lda crashState
         ora #$02
-        sta crashFlag
+        sta crashState
 
 checkLevelUp:
         jsr calcBCDLinesAndTileQueue
@@ -104,11 +104,11 @@ checkLevelUp:
 
 @nextLevel:
         lda levelNumber
-        sta level_old
+        sta levelPrev
         inc levelNumber
-        lda crashFlag
+        lda crashState
         ora #$08
-        sta crashFlag
+        sta crashState
         lda #$06 ; checked in floor linecap stuff, just below
         sta soundEffectSlot1Init
         lda outOfDateRenderFlags
@@ -192,7 +192,7 @@ addPoints:
         sta completedLines
 @notTapQuantity:
 
-        lda crashMode
+        lda crashModifier
         cmp #CRASH_OFF
         beq @crashDisabled
         jsr testCrash
@@ -540,21 +540,21 @@ testCrash:
         adc allegroIndex
         sta allegroIndex
 @digit1:
-        lda crashFlag
+        lda crashState
         and #$01
         beq @digit2
         lda #$4F ; add 79 cycles for lines 10s place
         adc allegroIndex
         sta allegroIndex
 @digit2:
-        lda crashFlag
+        lda crashState
         and #$02
         beq @newLevel
         lda #$0C ; add 12 cycles for lines 100s place
         adc allegroIndex
         sta allegroIndex
 @newLevel:
-        lda crashFlag
+        lda crashState
         and #$08
         beq @pushDown
         lda #$12 ; 18 cycles for levelup
@@ -617,7 +617,7 @@ testCrash:
         sta factorA24+2
         sta factorB24+1
         sta factorB24+2
-        sta crashFlag ; unrelated to current routine, just needed to clear the flag and $00 was loaded.
+        sta crashState ; unrelated to current routine, just needed to clear the flag and $00 was loaded.
         jsr unsigned_mul24 ; result in product24
         clc
         lda product24
@@ -697,7 +697,7 @@ testCrash:
         cmp #$31 ; gap
         bcs @continue
         lda #$F0
-        sta crashFlag ; F0 means standard crash.
+        sta crashState ; F0 means standard crash.
         jmp @crashGraphics ;too far to branch
 @continue:
         cmp #$36
@@ -717,7 +717,7 @@ testCrash:
         jmp @allegroClear ;allegroClear is basically return, just clears the variable first.
 @notRed:
         lda #$F0
-        sta crashFlag
+        sta crashState
         jmp @crashGraphics ;triggering crash in all other cases
 
 @nextSwitch:
@@ -753,7 +753,7 @@ testCrash:
         bcs @nextCheck
 @confettiA:
         lda #$E0 ;E0 = limited confetti
-        sta crashFlag
+        sta crashState
         jmp confettiHandler
 @nextCheck:
         ;levellag at 30877 = 0x789D
@@ -766,7 +766,7 @@ testCrash:
         bcc @allegroClear
 @levelLag:
         lda #$01
-        sta lagFlag
+        sta lagState
         ;linelag at 31072 = 0x7960
         lda cycleCount
         cmp #$79;high byte min
@@ -777,7 +777,7 @@ testCrash:
         bcc @allegroClear
 @lineLag:
         lda #$03
-        sta lagFlag
+        sta lagState
         ;confettiB at 31327-31755 7A5F-7C0B
         lda cycleCount
         cmp #$7A ;high byte min
@@ -795,12 +795,12 @@ testCrash:
         bcs @allegroClear
 @confettiB:
         lda #$D0 ;D0 = infinite confetti
-        sta crashFlag
+        sta crashState
         jmp confettiHandler
 @allegroClear:
         lda #$00 ;reset allegro flag and return to program execution, no crash
         sta allegroIndex
-        lda lagFlag
+        lda lagState
         beq @noLag ;if lag should happen, wait a frame here so that sprite staging doesn't happen.
         lda #$00
         sta verticalBlankingInterval
@@ -811,7 +811,7 @@ testCrash:
 @crashGraphics:
         lda #$00
         sta allegroIndex ; resetting variable
-        lda crashMode
+        lda crashModifier
         bne @otherMode
         lda outOfDateRenderFlags ; if mode = 0, tell score to update (might not be necessary?) so that crash info is printed
         ora #$04
@@ -835,7 +835,7 @@ sumTable:
 switchTable:
     .byte $3C, $77, $3C, $65, $3C, $66, $3C;60 119 60 101 60 102 60 gets read in reverse
 confettiHandler:
-        lda crashFlag ;E0 = confetti exits if [framecounter = 255 && controller != BDLR] or controller = AS
+        lda crashState ;E0 = confetti exits if [framecounter = 255 && controller != BDLR] or controller = AS
         cmp #$E0
         bne @infiniteConfetti
         lda heldButtons_player1

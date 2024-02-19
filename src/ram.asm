@@ -12,7 +12,7 @@ tmpBulkCopyToPpuReturnAddr: .res 2 ;  $0006 ; 2 bytes
 binScore: .res 4 ;  $8 ; 4 bytes binary
 score: .res 4 ;  $C ; 4 bytes BCD
 nmiReturnAddr: .res 1 ; $0010 ; used for crash
-crashFlag: .res 1 ; $0011 ; used for crash
+crashState: .res 1 ; $0011 ; used for crash
 cycleCount: .res 2 ; $0012 ; 2 bytes ; used for crash
 oneThirdPRNG: .res 1 ; $0014 ; used for crash
     .res $2
@@ -25,7 +25,7 @@ pointerAddrB: .res 2 ; $001D ; used in harddrop
 allegroIndex: .res 1 ; $001F for crash
 wasAllegro: .res 1 ; $0020 for crash
 startParity: .res 1 ; $0021 for crash
-lagFlag: .res 1 ; $0022 for lagged lines & score
+lagState: .res 1 ; $0022 for lagged lines & score
     .res $10
 
 verticalBlankingInterval: .res 1 ; $0033
@@ -58,8 +58,8 @@ garbageHole: .res 1 ; $0059                        ; Position of hole in receive
 garbageDelay: .res 1 ; $005A
 pieceTileModifier: .res 1 ; $005B ; above $80 - use a single one, below - use an offset
 curtainRow: .res 1 ; $5C
-lines_old: .res 2 ; $5D-E ; used for delayed draw at high levels
-level_old: .res 1 ; $5F
+linesPrev: .res 2 ; $5D-E ; used for delayed draw at high levels
+levelPrev: .res 1 ; $5F
 
 mathRAM: .res $12
 binary32 := mathRAM+$0
@@ -349,6 +349,6 @@ linecapFlag: .res 1
 dasOnlyFlag: .res 1
 qualFlag: .res 1
 palFlag: .res 1
-crashMode: .res 1
+crashModifier: .res 1
 
 ; ... $7FF
