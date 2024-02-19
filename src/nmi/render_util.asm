@@ -55,11 +55,11 @@ render_playfield:
         rts
 
 vramPlayfieldRows:
-        .word   $20C6,$20E6,$2106,$2126
-        .word   $2146,$2166,$2186,$21A6
-        .word   $21C6,$21E6,$2206,$2226
-        .word   $2246,$2266,$2286,$22A6
-        .word   $22C6,$22E6,$2306,$2326
+        .word   $20CC,$20EC,$210C,$212C
+        .word   $214C,$216C,$218C,$21AC
+        .word   $21CC,$21EC,$220C,$222C
+        .word   $224C,$226C,$228C,$22AC
+        .word   $22CC,$22EC,$230C,$232C
 
 copyPlayfieldRowToVRAM:
         ldx vramRow
@@ -76,8 +76,6 @@ copyPlayfieldRowToVRAM:
         dex
 
         lda vramPlayfieldRows,x
-        clc
-        adc #$06
         sta PPUADDR
 @copyRow:
         ldx #$0A
