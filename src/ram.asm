@@ -320,6 +320,7 @@ floorModifier: .res 1
 crunchModifier: .res 1
 tapModifier: .res 1
 transitionModifier: .res 1
+marathonModifier: .res 1
 tapqtyModifier: .res 1
 checkerModifier: .res 1
 garbageModifier: .res 1

@@ -78,6 +78,12 @@ checkLevelUp:
         lda practiseType
         cmp #MODE_TAPQTY
         beq @lineLoop
+        cmp #MODE_MARATHON
+        bne @notMarathon
+        lda marathonModifier
+        beq @lineLoop ; marathon mode 0 does not transition
+        bne @notSXTOKL
+@notMarathon:
         cmp #MODE_TRANSITION
         bne @notSXTOKL
         lda transitionModifier
