@@ -111,6 +111,22 @@ updateMusicSpeed:
         jsr setMusicTrack
 @ret:   rts
 
+checkIfAboveLowStackLine:
+; carry set - block found
+        ldx lowStackRow
+        lda multBy10Table,x
+        tay
+        ldx #$0A
+        sec
+@checkForBlockInRow:
+        lda playfield,y
+        bpl @foundBlockInRow
+        iny
+        dex
+        bne @checkForBlockInRow
+        clc
+@foundBlockInRow:
+        rts
 
 ; canon is adjustMusicSpeed
 setMusicTrack:

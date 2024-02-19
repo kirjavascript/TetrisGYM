@@ -103,6 +103,8 @@ copyGraphicToPlayfieldAtCustomRow:
         rts
 
 ; $28 is ! in game tileset
+lowStackNopeGraphic:
+        .byte   "N","O","P","E",$FF,$28,$00
 haltEndingGraphic:
         .byte   $FF,"G","G",$FF,$28,$00
 typebSuccessGraphic:

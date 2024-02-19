@@ -59,11 +59,12 @@ drawTiles(buffer, lookup, `
 #a    GARBAGE                 d#
 #a    DROUGHT                 d#
 #a    DAS DELAY               d#
+#a    LOW STACK               d#
 #a    KILLSCREEN »2           d#
 #a    INVISIBLE               d#
 #a    HARD DROP               d#
-#a    TAP/ROLL SPEED          d#
 `);drawTiles(extra, lookup, `
+#a    TAP/ROLL SPEED          d#
 #a    SCORING                 d#
 #a    HZ DISPLAY              d#
 #a    INPUT DISPLAY           d#
@@ -75,7 +76,6 @@ drawTiles(buffer, lookup, `
 #a    DAS ONLY                d#
 #a    QUAL MODE               d#
 #a    PAL MODE                d#
-#a                            d#
 #a                            d#
 #a V5                         d#
 #a                            d#
