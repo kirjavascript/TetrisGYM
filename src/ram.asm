@@ -5,17 +5,28 @@ tmp3: .res 1
 tmpX: .res 1 ;  $0003
 tmpY: .res 1 ;  $0004
 tmpZ: .res 1 ;  $0005
+switchTmp1 := tmpX ; for switch_s_plus_2a
+switchTmp2 := tmpY
+
 tmpBulkCopyToPpuReturnAddr: .res 2 ;  $0006 ; 2 bytes
 binScore: .res 4 ;  $8 ; 4 bytes binary
 score: .res 4 ;  $C ; 4 bytes BCD
-    .res 7
+nmiReturnAddr: .res 1 ; $0010 ; used for crash
+crashState: .res 1 ; $0011 ; used for crash
+cycleCount: .res 2 ; $0012 ; 2 bytes ; used for crash
+oneThirdPRNG: .res 1 ; $0014 ; used for crash
+    .res $2
 
 rng_seed: .res 2 ; $0017
 spawnID: .res 1 ; $0019
 spawnCount: .res 1 ; $001A
 pointerAddr: .res 2 ; $001B ; used in debug, harddrop
 pointerAddrB: .res 2 ; $001D ; used in harddrop
-    .res $14
+allegroIndex: .res 1 ; $001F for crash
+wasAllegro: .res 1 ; $0020 for crash
+startParity: .res 1 ; $0021 for crash
+lagState: .res 1 ; $0022 for lagged lines & score
+    .res $10
 
 verticalBlankingInterval: .res 1 ; $0033
 set_seed: .res 3 ; $0034 ; rng_seed, rng_seed+1, spawnCount
@@ -47,7 +58,8 @@ garbageHole: .res 1 ; $0059                        ; Position of hole in receive
 garbageDelay: .res 1 ; $005A
 pieceTileModifier: .res 1 ; $005B ; above $80 - use a single one, below - use an offset
 curtainRow: .res 1 ; $5C
-    .res 3
+linesPrev: .res 2 ; $5D-E ; used for delayed draw at high levels
+levelPrev: .res 1 ; $5F
 
 mathRAM: .res $12
 binary32 := mathRAM+$0
@@ -160,7 +172,8 @@ oamStaging: .res $100 ; $0200                        ; format: https://wiki.nesd
 statsByType: .res $E ; $03F0
     .res 2
 playfield: .res $c8 ; $0400
-    .res $38
+    .res $38 ; still technically part of playfield
+
     .res $100 ; $500 ; 2 player playfield
 
 practiseType: .res 1 ; $600
@@ -327,6 +340,7 @@ garbageModifier: .res 1
 droughtModifier: .res 1
 dasModifier: .res 1
 scoringModifier: .res 1
+crashModifier: .res 1
 hzFlag: .res 1
 inputDisplayFlag: .res 1
 disableFlashFlag: .res 1

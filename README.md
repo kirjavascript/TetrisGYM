@@ -76,7 +76,7 @@ Like in the original ROM, holding `a` `b` `select` and then pressing `start` wil
 
 ![Tetris](./assets/screens/levelmenu.png)
 
-Same gameplay as A-Type, with some improvements: no score cap, no rocket, no curtain, no music, always next box, better pause, start on any level.
+Same gameplay as A-Type, with some improvements: no score cap, no rocket, no curtain, no music, better pause, start on any level.
 
 ### T-Spins
 

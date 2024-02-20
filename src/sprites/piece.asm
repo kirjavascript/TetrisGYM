@@ -136,8 +136,6 @@ stageSpriteForCurrentPiece_return:
         rts
 
 stageSpriteForNextPiece:
-        lda qualFlag
-        beq @alwaysNextBox
         lda displayNextPiece
         bne @ret
 
