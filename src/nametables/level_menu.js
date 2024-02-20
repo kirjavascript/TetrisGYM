@@ -30,8 +30,6 @@ ui!###g@ß#####()
 
 lookup = [...lookup].map((d, i) => d === '#' ? String.fromCharCode(9472 + i) : d).join``;
 
-printNT(buffer, lookup);
-
 // heart
 
 // ###a  rtutututututy         d###

@@ -1,7 +1,7 @@
 # Changelog
 
 ## [unreleased]
-* Crash Detection / Simulation
+* Crash Simulation
 * Crunch Mode
 * Marathon Mode
 * Hidden Score Mode

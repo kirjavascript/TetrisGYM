@@ -1,7 +1,6 @@
 const {
-    readStripe,
     writeRLE,
-    printNT,
+    blankNT,
     drawTiles,
     drawRect,
     drawAttrs,
@@ -27,78 +26,74 @@ WXYZ-,˙>########
 ###############
 `);
 
-const buffer = readStripe(__dirname + '/game_type_menu_nametable.bin');
+const buffer = blankNT();
 const extra = [...buffer];
 
-printNT(buffer, lookup);
-
 drawTiles(buffer, lookup, `
-#a                            d#
-#a                            d#
-#a                            d#
-#a                            d#
-#a                            d#
-#a                            d#
-#a                            d#
-#a                            d#
-#a                            d#
-#a    TETRIS                  d#
-#a    T-SPINS                 d#
-#a    SEED                    d#
-#a    STACKING                d#
-#a    PACE                    d#
-#a    SETUPS                  d#
-#a    B-TYPE                  d#
-#a    FLOOR                   d#
-#a    CRUNCH                  d#
-#a    (QUICK)TAP              d#
-#a    TRANSITION              d#
-#a    MARATHON                d#
-#a    TAP QUANTITY            d#
-#a    CHECKERBOARD            d#
-#a    GARBAGE                 d#
-#a    DROUGHT                 d#
-#a    DAS DELAY               d#
-#a    KILLSCREEN »2           d#
-#a    INVISIBLE               d#
-#a    HARD DROP               d#
-#a    TAP/ROLL SPEED          d#
+ɢa                            dɳ
+ɲa                            dɢ
+ɲa                            dɲ
+ʂa                            dʡ
+ʀa                            dɢ
+ɢa                            dɂ
+ɀa                            dʂ
+ʂa                            dɢ
+ʀa                            dɂ
+ʐa    TETRIS                  dʂ
+ɲa    T-SPINS                 dɡ
+ʂa    SEED                    dɲ
+ɢa    STACKING                dʂ
+ɲa    PACE                    dʃ
+ʠa    SETUPS                  dɡ
+ɠa    B-TYPE                  dʂ
+ɰa    FLOOR                   dʃ
+ʁa    CRUNCH                  dʁ
+ɡa    (QUICK)TAP              dʃ
+ʂa    TRANSITION              dɢ
+ɳa    MARATHON                dʠ
+ʃa    TAP QUANTITY            dɳ
+ɡa    CHECKERBOARD            dɡ
+ɱa    GARBAGE                 dʂ
+ɡa    DROUGHT                 dɡ
+ʂa    DAS DELAY               dɱ
+ɢa    KILLSCREEN »2           dʁ
+ɲa    INVISIBLE               dɢ
+ɲa    HARD DROP               dɲ
+ʂa    TAP/ROLL SPEED          dʡ
 `);drawTiles(extra, lookup, `
-#a    SCORING                 d#
-#a    CRASH                   d#
-#a    HZ DISPLAY              d#
-#a    INPUT DISPLAY           d#
-#a    DISABLE FLASH           d#
-#a    DISABLE PAUSE           d#
-#a    GOOFY FOOT              d#
-#a    BLOCK TOOL              d#
-#a    LINECAP                 d#
-#a    DAS ONLY                d#
-#a    QUAL MODE               d#
-#a    PAL MODE                d#
-#a                            d#
-#a                            d#
-#a V5                         d#
-#a                            d#
-#a                            d#
-#a                            d#
-#a                            d#
-#a                            d#
-#a                            d#
-#a                            d#
-#a                            d#
-#a                            d#
-#a                            d#
-#a                            d#
-#a                            d#
-#a                            d#
-#a                            d#
-#a                            d#
+ɢa    SCORING                 dɳ
+ɲa    CRASH                   dɢ
+ɲa    HZ DISPLAY              dɲ
+ʂa    INPUT DISPLAY           dʡ
+ʀa    DISABLE FLASH           dɢ
+ɢa    DISABLE PAUSE           dɂ
+ɀa    GOOFY FOOT              dʂ
+ʂa    BLOCK TOOL              dɢ
+ʀa    LINECAP                 dɂ
+ʐa    DAS ONLY                dʂ
+ɲa    QUAL MODE               dɡ
+ʂa    PAL MODE                dɲ
+ɢa                            dʂ
+ɲa                            dʃ
+ʠa V5                         dɡ
+ɠa                            dʂ
+ɰa                            dʃ
+ʁa                            dʁ
+ɡa                            dʃ
+ʂa                            dɢ
+ɳa                            dʠ
+ʃa                            dɳ
+ɡa                            dɡ
+ɱa                            dʂ
+ɡa                            dɡ
+ʂa                            dɱ
+ɢa                            dʁ
+ɲa                            dɢ
+ɲa                            dɲ
+ʂa                            dʡ
 `);
 
-
 drawRect(buffer, 8, 2, 10, 5, 0xB0); // draw logo
-// drawRect(extra, 20, 0, 5, 5, 0x9A); // draw QR code
 
 const urlX = 3;
 const urlY = 14;
