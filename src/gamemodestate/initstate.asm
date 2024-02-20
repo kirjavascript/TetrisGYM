@@ -13,6 +13,11 @@ gameModeState_initGameState:
         lda #$05
         sta tetriminoX
 
+        ;init for crash frame parity
+        lda frameCounter
+        and #$01
+        sta startParity
+
         ; set seed init
         lda set_seed_input
         sta set_seed

@@ -1,6 +1,7 @@
 # Changelog
 
 ## [unreleased]
+* Crash Detection / Simulation
 * Crunch Mode
 * Marathon Mode
 * Hidden Score Mode
@@ -13,6 +14,7 @@
 * Fixed CNROM legal screen CHR bank
 * Fixed CNROM legal to title flicker
 * Block Tool pieces wrap around
+* Always Next Box removed
 * 0001 seeds are ignored
 * Famicom Keyboard support
 * Autodetect MMC1/CNROM

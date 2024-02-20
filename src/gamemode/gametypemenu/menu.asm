@@ -465,15 +465,16 @@ menuYTmp := tmp2
         cmp #MODE_SCORE_DISPLAY
         beq @renderScoreName
 
+        cmp #MODE_CRASH
+        beq @renderCrashMode
+
+
+        jsr menuItemY16Offset
+        bne @loopNext
+        txa
+
         ldx oamStagingLength
 
-        ; get Y offset
-        lda menuCounter
-        asl
-        asl
-        asl
-        adc #MENU_SPRITE_Y_BASE + 1
-        sbc menuScrollY
         sta oamStaging, x
         inx
         lda menuVars, y
@@ -517,6 +518,26 @@ menuYTmp := tmp2
         lda scoringModifier
         sta spriteIndexInOamContentLookup
         lda #(MODE_SCORE_DISPLAY*8) + MENU_SPRITE_Y_BASE + 1
+        sbc menuScrollY
+        sta spriteYOffset
+        lda #$e9
+        sta spriteXOffset
+        jsr stringSpriteAlignRight
+        jmp @loopNext
+
+@renderCrashMode:
+        jsr menuItemY16Offset
+        bne @loopNext
+@doRender:
+        lda crashModifier
+        cmp #CRASH_OFF
+        bne @notOff
+        lda #$F1
+@notOff:
+        adc #$16
+        sta spriteIndexInOamContentLookup
+        lda #(MODE_CRASH*8) + MENU_SPRITE_Y_BASE + 1
+        sec
         sbc menuScrollY
         sta spriteYOffset
         lda #$e9
