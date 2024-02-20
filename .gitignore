@@ -11,5 +11,3 @@ tetris.map
 tetris.dbg
 release/*
 target
-
-!src/nametables/game_nametable.bin
