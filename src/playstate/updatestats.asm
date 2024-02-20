@@ -122,8 +122,8 @@ checkLevelUp:
         sta outOfDateRenderFlags
 
 @lineLoop:  dex
-        bne incrementLines
-
+        beq checkLinecap
+        jmp incrementLines
 
 checkLinecap: ; set linecapState
         ; check if enabled
