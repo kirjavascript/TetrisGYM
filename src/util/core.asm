@@ -49,13 +49,9 @@ resetScroll:
 random10:
         ldx #rng_seed
         jsr generateNextPseudorandomNumber
-        ldx #rng_seed
         jsr generateNextPseudorandomNumber
-        ldx #rng_seed
         jsr generateNextPseudorandomNumber
-        ldx #rng_seed
         jsr generateNextPseudorandomNumber
-        ldx #rng_seed
         jsr generateNextPseudorandomNumber
         lda rng_seed
         and #$0F
