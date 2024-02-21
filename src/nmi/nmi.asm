@@ -21,7 +21,6 @@ nmi:    pha
         adc frameCounter+1
         sta frameCounter+1
         ldx #rng_seed
-        ldy #$02
         jsr generateNextPseudorandomNumber
         jsr copyCurrentScrollAndCtrlToPPU
         jsr pollControllerButtons

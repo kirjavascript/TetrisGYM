@@ -48,19 +48,14 @@ resetScroll:
 
 random10:
         ldx #rng_seed
-        ldy #$02
         jsr generateNextPseudorandomNumber
         ldx #rng_seed
-        ldy #$02
         jsr generateNextPseudorandomNumber
         ldx #rng_seed
-        ldy #$02
         jsr generateNextPseudorandomNumber
         ldx #rng_seed
-        ldy #$02
         jsr generateNextPseudorandomNumber
         ldx #rng_seed
-        ldy #$02
         jsr generateNextPseudorandomNumber
         lda rng_seed
         and #$0F
@@ -249,19 +244,12 @@ copyAddrAtReturnAddressToTmp_incrReturnAddrBy2:
 ;reg x: zeropage addr of seed; reg y: size of seed
 generateNextPseudorandomNumber:
         lda tmp1,x
+        eor tmp2,x
         and #$02
-        sta tmp1
-        lda tmp2,x
-        and #$02
-        eor tmp1
-        clc
-        beq @updateNextByteInSeed
-        sec
-@updateNextByteInSeed:
+        lsr
+        lsr
         ror tmp1,x
-        inx
-        dey
-        bne @updateNextByteInSeed
+        ror tmp2,x
         lda #$00
         adc oneThirdPRNG
         cmp #$03
