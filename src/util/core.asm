@@ -48,11 +48,7 @@ resetScroll:
 
 random10:
         ldx #rng_seed
-        jsr generateNextPseudorandomNumber
-        jsr generateNextPseudorandomNumber
-        jsr generateNextPseudorandomNumber
-        jsr generateNextPseudorandomNumber
-        jsr generateNextPseudorandomNumber
+        jsr generateNextPseudorandomNumber5x
         lda rng_seed
         and #$0F
         cmp #$0A
@@ -237,7 +233,15 @@ copyAddrAtReturnAddressToTmp_incrReturnAddrBy2:
         sta stack+4,x
         rts
 
-;reg x: zeropage addr of seed; reg y: size of seed
+;reg x: zeropage addr of seed
+generateNextPseudorandomNumber5x:
+        jsr generateNextPseudorandomNumber
+generateNextPseudorandomNumber4x:
+        jsr generateNextPseudorandomNumber
+generateNextPseudorandomNumber3x:
+        jsr generateNextPseudorandomNumber
+generateNextPseudorandomNumber2x:
+        jsr generateNextPseudorandomNumber
 generateNextPseudorandomNumber:
         lda tmp1,x
         eor tmp2,x
