@@ -47,26 +47,23 @@ resetScroll:
         rts
 
 random10:
+        lda rng_seed+1
+        asl                ; set carry bit to 0 or 1
+        lda rng_seed
+        and #$03           ; start with 0 to 3
+        adc #$06           ; add 6 or 7
+        sta generalCounter ; store value 6-10 for use when result >= 10
+.repeat 5
         ldx #rng_seed
         ldy #$02
         jsr generateNextPseudorandomNumber
-        ldx #rng_seed
-        ldy #$02
-        jsr generateNextPseudorandomNumber
-        ldx #rng_seed
-        ldy #$02
-        jsr generateNextPseudorandomNumber
-        ldx #rng_seed
-        ldy #$02
-        jsr generateNextPseudorandomNumber
-        ldx #rng_seed
-        ldy #$02
-        jsr generateNextPseudorandomNumber
+.endrepeat
         lda rng_seed
         and #$0F
         cmp #$0A
-        bpl random10
-        rts
+        bcc @ret
+        sbc generalCounter ; carry is set
+@ret:   rts
 
 ; canon is waitForVerticalBlankingInterval
 updateAudioWaitForNmiAndResetOamStaging:
