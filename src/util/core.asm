@@ -250,12 +250,12 @@ generateNextPseudorandomNumber:
         lsr
         ror tmp1,x
         ror tmp2,x
-        lda #$00
-        adc oneThirdPRNG
-        cmp #$03
-        bne @not3
-        lda #$00
-@not3:	sta oneThirdPRNG
+        lda oneThirdPRNG
+        sbc #$00
+        bpl @noReset
+        lda #$2
+@noReset:	
+        sta oneThirdPRNG
         rts
 
 ; canon is initializeOAM
