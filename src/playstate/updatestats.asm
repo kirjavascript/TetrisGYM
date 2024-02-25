@@ -122,8 +122,8 @@ checkLevelUp:
         sta outOfDateRenderFlags
 
 @lineLoop:  dex
-        bne incrementLines
-
+        beq checkLinecap
+        jmp incrementLines
 
 checkLinecap: ; set linecapState
         ; check if enabled
@@ -489,7 +489,7 @@ testCrash:
         bne @clearedLine
 
 @linesNotCleared:
-        lda displayNextPiece ;00 is nextbox enabled
+        lda hideNextPiece
         bne @nextOff
         lda #$8A ; add 394 cycles for nextbox
         adc cycleCount+1
@@ -733,7 +733,7 @@ testCrash:
         bne @loop
         ;562 has been added to the cycle count
         ;confettiA at 30405-30754 76C5-7822
-        lda displayNextPiece
+        lda hideNextPiece
         beq @nextOn
         lda cycleCount+1 ; add 394 cycles for nextbox if not added earlier. Necessary because we're checking for pre-nextbox NMI now.
         adc #$8A

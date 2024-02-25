@@ -1,7 +1,7 @@
 # Changelog
 
 ## [unreleased]
-* Crash Detection / Simulation
+* Crash Behaviours
 * Crunch Mode
 * Marathon Mode
 * Hidden Score Mode
@@ -13,6 +13,7 @@
 * Fixed ingame score display at 8 million with Classic Scoring
 * Fixed CNROM legal screen CHR bank
 * Fixed CNROM legal to title flicker
+* Fixed piece skip when doing Sonic Drop then Hard Drop immediately
 * Block Tool pieces wrap around
 * Always Next Box removed
 * 0001 seeds are ignored

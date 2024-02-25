@@ -136,10 +136,10 @@ stageSpriteForCurrentPiece_return:
         rts
 
 stageSpriteForNextPiece:
-        lda displayNextPiece
-        bne @ret
+        lda hideNextPiece
+        bne @maybeDisplayNextPiece
 
-@alwaysNextBox:
+@displayNextPiece:
         lda #$C8
         sta spriteXOffset
         lda #$77
@@ -148,4 +148,11 @@ stageSpriteForNextPiece:
         lda orientationToSpriteTable,x
         sta spriteIndexInOamContentLookup
         jmp loadSpriteIntoOamStaging
-@ret:   rts
+
+@maybeDisplayNextPiece:
+        lda practiseType
+        cmp #MODE_HARDDROP
+        beq @displayNextPiece
+        lda debugFlag
+        bne @displayNextPiece
+        rts

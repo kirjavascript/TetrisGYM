@@ -9,7 +9,7 @@ gameMode_gameTypeMenu:
         jsr calc_menuScrollY
         sta menuScrollY
         lda #0
-        sta displayNextPiece
+        sta hideNextPiece
         lda #$1
         sta renderMode
         jsr updateAudioWaitForNmiAndDisablePpuRendering

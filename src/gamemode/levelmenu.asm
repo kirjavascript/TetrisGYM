@@ -159,16 +159,14 @@ levelMenuCheckGoBack:
 shredSeedAndContinue:
         ; seed shredder
 @chooseRandomHole_player1:
-        ldx #$17
-        ldy #$02
+        ldx #rng_seed
         jsr generateNextPseudorandomNumber
         lda rng_seed
         and #$0F
         cmp #$0A
         bpl @chooseRandomHole_player1
 @chooseRandomHole_player2:
-        ldx #$17
-        ldy #$02
+        ldx #rng_seed
         jsr generateNextPseudorandomNumber
         lda rng_seed
         and #$0F

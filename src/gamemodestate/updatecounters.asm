@@ -8,8 +8,8 @@ gameModeState_updateCountersAndNonPlayerState:
         lda newlyPressedButtons_player1
         and #BUTTON_SELECT
         beq @ret
-        lda displayNextPiece
+        lda hideNextPiece
         eor #$01
-        sta displayNextPiece
+        sta hideNextPiece
 @ret:   inc gameModeState ; 3
         rts

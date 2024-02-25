@@ -70,7 +70,6 @@ advanceGameTSpins_actual:
 
 generateNewTSpin:
         ldx #rng_seed
-        ldy #$2
         jsr generateNextPseudorandomNumber
         lda rng_seed
         tax
