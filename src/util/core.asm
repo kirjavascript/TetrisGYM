@@ -245,7 +245,6 @@ generateNextPseudorandomNumber2x:
 generateNextPseudorandomNumber:
         lda tmp1,x
         eor tmp2,x
-        and #$02
         lsr
         lsr
         ror tmp1,x
@@ -254,7 +253,7 @@ generateNextPseudorandomNumber:
         sbc #$00
         bpl @noReset
         lda #$2
-@noReset:	
+@noReset:
         sta oneThirdPRNG
         rts
 
