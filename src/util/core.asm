@@ -48,20 +48,7 @@ resetScroll:
 
 random10:
         ldx #rng_seed
-        ldy #$02
-        jsr generateNextPseudorandomNumber
-        ldx #rng_seed
-        ldy #$02
-        jsr generateNextPseudorandomNumber
-        ldx #rng_seed
-        ldy #$02
-        jsr generateNextPseudorandomNumber
-        ldx #rng_seed
-        ldy #$02
-        jsr generateNextPseudorandomNumber
-        ldx #rng_seed
-        ldy #$02
-        jsr generateNextPseudorandomNumber
+        jsr generateNextPseudorandomNumber5x
         lda rng_seed
         and #$0F
         cmp #$0A
@@ -246,28 +233,29 @@ copyAddrAtReturnAddressToTmp_incrReturnAddrBy2:
         sta stack+4,x
         rts
 
-;reg x: zeropage addr of seed; reg y: size of seed
+;reg x: zeropage addr of seed
+generateNextPseudorandomNumber5x:
+        jsr generateNextPseudorandomNumber
+generateNextPseudorandomNumber4x:
+        jsr generateNextPseudorandomNumber
+generateNextPseudorandomNumber3x:
+        jsr generateNextPseudorandomNumber
+generateNextPseudorandomNumber2x:
+        jsr generateNextPseudorandomNumber
 generateNextPseudorandomNumber:
         lda tmp1,x
+        eor tmp2,x
         and #$02
-        sta tmp1
-        lda tmp2,x
-        and #$02
-        eor tmp1
-        clc
-        beq @updateNextByteInSeed
-        sec
-@updateNextByteInSeed:
+        lsr
+        lsr
         ror tmp1,x
-        inx
-        dey
-        bne @updateNextByteInSeed
-        lda #$00
-        adc oneThirdPRNG
-        cmp #$03
-        bne @not3
-        lda #$00
-@not3:	sta oneThirdPRNG
+        ror tmp2,x
+        lda oneThirdPRNG
+        sbc #$00
+        bpl @noReset
+        lda #$2
+@noReset:	
+        sta oneThirdPRNG
         rts
 
 ; canon is initializeOAM

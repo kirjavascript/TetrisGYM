@@ -61,7 +61,6 @@ pickRandomTetrimino:
         bne useNewSpawnID
 @invalidIndex:
         ldx #rng_seed
-        ldy #$02
         jsr generateNextPseudorandomNumber
         lda rng_seed
         and #$07
@@ -152,7 +151,6 @@ pickTetriminoSeed:
         bne @useNewSpawnID
 @invalidIndex:
         ldx #set_seed
-        ldy #$02
         jsr generateNextPseudorandomNumber
         lda set_seed
         and #$07
@@ -174,7 +172,6 @@ pickTetriminoSeed:
 
 setSeedNextRNG:
         ldx #set_seed
-        ldy #$02
         jsr generateNextPseudorandomNumber
         rts
 
