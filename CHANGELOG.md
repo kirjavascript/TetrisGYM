@@ -13,6 +13,7 @@
 * Fixed ingame score display at 8 million with Classic Scoring
 * Fixed CNROM legal screen CHR bank
 * Fixed CNROM legal to title flicker
+* Fixed a bug in Sonic Drop
 * Block Tool pieces wrap around
 * Always Next Box removed
 * 0001 seeds are ignored
