@@ -9,7 +9,7 @@ gameMode_gameTypeMenu:
         jsr calc_menuScrollY
         sta menuScrollY
         lda #0
-        sta displayNextPiece
+        sta hideNextPiece
         RESET_MMC1
 .if HAS_MMC
         ; switch to blank charmap
