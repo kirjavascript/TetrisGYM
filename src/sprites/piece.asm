@@ -136,6 +136,11 @@ stageSpriteForCurrentPiece_return:
         rts
 
 stageSpriteForNextPiece:
+        lda practiseType
+        cmp #MODE_HARDDROP
+        beq @alwaysNextBox
+        lda debugFlag
+        bne @alwaysNextBox
         lda displayNextPiece
         bne @ret
 
