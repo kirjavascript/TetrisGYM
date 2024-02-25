@@ -136,7 +136,7 @@ highScoreEntryRawPos: .res 1 ; $00D5                ; High score position 0=1st 
 highScoreEntryNameOffsetForRow: .res 1 ; $00D6      ; Relative to start of table
 highScoreEntryCurrentLetter: .res 1 ; $00D7
 lineClearStatsByType: .res 7 ; $00D8                ; bcd. one entry for each of single, double, triple, tetris
-displayNextPiece: .res 1 ; $00DF
+hideNextPiece: .res 1 ; $00DF
 AUDIOTMP1: .res 1 ; $00E0
 AUDIOTMP2: .res 1 ; $00E1
 AUDIOTMP3: .res 1 ; $00E2
