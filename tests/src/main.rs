@@ -8,6 +8,7 @@ mod video;
 
 mod drought;
 mod floor;
+mod garbage;
 mod pushdown;
 mod rng;
 mod score;
@@ -44,6 +45,8 @@ fn main() {
 
     // run tests
     if options.test {
+        // garbage::test_garbage4_crash();
+        // println!(">> garbage4 ✅");
         floor::test();
         println!(">> floor ✅");
         tspins::test();
@@ -72,9 +75,9 @@ fn main() {
         let mut blocks = sps::SPS::new();
 
         blocks.set_input((
-            ((options.sps_seed >> 16) & 0xFF) as u8,
-            ((options.sps_seed >> 8) & 0xFF) as u8,
-            (options.sps_seed & 0xFF) as u8,
+                ((options.sps_seed >> 16) & 0xFF) as u8,
+                ((options.sps_seed >> 8) & 0xFF) as u8,
+                (options.sps_seed & 0xFF) as u8,
         ));
 
         for _ in 0..options.sps_qty {

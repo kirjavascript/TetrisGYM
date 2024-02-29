@@ -21,10 +21,11 @@ nmi:    pha
         adc frameCounter+1
         sta frameCounter+1
         ldx #rng_seed
-        ldy #$02
         jsr generateNextPseudorandomNumber
         jsr copyCurrentScrollAndCtrlToPPU
         jsr pollControllerButtons
+        lda #$00
+        sta lagState ; clear flag after lag frame achieved
 .if KEYBOARD
 ; Read Family BASIC Keyboard
         jsr pollKeyboard
@@ -33,6 +34,9 @@ nmi:    pha
         sta verticalBlankingInterval
         pla
         tay
+        tsx
+        lda stack+4,x
+        sta nmiReturnAddr
         pla
         tax
         pla

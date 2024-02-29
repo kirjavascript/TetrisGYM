@@ -1,14 +1,13 @@
 const {
-    readStripe,
     writeRLE,
-    printNT,
+    blankNT,
     drawTiles,
     drawAttrs,
     flatLookup,
 } = require('./nametables');
 
 
-const buffer = readStripe(__dirname + '/enter_high_score_nametable.bin');
+const buffer = blankNT();
 
 let lookup = flatLookup(`
 0123456789ABCDEF
@@ -29,41 +28,37 @@ ui!###g@######()
 ###############
 `);
 
-lookup = [...lookup].map((d, i) => d === '#' ? String.fromCharCode(9472 + i) : d).join``;
-
-printNT(buffer, lookup);
-
 drawTiles(buffer, lookup, `
-################################
-#qwwwwwwwwwwwwwwwwwwwwwwwwwwwwe#
-#a                            d#
-#a                            d#
-#a                            d#
-#a                            d#
-#a         GOOD GAME          d#
-#a                            d#
-#a                            d#
-#a                            d#
-#a         YOU ARE A          d#
-#a                            d#
-#a       TETRIS MASTER#       d#
-#a                            d#
-#a                            d#
-#a   PLEASE ENTER YOUR NAME   d#
-#a                            d#
-#a rtttttttttttttttttttttttty d#
-#a fNAME     SCORE   LNS  LVh d#
-#a jbbbbbbbbbbbbbbbbbbbbbbbbl d#
-#a f                        h d#
-#a f                        h d#
-#a f                        h d#
-#a f                        h d#
-#a f                        h d#
-#a f                        h d#
-#a vbbbbbbbbbbbbbbbbbbbbbbbbn d#
-#a                            d#
-#zxxxxxxxxxxxxxxxxxxxxxxxxxxxxc#
-################################
+╲▂╢╢╢▀░▀╃▃╢╲╠╡▂▐▃╲▐▁▃▂╢▂╢╲╢▀▁▁▃╲
+╲qwwwwwwwwwwwwwwwwwwwwwwwwwwwwe□
+▂a                            d╢
+▀a                            d□
+╢a                            d╢
+╂a                            d□
+▂a         GOOD GAME          d▀
+╢a                            d╡
+╀a                            d╱
+▂a                            d▀
+╠a         YOU ARE A          d▃
+╰a                            d▃
+╠a       TETRIS MASTER.       d╢
+╰a                            d╀
+▀a                            d▂
+╢a   PLEASE ENTER YOUR NAME   d╢
+╀a                            d╲
+▂a rtttttttttttttttttttttttty d╲
+▃a fNAME     SCORE   LNS  LVh d▂
+▀a jbbbbbbbbbbbbbbbbbbbbbbbbl d▀
+▀a f                        h d▃
+▐a f                        h d▀
+╲a f                        h d▃
+▂a f                        h d▀
+▃a f                        h d▀
+▀a f                        h d╡
+▀a vbbbbbbbbbbbbbbbbbbbbbbbbn d╱
+▁a                            d╢
+╠zxxxxxxxxxxxxxxxxxxxxxxxxxxxxc□
+╰╱╰╱▐▃▀▁□╲■▁▃▂╀▃▂▀╂╀▃▀░▀╂╲╢╰╱╲▂╢
 `);
 
 drawAttrs(buffer, [`

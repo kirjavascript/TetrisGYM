@@ -92,6 +92,10 @@ stringLookup:
         .byte stringFromBelow-stringLookup
         .byte stringInviz-stringLookup
         .byte stringHalt-stringLookup
+        .byte stringShown-stringLookup ;16
+        .byte stringTopout-stringLookup
+        .byte stringCrash-stringLookup
+        .byte stringConfetti-stringLookup ;19
 stringClassic:
         .byte $7,'C','L','A','S','S','I','C'
 stringLetters:
@@ -138,3 +142,11 @@ stringHalt:
         .byte $4,'H','A','L','T'
 stringNull:
         .byte $0
+stringShown:
+        .byte $4,'S','H','O','W'
+stringTopout:
+        .byte $6,'T','O','P','O','U','T'
+stringCrash:
+        .byte $5,'C','R','A','S','H'
+stringConfetti:
+        .byte $8,'C','O','N','F','E','T','T','I'

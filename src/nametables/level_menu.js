@@ -1,20 +1,19 @@
 const {
-    readStripe,
+    blankNT,
     writeRLE,
-    printNT,
     drawTiles,
     drawAttrs,
     flatLookup,
 } = require('./nametables');
 
-const buffer = readStripe(__dirname + '/level_menu_nametable.bin');
+const buffer = blankNT();
 
 let lookup = flatLookup(`
 0123456789ABCDEF
 GHIJKLMNOPQRSTUV
 WXYZ-,˙>rtyfhvbn
 ########qweadzxc
-############jkl/
+####ĄąĆćĈĉĊċjkl/
 ui!###g@ß#####()
 ###########æ^$#.
 ################
@@ -28,62 +27,37 @@ ui!###g@ß#####()
 ###############
 `);
 
-lookup = [...lookup].map((d, i) => d === '#' ? String.fromCharCode(9472 + i) : d).join``;
-
-printNT(buffer, lookup);
-
-// heart
-
-// ###a  rtutututututy         d###
-// ###a  f0f1f2f3f4f^h         d###
-// ###a  jbkbkbkbkbkbl         d###
-//
-// v4
-//
-// ###a  rtututututg           d###
-// ###a  f0f1f2f3f4f           d###
-// ###a  jbkbkbkbkbkb@         d###
-// ###a  f5f6f7f8f9f$h         d###
-// ###a  vbibibibibibn         d###
-
-// v5-proto1
-// #a    rtututututy             d#
-// #a    f0f1f2f3f4ßbbb@         d#
-// #a    jbkbkbkbkbl   h         d#
-// #a    f5f6f7f8f9ßbbbn         d#
-// #a    vbibibibibn             d#
-
 drawTiles(buffer, lookup, `
-################################
-#qwwwwwwwwwwwwwwwwwwwwwwwwwwwwe#
-#a                            d#
-#a                   qwwwwwwe d#
-#a                   a      d d#
-#a                   zxxxxxxc d#
-#a                            d#
-#a      ╄╅╅╅╅╅╆               d#
-#a      ╇LEVEL╈               d#
-#a      ╉╊╊╊╊╊╋               d#
-#a    rtututututy             d#
-#a    f0f1f2f3f4h   rttty     d#
-#a    jbkbkbkbkbl   f   h     d#
-#a    f5f6f7f8f9h   vbbbn     d#
-#a    vbibibibibn             d#
-#a                            d#
-#a                            d#
-#a rtttttttttttttttttttttttty d#
-#a fNAME     SCORE   LNS  LVh d#
-#a jbbbbbbbbbbbbbbbbbbbbbbbbl d#
-#a f                        h d#
-#a f                        h d#
-#a f                        h d#
-#a f                        h d#
-#a f                        h d#
-#a f                        h d#
-#a vbbbbbbbbbbbbbbbbbbbbbbbbn d#
-#a                            d#
-#zxxxxxxxxxxxxxxxxxxxxxxxxxxxxc#
-################################
+ɠɡɠɡɢʂɢʐʃɢɢɢʂʀʑʀʑɰɱɢʂʀʁʁʃʐʃɢɢʀʁʑ
+ɰqwwwwwwwwwwwwwwwwwwwwwwwwwwwweʂ
+ʀa                            dɡ
+ʀa                   qwwwwwwe dɱ
+ɢa                   a      d dʃ
+ɲa                   zxxxxxxc dʑ
+ʠa                            dɲ
+ʐa      ĄąąąąąĆ               dʂ
+ʂa      ćLEVELĈ               dʑ
+ɠa      ĉĊĊĊĊĊċ               dʂ
+ɰa    rtututututy             dʑ
+ʀa    f0f1f2f3f4h   rttty     dʂ
+ɢa    jbkbkbkbkbl   f   h     dʀ
+ɲa    f5f6f7f8f9h   vbbbn     dʃ
+ɲa    vbibibibibn             dʃ
+ʂa                            dʃ
+ɢa                            dʑ
+ʠa rtttttttttttttttttttttttty dɲ
+ɢa fNAME     SCORE   LNS  LVh dʂ
+╂a jbbbbbbbbbbbbbbbbbbbbbbbbl dʑ
+ʂa f                        h dʂ
+ʀa f                        h dʑ
+ɠa f                        h dʂ
+ɰa f                        h dʀ
+ɢa f                        h dʃ
+ɲa f                        h dʃ
+ɲa vbbbbbbbbbbbbbbbbbbbbbbbbn dɡ
+ʂa                            dɱ
+ɢzxxxxxxxxxxxxxxxxxxxxxxxxxxxxcɢ
+ɲʀʡʀ╁ʃɢʂʀ╃ʃʀʡɢɲɢɰɱʂʀʁʡɢʂɠɡʠʃʠʃʀ╁
 `);
 
 drawAttrs(buffer, [`

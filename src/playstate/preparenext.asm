@@ -46,11 +46,20 @@ playState_prepareNext:
         bne @linecapHaltEnd
         ldx #<haltEndingGraphic
         ldy #>haltEndingGraphic
+
+        lda crashState ; LINECAP_HALT set in testCrash
+        cmp #$F0
+        bne @nonCrash
+        ldx #<crashGraphic
+        ldy #>crashGraphic
+@nonCrash:
         jmp copyGraphic
+
 @linecapHaltEnd:
         jsr practisePrepareNext
         inc playState
         rts
+
 typeBEndingStuff:
         ldx #<typebSuccessGraphic
         ldy #>typebSuccessGraphic
@@ -106,6 +115,8 @@ copyGraphicToPlayfieldAtCustomRow:
 lowStackNopeGraphic:
         .byte   "N","O","P","E",$FF,$28,$00
 haltEndingGraphic:
-        .byte   $FF,"G","G",$FF,$28,$00
+        .byte   $FF,'G','G',$FF,$28,$00
 typebSuccessGraphic:
-        .byte   "N","I","C","E",$FF,$28,$00
+        .byte   'N','I','C','E',$FF,$28,$00
+crashGraphic:
+        .byte   'C','R','A','S','H',$28,$00
