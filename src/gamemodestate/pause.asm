@@ -37,8 +37,7 @@ pause:
         sta renderMode
 
 @pauseSetupPart2:
-        jsr updateAudioAndWaitForNmi
-        jsr resetOAMStaging
+        jsr updateAudioWaitForNmiAndResetOamStaging
 
 @pauseLoop:
         lda qualFlag
