@@ -17,7 +17,9 @@ gameModeState_initGameState:
         lda frameCounter
         and #$01
         sta startParity
-
+.if ED2NTC = 1
+        inc ntcGameStart
+.endif
         ; set seed init
         lda set_seed_input
         sta set_seed

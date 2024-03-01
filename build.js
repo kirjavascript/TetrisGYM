@@ -18,13 +18,14 @@ const mappers = { // https://www.nesdev.org/wiki/Mapper
 const args = process.argv.slice(2);
 
 if (args.includes('-h')) {
-    console.log(`usage: node build.js [-h] [-v] [-m<${Object.keys(mappers).join('|')}>] [-a] [-s] [-k] [-w]
+    console.log(`usage: node build.js [-h] [-v] [-m<${Object.keys(mappers).join('|')}>] [-a] [-s] [-k] [-w] [-e]
 
 -m  mapper
 -a  faster aeppoz + press select to end game
 -s  disable highscores/SRAM
 -k  Famicom Keyboard support
 -w  force WASM compiler
+-e  everdrive nestrischamps support
 -c  force PNG to CHR conversion
 -t  run tests (requires cargo)
 -h  you are here
@@ -78,6 +79,11 @@ if (args.includes('-k')) {
 if (args.includes('-s')) {
     compileFlags.push('-D', 'SAVE_HIGHSCORES=0');
     console.log('highscore saving disabled');
+}
+
+if (args.includes('-e')) {
+    compileFlags.push('-D', 'ED2NTC=1');
+    console.log('everdrive nestrischamps enabled');
 }
 
 console.log();
