@@ -32,7 +32,6 @@ pause:
         sta PPUMASK
 @pauseSetupNotClassic:
         lda #$04 ; render_mode_pause
-@storeRenderMode:
         sta renderMode
 
 @pauseSetupPart2:
