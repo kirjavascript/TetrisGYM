@@ -31,7 +31,7 @@ pause:
         lda #$16
         sta PPUMASK
         lda #$00 ; render_mode_static - suspend rendering in qual mode pause
-        bne @storeRenderMode
+        beq @storeRenderMode
 @pauseSetupNotClassic:
         lda #$04 ; render_mode_pause
 @storeRenderMode:
