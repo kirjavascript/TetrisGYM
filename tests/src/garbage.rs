@@ -1,4 +1,5 @@
 use crate::{util, labels, playfield, video};
+use rusticnes_core::memory::read_byte;
 
 pub fn test_garbage4_crash() {
     let mut emu = util::emulator(None);
@@ -10,6 +11,9 @@ pub fn test_garbage4_crash() {
     let level_number = labels::get("levelNumber") as usize;
     let gmod = labels::get("garbageModifier") as usize;
     let mode = labels::get("MODE_GARBAGE") as u8;
+    let nmi_label = labels::get("nmi") as u16;
+    let wait_loop_start: u16 = labels::get("updateAudioWaitForNmiAndResetOamStaging") + 7 as u16;
+    let wait_loop_end: u16 = labels::get("resetOAMStaging") as u16;
 
     // spend a few frames bootstrapping
     for _ in 0..3 {
@@ -56,10 +60,18 @@ pub fn test_garbage4_crash() {
 ##########
 ##########"##);
 
-    for _ in 0..40 {
-        emu.run_until_vblank();
-        view.render(&mut emu);
-    }
+for _ in 0..40 {
+    loop {
+        emu.cycle();
+        if emu.registers.pc == nmi_label { break };
+        }
+    let stack_pointer = emu.registers.s;
+    let return_lo = read_byte(&mut emu, 0x0100 + stack_pointer as u16 + 2) as u16;
+    let return_hi = read_byte(&mut emu, 0x0100 + stack_pointer as u16 + 3) as u16 ;
+    let return_addr = return_hi << 8 | return_lo;
+    assert!(return_addr >= wait_loop_start && return_addr <= wait_loop_end);
+    // view.render(&mut emu);
+}
 
-    assert_ne!(emu.cpu.opcode, 18);
+assert_ne!(emu.cpu.opcode, 18);
 }
