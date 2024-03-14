@@ -1,4 +1,4 @@
-use crate::{labels, util, video};
+use crate::{input, labels, util, video};
 use rusticnes_core::nes::NesState;
 
 pub fn get_expected_tilesets() -> (Vec<u8>, Vec<u8>) {
@@ -78,11 +78,20 @@ pub fn test() {
     let current_tileset = get_current_tilesets(&mut emu);
     assert_eq!(tile_select, 1);
     assert_eq!(current_tileset, tileset1);
-
-    //todo:
-
     // boot in qual: tileset2, select 0
-
+    emu.p1_input = input::SELECT;
+    emu.reset();
+    for _ in 0..20 {
+        emu.run_until_vblank();
+        // view.render(&mut emu);
+    }
+    let tile_select = get_tile_select(&mut emu);
+    let current_tileset = get_current_tilesets(&mut emu);
+    assert_eq!(tile_select, 0);
+    assert_eq!(current_tileset, tileset2);
+    emu.p1_input = 0;
+    
+    //todo:
     // high score entry screen: tileset1, select 0
 
     // rocket screen: tileset2, select 0

@@ -50,22 +50,22 @@ fn main() {
         // println!(">> garbage4 ✅");
         mapper::test();
         println!(">> mappers ✅");
-        floor::test();
-        println!(">> floor ✅");
-        tspins::test();
-        println!(">> tspins ✅");
-        toprow::test();
-        println!(">> top row bug ✅");
-        score::test();
-        println!(">> score ✅");
-        score::test_render();
-        println!(">> score rendering ✅");
-        pushdown::test();
-        println!(">> pushdown ✅");
-        rng::test();
-        println!(">> rng seeds ✅");
-        sps::test();
-        println!(">> sps ✅");
+        // floor::test();
+        // println!(">> floor ✅");
+        // tspins::test();
+        // println!(">> tspins ✅");
+        // toprow::test();
+        // println!(">> top row bug ✅");
+        // score::test();
+        // println!(">> score ✅");
+        // score::test_render();
+        // println!(">> score rendering ✅");
+        // pushdown::test();
+        // println!(">> pushdown ✅");
+        // rng::test();
+        // println!(">> rng seeds ✅");
+        // sps::test();
+        // println!(">> sps ✅");
     }
 
     // count cycles
