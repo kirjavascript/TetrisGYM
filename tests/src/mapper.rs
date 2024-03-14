@@ -1,4 +1,4 @@
-use crate::util;
+use crate::{labels, util, video};
 use rusticnes_core::nes::NesState;
 
 pub fn get_expected_tilesets() -> (Vec<u8>, Vec<u8>) {
@@ -31,8 +31,11 @@ pub fn get_current_tilesets(emu: &mut NesState) -> Vec<u8>{
     }
 
 pub fn get_tile_select(emu: &mut NesState) -> u8 {
-    let bg_select = emu.ppu.control & 0x10 >> 4;
-    let sprite_select = emu.ppu.control & 0x08 >> 3;
+    let bg_select = (emu.ppu.control & 0x10) >> 4;
+    let sprite_select = (emu.ppu.control & 0x08) >> 3;
+    // println!("Current PPU Control is {:08b}", emu.ppu.control);
+    // println!("Current BG Select is {}", bg_select);
+    // println!("Current Sprite Select is {}", sprite_select);
 
     // validate here that background and sprite tile selects match
     assert_eq!(bg_select, sprite_select);
@@ -42,11 +45,12 @@ pub fn get_tile_select(emu: &mut NesState) -> u8 {
 
 pub fn test() {
     let mut emu = util::emulator(None);
-
+    let mut view = video::Video::new();
     let (tileset1, tileset2) = get_expected_tilesets();
 
-    for _ in 0..4 {
+    for _ in 0..20 {
         emu.run_until_vblank();
+        // view.render(&mut emu);
     }
 
     // test menu tileset is active
@@ -54,4 +58,33 @@ pub fn test() {
     let current_tileset = get_current_tilesets(&mut emu);
     assert_eq!(tile_select, 0);
     assert_eq!(current_tileset, tileset1);
+
+    // test game mode
+    let practise_type = labels::get("practiseType") as usize;
+    let game_mode = labels::get("gameMode") as usize;
+    let main_loop = labels::get("mainLoop");
+    let level_number = labels::get("levelNumber") as usize;
+    emu.memory.iram_raw[practise_type] = labels::get("MODE_TETRIS") as _;
+    emu.memory.iram_raw[level_number] = 18;
+    emu.memory.iram_raw[game_mode] = 4;
+    emu.registers.pc = main_loop;
+
+    for _ in 0..20 {
+        emu.run_until_vblank();
+        // view.render(&mut emu);
+    }
+
+    let tile_select = get_tile_select(&mut emu);
+    let current_tileset = get_current_tilesets(&mut emu);
+    assert_eq!(tile_select, 1);
+    assert_eq!(current_tileset, tileset1);
+
+    //todo:
+
+    // boot in qual: tileset2, select 0
+
+    // high score entry screen: tileset1, select 0
+
+    // rocket screen: tileset2, select 0
+
 }
