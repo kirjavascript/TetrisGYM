@@ -9,6 +9,7 @@ mod video;
 mod drought;
 mod floor;
 mod garbage;
+mod mapper;
 mod pushdown;
 mod rng;
 mod score;
@@ -47,6 +48,8 @@ fn main() {
     if options.test {
         // garbage::test_garbage4_crash();
         // println!(">> garbage4 ✅");
+        mapper::test();
+        println!(">> mappers ✅");
         floor::test();
         println!(">> floor ✅");
         tspins::test();
