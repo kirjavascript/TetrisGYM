@@ -1,9 +1,8 @@
-use crate::{util, labels, playfield, video};
+use crate::{util, labels, playfield};
 use rusticnes_core::memory::read_byte;
 
 pub fn test_garbage4_crash() {
     let mut emu = util::emulator(None);
-    let mut view = video::Video::new();
 
     let main_loop = labels::get("mainLoop");
     let practise_type = labels::get("practiseType") as usize;
@@ -70,7 +69,6 @@ for _ in 0..40 {
     let return_hi = read_byte(&mut emu, 0x0100 + stack_pointer as u16 + 3) as u16 ;
     let return_addr = return_hi << 8 | return_lo;
     assert!(return_addr >= wait_loop_start && return_addr <= wait_loop_end);
-    // view.render(&mut emu);
 }
 
 assert_ne!(emu.cpu.opcode, 18);
