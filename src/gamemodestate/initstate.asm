@@ -88,6 +88,7 @@ gameModeState_initGameState:
         sta demo_repeats
         sta demoIndex
         sta demoButtonsAddr
+        sta holdDownPoints
         sta spawnID
         lda #>demoButtonsTable
         sta demoButtonsAddr+1

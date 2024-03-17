@@ -49,14 +49,14 @@ mainLoop:
 .include "highscores/entry_screen.asm"
 
 .include "util/core.asm"
-.include "util/bytesprite.asm"
 .include "util/strings.asm"
 .include "util/math.asm"
 .include "util/menuthrottle.asm"
 .include "util/modetext.asm"
 
-.include "sprites/loadsprite.asm"
+.include "sprites/bytesprite.asm"
 .include "sprites/drawrect.asm"
+.include "sprites/loadsprite.asm"
 .include "sprites/piece.asm"
 
 .include "data/bytebcd.asm"
