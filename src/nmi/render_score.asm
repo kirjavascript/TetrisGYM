@@ -113,8 +113,8 @@ renderModernLines:
         inc linesTileQueue
 @endLinesTileQueue:
 
-        lda outOfDateRenderFlags
-        and #$01
+        lda renderFlags
+        and #RENDER_LINES
         beq @doneRenderLines
 
         ; 'normal' line drawing

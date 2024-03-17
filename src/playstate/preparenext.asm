@@ -71,9 +71,9 @@ typeBEndingStuffEnd:
         lda #$4
         sta soundEffectSlot1Init
 
-        lda outOfDateRenderFlags ; Flag needed to reveal hidden score
+        lda renderFlags ; Flag needed to reveal hidden score
         ora #$4
-        sta outOfDateRenderFlags
+        sta renderFlags
         lda #$0A ; playState_checkStartGameOver
         sta playState
         lda #$30

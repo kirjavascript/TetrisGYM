@@ -24,9 +24,9 @@ advanceGameTSpins:
 
         jsr clearPoints
 
-        lda outOfDateRenderFlags
-        ora #$04
-        sta outOfDateRenderFlags
+        lda renderFlags
+        ora #RENDER_SCORE
+        sta renderFlags
 @continue:
 
 advanceGameTSpins_actual:

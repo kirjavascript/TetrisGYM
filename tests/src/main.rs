@@ -45,8 +45,8 @@ fn main() {
 
     // run tests
     if options.test {
-        // garbage::test_garbage4_crash();
-        // println!(">> garbage4 ✅");
+        garbage::test_garbage4_crash();
+        println!(">> garbage4 ✅");
         floor::test();
         println!(">> floor ✅");
         tspins::test();

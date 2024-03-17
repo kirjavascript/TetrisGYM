@@ -88,6 +88,7 @@ gameModeState_initGameState:
         sta demo_repeats
         sta demoIndex
         sta demoButtonsAddr
+        sta holdDownPoints
         sta spawnID
         lda #>demoButtonsTable
         sta demoButtonsAddr+1
@@ -137,8 +138,8 @@ gameModeState_initGameState:
         jsr presetScoreFromBCD
 @noChecker:
 
-        lda #$57
-        sta outOfDateRenderFlags
+        lda #RENDER_STATS|RENDER_HZ|RENDER_SCORE|RENDER_LEVEL|RENDER_LINES
+        sta renderFlags
         jsr updateAudioWaitForNmiAndResetOamStaging
 
         lda practiseType

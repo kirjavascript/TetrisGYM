@@ -178,9 +178,9 @@ hzTap:
 @calcEnd:
 
         ; update game UI
-        lda outOfDateRenderFlags
-        ora #$10 ; @renderHz
-        sta outOfDateRenderFlags
+        lda renderFlags
+        ora #RENDER_HZ
+        sta renderFlags
         rts
 
 dasLimitLookup:

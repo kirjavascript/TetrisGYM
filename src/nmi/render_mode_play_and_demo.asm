@@ -16,8 +16,8 @@ render_mode_play_and_demo:
         lda scoringModifier
         bne @modernLines
 
-        lda outOfDateRenderFlags
-        and #$01
+        lda renderFlags
+        and #RENDER_LINES
         beq @renderLevel
 
         ldx #linesPrev-lines
@@ -39,13 +39,13 @@ render_mode_play_and_demo:
 @modernLines:
         jsr renderModernLines
 @doneRenderingLines:
-        lda outOfDateRenderFlags
-        and #$FE
-        sta outOfDateRenderFlags
+        lda renderFlags
+        and #~RENDER_LINES
+        sta renderFlags
 
 @renderLevel:
-        lda outOfDateRenderFlags
-        and #$02
+        lda renderFlags
+        and #RENDER_LEVEL
         beq @renderScore
 
         lda practiseType
@@ -84,13 +84,13 @@ render_mode_play_and_demo:
 
 @renderLevelEnd:
         jsr updatePaletteForLevel
-        lda outOfDateRenderFlags
-        and #$FD
-        sta outOfDateRenderFlags
+        lda renderFlags
+        and #~RENDER_LEVEL
+        sta renderFlags
 
 @renderScore:
-        lda outOfDateRenderFlags
-        and #$04
+        lda renderFlags
+        and #RENDER_SCORE
         beq @renderHz
 
         ; 8 safe tile writes freed from stats / hz
@@ -160,33 +160,33 @@ render_mode_play_and_demo:
         jsr renderClassicScore
 
 @clearScoreRenderFlags:
-        lda outOfDateRenderFlags
-        and #$FB
-        sta outOfDateRenderFlags
+        lda renderFlags
+        and #~RENDER_SCORE
+        sta renderFlags
 
 @renderHz:
         lda hzFlag
         beq @renderStats
-        lda outOfDateRenderFlags
-        and #$10
+        lda renderFlags
+        and #RENDER_HZ
         beq @renderStatsHz
         jsr renderHz
-        lda outOfDateRenderFlags
-        and #$EF
-        sta outOfDateRenderFlags
+        lda renderFlags
+        and #~RENDER_HZ
+        sta renderFlags
 
         ; run a patched version of the stats
 @renderStatsHz:
-        lda outOfDateRenderFlags
-        and #$40
+        lda renderFlags
+        and #RENDER_STATS
         beq @renderTetrisFlashAndSound
         lda #$06
         sta tmpCurrentPiece
         jmp @renderPieceStat
 
 @renderStats:
-        lda outOfDateRenderFlags
-        and #$40
+        lda renderFlags
+        and #RENDER_STATS
         beq @renderTetrisFlashAndSound
         ldx currentPiece
         lda tetriminoTypeFromOrientation, x
@@ -203,9 +203,9 @@ render_mode_play_and_demo:
         sta PPUDATA
         lda statsByType,x
         jsr twoDigsToPPU
-        lda outOfDateRenderFlags
-        and #$BF
-        sta outOfDateRenderFlags
+        lda renderFlags
+        and #~RENDER_STATS
+        sta renderFlags
 @renderTetrisFlashAndSound:
         lda #$3F
         sta PPUADDR
@@ -395,7 +395,7 @@ incrementPieceStat:
         sta statsByType+1,x
 L9996:  lda generalCounter
         sta statsByType,x
-        lda outOfDateRenderFlags
-        ora #$40
-        sta outOfDateRenderFlags
+        lda renderFlags
+        ora #RENDER_STATS
+        sta renderFlags
         rts
