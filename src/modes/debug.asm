@@ -300,9 +300,9 @@ renderStateGameplay:
         rts
 
 renderDebugSaveSlot:
-        lda pausedOutOfDateRenderFlags
+        lda pausedrenderFlags
         ora #$2
-        sta pausedOutOfDateRenderFlags
+        sta pausedrenderFlags
         rts
 
 renderDebugHUD:

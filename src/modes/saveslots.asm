@@ -110,7 +110,7 @@ loadState:
         ; sta score+2
         ; ; mark for update
         ; lda #7
-        ; sta outOfDateRenderFlags
+        ; sta renderFlags
 
         lda #$18
         sta saveStateSpriteType

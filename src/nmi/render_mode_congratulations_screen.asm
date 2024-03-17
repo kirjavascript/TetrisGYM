@@ -1,6 +1,6 @@
 render_mode_congratulations_screen:
-        lda outOfDateRenderFlags
-        and #$80
+        lda renderFlags
+        and #RENDER_HIGH_SCORE_LETTER
         beq @ret
         lda highScoreEntryRawPos
         asl a
@@ -19,7 +19,8 @@ render_mode_congratulations_screen:
         ldx highScoreEntryCurrentLetter
         lda highScoreCharToTile,x
         sta PPUDATA
-        sta outOfDateRenderFlags
+        lda #0
+        sta renderFlags
 @ret:
         jsr resetScroll
         rts
