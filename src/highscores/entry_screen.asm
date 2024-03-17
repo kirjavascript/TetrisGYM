@@ -279,8 +279,8 @@ highScoreEntryScreen:
         tax
         lda highscores,x
         sta highScoreEntryCurrentLetter
-        lda #$80
-        sta outOfDateRenderFlags
+        lda #RENDER_HIGH_SCORE_LETTER
+        sta renderFlags
         jsr updateAudioWaitForNmiAndResetOamStaging
         jmp @renderFrame
 
