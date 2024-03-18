@@ -308,7 +308,7 @@ highScoreLinesLength := 2
 highScoreLevelsLength := 2
 highScoreLength := highScoreNameLength + highScoreScoreLength + highScoreLinesLength + highScoreLevelsLength
     .res highScoreQuantity * highScoreLength ; 48 bytes
-    .res 43
+    .res 42
 initMagic: .res 5 ; $075B                        ; Initialized to a hard-coded number. When resetting, if not correct number then it knows this is a cold boot
 
 menuRAM:  ; $760
@@ -341,6 +341,7 @@ droughtModifier: .res 1
 dasModifier: .res 1
 scoringModifier: .res 1
 crashModifier: .res 1
+strictFlag: .res 1 ;used for crash detection. If 1, the game will register a crash anytime there is a possibility of one.
 hzFlag: .res 1
 inputDisplayFlag: .res 1
 disableFlashFlag: .res 1

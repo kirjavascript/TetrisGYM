@@ -63,6 +63,7 @@ drawTiles(buffer, lookup, `
 `);drawTiles(extra, lookup, `
 #a    SCORING                 d#
 #a    CRASH                   d#
+#a    STRICT CRASH            d#
 #a    HZ DISPLAY              d#
 #a    INPUT DISPLAY           d#
 #a    DISABLE FLASH           d#
@@ -73,7 +74,6 @@ drawTiles(buffer, lookup, `
 #a    DAS ONLY                d#
 #a    QUAL MODE               d#
 #a    PAL MODE                d#
-#a                            d#
 #a                            d#
 #a V5                         d#
 #a                            d#
