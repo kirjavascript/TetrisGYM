@@ -20,6 +20,7 @@
 * Fixed storage bug for push down points
 * Fixed crashes in garbage mode 4
 * Fixed line clearing happening on pause
+* Fixed PAL level 181 colour
 * Famicom Keyboard support
 * MMC3 Support
 * MMC5 Support
