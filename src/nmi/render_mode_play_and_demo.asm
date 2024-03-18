@@ -325,7 +325,7 @@ updatePaletteForLevel:
         tax
         lda palFlag
         beq @renderPalettes
-        cpx #$35 ; Level 181 & 245 and'd with $3F (level 53 is properly mod10'd)
+        cpx #$35 ; Level 181 & 245 and'd with $3F (level 53 & 117 are properly mod10'd)
         bne @renderPalettes
         ldx #$40
 @renderPalettes:
