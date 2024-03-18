@@ -9,6 +9,7 @@ mod video;
 mod drought;
 mod floor;
 mod garbage;
+mod palettes;
 mod pushdown;
 mod rng;
 mod score;
@@ -63,6 +64,8 @@ fn main() {
         println!(">> rng seeds ✅");
         sps::test();
         println!(">> sps ✅");
+        palettes::test_palettes();
+        println!(">> palettes ✅");
     }
 
     // count cycles
