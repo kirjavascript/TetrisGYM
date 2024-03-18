@@ -325,7 +325,7 @@ updatePaletteForLevel:
         tax
         lda palFlag
         beq @renderPalettes
-        cpx #(181 & $3F) ; level 53 is properly mod10'd
+        cpx #$35 ; Level 181 & 245 and'd with $3F (level 53 & 117 are properly mod10'd)
         bne @renderPalettes
         ldx #$40
 @renderPalettes:
@@ -370,7 +370,7 @@ colorTable0:
         .byte   $17,$47,$29,$19
         .byte   $06,$4C,$BD,$19
         .byte   $00,$01,$03,$05
-        .byte   $21 ; level 181 pal (different from NTSC)
+        .byte   $21 ; level 181/245 pal (different from NTSC)
 
 colorTable1:
         .byte   $21,$29,$24,$2A
@@ -389,7 +389,7 @@ colorTable1:
         .byte   $A0,$AB,$07,$C9
         .byte   $38,$2A,$4E,$60
         .byte   $00,$01,$04,$05
-        .byte   $2b ; level 181 pal (same as NTSC)
+        .byte   $2b ; level 181/245 pal (same as NTSC)
 
 colorTable2:
         .byte   $12,$1A,$14,$12
@@ -408,7 +408,7 @@ colorTable2:
         .byte   $02,$A5,$18,$07
         .byte   $E9,$99,$99,$00
         .byte   $01,$02,$04,$05
-        .byte   $25 ; level 181 pal (same as NTSC)
+        .byte   $25 ; level 181/245 pal (same as NTSC)
 
 incrementPieceStat:
         tax
