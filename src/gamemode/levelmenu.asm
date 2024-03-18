@@ -24,9 +24,9 @@ gameMode_levelMenu:
         beq @noLinecapInfo
         jsr levelMenuLinecapInfo
 @noLinecapInfo:
-        ; render level when loading screen
-        lda #$1
-        sta outOfDateRenderFlags
+        ; render lines when loading screen
+        lda #RENDER_LINES
+        sta renderFlags
         jsr resetScroll
         jsr waitForVBlankAndEnableNmi
         jsr updateAudioWaitForNmiAndResetOamStaging
@@ -295,9 +295,9 @@ levelControlCustomLevel:
 @changeLevel:
         lda #$1
         sta soundEffectSlot1Init
-        lda outOfDateRenderFlags
-        ora #$1
-        sta outOfDateRenderFlags
+        lda renderFlags
+        ora #RENDER_LINES
+        sta renderFlags
         rts
 
 levelControlHearts:

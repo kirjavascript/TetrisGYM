@@ -1,10 +1,10 @@
 render_mode_speed_test:
         jsr renderHzInputRows
-        lda outOfDateRenderFlags
+        lda renderFlags
         beq @noUpdate
         jsr renderHzSpeedTest
         lda #0
-        sta outOfDateRenderFlags
+        sta renderFlags
 @noUpdate:
         lda #$B0
         sta ppuScrollX

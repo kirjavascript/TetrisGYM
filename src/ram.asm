@@ -84,9 +84,9 @@ spriteXOffset: .res 1 ; $00A0
 spriteYOffset: .res 1 ; $00A1
 stringIndexLookup:
 spriteIndexInOamContentLookup: .res 1 ; $00A2
-outOfDateRenderFlags: .res 1 ; $00A3
+renderFlags: .res 1 ; $00A3
 ; play/demo
-; Bit 0-lines 1-level 2-score 4-hz 6-stats 7-high score entry letter
+; Bit 0-lines 1-level 2-score 3-debug 4-hz 6-stats 7-high score entry letter
 ; speedtest
 ; 0 - hz
 ; level menu
@@ -192,7 +192,7 @@ saveStateSlot: .res 1 ; $60B
 saveStateSpriteType: .res 1 ; $60C
 saveStateSpriteDelay: .res 1 ; $60D
 presetIndex: .res 1 ; $60E ; can be mangled in other modes
-pausedOutOfDateRenderFlags: .res 1 ; $60F ; 0 - statistics 1 - saveslot
+.res 1
 debugLevelEdit: .res 1 ; $610
 debugNextCounter: .res 1 ; $611
 paceResult: .res 3 ; $612 ; 3 bytes

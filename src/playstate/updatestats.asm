@@ -11,9 +11,9 @@ playState_updateLinesAndStatistics:
         lda     #$09
         sta     lineClearStatsByType-1,x
 @noCarry:
-        lda outOfDateRenderFlags
-        ora #$01
-        sta outOfDateRenderFlags
+        lda renderFlags
+        ora #RENDER_LINES
+        sta renderFlags
 
 ; type-b lines decrement
         lda practiseType
@@ -117,9 +117,9 @@ checkLevelUp:
         sta crashState
         lda #$06 ; checked in floor linecap stuff, just below
         sta soundEffectSlot1Init
-        lda outOfDateRenderFlags
-        ora #$02
-        sta outOfDateRenderFlags
+        lda renderFlags
+        ora #RENDER_LEVEL
+        sta renderFlags
 
 @lineLoop:  dex
         beq checkLinecap
@@ -189,9 +189,9 @@ addPoints:
         ; cmp #0 ; lda sets z flag
         bne @continueStreak
         jsr clearPoints
-        lda outOfDateRenderFlags
-        ora #$04
-        sta outOfDateRenderFlags
+        lda renderFlags
+        ora #RENDER_SCORE
+        sta renderFlags
         rts
 @continueStreak:
         lda #4
@@ -236,9 +236,9 @@ handlePointsCheckerboard:
         sbc #0
         sta binScore+1
         jsr setupScoreForRender
-        lda outOfDateRenderFlags
-        ora #$04
-        sta outOfDateRenderFlags
+        lda renderFlags
+        ora #RENDER_SCORE
+        sta renderFlags
 @end:
         lda #$0
         sta completedLines
@@ -388,9 +388,9 @@ addLineClearPoints:
         sta binScore+3
 
 addLineClearPoints_end:
-        lda outOfDateRenderFlags
-        ora #$04
-        sta outOfDateRenderFlags
+        lda renderFlags
+        ora #RENDER_SCORE
+        sta renderFlags
         lda #$00
         sta completedLines
 
@@ -819,9 +819,9 @@ testCrash:
         sta allegroIndex ; resetting variable
         lda crashModifier
         bne @otherMode
-        lda outOfDateRenderFlags ; if mode = 0, tell score to update (might not be necessary?) so that crash info is printed
-        ora #$04
-        sta outOfDateRenderFlags
+        lda renderFlags ; if mode = 0, tell score to update (might not be necessary?) so that crash info is printed
+        ora #RENDER_SCORE
+        sta renderFlags
         lda #$02
         sta soundEffectSlot0Init ; play topout sfx
         rts

@@ -58,8 +58,8 @@ speedTestControl:
         lda heldButtons_player1
         and #BUTTON_LEFT+BUTTON_RIGHT+BUTTON_B+BUTTON_A
         beq @noupdate
-        lda #$10
-        sta outOfDateRenderFlags
+        lda #RENDER_HZ
+        sta renderFlags
         lda newlyPressedButtons_player1
         and #BUTTON_LEFT+BUTTON_RIGHT
         beq @noupdate

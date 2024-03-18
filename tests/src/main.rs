@@ -28,6 +28,8 @@ struct TestOptions {
     help: bool,
     #[options(help = "run tests")]
     test: bool,
+    #[options(help = "run single tests")]
+    test_single: Option<String>,
     #[options(help = "count cycles")]
     cycles: bool,
     #[options(help = "set SPS seed", parse(try_from_str = "parse_hex"))]
@@ -44,28 +46,37 @@ struct TestOptions {
 fn main() {
     let options = TestOptions::parse_args_default_or_exit();
 
+    let tests: [(&str, fn()); 10] = [
+        ("garbage4", garbage::test_garbage4_crash),
+        ("floor", floor::test),
+        ("tspins", tspins::test),
+        ("top row bug", toprow::test),
+        ("score", score::test),
+        ("score_render", score::test_render),
+        ("mapper", mapper::test),
+        ("pushdown", pushdown::test),
+        ("rng seeds", rng::test),
+        ("sps", sps::test),
+        ("palettes", palettes::test),
+    ];
+
     // run tests
     if options.test {
-        // garbage::test_garbage4_crash();
-        // println!(">> garbage4 ✅");
-        mapper::test();
-        println!(">> mappers ✅");
-        floor::test();
-        println!(">> floor ✅");
-        tspins::test();
-        println!(">> tspins ✅");
-        toprow::test();
-        println!(">> top row bug ✅");
-        score::test();
-        println!(">> score ✅");
-        score::test_render();
-        println!(">> score rendering ✅");
-        pushdown::test();
-        println!(">> pushdown ✅");
-        rng::test();
-        println!(">> rng seeds ✅");
-        sps::test();
-        println!(">> sps ✅");
+        tests.iter().for_each(|(name, test)| {
+            test();
+            println!(">> {name} ✅");
+        });
+    }
+
+    // run single test
+    if let Some(name) = options.test_single {
+        let found = tests.iter().find(|&test| test.0 == name);
+        if let Some(test) = found {
+            test.1();
+            println!(">> {name} ✅");
+        } else {
+            println!("no such test {name}");
+        }
     }
 
     // count cycles
