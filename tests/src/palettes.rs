@@ -294,11 +294,20 @@ pub fn test() {
 
     let pal_flag = labels::get("palFlag") as usize;
     emu.memory.iram_raw[pal_flag] = 1;
-    emu.memory.iram_raw[level_number] = 181;
-    emu.memory.iram_raw[render_flags] = labels::get("RENDER_LEVEL") as u8;
-    emu.run_until_vblank();
-    let bg_palette = &emu.ppu.palette[9..12];
-    let sprite_palette = &emu.ppu.palette[25..28];
-    assert_eq!(bg_palette, sprite_palette);
-    assert_eq!(bg_palette, pal181);
+
+    for level in 0..256 {
+        emu.memory.iram_raw[level_number] = level as u8;
+        emu.memory.iram_raw[render_flags] = labels::get("RENDER_LEVEL") as u8;
+        emu.run_until_vblank();
+        let bg_palette = &emu.ppu.palette[9..12];
+        let sprite_palette = &emu.ppu.palette[25..28];
+
+        assert_eq!(bg_palette, sprite_palette);
+
+        if level == 181 || level == 245 {
+            assert_eq!(bg_palette, pal181);
+        } else {
+            assert_eq!(bg_palette, PALETTES[level]);
+        }
+    }
 }
