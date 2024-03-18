@@ -323,43 +323,31 @@ updatePaletteForLevel:
 @copyPalettes:
         and #$3F
         tax
-        lda #$3F
-        sta PPUADDR
-        lda #$09
-        sta PPUADDR
-        lda colorTable0,x
-        sta PPUDATA
-        lda colorTable1,x
-        sta PPUDATA
-        lda colorTable2,x
-        sta PPUDATA
-        lda #$3F
-        sta PPUADDR
-        lda #$19
-        sta PPUADDR
-        lda colorTable0,x
-        sta PPUDATA
-        lda colorTable1,x
-        sta PPUDATA
-        lda colorTable2,x
-        sta PPUDATA
-        ; PAL level 181 is a different colour because of an address change
         lda palFlag
-        beq @done
-        lda levelNumber
-        cmp #181
-        bne @done
+        beq @renderPalettes
+        cpx #(181 & $3F)
+        bne @renderPalettes
+        ldx #$40
+@renderPalettes:
         lda #$3F
         sta PPUADDR
         lda #$09
         sta PPUADDR
-        lda #$21
+        lda colorTable0,x
+        sta PPUDATA
+        lda colorTable1,x
+        sta PPUDATA
+        lda colorTable2,x
         sta PPUDATA
         lda #$3F
         sta PPUADDR
         lda #$19
         sta PPUADDR
-        lda #$21
+        lda colorTable0,x
+        sta PPUDATA
+        lda colorTable1,x
+        sta PPUDATA
+        lda colorTable2,x
         sta PPUDATA
 @done:
         rts
@@ -382,6 +370,7 @@ colorTable0:
         .byte   $17,$47,$29,$19
         .byte   $06,$4C,$BD,$19
         .byte   $00,$01,$03,$05
+        .byte   $21 ; level 181 pal (different from NTSC)
 
 colorTable1:
         .byte   $21,$29,$24,$2A
@@ -400,6 +389,7 @@ colorTable1:
         .byte   $A0,$AB,$07,$C9
         .byte   $38,$2A,$4E,$60
         .byte   $00,$01,$04,$05
+        .byte   $2b ; level 181 pal (same as NTSC)
 
 colorTable2:
         .byte   $12,$1A,$14,$12
@@ -418,6 +408,7 @@ colorTable2:
         .byte   $02,$A5,$18,$07
         .byte   $E9,$99,$99,$00
         .byte   $01,$02,$04,$05
+        .byte   $25 ; level 181 pal (same as NTSC)
 
 incrementPieceStat:
         tax
