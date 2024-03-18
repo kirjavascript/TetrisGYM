@@ -343,6 +343,25 @@ updatePaletteForLevel:
         sta PPUDATA
         lda colorTable2,x
         sta PPUDATA
+        ; PAL level 181 is a different colour because of an address change
+        lda palFlag
+        beq @done
+        lda levelNumber
+        cmp #181
+        bne @done
+        lda #$3F
+        sta PPUADDR
+        lda #$09
+        sta PPUADDR
+        lda #$21
+        sta PPUDATA
+        lda #$3F
+        sta PPUADDR
+        lda #$19
+        sta PPUADDR
+        lda #$21
+        sta PPUDATA
+@done:
         rts
 
 ; 3 bytes per level in separate tables
@@ -365,22 +384,22 @@ colorTable0:
         .byte   $00,$01,$03,$05
 
 colorTable1:
-        .byte   $21,$29,$24,$2A 
-        .byte   $2B,$22,$00,$05 
-        .byte   $16,$27,$69,$14 
-        .byte   $20,$89,$14,$20 
-        .byte   $A5,$30,$C9,$A5 
-        .byte   $D0,$A5,$20,$A6 
-        .byte   $A5,$D0,$C9,$A9 
-        .byte   $85,$A9,$A9,$A6 
-        .byte   $99,$69,$C9,$A5 
-        .byte   $4C,$EB,$A9,$60 
-        .byte   $05,$D3,$00,$4A 
-        .byte   $AA,$60,$60,$17 
-        .byte   $29,$F0,$4E,$D0 
-        .byte   $A0,$AB,$07,$C9 
-        .byte   $38,$2A,$4E,$60 
-        .byte   $00,$01,$04,$05 
+        .byte   $21,$29,$24,$2A
+        .byte   $2B,$22,$00,$05
+        .byte   $16,$27,$69,$14
+        .byte   $20,$89,$14,$20
+        .byte   $A5,$30,$C9,$A5
+        .byte   $D0,$A5,$20,$A6
+        .byte   $A5,$D0,$C9,$A9
+        .byte   $85,$A9,$A9,$A6
+        .byte   $99,$69,$C9,$A5
+        .byte   $4C,$EB,$A9,$60
+        .byte   $05,$D3,$00,$4A
+        .byte   $AA,$60,$60,$17
+        .byte   $29,$F0,$4E,$D0
+        .byte   $A0,$AB,$07,$C9
+        .byte   $38,$2A,$4E,$60
+        .byte   $00,$01,$04,$05
 
 colorTable2:
         .byte   $12,$1A,$14,$12

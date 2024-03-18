@@ -13,11 +13,13 @@
 * 0001 seeds are ignored
 * Floor no longer gobbled up by top line clear
 * Floor 0 has original no-burns behaviour again
-* Fixed ingame score display at 8 million with Classic Scoring
+* [Fixed ingame score display at 8/9 million with Classic Scoring](https://www.youtube.com/watch?v=fYdXky2i5AE)
 * Fixed CNROM legal screen CHR bank
 * Fixed CNROM legal to title flicker
 * Fixed piece skip when doing Sonic Drop then Hard Drop immediately
 * Fixed storage bug for push down points
+* Fixed crashes in garbage mode 4
+* Fixed line clearing happening on pause
 * Famicom Keyboard support
 * MMC3 Support
 * MMC5 Support
