@@ -9,6 +9,7 @@ mod video;
 mod drought;
 mod floor;
 mod garbage;
+mod mapper;
 mod palettes;
 mod pushdown;
 mod rng;
@@ -46,13 +47,14 @@ struct TestOptions {
 fn main() {
     let options = TestOptions::parse_args_default_or_exit();
 
-    let tests: [(&str, fn()); 10] = [
+    let tests: [(&str, fn()); 11] = [
         ("garbage4", garbage::test_garbage4_crash),
         ("floor", floor::test),
         ("tspins", tspins::test),
         ("top row bug", toprow::test),
         ("score", score::test),
         ("score_render", score::test_render),
+        ("mapper", mapper::test),
         ("pushdown", pushdown::test),
         ("rng seeds", rng::test),
         ("sps", sps::test),

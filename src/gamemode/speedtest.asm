@@ -22,15 +22,11 @@ gameMode_speedTest:
         sta PPUADDR
         lda #$30
         sta PPUDATA
-.if HAS_MMC
-        lda #$01
-        jsr changeCHRBank0
-        lda #$01
-        jsr changeCHRBank1
-.elseif INES_MAPPER = 3
-        lda #%10011001
-        sta PPUCTRL
+        lda #NMIEnable|BGPattern1|SpritePattern1
         sta currentPpuCtrl
+.if INES_MAPPER <> 0
+        lda #CHRBankSet0
+        jsr changeCHRBanks
 .endif
 
         jsr waitForVBlankAndEnableNmi

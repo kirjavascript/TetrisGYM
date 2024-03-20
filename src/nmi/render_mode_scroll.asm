@@ -3,11 +3,6 @@ render_mode_scroll:
         lda currentPpuCtrl
         and #$FC
         sta currentPpuCtrl
-.if INES_MAPPER = 3
-        and #%10000000
-        sta PPUCTRL
-        sta currentPpuCtrl
-.endif
         lda #0
         sta ppuScrollX
 

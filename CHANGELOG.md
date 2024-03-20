@@ -22,6 +22,8 @@
 * Fixed line clearing happening on pause
 * Fixed PAL colours
 * Famicom Keyboard support
+* Autodetect MMC1/CNROM
+* NROM Support
 * MMC3 Support
 * MMC5 Support
 
