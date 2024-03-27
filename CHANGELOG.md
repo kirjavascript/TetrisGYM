@@ -24,6 +24,8 @@
 * Famicom Keyboard support
 * MMC3 Support
 * MMC5 Support
+* Added "negative delay" to the hz display
+* Keep hz display enabled when topped out
 
 ## [v5 tournament]
 * Linecap Menu (from CTM Masters September 2022)

@@ -2,6 +2,11 @@ use crate::{input, labels, util};
 use rusticnes_core::nes::NesState;
 
 pub fn test() {
+    test_standard();
+    test_tspin();
+}
+
+fn test_standard() {
     let mut emu = util::emulator(None);
 
     for _ in 0..4 {
@@ -33,12 +38,56 @@ pub fn test() {
     // make piece fall immediately so emulation takes less time
     run_input_string(&mut emu, "D");
     // fall 18 rows, then 3 frames before the 10-frame entry delay finishes
-    util::run_n_vblanks(&mut emu, 18+10-3);
-    run_input_string(&mut emu, "R.R.R.R.R.");
-    assert_hz_display(&mut emu, HzSpeed(30, 5), 3, 1, Dir::Right);
-    // TODO: have tests for -2 and -1 entry delay too.
     // each negative entry delay should have its own test because they all
     // need to be handled specifically in separate branches
+    util::run_n_vblanks(&mut emu, 18+10-3);
+    run_input_string(&mut emu, "R.R.R.R.R.");
+    assert_hz_display(&mut emu, HzSpeed(30, 5), 3, -3, Dir::Right);
+    // -2 entry delay
+    util::run_n_vblanks(&mut emu, 12+10-2);
+    run_input_string(&mut emu, "LLL..L.L...L.");
+    assert_hz_display(&mut emu, HzSpeed(20, 3), 3, -2, Dir::Left);
+    // -1 entry delay
+    util::run_n_vblanks(&mut emu, 7+12-1);
+    run_input_string(&mut emu, "RR...R...R...R.R.");
+    assert_hz_display(&mut emu, HzSpeed(18, 3), 4, -1, Dir::Right);
+    // -4 entry delay shouldn't show up
+    util::run_n_vblanks(&mut emu, 2+12-4);
+    run_input_string(&mut emu, "L.....");
+    assert_hz_display(&mut emu, HzSpeed(18, 3), 4, -1, Dir::Right);
+}
+
+fn test_tspin() {
+    let mut emu = util::emulator(None);
+
+    for _ in 0..4 {
+        emu.run_until_vblank();
+    }
+
+    let practise_type = labels::get("practiseType") as usize;
+    let hz_flag = labels::get("hzFlag") as usize;
+    let game_mode = labels::get("gameMode") as usize;
+    let main_loop = labels::get("mainLoop");
+    let level_number = labels::get("levelNumber") as usize;
+
+    // set to tspin mode
+    emu.memory.iram_raw[practise_type] = labels::get("MODE_TSPINS") as _;
+    // turn on hz display
+    emu.memory.iram_raw[hz_flag] = 1;
+    // trick game into thinking it should start an a-type run
+    emu.memory.iram_raw[level_number] = 29;
+    emu.memory.iram_raw[game_mode] = 4;
+    emu.registers.pc = main_loop;
+
+    // wait for piece to become active
+    util::run_n_vblanks(&mut emu, 9);
+    run_input_string(&mut emu, "DRB");
+    util::run_n_vblanks(&mut emu, 14);
+    // lock first tspin
+    run_input_string(&mut emu, "A");
+    util::run_n_vblanks(&mut emu, 43);
+    run_input_string(&mut emu, "LLLL.");
+    assert_hz_display(&mut emu, HzSpeed(0, 0), 1, -3, Dir::Right);
 }
 
 // note:
