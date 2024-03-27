@@ -1,6 +1,7 @@
 use rusticnes_core::nes::NesState;
 use rusticnes_core::{ cartridge, opcodes, opcode_info };
-use crate::labels;
+use minifb::{Key, KeyRepeat};
+use crate::{labels, video};
 
 pub fn emulator(rom: Option<&[u8]>) -> NesState {
     let rom = rom.unwrap_or(include_bytes!("../../tetris.nes"));
@@ -9,6 +10,43 @@ pub fn emulator(rom: Option<&[u8]>) -> NesState {
     emu.power_on();
 
     emu
+}
+
+pub fn run_n_vblanks(emu: &mut NesState, n: i32) {
+    for _ in 0..n {
+        emu.run_until_vblank();
+    }
+}
+
+/// debug helper for showing the current visual state.
+/// hotkeys: 'q' closes window, 's' steps by a frame
+#[allow(dead_code)]
+pub fn preview(emu: &mut NesState) {
+    let mut view = video::Video::new();
+    view.window.set_key_repeat_rate(0.1);
+    loop {
+        if !view.window.is_open() {
+            break;
+        }
+        if view.window.is_key_pressed(Key::Q, KeyRepeat::No) {
+            break;
+        }
+        if view.window.is_key_pressed(Key::S, KeyRepeat::Yes) {
+            emu.run_until_vblank();
+        }
+        view.render(emu);
+    }
+}
+
+// emu.p1_input inverts the traditional bit assignments for the controller
+// (e.g. 0x01 corresponds to A) to more accurately emulate how bits are read
+// in.
+pub fn set_controller(emu: &mut NesState, buttons: u8) {
+    let mut flipped_buttons = 0u8;
+    for i in 0..8 {
+        flipped_buttons |= ((buttons >> i) & 1) << (7-i);
+    }
+    emu.p1_input = flipped_buttons;
 }
 
 pub fn run_to_return(emu: &mut NesState, print: bool) {

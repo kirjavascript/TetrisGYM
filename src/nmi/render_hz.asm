@@ -1,15 +1,23 @@
 renderHz:
         ; only set at game start and when player is controlling a piece
         ; during which, no other tile updates are happening
-        ; this is pretty expensive and uses up $7 PPU tile writes and 1 palette write
+        ; this is pretty expensive and uses up $8 PPU tile writes and 1 palette write
 
         ; delay
 
         lda #$22
         sta PPUADDR
-        lda #$68
+        lda #$67
         sta PPUADDR
+        ldx #$24 ; minus sign
         lda hzSpawnDelay
+        and #$80
+        bne @isNegative
+        ldx #$FF ; blank tile
+@isNegative:
+        stx PPUDATA
+        lda hzSpawnDelay
+        and #$7F ; clear sign flag
         sta PPUDATA
 
 renderHzSpeedTest:
