@@ -3,6 +3,14 @@ nmi:    pha
         pha
         tya
         pha
+; tmp1, tmp2, tmp3, tmpX, tmpY, tmpZ, generalCounter, generalCounter2 & generalCounter3 are shared
+        ldx #$08
+@backupSharedVars:
+        lda tmp1,x
+        pha
+        dex
+        bpl @backupSharedVars
+
         lda #$00
         sta oamStagingLength
         jsr render
@@ -32,6 +40,16 @@ nmi:    pha
 .endif
         lda #$01
         sta verticalBlankingInterval
+
+        ; restore shared variables
+        ldx #$00
+@restoreShared:
+        pla
+        sta tmp1,x
+        inx
+        cpx #$09
+        bne @restoreShared
+
         pla
         tay
         tsx
