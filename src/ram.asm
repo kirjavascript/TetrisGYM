@@ -5,34 +5,28 @@ tmp3: .res 1
 tmpX: .res 1 ;  $0003
 tmpY: .res 1 ;  $0004
 tmpZ: .res 1 ;  $0005
-generalCounter: .res 1 ; $0006                    ; canon is legalScreenCounter2
-generalCounter2: .res 1 ; $0007
-generalCounter3: .res 1 ; $0008
-generalCounter4: .res 1 ; $0009
-generalCounter5: .res 1 ; $000A
-
 switchTmp1 := tmpX ; for switch_s_plus_2a
 switchTmp2 := tmpY
 
-tmpBulkCopyToPpuReturnAddr: .res 2 ;  $000B ; 2 bytes
-binScore: .res 4 ;  $D ; 4 bytes binary
-score: .res 4 ;  $11 ; 4 bytes BCD
-nmiReturnAddr: .res 1 ; $0015 ; used for crash
-crashState: .res 1 ; $0016 ; used for crash
-cycleCount: .res 2 ; $0017 ; 2 bytes ; used for crash
-oneThirdPRNG: .res 1 ; $0019 ; used for crash
+tmpBulkCopyToPpuReturnAddr: .res 2 ;  $0006 ; 2 bytes
+binScore: .res 4 ;  $8 ; 4 bytes binary
+score: .res 4 ;  $C ; 4 bytes BCD
+nmiReturnAddr: .res 1 ; $0010 ; used for crash
+crashState: .res 1 ; $0011 ; used for crash
+cycleCount: .res 2 ; $0012 ; 2 bytes ; used for crash
+oneThirdPRNG: .res 1 ; $0014 ; used for crash
     .res $2
 
-rng_seed: .res 2 ; $001C
-spawnID: .res 1 ; $001E
-spawnCount: .res 1 ; $001F
-pointerAddr: .res 2 ; $0020 ; used in debug, harddrop
-pointerAddrB: .res 2 ; $0022 ; used in harddrop
-allegroIndex: .res 1 ; $0024 for crash
-wasAllegro: .res 1 ; $0025 for crash
-startParity: .res 1 ; $0026 for crash
-lagState: .res 1 ; $0027 for lagged lines & score
-    .res $B
+rng_seed: .res 2 ; $0017
+spawnID: .res 1 ; $0019
+spawnCount: .res 1 ; $001A
+pointerAddr: .res 2 ; $001B ; used in debug, harddrop
+pointerAddrB: .res 2 ; $001D ; used in harddrop
+allegroIndex: .res 1 ; $001F for crash
+wasAllegro: .res 1 ; $0020 for crash
+startParity: .res 1 ; $0021 for crash
+lagState: .res 1 ; $0022 for lagged lines & score
+    .res $10
 
 verticalBlankingInterval: .res 1 ; $0033
 set_seed: .res 3 ; $0034 ; rng_seed, rng_seed+1, spawnCount
@@ -101,7 +95,11 @@ renderFlags: .res 1 ; $00A3
     .res $3
 
 gameModeState: .res 1 ; $00A7                    ; For values, see playState_checkForCompletedRows
-.res 5
+generalCounter: .res 1 ; $00A8                    ; canon is legalScreenCounter2
+generalCounter2: .res 1 ; $00A9
+generalCounter3: .res 1 ; $00AA
+generalCounter4: .res 1 ; $00AB
+generalCounter5: .res 1 ; $00AC
 positionValidTmp: .res 1 ; $00AD              ; 0-level, 1-height
 originalY: .res 1 ; $00AE
 dropSpeed: .res 1 ; $00AF

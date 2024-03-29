@@ -3,8 +3,8 @@ nmi:    pha
         pha
         tya
         pha
-; tmp1, tmp2, tmp3, tmpX, tmpY, tmpZ, generalCounter, generalCounter2 & generalCounter3 are shared
-        ldx #$08
+; tmp1, tmp2, tmp3, tmpX, tmpY, and tmpZ are shared
+        ldx #$05
 @backupSharedVars:
         lda tmp1,x
         pha
@@ -47,7 +47,7 @@ nmi:    pha
         pla
         sta tmp1,x
         inx
-        cpx #$09
+        cpx #$06
         bne @restoreShared
 
         pla
