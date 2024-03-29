@@ -259,39 +259,39 @@ updateLineClearingAnimation:
         sty tmp3
 
         lda #$00
-        sta generalCounter3
+        sta tmpZ
 @whileCounter3LessThan4:
-        ldx generalCounter3
+        ldx tmpZ
         lda completedRow,x
         beq @nextRow
         asl a
         tay
         lda vramPlayfieldRows,y
-        sta generalCounter
+        sta tmpX
 
         iny
         lda vramPlayfieldRows,y
-        sta generalCounter2
+        sta tmpY
         sta PPUADDR
         ldx rowY
         lda leftColumns,x
         clc
-        adc generalCounter
+        adc tmpX
         sta PPUADDR
         lda tmp3 ; #$FF
         sta PPUDATA
-        lda generalCounter2
+        lda tmpY
         sta PPUADDR
         ldx rowY
         lda rightColumns,x
         clc
-        adc generalCounter
+        adc tmpX
         sta PPUADDR
         lda tmp3 ; #$FF
         sta PPUDATA
 @nextRow:
-        inc generalCounter3
-        lda generalCounter3
+        inc tmpZ
+        lda tmpZ
         cmp #$04
         bne @whileCounter3LessThan4
         inc rowY

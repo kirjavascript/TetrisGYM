@@ -12,7 +12,7 @@ render_mode_congratulations_screen:
         tax
         inx
         lda highScorePpuAddrTable,x
-        sta generalCounter
+        ; sta generalCounter ; unnecessary?
         clc
         adc highScoreEntryNameOffsetForLetter
         sta PPUADDR

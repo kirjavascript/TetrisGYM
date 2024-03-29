@@ -22,13 +22,13 @@ pollControllerButtons:
 @finishedMove:
         ldx #$00
         lda (demoButtonsAddr,x)
-        sta generalCounter
+        sta tmpX
         jsr demoButtonsTable_indexIncr
         lda demo_heldButtons
-        eor generalCounter
-        and generalCounter
+        eor tmpX
+        and tmpX
         sta newlyPressedButtons_player1
-        lda generalCounter
+        lda tmpX
         sta demo_heldButtons
         ldx #$00
         lda (demoButtonsAddr,x)
@@ -135,16 +135,16 @@ pollController:
         jsr pollController_actualRead
         jsr addExpansionPortInputAsControllerInput
         lda newlyPressedButtons_player1
-        sta generalCounter2
+        sta tmpY
         lda newlyPressedButtons_player2
-        sta generalCounter3
+        sta tmpZ
         jsr pollController_actualRead
         jsr addExpansionPortInputAsControllerInput
         lda newlyPressedButtons_player1
-        and generalCounter2
+        and tmpY
         sta newlyPressedButtons_player1
         lda newlyPressedButtons_player2
-        and generalCounter3
+        and tmpZ
         sta newlyPressedButtons_player2
 
         lda goofyFlag

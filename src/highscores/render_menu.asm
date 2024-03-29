@@ -1,9 +1,9 @@
 showHighScores:
         ldy #0
         lda #0
-        sta generalCounter2
+        sta tmpY
 @copyEntry:
-        lda generalCounter2
+        lda tmpY
         asl a
         tax
         lda highScorePpuAddrTable,x
@@ -16,10 +16,10 @@ showHighScores:
         ldx #highScoreNameLength
 @copyChar:
         lda highscores,y
-        sty generalCounter
+        sty tmpX
         tay
         lda highScoreCharToTile,y
-        ldy generalCounter
+        ldy tmpX
         sta PPUDATA
         iny
         dex
@@ -68,7 +68,7 @@ showHighScores:
         iny
 
         ; update PPUADDR for start level
-        lda generalCounter2
+        lda tmpY
         asl a
         tax
         lda highScorePpuAddrTable,x
@@ -83,8 +83,8 @@ showHighScores:
         jsr renderByteBCD
         iny
 
-        inc generalCounter2
-        lda generalCounter2
+        inc tmpY
+        lda tmpY
         cmp #highScoreQuantity
         beq showHighScores_ret
         jmp @copyEntry
