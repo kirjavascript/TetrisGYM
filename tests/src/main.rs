@@ -16,6 +16,8 @@ mod score;
 mod sps;
 mod toprow;
 mod tspins;
+mod hz_display;
+mod nmi;
 
 use gumdrop::Options;
 
@@ -46,7 +48,7 @@ struct TestOptions {
 fn main() {
     let options = TestOptions::parse_args_default_or_exit();
 
-    let tests: [(&str, fn()); 10] = [
+    let tests: [(&str, fn()); 12] = [
         ("garbage4", garbage::test_garbage4_crash),
         ("floor", floor::test),
         ("tspins", tspins::test),
@@ -57,6 +59,8 @@ fn main() {
         ("rng seeds", rng::test),
         ("sps", sps::test),
         ("palettes", palettes::test),
+        ("hz_display", hz_display::test),
+        ("nmi", nmi::test),
     ];
 
     // run tests
