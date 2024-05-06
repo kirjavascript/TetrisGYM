@@ -466,7 +466,7 @@ testCrash:
         sta cycleCount
         lda #$6F
         sta cycleCount+1 ;low byte at +1
-		
+
         lda completedLines ; checking if lines cleared
         beq @linesNotCleared
         ldx #$04 ;setting loop to run 4x
@@ -653,19 +653,19 @@ testCrash:
         adc allegroIndex
         sta allegroIndex
 @palCycles:
-		lda palFlag ; if pal, move thresholds for crashes 3467 cycles away
-		beq @randomFactors
-		sec
-		lda cycleCount+1
-		sbc #$8B
-		sta cycleCount+1
-		lda cycleCount
-		sbc #$0D
-		sta cycleCount
-		clc
+        lda palFlag ; if pal, move thresholds for crashes 3467 cycles away
+        beq @randomFactors
+        sec
+        lda cycleCount+1
+        sbc #$8B
+        sta cycleCount+1
+        lda cycleCount
+        sbc #$0D
+        sta cycleCount
+        clc
 @randomFactors:
-		lda strictFlag
-		bne @noDMA ;for strict crash, do not add random cycles.
+        lda strictFlag
+        bne @noDMA ;for strict crash, do not add random cycles.
         lda oneThirdPRNG ; RNG for which cycle of the last instruction the game returns to
         adc allegroIndex
         sta allegroIndex
@@ -710,13 +710,13 @@ testCrash:
 ;confettiB = 30765-31193
         cmp #$74 ;high byte of cycle count is already loaded
         bne @nextSwitch
-		lda strictFlag
-		beq @normalChecks ;special conditions for "strict" mode. crash on 7423-7442, check red on 7443-7448.
-		lda cycleCount+1
-		cmp #$23 ;up to 8 cycles could have been added, but weren't, so our low bound is 8 below the typical.
-		bcc @nextSwitch ;if too low, exit
-		bcs @highBoundary ;otherwise, check high bound and skip check for gap.
-@normalChecks:		
+        lda strictFlag
+        beq @normalChecks ;special conditions for "strict" mode. crash on 7423-7442, check red on 7443-7448.
+        lda cycleCount+1
+        cmp #$23 ;up to 8 cycles could have been added, but weren't, so our low bound is 8 below the typical.
+        bcc @nextSwitch ;if too low, exit
+        bcs @highBoundary ;otherwise, check high bound and skip check for gap.
+@normalChecks:
         lda cycleCount+1
         cmp #$2B ; minimum crash
         bcc @nextSwitch
@@ -733,11 +733,11 @@ testCrash:
         bcs @nextSwitch ;between 7436 & 7448
         cmp #$43
         bcc @notRed ;checking if crash is during first crashable instruction
-		txa
-		lsr ;all odd switches on PAL result in no crash.
-		bcs @oddSwitch
-		lda palFlag
-		bne @nextSwitch ;if PAL, no crash.
+        txa
+        lsr ;all odd switches on PAL result in no crash.
+        bcs @oddSwitch
+        lda palFlag
+        bne @nextSwitch ;if PAL, no crash.
 @oddSwitch:
         cpx #$07 ; checking which switch routine is active.
         beq @isPal ;checks version if sw2
@@ -749,10 +749,10 @@ testCrash:
         jsr satanSpawn
         jmp @allegroClear ;allegroClear is basically return, just clears the variable first.
 @isPal:
-		lda palFlag
-		beq @nextSwitch ;if NTSC, continue, no crash.
-		jsr blackBox
-		jmp @allegroClear
+        lda palFlag
+        beq @nextSwitch ;if NTSC, continue, no crash.
+        jsr blackBox
+        jmp @allegroClear
 @notRed:
         lda #$F0
         sta crashState
@@ -899,8 +899,8 @@ confettiHandler:
         beq @checkForNmi
         jmp confettiHandler
 @infiniteConfetti:
-		lda palFlag
-		bne @endConfetti ;infinite confetti does not exist on PAL
+        lda palFlag
+        bne @endConfetti ;infinite confetti does not exist on PAL
         lda heldButtons_player1
         adc #$80 ; loading 80 as Y coordinate of confetti text if nothing is held.
         cmp #$80
@@ -911,18 +911,18 @@ confettiHandler:
         rts
 satanSpawn: ; copied from routine vanilla game's memset_ppu_page_and_more which is no longer present in gym
         lda palFlag
-		beq @ntsc
-		lda #$00
+        beq @ntsc
+        lda #$00
         sta verticalBlankingInterval
 @checkForNmi:
         lda verticalBlankingInterval ;busyloop
-        beq @checkForNmi  
-		ldx #$FF
-		ldy #$00
-		
+        beq @checkForNmi
+        ldx #$FF
+        ldy #$00
+
 @ntsc:
-		lda #$AA
-		sta     tmp1
+        lda #$AA
+        sta     tmp1
         stx     tmp2
         sty     tmp3
         lda     PPUSTATUS
