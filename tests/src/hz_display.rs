@@ -1,4 +1,4 @@
-use crate::{input, labels, util};
+use crate::{labels, util};
 use rusticnes_core::nes::NesState;
 
 pub fn test() {
@@ -9,9 +9,7 @@ pub fn test() {
 fn test_standard() {
     let mut emu = util::emulator(None);
 
-    for _ in 0..4 {
-        emu.run_until_vblank();
-    }
+    util::run_n_vblanks(&mut emu, 4);
 
     let hz_flag = labels::get("hzFlag") as usize;
     let game_mode = labels::get("gameMode") as usize;
@@ -90,25 +88,12 @@ fn test_tspin() {
     assert_hz_display(&mut emu, HzSpeed(0, 0), 1, -3, Dir::Right);
 }
 
-// note:
 fn run_input_string(emu: &mut NesState, inputs: &str) {
     for button in inputs.chars() {
-        let controller_data = match button {
-            'L' => input::LEFT,
-            'R' => input::RIGHT,
-            'D' => input::DOWN,
-            'U' => input::UP,
-            'A' => input::A,
-            'B' => input::B,
-            'S' => input::START,
-            'T' => input::SELECT,
-            '.' => 0,
-            _ => panic!("character '{}' cannot be used as controller input", button),
-        };
-        util::set_controller(emu, controller_data);
+        util::set_controller(emu, button);
         emu.run_until_vblank();
     }
-    util::set_controller(emu, 0);
+    util::set_controller(emu, '.');
 }
 
 #[derive(PartialEq)]

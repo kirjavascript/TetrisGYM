@@ -93,7 +93,7 @@ render_mode_play_and_demo:
         and #RENDER_SCORE
         beq @renderHz
 
-        ; 9 safe tile writes freed from stats / hz
+        ; 7 safe tile writes freed from stats / hz
         ; (lazy render hz for 10 more)
         ; 1 added in level (3 total)
         ; 2 added in lines (5 total)

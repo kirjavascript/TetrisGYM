@@ -1,7 +1,6 @@
 use rusticnes_core::nes::NesState;
 use rusticnes_core::{ cartridge, opcodes, opcode_info };
-use minifb::{Key, KeyRepeat};
-use crate::{labels, video};
+use crate::{input, labels};
 
 pub fn emulator(rom: Option<&[u8]>) -> NesState {
     let rom = rom.unwrap_or(include_bytes!("../../tetris.nes"));
@@ -12,41 +11,36 @@ pub fn emulator(rom: Option<&[u8]>) -> NesState {
     emu
 }
 
-pub fn run_n_vblanks(emu: &mut NesState, n: i32) {
+pub fn run_n_vblanks(emu: &mut NesState, n: usize) {
     for _ in 0..n {
         emu.run_until_vblank();
-    }
-}
-
-/// debug helper for showing the current visual state.
-/// hotkeys: 'q' closes window, 's' steps by a frame
-#[allow(dead_code)]
-pub fn preview(emu: &mut NesState) {
-    let mut view = video::Video::new();
-    view.window.set_key_repeat_rate(0.1);
-    loop {
-        if !view.window.is_open() {
-            break;
-        }
-        if view.window.is_key_pressed(Key::Q, KeyRepeat::No) {
-            break;
-        }
-        if view.window.is_key_pressed(Key::S, KeyRepeat::Yes) {
-            emu.run_until_vblank();
-        }
-        view.render(emu);
     }
 }
 
 // emu.p1_input inverts the traditional bit assignments for the controller
 // (e.g. 0x01 corresponds to A) to more accurately emulate how bits are read
 // in.
-pub fn set_controller(emu: &mut NesState, buttons: u8) {
+pub fn set_controller_raw(emu: &mut NesState, buttons: u8) {
     let mut flipped_buttons = 0u8;
     for i in 0..8 {
         flipped_buttons |= ((buttons >> i) & 1) << (7-i);
     }
     emu.p1_input = flipped_buttons;
+}
+
+pub fn set_controller(emu: &mut NesState, button: char) {
+    set_controller_raw(emu, match button {
+        'L' => input::LEFT,
+        'R' => input::RIGHT,
+        'D' => input::DOWN,
+        'U' => input::UP,
+        'A' => input::A,
+        'B' => input::B,
+        'S' => input::START,
+        'T' => input::SELECT,
+        '.' => 0,
+        _ => panic!("character '{}' cannot be used as controller input", button),
+    });
 }
 
 pub fn run_to_return(emu: &mut NesState, print: bool) {
@@ -86,6 +80,65 @@ pub fn cycles_to_return(emu: &mut NesState) -> u32 {
 
     opcodes::pop(emu);
     opcodes::pop(emu);
+
+    cycles
+}
+
+pub fn cycles_to_vblank(emu: &mut NesState) -> u32 {
+    let vblank = labels::get("verticalBlankingInterval") as usize;
+    let mut cycles = 0;
+    let mut done = false;
+
+    while emu.ppu.current_scanline == 242 {
+        emu.cycle();
+        if !done {
+            cycles += 1;
+            if emu.memory.iram_raw[vblank] == 1 {
+                done = true;
+            }
+        }
+        let mut i = 0;
+        while emu.cpu.tick >= 1 && i < 10 {
+            emu.cycle();
+            if !done {
+                cycles += 1;
+                if emu.memory.iram_raw[vblank] == 1 {
+                    done = true;
+                }
+            }
+            i += 1;
+        }
+        if emu.ppu.current_frame != emu.last_frame {
+            emu.event_tracker.swap_buffers();
+            emu.last_frame = emu.ppu.current_frame;
+        }
+    }
+    emu.memory.iram_raw[vblank] = 1;
+    done = false;
+    while emu.ppu.current_scanline != 242 {
+        emu.cycle();
+        if !done {
+            cycles += 1;
+            if emu.memory.iram_raw[vblank] == 0 {
+                done = true;
+            }
+        }
+        let mut i = 0;
+        while emu.cpu.tick >= 1 && i < 10 {
+            emu.cycle();
+            if !done {
+                cycles += 1;
+                if emu.memory.iram_raw[vblank] == 0 {
+                    done = true;
+                }
+            }
+            i += 1;
+        }
+        if emu.ppu.current_frame != emu.last_frame {
+            emu.event_tracker.swap_buffers();
+            emu.last_frame = emu.ppu.current_frame;
+        }
+    }
 
     cycles
 }
