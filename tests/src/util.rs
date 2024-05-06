@@ -26,9 +26,6 @@ pub fn run_to_return(emu: &mut NesState, print: bool) {
             break;
         }
     }
-
-    opcodes::pop(emu);
-    opcodes::pop(emu);
 }
 
 pub fn cycles_to_return(emu: &mut NesState) -> u32 {
@@ -45,9 +42,6 @@ pub fn cycles_to_return(emu: &mut NesState) -> u32 {
             break;
         }
     }
-
-    opcodes::pop(emu);
-    opcodes::pop(emu);
 
     cycles
 }
