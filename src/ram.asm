@@ -308,7 +308,7 @@ highScoreLinesLength := 2
 highScoreLevelsLength := 2
 highScoreLength := highScoreNameLength + highScoreScoreLength + highScoreLinesLength + highScoreLevelsLength
     .res highScoreQuantity * highScoreLength ; 48 bytes
-    .res 42
+    .res 43
 initMagic: .res 5 ; $075B                        ; Initialized to a hard-coded number. When resetting, if not correct number then it knows this is a cold boot
 
 menuRAM:  ; $760

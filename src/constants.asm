@@ -142,7 +142,7 @@ MENU_TOP_MARGIN_SCROLL := 7 ; in blocks
     .byte $0    ; MODE_SPEED_TEST
     .byte $5    ; MODE_SCORE_DISPLAY
     .byte $3	; MODE_CRASH
-	.byte $1	; MODE_STRICT
+    .byte $1	; MODE_STRICT
     .byte $1    ; MODE_HZ_DISPLAY
     .byte $1    ; MODE_INPUT_DISPLAY
     .byte $1    ; MODE_DISABLE_FLASH
