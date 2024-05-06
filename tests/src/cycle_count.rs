@@ -1,12 +1,12 @@
 use crate::{util, score, labels, playfield};
 
 pub fn count_cycles() {
-    test_hz_cycles();
-    test_max_score_cycles();
-    test_mode_score_cycles();
+    count_hz_cycles();
+    count_max_score_cycles();
+    count_mode_score_cycles();
 }
 
-fn test_hz_cycles() {
+fn count_hz_cycles() {
     // check max hz calculation amount
     let mut emu = util::emulator(None);
 
@@ -49,7 +49,7 @@ fn test_hz_cycles() {
     println!("hz display most cycles to vblank: {}", highest);
 }
 
-fn test_max_score_cycles() {
+fn count_max_score_cycles() {
     // check max scoring cycle amount
     let mut emu = util::emulator(None);
 
@@ -80,7 +80,7 @@ fn test_max_score_cycles() {
     println!("scoring routine most cycles: {}", highest);
 }
 
-fn test_mode_score_cycles() {
+fn count_mode_score_cycles() {
     // check clock cycles frames in each mode
     let mut emu = util::emulator(None);
 
