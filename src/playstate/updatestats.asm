@@ -586,7 +586,7 @@ testCrash:
         beq @dontClearCount
         tax
         ldy lineClearStatsByType-1,x
-        beq @dontClearCount
+        bne @dontClearCount
         lda #$0B ; 11 cycles for clearcount 10s place
         adc allegroIndex
         sta allegroIndex
@@ -648,11 +648,24 @@ testCrash:
         clc
         adc allegroIndex ; adds 8 cycles for current piece = 8 (horizontal Z)
         sta allegroIndex
-@not8:	bcc @randomFactors ; adc above means branch always when entered after it. piece < 8 adds 0 cycles.
+@not8:	bcc @palCycles ; adc above means branch always when entered after it. piece < 8 adds 0 cycles.
         lda #$0B ; would be 12 but carry is set. for piece > 8
         adc allegroIndex
         sta allegroIndex
+@palCycles:
+        lda palFlag ; if pal, move thresholds for crashes 3467 cycles away
+        beq @randomFactors
+        sec
+        lda cycleCount+1
+        sbc #$8B
+        sta cycleCount+1
+        lda cycleCount
+        sbc #$0D
+        sta cycleCount
+        clc
 @randomFactors:
+        lda strictFlag
+        bne @noDMA ;for strict crash, do not add random cycles.
         lda oneThirdPRNG ; RNG for which cycle of the last instruction the game returns to
         adc allegroIndex
         sta allegroIndex
@@ -697,6 +710,13 @@ testCrash:
 ;confettiB = 30765-31193
         cmp #$74 ;high byte of cycle count is already loaded
         bne @nextSwitch
+        lda strictFlag
+        beq @normalChecks ;special conditions for "strict" mode. crash on 7423-7442, check red on 7443-7448.
+        lda cycleCount+1
+        cmp #$23 ;up to 8 cycles could have been added, but weren't, so our low bound is 8 below the typical.
+        bcc @nextSwitch ;if too low, exit
+        bcs @highBoundary ;otherwise, check high bound and skip check for gap.
+@normalChecks:
         lda cycleCount+1
         cmp #$2B ; minimum crash
         bcc @nextSwitch
@@ -708,12 +728,19 @@ testCrash:
 @continue:
         cmp #$36
         bcc @nextSwitch
+@highBoundary:
         cmp #$49
         bcs @nextSwitch ;between 7436 & 7448
         cmp #$43
         bcc @notRed ;checking if crash is during first crashable instruction
+        txa
+        lsr ;all odd switches on PAL result in no crash.
+        bcs @oddSwitch
+        lda palFlag
+        bne @nextSwitch ;if PAL, no crash.
+@oddSwitch:
         cpx #$07 ; checking which switch routine is active.
-        beq @nextSwitch ;continues crashless if sw2
+        beq @isPal ;checks version if sw2
         cpx #$03
         bne @notRed ; runs graphics corruption if sw6
         ldx #$FF ; these are normally set by the code it would jump to after NMI.
@@ -721,6 +748,11 @@ testCrash:
         lda #$81 ; value normally held at this point in sw6
         jsr satanSpawn
         jmp @allegroClear ;allegroClear is basically return, just clears the variable first.
+@isPal:
+        lda palFlag
+        beq @nextSwitch ;if NTSC, continue, no crash.
+        jsr blackBox
+        jmp @allegroClear
 @notRed:
         lda #$F0
         sta crashState
@@ -867,6 +899,8 @@ confettiHandler:
         beq @checkForNmi
         jmp confettiHandler
 @infiniteConfetti:
+        lda palFlag
+        bne @endConfetti ;infinite confetti does not exist on PAL
         lda heldButtons_player1
         adc #$80 ; loading 80 as Y coordinate of confetti text if nothing is held.
         cmp #$80
@@ -876,6 +910,18 @@ confettiHandler:
         sta allegroIndex
         rts
 satanSpawn: ; copied from routine vanilla game's memset_ppu_page_and_more which is no longer present in gym
+        lda palFlag
+        beq @ntsc
+        lda #$00
+        sta verticalBlankingInterval
+@checkForNmi:
+        lda verticalBlankingInterval ;busyloop
+        beq @checkForNmi
+        ldx #$FF
+        ldy #$00
+
+@ntsc:
+        lda #$AA
         sta     tmp1
         stx     tmp2
         sty     tmp3
@@ -913,3 +959,41 @@ LAC61:  sty     PPUDATA
         bne     LAC61
 LAC67:  ldx     tmp2
         rts
+blackBox: ;copied from patchToPpu from original game as it's no longer present in gym
+        lda #$00
+        sta verticalBlankingInterval
+@checkForNmi:
+        lda verticalBlankingInterval ;busyloop
+        beq @checkForNmi
+        ldy     #$00
+@patchAddr:
+        lda     patchData,y
+        sta     PPUADDR
+        iny
+        lda     patchData,y
+        sta     PPUADDR
+        iny
+@patchValue:
+        lda     patchData,y
+        iny
+        cmp     #$FE
+        beq     @patchAddr
+        cmp     #$FD
+        beq     @ret
+        sta     PPUDATA
+        jmp     @patchValue
+
+@ret:   rts
+patchData:
+        .byte   $22,$58,$FF,$FE,$22,$75,$FF,$FF
+        .byte   $FF,$FF,$FF,$FF,$FE,$22,$94,$FF
+        .byte   $FF,$FF,$FF,$FF,$FF,$FF,$FF,$FE
+        .byte   $22,$B4,$FF,$FF,$FF,$FF,$FF,$FF
+        .byte   $FF,$FF,$FE,$22,$D4,$FF,$FF,$FF
+        .byte   $FF,$FF,$FF,$FF,$FF,$FE,$22,$F4
+        .byte   $FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF
+        .byte   $FE,$23,$14,$FF,$FF,$FF,$FF,$FF
+        .byte   $FF,$FF,$FF,$FE,$23,$34,$FF,$FF
+        .byte   $FF,$FF,$FF,$FF,$FF,$FF,$FE,$22
+        .byte   $CA,$46,$47,$FE,$22,$EA,$56,$57
+        .byte   $FD
