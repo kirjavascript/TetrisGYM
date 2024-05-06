@@ -46,7 +46,7 @@ fn test_hz_cycles() {
         util::run_n_vblanks(&mut emu, debounce + 1);
     }
 
-    println!("hz display most cycles {}", highest);
+    println!("hz display most cycles to vblank: {}", highest);
 }
 
 fn test_max_score_cycles() {
@@ -135,6 +135,6 @@ fn test_mode_score_cycles() {
             }
         }
 
-        println!("cycles {} lines {} mode {}", highest, lines, mode);
+        println!("cycles to vblank {} lines {} mode {}", highest, lines, mode);
     }
 }

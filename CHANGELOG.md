@@ -8,6 +8,7 @@
 * M Score changed to Classic Scoring + Millions counter
 * Invisible linecap turns entire playfield invisible
 * Invisible mode preserves original piece colors
+* Added "negative delay" to the hz display
 * Block Tool pieces wrap around
 * Always Next Box removed
 * 0001 seeds are ignored
@@ -21,11 +22,10 @@
 * Fixed crashes in garbage mode 4
 * Fixed line clearing happening on pause
 * Fixed PAL colours
+* Keep hz display enabled when topped out
 * Famicom Keyboard support
 * MMC3 Support
 * MMC5 Support
-* Added "negative delay" to the hz display
-* Keep hz display enabled when topped out
 
 ## [v5 tournament]
 * Linecap Menu (from CTM Masters September 2022)
