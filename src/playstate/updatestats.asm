@@ -752,6 +752,7 @@ testCrash:
 		lda palFlag
 		beq @nextSwitch ;if NTSC, continue, no crash.
 		jsr blackBox
+@allegroJump:
 		jmp @allegroClear
 @notRed:
         lda #$F0
@@ -777,9 +778,15 @@ testCrash:
 @nextOn:
         lda cycleCount ;testing for limited confetti
         cmp #$76 ;high byte min
-        bcc @allegroClear
+        bcc @allegroJump
         bne @not76
         lda cycleCount+1
+		ldx strictFlag
+		beq @notStrict_confetti
+		cmp #$BD
+		bcc @allegroJump
+		bcs @confettiA
+@notStrict_confetti:
         cmp #$C5 ;low byte min
         bcc @allegroClear
         bcs @confettiA
@@ -800,6 +807,12 @@ testCrash:
         bcc @allegroClear
         bne @levelLag
         lda cycleCount+1
+		ldx strictFlag
+		beq @notStrict_level
+		cmp #$95
+		bcc @allegroClear
+		bcs @levelLag
+@notStrict_level:
         cmp #$9D;low byte min
         bcc @allegroClear
 @levelLag:
@@ -811,6 +824,12 @@ testCrash:
         bcc @allegroClear
         bne @lineLag
         lda cycleCount+1
+		ldx strictFlag
+		beq @notStrict_lines
+		cmp #$58
+		bcc @allegroClear
+		bcs @lineLag
+@notStrict_lines:
         cmp #$60;low byte min
         bcc @allegroClear
 @lineLag:
@@ -822,6 +841,12 @@ testCrash:
         bcc @allegroClear
         bne @not7A
         lda cycleCount+1
+		ldx strictFlag
+		beq @notStrict_B
+		cmp #$57
+		bcc @allegroClear
+		bcs @confettiB
+@notStrict_B:
         cmp #$5F ;low byte min
         bcc @allegroClear
         bcs @confettiB
