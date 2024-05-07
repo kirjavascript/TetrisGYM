@@ -56,11 +56,12 @@ drawTiles(buffer, lookup, `
 #a    GARBAGE                 d#
 #a    DROUGHT                 d#
 #a    DAS DELAY               d#
+#a    LOW STACK               d#
 #a    KILLSCREEN »2           d#
 #a    INVISIBLE               d#
 #a    HARD DROP               d#
-#a    TAP/ROLL SPEED          d#
 `);drawTiles(extra, lookup, `
+#a    TAP/ROLL SPEED          d#
 #a    SCORING                 d#
 #a    CRASH                   d#
 #a    STRICT CRASH            d#
