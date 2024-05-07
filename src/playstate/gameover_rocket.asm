@@ -1,4 +1,5 @@
 playState_checkStartGameOver:
+        jsr hzControl
 .if !ALWAYS_CURTAIN
         ; skip curtain / rocket when not qualling
         lda qualFlag

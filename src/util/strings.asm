@@ -96,6 +96,7 @@ stringLookup:
         .byte stringTopout-stringLookup
         .byte stringCrash-stringLookup
         .byte stringConfetti-stringLookup ;19
+        .byte stringStrict-stringLookup
 stringClassic:
         .byte $7,'C','L','A','S','S','I','C'
 stringLetters:
@@ -150,3 +151,5 @@ stringCrash:
         .byte $5,'C','R','A','S','H'
 stringConfetti:
         .byte $8,'C','O','N','F','E','T','T','I'
+stringStrict:
+        .byte $6,'S','T','R','I','C','T'

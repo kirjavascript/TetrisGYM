@@ -64,6 +64,7 @@ drawTiles(buffer, lookup, `
 #a    TAP/ROLL SPEED          d#
 #a    SCORING                 d#
 #a    CRASH                   d#
+#a    STRICT CRASH            d#
 #a    HZ DISPLAY              d#
 #a    INPUT DISPLAY           d#
 #a    DISABLE FLASH           d#
@@ -75,8 +76,8 @@ drawTiles(buffer, lookup, `
 #a    QUAL MODE               d#
 #a    PAL MODE                d#
 #a                            d#
-#a V5                         d#
 #a                            d#
+#a V6                         d#
 #a                            d#
 #a                            d#
 #a                            d#
@@ -132,7 +133,7 @@ drawTiles(extra, lookup, background);
 drawRect(buffer, 8, 2, 10, 5, 0xB0); // draw logo
 
 const urlX = 3;
-const urlY = 14;
+const urlY = 15;
 drawRect(extra, urlX, urlY, 12, 1, 0x74);
 drawRect(extra, urlX+12, urlY, 12, 1, 0x84);
 

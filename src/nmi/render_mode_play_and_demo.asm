@@ -93,7 +93,7 @@ render_mode_play_and_demo:
         and #RENDER_SCORE
         beq @renderHz
 
-        ; 8 safe tile writes freed from stats / hz
+        ; 7 safe tile writes freed from stats / hz
         ; (lazy render hz for 10 more)
         ; 1 added in level (3 total)
         ; 2 added in lines (5 total)
@@ -321,52 +321,94 @@ updatePaletteForLevel:
         jmp @mod10
 
 @copyPalettes:
-        asl a
-        asl a
+        and #$3F
         tax
-        lda #$00
-        sta generalCounter
-@copyPalette:
+        lda palFlag
+        beq @renderPalettes
+        cpx #$35 ; Level 181 & 245 and'd with $3F (level 53 & 117 are properly mod10'd)
+        bne @renderPalettes
+        ldx #$40
+@renderPalettes:
         lda #$3F
         sta PPUADDR
-        lda #$08
-        clc
-        adc generalCounter
+        lda #$09
         sta PPUADDR
-        lda colorTable,x
+        lda colorTable0,x
         sta PPUDATA
-        lda colorTable+1,x
+        lda colorTable1,x
         sta PPUDATA
-        lda colorTable+1+1,x
+        lda colorTable2,x
         sta PPUDATA
-        lda colorTable+1+1+1,x
+        lda #$3F
+        sta PPUADDR
+        lda #$19
+        sta PPUADDR
+        lda colorTable0,x
         sta PPUDATA
-        lda generalCounter
-        clc
-        adc #$10
-        sta generalCounter
-        cmp #$20
-        bne @copyPalette
+        lda colorTable1,x
+        sta PPUDATA
+        lda colorTable2,x
+        sta PPUDATA
+@done:
         rts
 
-; 4 bytes per level (bg, fg, c3, c4)
-colorTable:
-        .dbyt   $0F30,$2112,$0F30,$291A,$0F30,$2414,$0F30,$2A12
-        .dbyt   $0F30,$2B15,$0F30,$222B,$0F30,$0016,$0F30,$0513
-        .dbyt   $0F30,$1612,$0F30,$2716,$60E6,$69A5,$69C9,$1430
-        .dbyt   $04A9,$2085,$69E6,$89A5,$89C9,$1430,$04A9,$2085
-        .dbyt   $8960,$A549,$C920,$3056,$A5BE,$C901,$F020,$A5A4
-        .dbyt   $C900,$D00E,$E6A4,$A5B7,$85A5,$20EB,$9885,$A64C
-        .dbyt   $EA98,$A5A5,$C5B7,$D036,$A5A4,$C91C,$D030,$A900
-        .dbyt   $85A4,$8545,$8541,$A901,$8548,$A905,$8540,$A6BF
-        .dbyt   $BD56,$9985,$4220,$6999,$A5BE,$C901,$F007,$A5A6
-        .dbyt   $85BF,$4CE6,$9820,$EB98,$85BF,$A900,$854E,$60A5
-        .dbyt   $C0C9,$05D0,$12A6,$D3E6,$D3BD,$00DF,$4A4A,$4A4A
-        .dbyt   $2907,$AABD,$4E99,$6020,$0799,$60E6,$1AA5,$1718
-        .dbyt   $651A,$2907,$C907,$F008,$AABD,$4E99,$C519,$D01C
-        .dbyt   $A217,$A002,$2047,$ABA5,$1729,$0718,$6519,$C907
-        .dbyt   $9006,$38E9,$074C,$2A99,$AABD,$4E99,$8519,$6000
-        .dbyt   $0000,$0001,$0101,$0102,$0203,$0404,$0505,$0505
+; 3 bytes per level in separate tables
+colorTable0:
+        .byte   $30,$30,$30,$30
+        .byte   $30,$30,$30,$30
+        .byte   $30,$30,$E6,$C9
+        .byte   $A9,$E6,$C9,$A9
+        .byte   $60,$20,$BE,$20
+        .byte   $00,$A4,$A5,$85
+        .byte   $98,$B7,$A4,$30
+        .byte   $A4,$41,$48,$40
+        .byte   $56,$20,$BE,$07
+        .byte   $BF,$20,$BF,$4E
+        .byte   $C9,$A6,$BD,$4A
+        .byte   $07,$99,$99,$A5
+        .byte   $1A,$07,$BD,$19
+        .byte   $17,$47,$29,$19
+        .byte   $06,$4C,$BD,$19
+        .byte   $00,$01,$03,$05
+        .byte   $21 ; level 181/245 pal (different from NTSC)
+
+colorTable1:
+        .byte   $21,$29,$24,$2A
+        .byte   $2B,$22,$00,$05
+        .byte   $16,$27,$69,$14
+        .byte   $20,$89,$14,$20
+        .byte   $A5,$30,$C9,$A5
+        .byte   $D0,$A5,$20,$A6
+        .byte   $A5,$D0,$C9,$A9
+        .byte   $85,$A9,$A9,$A6
+        .byte   $99,$69,$C9,$A5
+        .byte   $4C,$EB,$A9,$60
+        .byte   $05,$D3,$00,$4A
+        .byte   $AA,$60,$60,$17
+        .byte   $29,$F0,$4E,$D0
+        .byte   $A0,$AB,$07,$C9
+        .byte   $38,$2A,$4E,$60
+        .byte   $00,$01,$04,$05
+        .byte   $2b ; level 181/245 pal (same as NTSC)
+
+colorTable2:
+        .byte   $12,$1A,$14,$12
+        .byte   $15,$2B,$16,$13
+        .byte   $12,$16,$A5,$30
+        .byte   $85,$A5,$30,$85
+        .byte   $49,$56,$01,$A4
+        .byte   $0E,$B7,$EB,$4C
+        .byte   $A5,$36,$1C,$00
+        .byte   $45,$01,$05,$BF
+        .byte   $85,$99,$01,$A6
+        .byte   $E6,$98,$00,$A5
+        .byte   $D0,$E6,$DF,$4A
+        .byte   $BD,$20,$E6,$18
+        .byte   $07,$08,$99,$1C
+        .byte   $02,$A5,$18,$07
+        .byte   $E9,$99,$99,$00
+        .byte   $01,$02,$04,$05
+        .byte   $25 ; level 181/245 pal (same as NTSC)
 
 incrementPieceStat:
         tax

@@ -16,12 +16,10 @@
     * [Setups](#setups)
     * [B-Type](#b-type)
     * [Floor](#floor)
-    * [Crunch](#crunch)
     * [(Quick)Tap](#quicktap)
     * [Tap Quantity](#tap-quantity)
     * [Checkerboard](#checkerboard)
     * [Transition](#transition)
-    * [Marathon](#marathon)
     * [Garbage](#garbage)
     * [Drought](#drought)
     * [DAS Delay](#das-delay)
@@ -155,16 +153,6 @@ Fill in the floor to a certain height to force higher stacking. This mode is oft
 
 Setting the height to zero will result in a game mode with burns disabled.
 
-### Crunch
-
-![Crunch](./assets/screens/crunch.png)
-
-Shrink the width of the playfield to force cramped stacking.
-
-Every increment of 4 will decrease the width from the left.
-
-Every increment of 1 will decrease the width from the right until it reaches its maximum of 3, where it will be reset to 0.
-
 ### (Quick)Tap
 
 ![Tap](./assets/screens/tap.png)
@@ -194,14 +182,6 @@ Uses custom scoring.
 Puts you ten lines before transition. The value given will be added to your score, so set this to 5 and start on level 18 for a 'maxout trainer' style mode.
 
 Setting the value to G causes the mode to act identical to the game genie code `SXTOKL`
-
-### Marathon
-
-Play as long as you are able to survive at a consistent speed.
-
-0. Level transitions do not happen, game remains on the same level for as long as you are able to survive.
-1. Levels will transition normally, but speed and points will remain fixed based on your starting level.
-2. Similar to 1, speed and points will remain fixed based on the starting level you choose, but actual game will begin at level 0.
 
 ### Garbage
 
