@@ -184,7 +184,7 @@ MENU_TOP_MARGIN_SCROLL := 7 ; in blocks
     .byte   "GARBGE"
     .byte   "LOBARS"
     .byte   "DASDLY"
-    .byte   "LOSTAK"
+    .byte   "LOWSTK"
     .byte   "KILLX2"
     .byte   "INVZBL"
     .byte   "HRDDRP"
