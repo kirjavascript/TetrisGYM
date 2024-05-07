@@ -379,6 +379,7 @@ testCrash:
         beq @noLag ;if lag should happen, wait a frame here so that sprite staging doesn't happen.
         lda #$00
         sta verticalBlankingInterval
+		sta lagState ;clear lagstate for next
 @checkForNmi:
         lda verticalBlankingInterval ;busyloop
         beq @checkForNmi
