@@ -1,4 +1,3 @@
-
 gameModeState_initGameBackground:
         jsr updateAudioWaitForNmiAndDisablePpuRendering
         jsr disableNmi
@@ -255,6 +254,9 @@ savestate_nametable_patch:
         .byte   $23,$37,$3B,$FF,$FF,$FF,$FF,$FF,$FF,$3C,$FE
         .byte   $23,$57,$3D,$3E,$3E,$3E,$3E,$3E,$3E,$3F,$FD
 
+DARK_CORNER_TILES := $94
+DARK_CORNER_TILES2 := $90
+
 drawDarkMode:
         jsr bulkCopyToPpu
         .addr darkmode_stripes
@@ -288,9 +290,6 @@ drawDarkMode:
 
 stripeHoriz = $40
 stripeVert = $C0
-
-DARK_CORNER_TILES := $94
-DARK_CORNER_TILES2 := $90
 
 darkmode_stripes:
         .byte  $20,$00

@@ -71,10 +71,10 @@ drawTiles(buffer, lookup, `
 #a    DISABLE PAUSE           d#
 #a    GOOFY FOOT              d#
 #a    BLOCK TOOL              d#
+#a    DARK MODE               d#
 #a    LINECAP                 d#
 #a    DAS ONLY                d#
 #a    QUAL MODE               d#
-#a    DARK MODE               d#
 #a    PAL MODE                d#
 #a                            d#
 #a                            d#
