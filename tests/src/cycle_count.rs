@@ -1,7 +1,56 @@
 use crate::{util, score, labels, playfield};
-use rusticnes_core::nes::NesState;
 
 pub fn count_cycles() {
+    count_hz_cycles();
+    count_max_score_cycles();
+    count_mode_score_cycles();
+}
+
+fn count_hz_cycles() {
+    // check max hz calculation amount
+    let mut emu = util::emulator(None);
+
+    let hz_flag = labels::get("hzFlag") as usize;
+    let game_mode = labels::get("gameMode") as usize;
+    let x = labels::get("tetriminoX") as usize;
+    let y = labels::get("tetriminoY") as usize;
+    let main_loop = labels::get("mainLoop");
+    let level_number = labels::get("levelNumber") as usize;
+    let debounce = labels::get("hzDebounceThreshold") as usize;
+
+    util::run_n_vblanks(&mut emu, 3);
+
+    emu.memory.iram_raw[hz_flag] = 1;
+    emu.memory.iram_raw[level_number] = 18;
+    emu.memory.iram_raw[game_mode] = 4;
+    emu.registers.pc = main_loop;
+
+    util::run_n_vblanks(&mut emu, 5);
+
+    let mut highest = 0;
+
+    for buttons in &[
+        "L.L.L.L.L",
+        "RR...R...R...R.R.",
+        ".....L.L..L.L.",
+        "LLL..L.L...L.R.R..L...R....L....L...L....L",
+        "R.R.R.R.R.R.R.R.R.R.R.R.R.R.R.R.R.R.R.R.R.R.R.R.R.R.R.R.R.R.R.R.R",
+    ] {
+        buttons.chars().for_each(|button| {
+            emu.memory.iram_raw[x] = 5;
+            emu.memory.iram_raw[y] = 0;
+            util::set_controller(&mut emu, button);
+            highest = highest.max(util::cycles_to_vblank(&mut emu));
+        });
+
+        util::run_n_vblanks(&mut emu, debounce + 1);
+    }
+
+    println!("hz display most cycles to vblank: {}", highest);
+}
+
+fn count_max_score_cycles() {
+    // check max scoring cycle amount
     let mut emu = util::emulator(None);
 
     let completed_lines = labels::get("completedLines") as usize;
@@ -18,7 +67,6 @@ pub fn count_cycles() {
 
     let mut highest = 0;
 
-    // check every linecount on every level
     for level in 0..=255 {
         for lines in 0..=4 {
             let count = score(999999, lines, level);
@@ -30,9 +78,10 @@ pub fn count_cycles() {
     }
 
     println!("scoring routine most cycles: {}", highest);
+}
 
+fn count_mode_score_cycles() {
     // check clock cycles frames in each mode
-
     let mut emu = util::emulator(None);
 
     for mode in 0..labels::get("MODE_GAME_QUANTITY") {
@@ -76,7 +125,7 @@ pub fn count_cycles() {
             emu.memory.iram_raw[labels::get("autorepeatY") as usize] = 0;
 
             for _ in 0..45 {
-                let cycles = cycles_to_vblank(&mut emu);
+                let cycles = util::cycles_to_vblank(&mut emu);
 
                 if cycles > highest {
                     highest = cycles;
@@ -86,66 +135,6 @@ pub fn count_cycles() {
             }
         }
 
-        println!("cycles {} lines {} mode {}", highest, lines, mode);
+        println!("cycles to vblank {} lines {} mode {}", highest, lines, mode);
     }
-
-}
-
-fn cycles_to_vblank(emu: &mut NesState) -> u32 {
-    let vblank = labels::get("verticalBlankingInterval") as usize;
-    let mut cycles = 0;
-    let mut done = false;
-
-    while emu.ppu.current_scanline == 242 {
-        emu.cycle();
-        if !done {
-            cycles += 1;
-            if emu.memory.iram_raw[vblank] == 1 {
-                done = true;
-            }
-        }
-        let mut i = 0;
-        while emu.cpu.tick >= 1 && i < 10 {
-            emu.cycle();
-            if !done {
-                cycles += 1;
-                if emu.memory.iram_raw[vblank] == 1 {
-                    done = true;
-                }
-            }
-            i += 1;
-        }
-        if emu.ppu.current_frame != emu.last_frame {
-            emu.event_tracker.swap_buffers();
-            emu.last_frame = emu.ppu.current_frame;
-        }
-    }
-    emu.memory.iram_raw[vblank] = 1;
-    done = false;
-    while emu.ppu.current_scanline != 242 {
-        emu.cycle();
-        if !done {
-            cycles += 1;
-            if emu.memory.iram_raw[vblank] == 0 {
-                done = true;
-            }
-        }
-        let mut i = 0;
-        while emu.cpu.tick >= 1 && i < 10 {
-            emu.cycle();
-            if !done {
-                cycles += 1;
-                if emu.memory.iram_raw[vblank] == 0 {
-                    done = true;
-                }
-            }
-            i += 1;
-        }
-        if emu.ppu.current_frame != emu.last_frame {
-            emu.event_tracker.swap_buffers();
-            emu.last_frame = emu.ppu.current_frame;
-        }
-    }
-
-    cycles
 }

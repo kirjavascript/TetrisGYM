@@ -1,5 +1,4 @@
 use crate::{util, labels};
-use std::collections::HashSet;
 
 pub fn test() {
     assert_eq!(
@@ -8,13 +7,13 @@ pub fn test() {
     );
 }
 
-pub fn seeds_impl() -> HashSet<u16> {
-    let mut seeds: HashSet<u16> = HashSet::new();
+pub fn seeds_impl() -> Vec<u16> {
+    let mut seeds: Vec<u16> = Vec::new();
 
     let mut seed = 0x8988;
 
     loop {
-        seeds.insert(seed);
+        seeds.push(seed);
 
         let new_bit = ((seed >> 9) ^ (seed >> 1)) & 1;
         seed = (new_bit << 15) | (seed >> 1);
@@ -27,17 +26,17 @@ pub fn seeds_impl() -> HashSet<u16> {
     seeds
 }
 
-pub fn seeds() -> HashSet<u16> {
+pub fn seeds() -> Vec<u16> {
     let mut emu = util::emulator(None);
     let rng_seed = labels::get("rng_seed");
     let next_rng = labels::get("generateNextPseudorandomNumber");
 
-    let mut seeds: HashSet<u16> = HashSet::new();
+    let mut seeds: Vec<u16> = Vec::new();
 
     let mut seed = 0x8988;
 
     loop {
-        seeds.insert(seed);
+        seeds.push(seed);
 
         emu.memory.iram_raw[(rng_seed + 0) as usize] = (seed >> 8) as _;
         emu.memory.iram_raw[(rng_seed + 1) as usize] = seed as u8;

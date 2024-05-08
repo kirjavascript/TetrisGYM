@@ -1,10 +1,10 @@
 render_mode_linecap_menu:
-        lda outOfDateRenderFlags
-        and #1
+        lda renderFlags
+        and #RENDER_LINES
         beq @static
         ; render level / lines
         lda #0
-        sta outOfDateRenderFlags
+        sta renderFlags
         lda #$21
         sta PPUADDR
         lda #$F3

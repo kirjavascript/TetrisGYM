@@ -38,8 +38,6 @@ harddrop_tetrimino:
         bne @sonic
         rts
 @sonic:
-        lda #0
-        sta vramRow
         lda #$D0
         sta autorepeatY
         rts

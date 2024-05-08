@@ -16,12 +16,10 @@
     * [Setups](#setups)
     * [B-Type](#b-type)
     * [Floor](#floor)
-    * [Crunch](#crunch)
     * [(Quick)Tap](#quicktap)
     * [Tap Quantity](#tap-quantity)
     * [Checkerboard](#checkerboard)
     * [Transition](#transition)
-    * [Marathon](#marathon)
     * [Garbage](#garbage)
     * [Drought](#drought)
     * [DAS Delay](#das-delay)
@@ -76,7 +74,7 @@ Like in the original ROM, holding `a` `b` `select` and then pressing `start` wil
 
 ![Tetris](./assets/screens/levelmenu.png)
 
-Same gameplay as A-Type, with some improvements: no score cap, no rocket, no curtain, no music, always next box, better pause, start on any level.
+Same gameplay as A-Type, with some improvements: no score cap, no rocket, no curtain, no music, better pause, start on any level.
 
 ### T-Spins
 
@@ -154,16 +152,6 @@ Fill in the floor to a certain height to force higher stacking. This mode is oft
 
 Setting the height to zero will result in a game mode with burns disabled.
 
-### Crunch
-
-![Crunch](./assets/screens/crunch.png)
-
-Shrink the width of the playfield to force cramped stacking.
-
-Every increment of 4 will decrease the width from the left.
-
-Every increment of 1 will decrease the width from the right until it reaches its maximum of 3, where it will be reset to 0.
-
 ### (Quick)Tap
 
 ![Tap](./assets/screens/tap.png)
@@ -193,10 +181,6 @@ Uses custom scoring.
 Puts you ten lines before transition. The value given will be added to your score, so set this to 5 and start on level 18 for a 'maxout trainer' style mode.
 
 Setting the value to G causes the mode to act identical to the game genie code `SXTOKL`
-
-### Marathon
-
-Play as long as you are able to survive at a consistent speed.  While the level will increase normally, the drop rate and the points rewarded will remain fixed based on the starting level.
 
 ### Garbage
 

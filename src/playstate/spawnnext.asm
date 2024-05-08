@@ -3,11 +3,24 @@ SPAWN_NEXT_ADDONS := 1
 playState_spawnNextTetrimino:
         lda vramRow
         cmp #$20
-        bmi @ret
+        bpl :+
+        ldx #$82 ; -2 tap delay
+        jsr checkNegativeDelay
+        rts
 
+:
 .if SPAWN_NEXT_ADDONS
         lda spawnDelay
         beq @notDelaying
+        ; here, spawnDelay=1 means hzSpawnDelay=-2, 2 implies -3, and etc.
+        cmp #3 ; if spawnDelay is >= 3, don't update
+        bcs @noCheck
+        clc
+        adc #1
+        ora #$80 ; mark delay as negative
+        tax
+        jsr checkNegativeDelay
+@noCheck:
         dec spawnDelay
         jmp @ret
 .endif
@@ -24,7 +37,8 @@ playState_spawnNextTetrimino:
         sta saveStateDirty
         rts
 @noSaveState:
-
+        ldx #$81 ; -1 tap delay
+        jsr checkNegativeDelay
         jsr hzStart
 .endif
 
@@ -61,7 +75,6 @@ pickRandomTetrimino:
         bne useNewSpawnID
 @invalidIndex:
         ldx #rng_seed
-        ldy #$02
         jsr generateNextPseudorandomNumber
         lda rng_seed
         and #$07
@@ -152,7 +165,6 @@ pickTetriminoSeed:
         bne @useNewSpawnID
 @invalidIndex:
         ldx #set_seed
-        ldy #$02
         jsr generateNextPseudorandomNumber
         lda set_seed
         and #$07
@@ -174,7 +186,6 @@ pickTetriminoSeed:
 
 setSeedNextRNG:
         ldx #set_seed
-        ldy #$02
         jsr generateNextPseudorandomNumber
         rts
 

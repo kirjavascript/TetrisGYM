@@ -5,17 +5,28 @@ tmp3: .res 1
 tmpX: .res 1 ;  $0003
 tmpY: .res 1 ;  $0004
 tmpZ: .res 1 ;  $0005
+switchTmp1 := tmpX ; for switch_s_plus_2a
+switchTmp2 := tmpY
+
 tmpBulkCopyToPpuReturnAddr: .res 2 ;  $0006 ; 2 bytes
 binScore: .res 4 ;  $8 ; 4 bytes binary
 score: .res 4 ;  $C ; 4 bytes BCD
-    .res 7
+nmiReturnAddr: .res 1 ; $0010 ; used for crash
+crashState: .res 1 ; $0011 ; used for crash
+cycleCount: .res 2 ; $0012 ; 2 bytes ; used for crash
+oneThirdPRNG: .res 1 ; $0014 ; used for crash
+    .res $2
 
 rng_seed: .res 2 ; $0017
 spawnID: .res 1 ; $0019
 spawnCount: .res 1 ; $001A
 pointerAddr: .res 2 ; $001B ; used in debug, harddrop
 pointerAddrB: .res 2 ; $001D ; used in harddrop
-    .res $14
+allegroIndex: .res 1 ; $001F for crash
+wasAllegro: .res 1 ; $0020 for crash
+startParity: .res 1 ; $0021 for crash
+lagState: .res 1 ; $0022 for lagged lines & score
+    .res $10
 
 verticalBlankingInterval: .res 1 ; $0033
 set_seed: .res 3 ; $0034 ; rng_seed, rng_seed+1, spawnCount
@@ -47,7 +58,8 @@ garbageHole: .res 1 ; $0059                        ; Position of hole in receive
 garbageDelay: .res 1 ; $005A
 pieceTileModifier: .res 1 ; $005B ; above $80 - use a single one, below - use an offset
 curtainRow: .res 1 ; $5C
-    .res 3
+linesPrev: .res 2 ; $5D-E ; used for delayed draw at high levels
+levelPrev: .res 1 ; $5F
 
 mathRAM: .res $12
 binary32 := mathRAM+$0
@@ -72,9 +84,9 @@ spriteXOffset: .res 1 ; $00A0
 spriteYOffset: .res 1 ; $00A1
 stringIndexLookup:
 spriteIndexInOamContentLookup: .res 1 ; $00A2
-outOfDateRenderFlags: .res 1 ; $00A3
+renderFlags: .res 1 ; $00A3
 ; play/demo
-; Bit 0-lines 1-level 2-score 4-hz 6-stats 7-high score entry letter
+; Bit 0-lines 1-level 2-score 3-debug 4-hz 6-stats 7-high score entry letter
 ; speedtest
 ; 0 - hz
 ; level menu
@@ -124,7 +136,7 @@ highScoreEntryRawPos: .res 1 ; $00D5                ; High score position 0=1st 
 highScoreEntryNameOffsetForRow: .res 1 ; $00D6      ; Relative to start of table
 highScoreEntryCurrentLetter: .res 1 ; $00D7
 lineClearStatsByType: .res 7 ; $00D8                ; bcd. one entry for each of single, double, triple, tetris
-displayNextPiece: .res 1 ; $00DF
+hideNextPiece: .res 1 ; $00DF
 AUDIOTMP1: .res 1 ; $00E0
 AUDIOTMP2: .res 1 ; $00E1
 AUDIOTMP3: .res 1 ; $00E2
@@ -160,7 +172,8 @@ oamStaging: .res $100 ; $0200                        ; format: https://wiki.nesd
 statsByType: .res $E ; $03F0
     .res 2
 playfield: .res $c8 ; $0400
-    .res $38
+    .res $38 ; still technically part of playfield
+
     .res $100 ; $500 ; 2 player playfield
 
 practiseType: .res 1 ; $600
@@ -179,7 +192,7 @@ saveStateSlot: .res 1 ; $60B
 saveStateSpriteType: .res 1 ; $60C
 saveStateSpriteDelay: .res 1 ; $60D
 presetIndex: .res 1 ; $60E ; can be mangled in other modes
-pausedOutOfDateRenderFlags: .res 1 ; $60F ; 0 - statistics 1 - saveslot
+.res 1
 debugLevelEdit: .res 1 ; $610
 debugNextCounter: .res 1 ; $611
 paceResult: .res 3 ; $612 ; 3 bytes
@@ -320,12 +333,16 @@ floorModifier: .res 1
 crunchModifier: .res 1
 tapModifier: .res 1
 transitionModifier: .res 1
+marathonModifier: .res 1
 tapqtyModifier: .res 1
 checkerModifier: .res 1
 garbageModifier: .res 1
 droughtModifier: .res 1
 dasModifier: .res 1
+lowStackRow: .res 1
 scoringModifier: .res 1
+crashModifier: .res 1
+strictFlag: .res 1 ;used for crash detection. If 1, the game will register a crash anytime there is a possibility of one.
 hzFlag: .res 1
 inputDisplayFlag: .res 1
 disableFlashFlag: .res 1

@@ -30,9 +30,9 @@ gameMode_levelMenu:
         beq @noLinecapInfo
         jsr levelMenuLinecapInfo
 @noLinecapInfo:
-        ; render level when loading screen
-        lda #$1
-        sta outOfDateRenderFlags
+        ; render lines when loading screen
+        lda #RENDER_LINES
+        sta renderFlags
         jsr resetScroll
         jsr waitForVBlankAndEnableNmi
         jsr updateAudioWaitForNmiAndResetOamStaging
@@ -132,6 +132,14 @@ levelMenuCheckStartGame:
         sta startLevel
 @startGame:
         ; lda startLevel
+        ldy practiseType
+        cpy #MODE_MARATHON
+        bne @noLevelModification
+        ldy marathonModifier
+        cpy #2 ; marathon mode 2 starts at level 0
+        bne @noLevelModification
+        lda #0
+@noLevelModification:
         sta levelNumber
         lda #$00
         sta gameModeState
@@ -157,16 +165,14 @@ levelMenuCheckGoBack:
 shredSeedAndContinue:
         ; seed shredder
 @chooseRandomHole_player1:
-        ldx #$17
-        ldy #$02
+        ldx #rng_seed
         jsr generateNextPseudorandomNumber
         lda rng_seed
         and #$0F
         cmp #$0A
         bpl @chooseRandomHole_player1
 @chooseRandomHole_player2:
-        ldx #$17
-        ldy #$02
+        ldx #rng_seed
         jsr generateNextPseudorandomNumber
         lda rng_seed
         and #$0F
@@ -295,9 +301,9 @@ levelControlCustomLevel:
 @changeLevel:
         lda #$1
         sta soundEffectSlot1Init
-        lda outOfDateRenderFlags
-        ora #$1
-        sta outOfDateRenderFlags
+        lda renderFlags
+        ora #RENDER_LINES
+        sta renderFlags
         rts
 
 levelControlHearts:

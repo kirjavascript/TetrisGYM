@@ -13,6 +13,11 @@ gameModeState_initGameState:
         lda #$05
         sta tetriminoX
 
+        ;init for crash frame parity
+        lda frameCounter
+        and #$01
+        sta startParity
+
         ; set seed init
         lda set_seed_input
         sta set_seed
@@ -83,6 +88,7 @@ gameModeState_initGameState:
         sta demo_repeats
         sta demoIndex
         sta demoButtonsAddr
+        sta holdDownPoints
         sta spawnID
         lda #>demoButtonsTable
         sta demoButtonsAddr+1
@@ -98,7 +104,6 @@ gameModeState_initGameState:
         sta currentPiece
         jsr incrementPieceStat
         ldx #rng_seed
-        ldy #$02
         jsr generateNextPseudorandomNumber
         jsr chooseNextTetrimino
         sta nextPiece
@@ -133,8 +138,8 @@ gameModeState_initGameState:
         jsr presetScoreFromBCD
 @noChecker:
 
-        lda #$57
-        sta outOfDateRenderFlags
+        lda #RENDER_STATS|RENDER_HZ|RENDER_SCORE|RENDER_LEVEL|RENDER_LINES
+        sta renderFlags
         jsr updateAudioWaitForNmiAndResetOamStaging
 
         lda practiseType
@@ -144,6 +149,8 @@ gameModeState_initGameState:
 @noTypeBPlayfield:
 
         jsr hzStart
+        lda #0
+        sta hzSpawnDelay
         jsr practiseInitGameState
         jsr resetScroll
 
@@ -264,8 +271,7 @@ L87E7:  lda generalCounter
         sta vramRow
         lda #$09
         sta generalCounter3
-L87FC:  ldx #$17
-        ldy #$02
+L87FC:  ldx #rng_seed
         jsr generateNextPseudorandomNumber
         lda rng_seed
         and #$07
@@ -284,8 +290,7 @@ L87FC:  ldx #$17
         dec generalCounter3
         jmp L87FC
 
-L8824:  ldx #$17
-        ldy #$02
+L8824:  ldx #rng_seed
         jsr generateNextPseudorandomNumber
         lda rng_seed
         and #$0F
