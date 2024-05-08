@@ -1,3 +1,4 @@
+
 gameModeState_initGameBackground:
         jsr updateAudioWaitForNmiAndDisablePpuRendering
         jsr disableNmi
@@ -12,10 +13,9 @@ gameModeState_initGameBackground:
         jsr copyRleNametableToPpu
         .addr   game_nametable
         jsr scoringBackground
-        lda darkMode
-        beq @notDarkMode
-        jsr bulkCopyToPpu
-        .addr darkmode_stripes
+        ; lda darkMode
+        ; beq @notDarkMode
+        jsr drawDarkMode
 @notDarkMode:
 
         lda hzFlag
@@ -255,40 +255,113 @@ savestate_nametable_patch:
         .byte   $23,$37,$3B,$FF,$FF,$FF,$FF,$FF,$FF,$3C,$FE
         .byte   $23,$57,$3D,$3E,$3E,$3E,$3E,$3E,$3E,$3F,$FD
 
-horz = $40
-vert = $C0
+drawDarkMode:
+        jsr bulkCopyToPpu
+        .addr darkmode_stripes
+
+        ldx #0
+        lda darkCorners, x
+@darkCornerLoop:
+        stx tmpZ
+        sta PPUADDR
+        inx
+        lda darkCorners, x
+        sta PPUADDR
+        inx
+        clc
+        lda #DARK_CORNER_TILES
+        ldy tmpZ
+        cpy #40
+        bmi @notAlt
+        lda #DARK_CORNER_TILES2
+@notAlt:
+        sta tmpX
+        lda tmpZ
+        lsr
+        and #$3
+        adc tmpX
+        sta PPUDATA
+        lda darkCorners, x
+        bne @darkCornerLoop
+@notDarkMode:
+        rts
+
+stripeHoriz = $40
+stripeVert = $C0
+
+DARK_CORNER_TILES := $94
+DARK_CORNER_TILES2 := $90
 
 darkmode_stripes:
         .byte  $20,$00
-        .byte  $00|horz,$FF
+        .byte  $00|stripeHoriz,$FF
         .byte  $20,$40
-        .byte  $0B|horz,$FF
+        .byte  $0B|stripeHoriz,$FF
         .byte  $20,$60
-        .byte  $18|vert,$FF
+        .byte  $18|stripeVert,$FF
         .byte  $20,$61
-        .byte  $03|vert,$FF
+        .byte  $03|stripeVert,$FF
         .byte  $20,$6A
-        .byte  $05|vert,$FF
+        .byte  $05|stripeVert,$FF
         .byte  $20,$5F
-        .byte  $15|vert,$FF
+        .byte  $15|stripeVert,$FF
         .byte  $20,$C1
-        .byte  $09|horz,$FF
+        .byte  $09|stripeHoriz,$FF
         .byte  $20,$E1
-        .byte  $09|horz,$FF
+        .byte  $09|stripeHoriz,$FF
         .byte  $21,$77
-        .byte  $08|horz,$FF
+        .byte  $08|stripeHoriz,$FF
         .byte  $21,$9D
-        .byte  $07|vert,$FF
+        .byte  $07|stripeVert,$FF
         .byte  $21,$7E
-        .byte  $0C|vert,$FF
+        .byte  $0C|stripeVert,$FF
         .byte  $22,$F7
-        .byte  $09|horz,$FF
+        .byte  $09|stripeHoriz,$FF
         .byte  $23,$17
-        .byte  $09|horz,$FF
+        .byte  $09|stripeHoriz,$FF
         .byte  $23,$37
-        .byte  $09|horz,$FF
+        .byte  $09|stripeHoriz,$FF
         .byte  $23,$57
-        .byte  $00|horz,$FF
+        .byte  $00|stripeHoriz,$FF
         .byte  $23,$97
-        .byte  $29|horz,$FF
+        .byte  $29|stripeHoriz,$FF
         .byte  $FF
+
+darkCorners:
+        ; mode
+        .byte  $20,$62
+        .byte  $20,$69
+        .byte  $20,$A2
+        .byte  $20,$A9
+        ; stats
+        .byte  $21,$01
+        .byte  $21,$0A
+        .byte  $23,$41
+        .byte  $23,$4A
+        ; lines
+        .byte  $20,$4B
+        .byte  $20,$56
+        .byte  $20,$8B
+        .byte  $20,$96
+        ; score
+        .byte  $20,$57
+        .byte  $20,$5E
+        .byte  $21,$57
+        .byte  $21,$5E
+        ; level
+        .byte  $22,$77
+        .byte  $22,$7D
+        .byte  $22,$D7
+        .byte  $22,$DD
+        ; alt tiles
+        ; next
+        .byte  $21,$97
+        .byte  $21,$9C
+        .byte  $22,$57
+        .byte  $22,$5c
+        ; game
+        .byte  $20,$AB
+        .byte  $20,$B6
+        .byte  $23,$4B
+        .byte  $23,$56
+        .byte  $0
