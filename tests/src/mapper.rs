@@ -83,7 +83,7 @@ pub fn test() {
     assert_eq!(current_tileset, tileset1);
 
     // boot in qual: tileset2, select 0
-    emu.p1_input = input::SELECT;
+    util::set_controller_raw(&mut emu, input::SELECT);
     emu.reset();
     for _ in 0..20 {
         emu.run_until_vblank();
