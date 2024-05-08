@@ -14,7 +14,8 @@ gameModeState_initGameBackground:
         jsr scoringBackground
         lda darkMode
         beq @notDarkMode
-        jsr drawDarkMode
+        jsr bulkCopyToPpu
+        .addr darkmode_stripes
 @notDarkMode:
 
         lda hzFlag
@@ -254,65 +255,40 @@ savestate_nametable_patch:
         .byte   $23,$37,$3B,$FF,$FF,$FF,$FF,$FF,$FF,$3C,$FE
         .byte   $23,$57,$3D,$3E,$3E,$3E,$3E,$3E,$3E,$3F,$FD
 
-drawDarkMode:
-        ldx #$00
-@darkLoop:
-        lda darkmode_stripes,x
-        beq @ret
-        sta PPUADDR
-        inx
-        lda darkmode_stripes,x
-        sta PPUADDR
-        inx
-        lda darkmode_stripes,x
-        lsr
-        tay
-        lda #$00
-        rol
-        asl
-        asl
-        ora currentPpuCtrl
-        sta PPUCTRL
-        lda #$FF
-@darkTiles:
-        sta PPUDATA
-        dey
-        bne @darkTiles
-        inx
-        bne @darkLoop
-@ret:   rts
-
-
-drawHorz = $00
-drawVert = $01
+horz = $40
+vert = $C0
 
 darkmode_stripes:
         .byte  $20,$00
-        .byte  $4B << 1 | drawHorz
+        .byte  $00|horz,$FF
+        .byte  $20,$40
+        .byte  $0B|horz,$FF
         .byte  $20,$60
-        .byte  $18 << 1 | drawVert
+        .byte  $18|vert,$FF
         .byte  $20,$61
-        .byte  $03 << 1 | drawVert
+        .byte  $03|vert,$FF
         .byte  $20,$6A
-        .byte  $05 << 1 | drawVert
+        .byte  $05|vert,$FF
         .byte  $20,$5F
-        .byte  $15 << 1 | drawVert
+        .byte  $15|vert,$FF
         .byte  $20,$C1
-        .byte  $09 << 1 | drawHorz
+        .byte  $09|horz,$FF
         .byte  $20,$E1
-        .byte  $09 << 1 | drawHorz
+        .byte  $09|horz,$FF
         .byte  $21,$77
-        .byte  $08 << 1 | drawHorz
+        .byte  $08|horz,$FF
         .byte  $21,$9D
-        .byte  $07 << 1 | drawVert
+        .byte  $07|vert,$FF
         .byte  $21,$7E
-        .byte  $0C << 1 | drawVert
+        .byte  $0C|vert,$FF
         .byte  $22,$F7
-        .byte  $09 << 1 | drawHorz
+        .byte  $09|horz,$FF
         .byte  $23,$17
-        .byte  $09 << 1 | drawHorz
+        .byte  $09|horz,$FF
         .byte  $23,$37
-        .byte  $09 << 1 | drawHorz
+        .byte  $09|horz,$FF
         .byte  $23,$57
-        .byte  $69 << 1 | drawHorz
-        .byte  $00
+        .byte  $00|horz,$FF
+        .byte  $23,$97
+        .byte  $29|horz,$FF
+        .byte  $FF
