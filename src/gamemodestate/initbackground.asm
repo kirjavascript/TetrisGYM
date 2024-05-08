@@ -109,20 +109,8 @@ scoringBackground:
         .addr seven_digit_nametable
         lda darkMode
         beq @notDarkMode
-        lda #$20
-        sta PPUADDR
-        lda #$5F
-        sta PPUADDR
-        lda #DARK_CORNER_TILES+1
-        sta PPUDATA
-        lda #$21
-        sta PPUADDR
-        lda #$5F
-        sta PPUADDR
-        lda #DARK_CORNER_TILES+3
-        sta PPUDATA
-        ; jsr bulkCopyToPpu
-        ; .addr seven_digit_nametable_dark
+        jsr bulkCopyToPpu
+        .addr seven_digit_nametable_dark
 @notDarkMode:
 
 @noSevenDigit:
@@ -268,10 +256,10 @@ seven_digit_nametable:
         .byte $21, $1E, $41, $0  ; 0
         .byte $FF
 
-; seven_digit_nametable_dark:
-;         .byte $20, $5F, $41, DARK_CORNER_TILES+1
-;         .byte $21, $5F, $41, DARK_CORNER_TILES+3
-;         .byte $FF
+seven_digit_nametable_dark:
+        .byte $20, $5F, $41, DARK_CORNER_TILES+1
+        .byte $21, $5F, $41, DARK_CORNER_TILES+3
+        .byte $FF
 
 savestate_nametable_patch:
         .byte   $22,$F7,$38,$39,$39,$39,$39,$39,$39,$3A,$FE
