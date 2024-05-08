@@ -1,7 +1,6 @@
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
-const { spawnSync } = require('child_process');
 
 console.log('TetrisGYM buildscript');
 console.time('build');
@@ -125,7 +124,10 @@ console.timeEnd('CHR');
 
 // build object files
 
-function handleSpawn(exe, ...args) {
+const { spawnSync } = require('child_process');
+
+function exec(cmd) {
+    const [exe, ...args] = cmd.split(' ');
     const output = spawnSync(exe, args).output.flatMap(
         (d) => d?.toString() || [],
     );
@@ -135,36 +137,23 @@ function handleSpawn(exe, ...args) {
     }
 }
 
-const ca65bin = nativeCC65 ? ['ca65'] : ['node', './tools/assemble/ca65.js'];
+const ca65bin = nativeCC65 ? 'ca65' : 'node ./tools/assemble/ca65.js';
+const flags = compileFlags.join(' ');
 
 console.time('assemble');
 
-handleSpawn(
-    ...ca65bin,
-    ...compileFlags,
-    ...'-g src/header.asm -o header.o'.split(' '),
-);
-
-handleSpawn(
-    ...ca65bin,
-    ...compileFlags,
-    ...'-l tetris.lst -g src/main.asm -o main.o'.split(' '),
-);
+exec(`${ca65bin} ${flags} -g src/header.asm -o header.o`);
+exec(`${ca65bin} ${flags} -l tetris.lst -g src/main.asm -o main.o`);
 
 console.timeEnd('assemble');
 
 // link object files
 
-const ld65bin = nativeCC65 ? ['ld65'] : ['node', './tools/assemble/ld65.js'];
+const ld65bin = nativeCC65 ? 'ld65' : 'node ./tools/assemble/ld65.js';
 
 console.time('link');
 
-handleSpawn(
-    ...ld65bin,
-    ...'-m tetris.map -Ln tetris.lbl --dbgfile tetris.dbg -o tetris.nes -C src/tetris.nes.cfg main.o header.o'.split(
-        ' ',
-    ),
-);
+exec(`${ld65bin} -m tetris.map -Ln tetris.lbl --dbgfile tetris.dbg -o tetris.nes -C src/tetris.nes.cfg main.o header.o`);
 
 console.timeEnd('link');
 
@@ -208,5 +197,5 @@ console.timeEnd('build');
 
 if (args.includes('-t')) {
     console.log('\nrunning tests');
-    handleSpawn('cargo', ...'run --release --manifest-path tests/Cargo.toml -- -t'.split(' '));
+    exec('cargo run --release --manifest-path tests/Cargo.toml -- -t');
 }

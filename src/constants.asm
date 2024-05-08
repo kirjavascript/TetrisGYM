@@ -36,6 +36,7 @@ BTYPE_START_LINES := $25 ; bcd
 MENU_HIGHLIGHT_COLOR := $12 ; $12 in gym, $16 in original
 BLOCK_TILES := $7B
 EMPTY_TILE := $EF
+LOW_STACK_LINE := $DF
 TETRIMINO_X_HIDE := $EF
 
 PAUSE_SPRITE_X := $74
@@ -80,12 +81,14 @@ MODE_CHECKERBOARD
 MODE_GARBAGE
 MODE_DROUGHT
 MODE_DAS
+MODE_LOWSTACK
 MODE_KILLX2
 MODE_INVISIBLE
 MODE_HARDDROP
 MODE_SPEED_TEST
 MODE_SCORE_DISPLAY
 MODE_CRASH
+MODE_STRICT
 MODE_HZ_DISPLAY
 MODE_INPUT_DISPLAY
 MODE_DISABLE_FLASH
@@ -122,7 +125,7 @@ LINECAP_WHEN_STRING_OFFSET := $10
 LINECAP_HOW_STRING_OFFSET := $12
 
 MENU_SPRITE_Y_BASE := $47
-MENU_MAX_Y_SCROLL := $80
+MENU_MAX_Y_SCROLL := $98
 MENU_TOP_MARGIN_SCROLL := 7 ; in blocks
 
 ; menuConfigSizeLookup
@@ -145,12 +148,14 @@ MENU_TOP_MARGIN_SCROLL := 7 ; in blocks
     .byte $4    ; MODE_GARBAGE
     .byte $12   ; MODE_DROUGHT
     .byte $10   ; MODE_DAS
+    .byte $0F   ; MODE_LOWSTACK
     .byte $0    ; MODE_KILLX2
     .byte $0    ; MODE_INVISIBLE
     .byte $0    ; MODE_HARDDROP
     .byte $0    ; MODE_SPEED_TEST
     .byte $5    ; MODE_SCORE_DISPLAY
     .byte $3	; MODE_CRASH
+    .byte $1	; MODE_STRICT
     .byte $1    ; MODE_HZ_DISPLAY
     .byte $1    ; MODE_INPUT_DISPLAY
     .byte $1    ; MODE_DISABLE_FLASH
@@ -181,6 +186,7 @@ MENU_TOP_MARGIN_SCROLL := 7 ; in blocks
     .byte   "GARBGE"
     .byte   "LOBARS"
     .byte   "DASDLY"
+    .byte   "LOWSTK"
     .byte   "KILLX2"
     .byte   "INVZBL"
     .byte   "HRDDRP"

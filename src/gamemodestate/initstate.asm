@@ -149,6 +149,8 @@ gameModeState_initGameState:
 @noTypeBPlayfield:
 
         jsr hzStart
+        lda #0
+        sta hzSpawnDelay
         jsr practiseInitGameState
         jsr resetScroll
 

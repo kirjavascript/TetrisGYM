@@ -290,8 +290,6 @@ pub fn test() {
         assert_eq!(bg_palette, PALETTES[level]);
     }
 
-    let pal181 = [0x21, 0x2b, 0x25];
-
     let pal_flag = labels::get("palFlag") as usize;
     emu.memory.iram_raw[pal_flag] = 1;
 
@@ -305,7 +303,7 @@ pub fn test() {
         assert_eq!(bg_palette, sprite_palette);
 
         if level == 181 || level == 245 {
-            assert_eq!(bg_palette, pal181);
+            assert_eq!(bg_palette, [0x21, 0x2b, 0x25]);
         } else {
             assert_eq!(bg_palette, PALETTES[level]);
         }

@@ -79,6 +79,7 @@ mainLoop:
 .include "modes/pace.asm"
 .include "modes/debug.asm"
 .include "modes/saveslots.asm"
+.include "modes/crash.asm"
 
 .code
 
