@@ -13,8 +13,8 @@ gameModeState_initGameBackground:
         jsr copyRleNametableToPpu
         .addr   game_nametable
         jsr scoringBackground
-        ; lda darkMode
-        ; beq @notDarkMode
+        lda darkMode
+        beq @notDarkMode
         jsr drawDarkMode
 @notDarkMode:
 
