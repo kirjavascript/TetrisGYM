@@ -36,6 +36,9 @@
         ; cpx #0 ; dex sets z flag
         bne @loop
 
+        lda #1
+        sta debugFlag
+
         ; default pace to A
         lda #$A
         sta paceModifier

@@ -176,25 +176,8 @@ saveSlotNametablePatch:
         rts
 
 saveStateNametableUI:
-        ; todo: replace with stripe
-        ldx #$00
-@nextPpuAddress:
-        lda savestate_nametable_patch,x
-        inx
-        sta PPUADDR
-        lda savestate_nametable_patch,x
-        inx
-        sta PPUADDR
-@nextPpuData:
-        lda savestate_nametable_patch,x
-        inx
-        cmp #$FE
-        beq @nextPpuAddress
-        cmp #$FD
-        beq @endOfPpuPatching
-        sta PPUDATA
-        jmp @nextPpuData
-@endOfPpuPatching:
+        jsr bulkCopyToPpu
+        .addr savestate_nametable
         rts
 
 statisticsNametablePatch:
@@ -261,11 +244,12 @@ seven_digit_nametable_dark:
         .byte $21, $5F, $41, DARK_CORNER_TILES+3
         .byte $FF
 
-savestate_nametable_patch:
-        .byte   $22,$F7,$38,$39,$39,$39,$39,$39,$39,$3A,$FE
-        .byte   $23,$17,$3B,$1C,$15,$18,$1D,$FF,$FF,$3C,$FE
-        .byte   $23,$37,$3B,$FF,$FF,$FF,$FF,$FF,$FF,$3C,$FE
-        .byte   $23,$57,$3D,$3E,$3E,$3E,$3E,$3E,$3E,$3F,$FD
+savestate_nametable:
+        .byte   $22,$F7,$8,$38,$39,$39,$39,$39,$39,$39,$3A
+        .byte   $23,$17,$8,$3B,$1C,$15,$18,$1D,$FF,$FF,$3C
+        .byte   $23,$37,$8,$3B,$FF,$FF,$FF,$FF,$FF,$FF,$3C
+        .byte   $23,$57,$8,$3D,$3E,$3E,$3E,$3E,$3E,$3E,$3F
+        .byte   $FF
 
 DARK_CORNER_TILES := $94
 DARK_CORNER_TILES2 := $90
