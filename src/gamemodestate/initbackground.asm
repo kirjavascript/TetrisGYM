@@ -176,8 +176,11 @@ saveSlotNametablePatch:
         rts
 
 saveStateNametableUI:
+        lda darkMode
+        bne @noDark
         jsr bulkCopyToPpu
         .addr savestate_nametable
+@noDark:
         rts
 
 statisticsNametablePatch:
