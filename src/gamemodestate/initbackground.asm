@@ -11,11 +11,13 @@ gameModeState_initGameBackground:
         .addr   game_palette
         jsr copyRleNametableToPpu
         .addr   game_nametable
+        jsr scoringBackground
+        jsr debugNametableUI
+
         lda darkMode
         beq @notDarkMode
         jsr drawDarkMode
 @notDarkMode:
-        jsr scoringBackground
 
         lda hzFlag
         beq @noHz
@@ -29,7 +31,6 @@ gameModeState_initGameBackground:
         sta tmp2
         jsr displayModeText
         jsr statisticsNametablePatch ; for input display
-        jsr debugNametableUI
 
         ; ingame hearts
         lda heartsAndReady
@@ -107,11 +108,6 @@ scoringBackground:
         bne @noSevenDigit
         jsr bulkCopyToPpu
         .addr seven_digit_nametable
-        lda darkMode
-        beq @notDarkMode
-        jsr bulkCopyToPpu
-        .addr seven_digit_nametable_dark
-@notDarkMode:
 
 @noSevenDigit:
 
@@ -161,7 +157,8 @@ MODENAMES
 debugNametableUI:
         lda debugFlag
         beq @notDebug
-        jsr saveStateNametableUI
+        jsr bulkCopyToPpu
+        .addr savestate_nametable
         jsr saveSlotNametablePatch
 @notDebug:
         rts
@@ -175,13 +172,6 @@ saveSlotNametablePatch:
         sta PPUDATA
         rts
 
-saveStateNametableUI:
-        lda darkMode
-        bne @noDark
-        jsr bulkCopyToPpu
-        .addr savestate_nametable
-@noDark:
-        rts
 
 statisticsNametablePatch:
         lda #$21
@@ -233,134 +223,95 @@ hzStats: ; stripe
         .byte $FF
 
 seven_digit_nametable:
-        .byte $20, $5F, $41, $3a ; -
-        .byte $20, $7f, $C7, $3c ; |
-        .byte $21, $5F, $41, $3F ; -
+        .byte $20, $5F, $41, $75 ; -
+        .byte $20, $7f, $C7, $36 ; |
+        .byte $21, $5F, $41, $77 ; -
         .byte $20, $7E, $C7, $FF ; |
-        .byte $20, $5E, $41, $39 ; -
-        .byte $21, $5E, $41, $3E ; -
+        .byte $20, $5E, $41, $34 ; -
+        .byte $21, $5E, $41, $37 ; -
         .byte $21, $1E, $41, $0  ; 0
         .byte $FF
 
-seven_digit_nametable_dark:
-        .byte $20, $5F, $41, DARK_CORNER_TILES+1
-        .byte $21, $5F, $41, DARK_CORNER_TILES+3
-        .byte $FF
-
 savestate_nametable:
-        .byte   $22,$F7,$8,$38,$39,$39,$39,$39,$39,$39,$3A
-        .byte   $23,$17,$8,$3B,$1C,$15,$18,$1D,$FF,$FF,$3C
-        .byte   $23,$37,$8,$3B,$FF,$FF,$FF,$FF,$FF,$FF,$3C
-        .byte   $23,$57,$8,$3D,$3E,$3E,$3E,$3E,$3E,$3E,$3F
+        .byte   $22,$F7,$8,$74,$34,$34,$34,$34,$34,$34,$75
+        .byte   $23,$17,$8,$35,$1C,$15,$18,$1D,$FF,$FF,$36
+        .byte   $23,$37,$8,$35,$FF,$FF,$FF,$FF,$FF,$FF,$36
+        .byte   $23,$57,$8,$76,$37,$37,$37,$37,$37,$37,$77
         .byte   $FF
 
-DARK_CORNER_TILES := $94
-DARK_CORNER_TILES2 := $90
+NORMAL_CORNER_TILES := $70
+DARK_CORNER_TILES := $80
 
 drawDarkMode:
-        jsr bulkCopyToPpu
-        .addr darkmode_stripes
+
+darkBuffer := playfield ; cleared right after in initGameState
+
+        ; process the playfield in 60 chunks
+        lda #60
+        sta tmpZ
+
+        lda #$20
+        sta tmpX
+        lda #$00
+        sta tmpY
+
+@processChunk: ; process 16 tiles at a time
+        lda tmpX
+        sta PPUADDR
+        lda tmpY
+        sta PPUADDR
+        lda PPUDATA
 
         ldx #0
-        lda darkCorners, x
-@darkCornerLoop:
-        stx tmpZ
-        sta PPUADDR
+@copyToBuffer:
+        lda PPUDATA
+        sta darkBuffer, x
         inx
-        lda darkCorners, x
+        cpx #16
+        bne @copyToBuffer
+
+        ; reset PPUADDR
+        lda tmpX
         sta PPUADDR
-        inx
+        lda tmpY
+        sta PPUADDR
+
+        ldx #0
+@copyToNametable:
+        lda darkBuffer, x
+
+        ; set pattern as blank
+        cmp #$90
+        bmi :+
+        cmp #$A2
+        bpl :+
+        lda #$EF
+:
+        ; use rounded corners
+        cmp #$70
+        bmi :+
+        cmp #$78
+        bpl :+
         clc
-        lda #DARK_CORNER_TILES
-        ldy tmpZ
-        cpy #40
-        bmi @notAlt
-        lda #DARK_CORNER_TILES2
-@notAlt:
-        sta tmpX
-        lda tmpZ
-        lsr
-        and #$3
-        adc tmpX
+        adc #$10
+:
+
         sta PPUDATA
-        lda darkCorners, x
-        bne @darkCornerLoop
-@notDarkMode:
+        inx
+        cpx #16
+        bne @copyToNametable
+
+        clc
+        lda tmpY
+        adc #16
+        sta tmpY
+        bcc @noverflow
+        inc tmpX
+@noverflow:
+
+        sec
+        lda tmpZ
+        sbc #1
+        sta tmpZ
+        bne @processChunk
         rts
-
-stripeHoriz = $40
-stripeVert = $C0
-
-darkmode_stripes:
-        .byte  $20,$00
-        .byte  $00|stripeHoriz,$FF
-        .byte  $20,$40
-        .byte  $0B|stripeHoriz,$FF
-        .byte  $20,$60
-        .byte  $18|stripeVert,$FF
-        .byte  $20,$61
-        .byte  $03|stripeVert,$FF
-        .byte  $20,$6A
-        .byte  $05|stripeVert,$FF
-        .byte  $20,$5F
-        .byte  $15|stripeVert,$FF
-        .byte  $20,$C1
-        .byte  $09|stripeHoriz,$FF
-        .byte  $20,$E1
-        .byte  $09|stripeHoriz,$FF
-        .byte  $21,$77
-        .byte  $08|stripeHoriz,$FF
-        .byte  $21,$9D
-        .byte  $07|stripeVert,$FF
-        .byte  $21,$7E
-        .byte  $0C|stripeVert,$FF
-        .byte  $22,$F7
-        .byte  $09|stripeHoriz,$FF
-        .byte  $23,$17
-        .byte  $09|stripeHoriz,$FF
-        .byte  $23,$37
-        .byte  $09|stripeHoriz,$FF
-        .byte  $23,$57
-        .byte  $00|stripeHoriz,$FF
-        .byte  $23,$97
-        .byte  $29|stripeHoriz,$FF
-        .byte  $FF
-
-darkCorners:
-        ; mode
-        .byte  $20,$62
-        .byte  $20,$69
-        .byte  $20,$A2
-        .byte  $20,$A9
-        ; stats
-        .byte  $21,$01
-        .byte  $21,$0A
-        .byte  $23,$41
-        .byte  $23,$4A
-        ; lines
-        .byte  $20,$4B
-        .byte  $20,$56
-        .byte  $20,$8B
-        .byte  $20,$96
-        ; score
-        .byte  $20,$57
-        .byte  $20,$5E
-        .byte  $21,$57
-        .byte  $21,$5E
-        ; level
-        .byte  $22,$77
-        .byte  $22,$7D
-        .byte  $22,$D7
-        .byte  $22,$DD
-        ; alt tiles
-        ; next
-        .byte  $21,$97
-        .byte  $21,$9C
-        .byte  $22,$57
-        .byte  $22,$5c
-        ; game
-        .byte  $20,$AB
-        .byte  $20,$B6
-        .byte  $23,$4B
-        .byte  $23,$56
-        .byte  $0
