@@ -262,13 +262,12 @@ darkBuffer := playfield ; cleared right after in initGameState
         sta PPUADDR
         lda PPUDATA
 
-        ldx #0
+        ldx #15
 @copyToBuffer:
         lda PPUDATA
         sta darkBuffer, x
-        inx
-        cpx #16
-        bne @copyToBuffer
+        dex
+        bpl @copyToBuffer
 
         ; reset PPUADDR
         lda tmpX
@@ -276,7 +275,7 @@ darkBuffer := playfield ; cleared right after in initGameState
         lda tmpY
         sta PPUADDR
 
-        ldx #0
+        ldx #15
 @copyToNametable:
         lda darkBuffer, x
 
@@ -297,9 +296,8 @@ darkBuffer := playfield ; cleared right after in initGameState
 :
 
         sta PPUDATA
-        inx
-        cpx #16
-        bne @copyToNametable
+        dex
+        bpl @copyToNametable
 
         clc
         lda tmpY
@@ -309,9 +307,6 @@ darkBuffer := playfield ; cleared right after in initGameState
         inc tmpX
 @noverflow:
 
-        sec
-        lda tmpZ
-        sbc #1
-        sta tmpZ
+        dec tmpZ
         bne @processChunk
         rts
