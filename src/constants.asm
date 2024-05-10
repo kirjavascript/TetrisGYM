@@ -93,6 +93,7 @@ MODE_DISABLE_FLASH
 MODE_DISABLE_PAUSE
 MODE_GOOFY
 MODE_DEBUG
+MODE_DARK
 MODE_LINECAP
 MODE_DASONLY
 MODE_QUAL
@@ -160,6 +161,7 @@ MENU_TOP_MARGIN_SCROLL := 7 ; in blocks
     .byte $1    ; MODE_DISABLE_PAUSE
     .byte $1    ; MODE_GOOFY
     .byte $1    ; MODE_DEBUG
+    .byte $1    ; MODE_DARK
     .byte $1    ; MODE_LINECAP
     .byte $1    ; MODE_DASONLY
     .byte $1    ; MODE_QUAL

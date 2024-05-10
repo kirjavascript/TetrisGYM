@@ -5,6 +5,7 @@
 * Crunch Mode
 * Marathon Mode
 * Hidden Score Mode
+* Dark Mode
 * Low Stack Mode
 * M Score changed to Classic Scoring + Millions counter
 * Invisible linecap turns entire playfield invisible

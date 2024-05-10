@@ -12,6 +12,12 @@ gameModeState_initGameBackground:
         jsr copyRleNametableToPpu
         .addr   game_nametable
         jsr scoringBackground
+        jsr debugNametableUI
+
+        lda darkMode
+        beq @notDarkMode
+        jsr drawDarkMode
+@notDarkMode:
 
         lda hzFlag
         beq @noHz
@@ -25,7 +31,6 @@ gameModeState_initGameBackground:
         sta tmp2
         jsr displayModeText
         jsr statisticsNametablePatch ; for input display
-        jsr debugNametableUI
 
         ; ingame hearts
         lda heartsAndReady
@@ -86,6 +91,7 @@ scoringBackground:
         sta PPUDATA
         jmp @noSevenDigit
 @noFloat:
+        ; hidden score
         cmp #SCORING_HIDDEN
         bne @notHidden
         jsr scoreSetupPPU
@@ -97,10 +103,12 @@ scoringBackground:
         bne @hiddenScoreLoop
         jmp @noSevenDigit
 @notHidden:
+        ; 7 digit
         cmp #SCORING_SEVENDIGIT
         bne @noSevenDigit
         jsr bulkCopyToPpu
         .addr seven_digit_nametable
+
 @noSevenDigit:
 
         jsr showPaceDiffText
@@ -149,7 +157,8 @@ MODENAMES
 debugNametableUI:
         lda debugFlag
         beq @notDebug
-        jsr saveStateNametableUI
+        jsr bulkCopyToPpu
+        .addr savestate_nametable
         jsr saveSlotNametablePatch
 @notDebug:
         rts
@@ -163,27 +172,6 @@ saveSlotNametablePatch:
         sta PPUDATA
         rts
 
-saveStateNametableUI:
-        ; todo: replace with stripe
-        ldx #$00
-@nextPpuAddress:
-        lda savestate_nametable_patch,x
-        inx
-        sta PPUADDR
-        lda savestate_nametable_patch,x
-        inx
-        sta PPUADDR
-@nextPpuData:
-        lda savestate_nametable_patch,x
-        inx
-        cmp #$FE
-        beq @nextPpuAddress
-        cmp #$FD
-        beq @endOfPpuPatching
-        sta PPUDATA
-        jmp @nextPpuData
-@endOfPpuPatching:
-        rts
 
 statisticsNametablePatch:
         lda #$21
@@ -235,17 +223,95 @@ hzStats: ; stripe
         .byte $FF
 
 seven_digit_nametable:
-        .byte $20, $5F, $41, $3a ; -
-        .byte $20, $7f, $C7, $3c ; |
-        .byte $21, $5F, $41, $3F ; -
+        .byte $20, $5F, $41, $75 ; -
+        .byte $20, $7f, $C7, $36 ; |
+        .byte $21, $5F, $41, $77 ; -
         .byte $20, $7E, $C7, $FF ; |
-        .byte $20, $5E, $41, $39 ; -
-        .byte $21, $5E, $41, $3E ; -
+        .byte $20, $5E, $41, $34 ; -
+        .byte $21, $5E, $41, $37 ; -
         .byte $21, $1E, $41, $0  ; 0
         .byte $FF
 
-savestate_nametable_patch:
-        .byte   $22,$F7,$38,$39,$39,$39,$39,$39,$39,$3A,$FE
-        .byte   $23,$17,$3B,$1C,$15,$18,$1D,$FF,$FF,$3C,$FE
-        .byte   $23,$37,$3B,$FF,$FF,$FF,$FF,$FF,$FF,$3C,$FE
-        .byte   $23,$57,$3D,$3E,$3E,$3E,$3E,$3E,$3E,$3F,$FD
+savestate_nametable:
+        .byte   $22,$F7,$8,$74,$34,$34,$34,$34,$34,$34,$75
+        .byte   $23,$17,$8,$35,$1C,$15,$18,$1D,$FF,$FF,$36
+        .byte   $23,$37,$8,$35,$FF,$FF,$FF,$FF,$FF,$FF,$36
+        .byte   $23,$57,$8,$76,$37,$37,$37,$37,$37,$37,$77
+        .byte   $FF
+
+NORMAL_CORNER_TILES := $70
+DARK_CORNER_TILES := $80
+
+drawDarkMode:
+
+darkBuffer := playfield ; cleared right after in initGameState
+
+        ; process the playfield in 60 chunks
+        lda #60
+        sta tmpZ
+
+        lda #$20
+        sta tmpX
+        lda #$00
+        sta tmpY
+
+@processChunk: ; process 16 tiles at a time
+        lda tmpX
+        sta PPUADDR
+        lda tmpY
+        sta PPUADDR
+        lda PPUDATA
+
+        ldx #0
+@copyToBuffer:
+        lda PPUDATA
+        sta darkBuffer, x
+        inx
+        cpx #16
+        bne @copyToBuffer
+
+        ; reset PPUADDR
+        lda tmpX
+        sta PPUADDR
+        lda tmpY
+        sta PPUADDR
+
+        ldx #0
+@copyToNametable:
+        lda darkBuffer, x
+
+        ; set pattern as blank
+        cmp #$90
+        bmi :+
+        cmp #$A2
+        bpl :+
+        lda #$EF
+:
+        ; use rounded corners
+        cmp #$70
+        bmi :+
+        cmp #$78
+        bpl :+
+        clc
+        adc #$10
+:
+
+        sta PPUDATA
+        inx
+        cpx #16
+        bne @copyToNametable
+
+        clc
+        lda tmpY
+        adc #16
+        sta tmpY
+        bcc @noverflow
+        inc tmpX
+@noverflow:
+
+        sec
+        lda tmpZ
+        sbc #1
+        sta tmpZ
+        bne @processChunk
+        rts
