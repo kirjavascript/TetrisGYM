@@ -2,8 +2,14 @@ use rusticnes_core::nes::NesState;
 use rusticnes_core::{ cartridge, opcodes, opcode_info };
 use crate::{input, labels};
 
+static ROM: &'static [u8] = include_bytes!("../../tetris.nes");
+
+pub fn rom_data() -> &'static [u8] {
+    &ROM[0x10..]
+}
+
 pub fn emulator(rom: Option<&[u8]>) -> NesState {
-    let rom = rom.unwrap_or(include_bytes!("../../tetris.nes"));
+    let rom = rom.unwrap_or(ROM);
     let mut emu = NesState::new(Box::new(cartridge::mapper_from_file(rom)).unwrap());
 
     emu.power_on();
