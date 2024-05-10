@@ -97,6 +97,7 @@ MODE_DARK
 MODE_LINECAP
 MODE_DASONLY
 MODE_QUAL
+MODE_TILES
 MODE_PAL
 .endenum
 
@@ -165,6 +166,7 @@ MENU_TOP_MARGIN_SCROLL := 7 ; in blocks
     .byte $1    ; MODE_LINECAP
     .byte $1    ; MODE_DASONLY
     .byte $1    ; MODE_QUAL
+    .byte $4    ; MODE_TILES
     .byte $1    ; MODE_PAL
 .endmacro
 

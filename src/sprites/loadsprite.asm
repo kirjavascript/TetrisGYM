@@ -1,6 +1,7 @@
 ; the engine from the original game
 
 loadSpriteIntoOamStaging:
+        jsr saveTilesOffsetInTmpZ
         clc
         lda spriteIndexInOamContentLookup
         rol a
@@ -22,6 +23,7 @@ loadSpriteIntoOamStaging:
         inx
         iny
         lda (generalCounter),y
+        jsr addTilesOffset
         sta oamStaging,x
         inx
         iny

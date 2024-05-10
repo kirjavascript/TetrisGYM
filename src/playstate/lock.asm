@@ -29,6 +29,7 @@ playState_lockTetrimino:
         rts
 
 @notGameOver:
+        jsr saveTilesOffsetInTmpZ
         lda vramRow
         cmp #$20
         bmi @ret
@@ -73,6 +74,7 @@ playState_lockTetrimino:
         adc positionValidTmp
         tay
         lda generalCounter5
+        jsr addTilesOffset
         ; BLOCK_TILES
         sta (playfieldAddr),y
         inx

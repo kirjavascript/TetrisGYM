@@ -75,8 +75,8 @@ drawTiles(buffer, lookup, `
 #a    LINECAP                 d#
 #a    DAS ONLY                d#
 #a    QUAL MODE               d#
+#a    TILES                   d#
 #a    PAL MODE                d#
-#a                            d#
 #a                            d#
 #a V6                         d#
 #a                            d#

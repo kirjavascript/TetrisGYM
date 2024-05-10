@@ -1,4 +1,23 @@
+tilesOffset:
+        .byte $00,$30,$40,$50,$60
+
+saveTilesOffsetInTmpZ:
+        ldx tilesModifier
+        lda tilesOffset,x
+        sta tmpZ
+        rts
+
+addTilesOffset:
+        cmp #$7B
+        bcc :+
+        cmp #$7E
+        bcs :+
+        adc tmpZ
+:
+        rts
+
 stageSpriteForCurrentPiece:
+        jsr saveTilesOffsetInTmpZ
         lda #$0
         sta pieceTileModifier
         jsr stageSpriteForCurrentPiece_actual
@@ -52,7 +71,7 @@ tileModifierForCurrentPiece:
         rts
 @tileNormal:
         lda orientationTable,x
-        rts
+        jmp addTilesOffset
 
 stageSpriteForCurrentPiece_actual:
         lda tetriminoX
