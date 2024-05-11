@@ -10,8 +10,7 @@ render: lda renderMode
         .addr   render_mode_level_menu
         .addr   render_mode_linecap_menu
 
-.include "render_mode_level_menu.asm"
-    ; no rts / jmp
+.include "render_mode_level_menu.asm" ; no rts / jmp
 
 render_mode_static:
         lda currentPpuCtrl
