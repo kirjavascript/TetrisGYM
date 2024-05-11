@@ -97,6 +97,7 @@ render_mode_play_and_demo:
         ; (lazy render hz for 10 more)
         ; 1 added in level (3 total)
         ; 2 added in lines (5 total)
+        ; 2 added on crash
         ; independent writes;
         ; 1 added in 7digit
         ; 3 added in float
@@ -109,12 +110,14 @@ render_mode_play_and_demo:
         cmp #$F0
         bne @noCrash
 
+        ; crash face
         lda #$20
         sta PPUADDR
         lda #$FD
         sta PPUADDR
         lda #$D8
         sta PPUDATA
+        ; grey palette
         lda #$3F
         sta PPUADDR
         lda #$0D
