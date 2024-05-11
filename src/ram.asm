@@ -347,9 +347,9 @@ hzFlag: .res 1
 inputDisplayFlag: .res 1
 disableFlashFlag: .res 1
 disablePauseFlag: .res 1
+darkMode: .res 1
 goofyFlag: .res 1
 debugFlag: .res 1
-darkMode: .res 1
 linecapFlag: .res 1
 dasOnlyFlag: .res 1
 qualFlag: .res 1

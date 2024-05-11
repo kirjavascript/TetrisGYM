@@ -69,9 +69,9 @@ drawTiles(buffer, lookup, `
 #a    INPUT DISPLAY           d#
 #a    DISABLE FLASH           d#
 #a    DISABLE PAUSE           d#
+#a    DARK MODE               d#
 #a    GOOFY FOOT              d#
 #a    BLOCK TOOL              d#
-#a    DARK MODE               d#
 #a    LINECAP                 d#
 #a    DAS ONLY                d#
 #a    QUAL MODE               d#
@@ -134,7 +134,7 @@ drawTiles(extra, lookup, background);
 drawRect(buffer, 8, 2, 10, 5, 0xB0); // draw logo
 
 const urlX = 3;
-const urlY = 15;
+const urlY = 17;
 drawRect(extra, urlX, urlY, 12, 1, 0x74);
 drawRect(extra, urlX+12, urlY, 12, 1, 0x84);
 
@@ -158,8 +158,6 @@ drawAttrs(buffer, [`
     2222222222222222
 `]);
 
-const line = '2'.repeat(16);
-const screen = Array.from({ length: 8 }, () => line).join('\n');
 drawAttrs(extra, [`
     2222222222222222
     2222222222222222
@@ -168,8 +166,17 @@ drawAttrs(extra, [`
     2222222222222222
     2222222222222222
     2222222222222222
+    2222222222222222
+`, `
     2333333333333332
-`, screen]);
+    2222222222222222
+    2222222222222222
+    2222222222222222
+    2222222222222222
+    2222222222222222
+    2222222222222222
+    2222222222222222
+`]);
 
 writeRLE(
     __dirname + '/game_type_menu_nametable_practise.bin',
