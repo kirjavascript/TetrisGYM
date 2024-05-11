@@ -555,9 +555,9 @@ menuYTmp := tmp2
         lda crashModifier
         cmp #CRASH_OFF
         bne @notOff
-        lda #$F1
+        lda #$F3
 @notOff:
-        adc #$16
+        adc #$14
         sta spriteIndexInOamContentLookup
         lda #(MODE_CRASH*8) + MENU_SPRITE_Y_BASE + 1
         sec

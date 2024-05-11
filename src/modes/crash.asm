@@ -419,6 +419,7 @@ testCrash:
         lda #$00
         sta allegroIndex ; resetting variable
         lda crashModifier
+        cmp #CRASH_SHOW
         bne @otherMode
         lda renderFlags ; if mode = 0, tell score to update (might not be necessary?) so that crash info is printed
         ora #RENDER_SCORE
