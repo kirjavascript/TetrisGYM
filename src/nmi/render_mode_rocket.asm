@@ -18,10 +18,5 @@ render_mode_rocket:
         .addr rocket_nametable_patch
 @stage2:
 @rocketEnd:
-.if INES_MAPPER = 3
-        lda #%10000000
-        sta PPUCTRL
-        sta currentPpuCtrl
-.endif
         jsr resetScroll
         rts

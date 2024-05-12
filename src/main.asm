@@ -54,6 +54,10 @@ mainLoop:
 .include "util/math.asm"
 .include "util/menuthrottle.asm"
 .include "util/modetext.asm"
+.include "util/mapper.asm"
+.if INES_MAPPER = 1000
+.include "util/autodetect.asm"
+.endif
 
 .include "sprites/bytesprite.asm"
 .include "sprites/drawrect.asm"

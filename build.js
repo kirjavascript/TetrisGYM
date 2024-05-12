@@ -6,10 +6,12 @@ console.log('TetrisGYM buildscript');
 console.time('build');
 
 const mappers = { // https://www.nesdev.org/wiki/Mapper
+    0: 'NROM',
     1: 'MMC1',
     3: 'CNROM',
     4: 'MMC3',
     5: 'MMC5',
+    1000: 'Autodetect MMC1/CNROM',
 };
 
 // options handling
@@ -25,6 +27,7 @@ if (args.includes('-h')) {
 -k  Famicom Keyboard support
 -w  force WASM compiler
 -c  force PNG to CHR conversion
+-o  override autodetect mmc1 header with cnrom
 -t  run tests (requires cargo)
 -h  you are here
 `);
@@ -47,7 +50,7 @@ console.log(`using ${nativeCC65 ? 'system' : 'wasm'} ca65/ld65`);
 
 // mapper options
 
-const mapper = args.find((d) => d.startsWith('-m'))?.slice(2) ?? 1;
+const mapper = args.find((d) => d.startsWith('-m'))?.slice(2) ?? 1000;
 
 if (!mappers[mapper]) {
     console.error(
@@ -77,6 +80,11 @@ if (args.includes('-k')) {
 if (args.includes('-s')) {
     compileFlags.push('-D', 'SAVE_HIGHSCORES=0');
     console.log('highscore saving disabled');
+}
+
+if (args.includes('-o')) {
+    compileFlags.push('-D', 'CNROM_OVERRIDE=1');
+    console.log('cnrom override for autodetect');
 }
 
 console.log();
