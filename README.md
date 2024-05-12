@@ -67,7 +67,7 @@ ROM CRC32: 1394F57E
 
 A link to the BPS can be found on the [releases page](https://github.com/kirjavascript/TetrisGYM/releases).
 
-TetrisGYM supports being built with mappers NROM, MMC1, MMC3, MMC5, and CNROM.
+TetrisGYM supports being built for mappers NROM, MMC1, MMC3, MMC5, and CNROM.
 
 The default build produces a file with an MMC1 header, but it also works when treated as CNROM.
 
