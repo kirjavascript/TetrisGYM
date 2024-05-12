@@ -6,10 +6,10 @@ playState_updateLinesAndStatistics:
 
 @linesCleared:
         tax
-        dec     lineClearStatsByType-1,x
-        bpl     @noCarry
-        lda     #$09
-        sta     lineClearStatsByType-1,x
+        dec lineClearStatsByType-1,x
+        bpl @noCarry
+        lda #$09
+        sta lineClearStatsByType-1,x
 @noCarry:
         lda renderFlags
         ora #RENDER_LINES

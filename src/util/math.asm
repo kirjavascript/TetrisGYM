@@ -267,25 +267,25 @@ unsigned_div24:
 
 cos_A:
       clc                     ; clear carry for add
-      adc   #$40              ; add 1/4 rotation
+      adc #$40              ; add 1/4 rotation
 
 ;----------------------------------------------------------------
 ;
 ; get SIN(A) in AX. enter with flags reflecting the contents of A
 
 sin_A:
-      bpl   sin_cos           ; just get SIN/COS and return if +ve
+      bpl sin_cos           ; just get SIN/COS and return if +ve
 
-      and   #$7F              ; else make +ve
-      jsr   sin_cos           ; get SIN/COS
+      and #$7F              ; else make +ve
+      jsr sin_cos           ; get SIN/COS
                               ; now do twos complement
-      eor   #$FF              ; toggle low byte
+      eor #$FF              ; toggle low byte
       clc                     ; clear carry for add
-      adc   #$01              ; add to low byte
+      adc #$01              ; add to low byte
       pha                     ; save low byte
       txa                     ; copy high byte
-      eor   #$FF              ; toggle high byte
-      adc   #$00              ; add carry from low byte
+      eor #$FF              ; toggle high byte
+      adc #$00              ; add carry from low byte
       tax                     ; copy back to X
       pla                     ; restore low byte
       rts
@@ -295,17 +295,17 @@ sin_A:
 ; get AX from SIN/COS table
 
 sin_cos:
-      cmp   #$41              ; compare with max+1
-      bcc   quadrant          ; branch if less
+      cmp #$41              ; compare with max+1
+      bcc quadrant          ; branch if less
 
-      eor   #$7F              ; wrap $41 to $7F ..
-      adc   #$00              ; .. to $3F to $00
+      eor #$7F              ; wrap $41 to $7F ..
+      adc #$00              ; .. to $3F to $00
 quadrant:
       asl                     ; * 2 bytes per value
       tax                     ; copy to index
-      lda   sintab,X          ; get SIN/COS table value low byte
+      lda sintab,X          ; get SIN/COS table value low byte
       pha                     ; save it
-      lda   sintab+1,X        ; get SIN/COS table value high byte
+      lda sintab+1,X        ; get SIN/COS table value high byte
       tax                     ; copy to X
       pla                     ; restore low byte
       rts
