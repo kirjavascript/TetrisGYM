@@ -26,6 +26,8 @@
 * Fixed PAL colours
 * Keep hz display enabled when topped out
 * Famicom Keyboard support
+* Autodetect MMC1/CNROM
+* NROM Support
 * MMC3 Support
 * MMC5 Support
 

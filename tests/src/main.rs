@@ -9,6 +9,7 @@ mod video;
 mod drought;
 mod floor;
 mod garbage;
+mod mapper;
 mod palettes;
 mod pushdown;
 mod rng;
@@ -56,6 +57,7 @@ fn main() {
         ("top row bug", toprow::test),
         ("score", score::test),
         ("score_render", score::test_render),
+        ("mapper", mapper::test),
         ("pushdown", pushdown::test),
         ("rng seeds", rng::test),
         ("sps", sps::test),

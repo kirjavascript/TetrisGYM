@@ -1,8 +1,6 @@
 .ifndef INES_MAPPER ; is set via ca65 flags
-INES_MAPPER := 1 ; supports 1, 3 and 4 (MMC1 / CNROM / MMC3)
+INES_MAPPER := 1000 ; 0 (NROM), 1 (MMC1), 3 (CNROM), 4 (MMC3), 5 (MMC5), and 1000 (autodetect 1/3)
 .endif
-
-HAS_MMC = INES_MAPPER = 1 || INES_MAPPER = 4 || INES_MAPPER = 5
 
 .ifndef SAVE_HIGHSCORES
 SAVE_HIGHSCORES := 1
@@ -15,6 +13,10 @@ AUTO_WIN := 0
 
 .ifndef KEYBOARD
 KEYBOARD := 0
+.endif
+
+.ifndef CNROM_OVERRIDE
+CNROM_OVERRIDE := 0
 .endif
 
 NO_MUSIC := 1
