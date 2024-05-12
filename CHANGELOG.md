@@ -1,12 +1,12 @@
 # Changelog
 
 ## [unreleased]
-* Crash Behaviours
-* Crunch Mode
-* Marathon Mode
+* Crunch Trainer
+* Marathon Trainer
+* Low Stack Trainer
+* Crash Modes
 * Hidden Score Mode
 * Dark Mode
-* Low Stack Mode
 * M Score changed to Classic Scoring + Millions counter
 * Invisible linecap turns entire playfield invisible
 * Invisible mode preserves original piece colors

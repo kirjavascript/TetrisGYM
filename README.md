@@ -1,7 +1,7 @@
 # TetrisGYM
 
 <div align="center">
-    <img src="./assets/screens/menu5.png" alt="Menuscreen">
+    <img src="./assets/screens/menu6.png" alt="Menuscreen">
     <br>
 </div>
 <br>
@@ -37,6 +37,7 @@
 * [Input Display](#input-display)
 * [Disable Flash](#disable-flash)
 * [Disable Pause](#disable-pause)
+* [Dark Mode](#dark-mode)
 * [Goofy Foot](#goofy-foot)
 * [Block Tool](#block-tool)
     * [Level Editor](#level-editor)
@@ -314,7 +315,7 @@ __M__
 
 ![M](./assets/screens/score-m.png)
 
-Shows your score in millions, rolls over at 100 million.
+Same as Classic scoring, except additionally display your score in millions.
 
 __Capped__
 
@@ -351,6 +352,12 @@ Disable the ability to pause the game.
 ## Goofy Foot
 
 Flips A/B, Start/Select, and inverts DPad directions like a Goofy Foot controller.
+
+## Dark Mode
+
+![Dark Mode](./assets/screens/dark.png)
+
+Alternative pattern-less background.
 
 ## Block Tool
 
