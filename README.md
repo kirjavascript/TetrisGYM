@@ -33,6 +33,7 @@
 * [Highscores](#highscores)
 * [Tap/Roll Speed Tester](#taproll-speed-tester)
 * [Scoring](#scoring)
+* [Crash](#crash)
 * [Hz Display](#hz-display)
 * [Input Display](#input-display)
 * [Disable Flash](#disable-flash)
@@ -66,7 +67,9 @@ ROM CRC32: 1394F57E
 
 A link to the BPS can be found on the [releases page](https://github.com/kirjavascript/TetrisGYM/releases).
 
-TetrisGYM supports the mappers MMC1, MMC3, and CNROM. The default build is MMC1.
+TetrisGYM supports being built with mappers NROM, MMC1, MMC3, MMC5, and CNROM.
+
+The default build produces a file with an MMC1 header, but it also works when treated as CNROM.
 
 ## Trainers
 
@@ -329,6 +332,24 @@ __Hidden__
 
 Hides score until game over.
 
+## Crash
+
+![Crash](./assets/screens/crash.png)
+
+Recreation of the crash conditions and behaviour seen in the original game.
+
+* Off  
+        "Normal Gym Mode" - no behaviour caused by the crash bug are present  
+* Show  
+        TODO  
+* Topout  
+        TODO  
+* Crash  
+
+## Strict Crash
+
+By enabling this option the crash triggers based on probabilities will always crash at the earliest opportunity.
+
 ## Hz Display
 
 ![Hz Display](./assets/screens/hz.png)
@@ -470,4 +491,3 @@ This project descends from the TAUS disassembly of NES Tetris and has been heavi
 
 * [https://github.com/ejona86/taus](https://github.com/ejona86/taus)  
 * [https://github.com/CelestialAmber/TetrisNESDisasm](https://github.com/CelestialAmber/TetrisNESDisasm)  
-* [https://github.com/pinobatch/holy-mapperel](https://github.com/pinobatch/holy-mapperel)
