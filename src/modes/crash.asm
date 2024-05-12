@@ -288,11 +288,11 @@ testCrash:
         jsr satanSpawn
         jmp @allegroClear ;allegroClear is basically return, just clears the variable first.
 @isPal:
-		lda palFlag
-		beq @nextSwitch ;if NTSC, continue, no crash.
-		jsr blackBox
+        lda palFlag
+        beq @nextSwitch ;if NTSC, continue, no crash.
+        jsr blackBox
 @allegroJump:
-		jmp @allegroClear
+        jmp @allegroClear
         lda palFlag
         beq @nextSwitch ;if NTSC, continue, no crash.
         jsr blackBox
@@ -324,11 +324,11 @@ testCrash:
         bcc @allegroJump
         bne @not76
         lda cycleCount+1
-		ldx strictFlag
-		beq @notStrict_confetti
-		cmp #$BD
-		bcc @allegroJump
-		bcs @confettiA
+        ldx strictFlag
+        beq @notStrict_confetti
+        cmp #$BD
+        bcc @allegroJump
+        bcs @confettiA
 @notStrict_confetti:
         cmp #$C5 ;low byte min
         bcc @allegroClear
@@ -350,11 +350,11 @@ testCrash:
         bcc @allegroClear
         bne @levelLag
         lda cycleCount+1
-		ldx strictFlag
-		beq @notStrict_level
-		cmp #$95
-		bcc @allegroClear
-		bcs @levelLag
+        ldx strictFlag
+        beq @notStrict_level
+        cmp #$95
+        bcc @allegroClear
+        bcs @levelLag
 @notStrict_level:
         cmp #$9D;low byte min
         bcc @allegroClear
@@ -367,11 +367,11 @@ testCrash:
         bcc @allegroClear
         bne @lineLag
         lda cycleCount+1
-		ldx strictFlag
-		beq @notStrict_lines
-		cmp #$58
-		bcc @allegroClear
-		bcs @lineLag
+        ldx strictFlag
+        beq @notStrict_lines
+        cmp #$58
+        bcc @allegroClear
+        bcs @lineLag
 @notStrict_lines:
         cmp #$60;low byte min
         bcc @allegroClear
@@ -384,11 +384,11 @@ testCrash:
         bcc @allegroClear
         bne @not7A
         lda cycleCount+1
-		ldx strictFlag
-		beq @notStrict_B
-		cmp #$57
-		bcc @allegroClear
-		bcs @confettiB
+        ldx strictFlag
+        beq @notStrict_B
+        cmp #$57
+        bcc @allegroClear
+        bcs @confettiB
 @notStrict_B:
         cmp #$5F ;low byte min
         bcc @allegroClear
@@ -410,7 +410,7 @@ testCrash:
         beq @noLag ;if lag should happen, wait a frame here so that sprite staging doesn't happen.
         lda #$00
         sta verticalBlankingInterval
-		sta lagState ;clear lagstate for next
+        sta lagState ;clear lagstate for next
 @checkForNmi:
         lda verticalBlankingInterval ;busyloop
         beq @checkForNmi
@@ -492,41 +492,41 @@ satanSpawn: ; copied from routine vanilla game's memset_ppu_page_and_more which 
 
 @ntsc:
         lda #$AA
-        sta     tmp1
-        stx     tmp2
-        sty     tmp3
-        lda     PPUSTATUS
-        lda     currentPpuCtrl
-        and     #$FB
-        sta     PPUCTRL
-        sta     currentPpuCtrl
-        lda     tmp1
-        sta     PPUADDR
-        ldy     #$00
-        sty     PPUADDR
-        ldx     #$04
-        cmp     #$20
-        bcs     LAC40
-        ldx     tmp3
+        sta tmp1
+        stx tmp2
+        sty tmp3
+        lda PPUSTATUS
+        lda currentPpuCtrl
+        and #$FB
+        sta PPUCTRL
+        sta currentPpuCtrl
+        lda tmp1
+        sta PPUADDR
+        ldy #$00
+        sty PPUADDR
+        ldx #$04
+        cmp #$20
+        bcs LAC40
+        ldx tmp3
 LAC40:  ldy     #$00
-        lda     tmp2
+        lda tmp2
 LAC44:  sta     PPUDATA
         dey
-        bne     LAC44
+        bne LAC44
         dex
-        bne     LAC44
-        ldy     tmp3
-        lda     tmp1
-        cmp     #$20
-        bcc     LAC67
-        adc     #$02
-        sta     PPUADDR
-        lda     #$C0
-        sta     PPUADDR
-        ldx     #$40
+        bne LAC44
+        ldy tmp3
+        lda tmp1
+        cmp #$20
+        bcc LAC67
+        adc #$02
+        sta PPUADDR
+        lda #$C0
+        sta PPUADDR
+        ldx #$40
 LAC61:  sty     PPUDATA
         dex
-        bne     LAC61
+        bne LAC61
 LAC67:  ldx     tmp2
         rts
 blackBox: ;copied from patchToPpu from original game as it's no longer present in gym
@@ -535,23 +535,23 @@ blackBox: ;copied from patchToPpu from original game as it's no longer present i
 @checkForNmi:
         lda verticalBlankingInterval ;busyloop
         beq @checkForNmi
-        ldy     #$00
+        ldy #$00
 @patchAddr:
-        lda     patchData,y
-        sta     PPUADDR
+        lda patchData,y
+        sta PPUADDR
         iny
-        lda     patchData,y
-        sta     PPUADDR
+        lda patchData,y
+        sta PPUADDR
         iny
 @patchValue:
-        lda     patchData,y
+        lda patchData,y
         iny
-        cmp     #$FE
-        beq     @patchAddr
-        cmp     #$FD
-        beq     @ret
-        sta     PPUDATA
-        jmp     @patchValue
+        cmp #$FE
+        beq @patchAddr
+        cmp #$FD
+        beq @ret
+        sta PPUDATA
+        jmp @patchValue
 
 @ret:   rts
 patchData:

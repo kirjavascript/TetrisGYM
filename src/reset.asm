@@ -80,18 +80,18 @@ not_mmc1:
 .elseif INES_MAPPER = 4
 ; https://www.nesdev.org/wiki/MMC3
         ; 110: R6: Select 8 KB PRG ROM bank at $8000-$9FFF (or $C000-$DFFF)
-        ldx     #$06
-        ldy     #$00
-        stx     MMC3_BANK_SELECT
-        sty     MMC3_BANK_DATA
+        ldx #$06
+        ldy #$00
+        stx MMC3_BANK_SELECT
+        sty MMC3_BANK_DATA
 
         ; 111: R7: Select 8 KB PRG ROM bank at $A000-$BFFF
         inx
         iny
-        stx     MMC3_BANK_SELECT
-        sty     MMC3_BANK_DATA
-        lda     #$80 ; enable PRG RAM
-        sta     MMC3_PRG_RAM
+        stx MMC3_BANK_SELECT
+        sty MMC3_BANK_DATA
+        lda #$80 ; enable PRG RAM
+        sta MMC3_PRG_RAM
         rts
 
 ; MMC5

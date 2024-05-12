@@ -33,16 +33,16 @@ addrHi  := addrLo+1
 addrOff := addrLo+2
 
 copyRleNametableToPpu:
-        lda     #$20
-        sta     addrOff
+        lda #$20
+        sta addrOff
 copyRleNametableToPpuOffset:
-        jsr     copyAddrAtReturnAddressToTmp_incrReturnAddrBy2
-        ldx     PPUSTATUS
-        lda     addrOff
-        sta     PPUADDR
-        lda     #$00
-        sta     PPUADDR
-        jmp     rleDecodeToPpu
+        jsr copyAddrAtReturnAddressToTmp_incrReturnAddrBy2
+        ldx PPUSTATUS
+        lda addrOff
+        sta PPUADDR
+        lda #$00
+        sta PPUADDR
+        jmp rleDecodeToPpu
 
 ; Decodes Konami RLE-encoded stream with address stored at $0000.
 ;
@@ -50,50 +50,50 @@ copyRleNametableToPpuOffset:
 rleDecodeToPpu:
         ; y is current input offset
         ; x is chunk length remaining
-        ldy     #$00
+        ldy #$00
 
 @processChunk:
-        lda     (addrLo),y
-        cmp     #$81
-        bmi     @runLength
-        cmp     #$FF
-        beq     @ret
-        and     #$7F
+        lda (addrLo),y
+        cmp #$81
+        bmi @runLength
+        cmp #$FF
+        beq @ret
+        and #$7F
 
 ; literalLength
         tax
 @literalLoop:
         iny
-        lda     (addrLo),y
-        sta     PPUDATA
+        lda (addrLo),y
+        sta PPUDATA
         dex
-        bne     @literalLoop
-        beq     @preventYOverflow
+        bne @literalLoop
+        beq @preventYOverflow
 
 @runLength:
         tax
         iny
-        lda     (addrLo),y
+        lda (addrLo),y
 @runLengthLoop:
-        sta     PPUDATA
+        sta PPUDATA
         dex
-        bne     @runLengthLoop
+        bne @runLengthLoop
 
 @preventYOverflow:
         ; The largest input chunk size is literal with a length of 126, which
         ; is 127 bytes of input. We make sure adding 127 to y does not
         ; overflow. This allows us to ignore y overflow during loops.
         iny
-        bpl     @processChunk
+        bpl @processChunk
         ; y is at risk of overflowing next chunk
         tya
-        ldy     #$00
+        ldy #$00
         clc
-        adc     addrLo
-        sta     addrLo
-        bcc     @processChunk
-        inc     addrHi
-        jmp     @processChunk
+        adc addrLo
+        sta addrLo
+        bcc @processChunk
+        inc addrHi
+        jmp @processChunk
 
 @ret:
         rts
