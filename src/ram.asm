@@ -222,9 +222,10 @@ linecapState: .res 1 ; $639 ; 0 if not triggered, 1 + linecapHow otherwise, rese
 dasOnlyShiftDisabled: .res 1 ; $63A
 
 invisibleFlag: .res 1 ; $63B  ; 0 for normal mode, non-zero for Invisible playfield rendering.  Reset on game init and game over.
-currentFloor: .res 1 ; floorModifier is copied here at game init.  Set to 0 otherwise and incremented when linecap floor.
+currentFloor: .res 1 ; $63C floorModifier is copied here at game init.  Set to 0 otherwise and incremented when linecap floor.
+mapperId: .res 1 ; $63D ; For INES_MAPPER 1000 (autodetect).  0 = CNROM.  1 = MMC1.
 
-    .res $38
+    .res $37
 
 .if KEYBOARD
 newlyPressedKeys: .res 1 ; $0675
@@ -339,12 +340,15 @@ checkerModifier: .res 1
 garbageModifier: .res 1
 droughtModifier: .res 1
 dasModifier: .res 1
+lowStackRowModifier: .res 1
 scoringModifier: .res 1
 crashModifier: .res 1
+strictFlag: .res 1 ;used for crash detection. If 1, the game will register a crash anytime there is a possibility of one.
 hzFlag: .res 1
 inputDisplayFlag: .res 1
 disableFlashFlag: .res 1
 disablePauseFlag: .res 1
+darkMode: .res 1
 goofyFlag: .res 1
 debugFlag: .res 1
 linecapFlag: .res 1

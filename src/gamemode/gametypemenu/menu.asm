@@ -10,24 +10,6 @@ gameMode_gameTypeMenu:
         sta menuScrollY
         lda #0
         sta hideNextPiece
-        RESET_MMC1
-.if HAS_MMC
-        ; switch to blank charmap
-        ; (stops glitching when resetting)
-        lda #$03
-        jsr changeCHRBank1
-.endif
-.if INES_MAPPER = 4
-        ; Horizontal mirroring
-        lda #$1
-        sta MMC3_MIRRORING
-.elseif INES_MAPPER = 5
-        ; Horizontal mirroring
-        lda #$50
-        sta MMC5_NT_MAPPING
-.endif
-        lda #%10011 ; used to be $10 (enable horizontal mirroring)
-        jsr setMMC1Control
         lda #$1
         sta renderMode
         jsr updateAudioWaitForNmiAndDisablePpuRendering
@@ -40,15 +22,12 @@ gameMode_gameTypeMenu:
         sta tmp3
         jsr copyRleNametableToPpuOffset
         .addr   game_type_menu_nametable_extra
-        lda #$00
-        jsr changeCHRBank0
-        lda #$00
-        jsr changeCHRBank1
-.if INES_MAPPER = 3
-CNROM_CHR_MENU:
-        lda #1
-        sta CNROM_CHR_MENU+1
+.if INES_MAPPER <> 0
+        lda #CHRBankSet0
+        jsr changeCHRBanks
 .endif
+        lda #NMIEnable
+        sta currentPpuCtrl
         jsr waitForVBlankAndEnableNmi
         jsr updateAudioWaitForNmiAndResetOamStaging
         jsr updateAudioWaitForNmiAndEnablePpuRendering
@@ -72,8 +51,6 @@ gameTypeLoopCheckStart:
         lda practiseType
         cmp #MODE_KILLX2
         bne @checkSpeedTest
-        lda #$10
-        jsr setMMC1Control
         lda #29
         sta startLevel
         sta levelNumber
@@ -555,9 +532,9 @@ menuYTmp := tmp2
         lda crashModifier
         cmp #CRASH_OFF
         bne @notOff
-        lda #$F1
+        lda #$F3
 @notOff:
-        adc #$16
+        adc #$14
         sta spriteIndexInOamContentLookup
         lda #(MODE_CRASH*8) + MENU_SPRITE_Y_BASE + 1
         sec

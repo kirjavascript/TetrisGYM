@@ -93,10 +93,11 @@ render_mode_play_and_demo:
         and #RENDER_SCORE
         beq @renderHz
 
-        ; 8 safe tile writes freed from stats / hz
+        ; 7 safe tile writes freed from stats / hz
         ; (lazy render hz for 10 more)
         ; 1 added in level (3 total)
         ; 2 added in lines (5 total)
+        ; 2 added on crash
         ; independent writes;
         ; 1 added in 7digit
         ; 3 added in float
@@ -109,12 +110,14 @@ render_mode_play_and_demo:
         cmp #$F0
         bne @noCrash
 
+        ; crash face
         lda #$20
         sta PPUADDR
         lda #$FD
         sta PPUADDR
         lda #$D8
         sta PPUDATA
+        ; grey palette
         lda #$3F
         sta PPUADDR
         lda #$0D
@@ -229,11 +232,6 @@ render_mode_play_and_demo:
         bne @noFlash
         stx PPUDATA
 @noFlash:
-.if INES_MAPPER = 3
-        lda #%10011000
-        sta PPUCTRL
-        sta currentPpuCtrl
-.endif
         jsr resetScroll
         rts
 

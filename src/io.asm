@@ -45,6 +45,7 @@ KB_MASK  := $1E
 MMC1_Control := $8000
 MMC1_CHR0   := $BFFF
 MMC1_CHR1   := $DFFF
+MMC1_PRG    := $FFFF
 
 MMC3_BANK_SELECT := $8000
 MMC3_BANK_DATA := $8001
@@ -61,8 +62,15 @@ MMC5_CHR_BANK0 := $5123 ; 4kb page index
 MMC5_CHR_BANK1 := $5127
 
 .macro RESET_MMC1
-.if INES_MAPPER = 1
+.if INES_MAPPER = 1 .or INES_MAPPER = 1000
 :       inc :-  ; increments inc ($aa), writing a negative value to prg
                 ; https://www.nesdev.org/wiki/MMC1#Reset
 .endif
 .endmacro
+
+NMIEnable = $80
+BGPattern1 = $10
+SpritePattern1 = $08
+
+CHRBankSet0 = $00
+CHRBankSet1 = $02

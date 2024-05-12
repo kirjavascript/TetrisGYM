@@ -1,21 +1,15 @@
 gameMode_levelMenu:
-        RESET_MMC1
-        lda #$10
-        jsr setMMC1Control
-.if INES_MAPPER = 3
-        lda currentPpuCtrl
-        and #%10000000
+        lda #NMIEnable
         sta currentPpuCtrl
-.endif
         jsr updateAudio2
         lda #$7
         sta renderMode
         jsr updateAudioWaitForNmiAndDisablePpuRendering
         jsr disableNmi
-        lda #$00
-        jsr changeCHRBank0
-        lda #$00
-        jsr changeCHRBank1
+.if INES_MAPPER <> 0
+        lda #CHRBankSet0
+        jsr changeCHRBanks
+.endif
         jsr bulkCopyToPpu
         .addr   menu_palette
         jsr copyRleNametableToPpu
