@@ -1,6 +1,6 @@
 # Changelog
 
-## 6.0.0
+## [v6]
 * Crunch Trainer
 * Marathon Trainer
 * Low Stack Trainer
@@ -31,7 +31,6 @@
 * NROM Support
 * MMC3 Support
 * MMC5 Support
-* Switch to semantic versioning
 
 ## [v5 tournament]
 * Linecap Menu (from CTM Masters September 2022)

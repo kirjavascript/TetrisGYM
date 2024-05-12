@@ -66,7 +66,10 @@ vramPlayfieldRows:
         .word   $22CC,$22EC,$230C,$232C
 
 copyLowStackRowToVram:
-        lda lowStackRowModifier
+        sec
+        lda #19
+        sbc lowStackRowModifier
+        ; lda lowStackRowModifier
         asl
         tax
         lda vramPlayfieldRows+1,x

@@ -149,7 +149,7 @@ MENU_TOP_MARGIN_SCROLL := 7 ; in blocks
     .byte $4    ; MODE_GARBAGE
     .byte $12   ; MODE_DROUGHT
     .byte $10   ; MODE_DAS
-    .byte $0F   ; MODE_LOWSTACK
+    .byte $12   ; MODE_LOWSTACK
     .byte $0    ; MODE_KILLX2
     .byte $0    ; MODE_INVISIBLE
     .byte $0    ; MODE_HARDDROP
