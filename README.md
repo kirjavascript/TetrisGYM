@@ -338,13 +338,16 @@ Hides score until game over.
 
 Recreation of the crash conditions and behaviour seen in the original game.
 
+For example; crashing, level lag, confetti, satan spawn
+
 * Off  
         "Normal Gym Mode" - no behaviour caused by the crash bug are present  
 * Show  
-        TODO  
+        Enable crash glitches. Instead of crashing, show an icon next to score and continue the game.  
 * Topout  
-        TODO  
+        Enable crash glitches. Instead of crashing, behave as if the player topped out.  
 * Crash  
+        Enable crash glitches, actually crash on crash triggers.
 
 ## Strict Crash
 

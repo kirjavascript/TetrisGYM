@@ -69,7 +69,6 @@ copyLowStackRowToVram:
         sec
         lda #19
         sbc lowStackRowModifier
-        ; lda lowStackRowModifier
         asl
         tax
         lda vramPlayfieldRows+1,x
