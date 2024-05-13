@@ -84,14 +84,8 @@ gameModeState_initGameState:
         sta lineClearStatsByType+2
         sta lineClearStatsByType+3
         sta allegro
-        sta demo_heldButtons
-        sta demo_repeats
-        sta demoIndex
-        sta demoButtonsAddr
         sta holdDownPoints
         sta spawnID
-        lda #>demoButtonsTable
-        sta demoButtonsAddr+1
         lda #$03
         sta renderMode
         ldx #$A0

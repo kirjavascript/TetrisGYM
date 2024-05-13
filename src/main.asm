@@ -31,6 +31,7 @@ mainLoop:
 @continue:
         jmp mainLoop
 
+.include "audio.asm"
 .include "nmi/nmi.asm"
 .include "nmi/render.asm"
 .include "nmi/pollcontroller.asm"
@@ -80,14 +81,6 @@ mainLoop:
 .include "modes/debug.asm"
 .include "modes/saveslots.asm"
 .include "modes/crash.asm"
-
-.code
-
-.segment    "PRG_chunk2": absolute
-
-.include "data/demo.asm"
-.include "audio.asm"
-
 .include "modes/events.asm"
 .include "modes/controllerinput.asm"
 .include "modes/tapqty.asm"
