@@ -85,7 +85,7 @@ spriteYOffset: .res 1 ; $00A1
 stringIndexLookup:
 spriteIndexInOamContentLookup: .res 1 ; $00A2
 renderFlags: .res 1 ; $00A3
-; play/demo
+; gameplay
 ; Bit 0-lines 1-level 2-score 3-debug 4-hz 6-stats 7-high score entry letter
 ; speedtest
 ; 0 - hz
@@ -117,7 +117,7 @@ pendingGarbage: .res 1 ; $00BB                    ; Garbage waiting to be delive
 renderMode: .res 1 ; $00BD
     .res 1
 nextPiece: .res 1 ; $00BF                        ; Stored by its orientation ID
-gameMode: .res 1 ; $00C0                        ; 0=legal, 1=title, 2=type menu, 3=level menu, 4=play and ending and high score, 5=demo, 6=start demo
+gameMode: .res 1 ; $00C0                        ; see gamemode/branch.asm
 screenStage: .res 1 ; $00C1                        ; used in gameMode_waitScreen, endingAnimation
 musicType: .res 1 ; $00C2                        ; 0-3; 3 is off
 sleepCounter: .res 1 ; $00C3                    ;
@@ -126,11 +126,7 @@ endingRocketCounter: .res 1 ; $00C6
 endingRocketX: .res 1 ; $C7
 endingRocketY: .res 1 ; $C8
     .res 5
-demo_heldButtons: .res 1 ; $00CE
-demo_repeats: .res 1 ; $00CF
-    .res 1
-demoButtonsAddr: .res 2 ; $00D1                    ; Current address within demoButtonsTable
-demoIndex: .res 1 ; $00D3
+    .res 6 ; used to be demo stuff
 highScoreEntryNameOffsetForLetter: .res 1 ; $00D4   ; Relative to current row
 highScoreEntryRawPos: .res 1 ; $00D5                ; High score position 0=1st type A, 1=2nd... 4=1st type B... 7=4th/extra type B
 highScoreEntryNameOffsetForRow: .res 1 ; $00D6      ; Relative to start of table
