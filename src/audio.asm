@@ -269,7 +269,7 @@ handlePausedAudio:  lda audioInitialized
         cmp #$03
         bne LE212
         inc musicPauseSoundEffectCounter
-        ldy #$10
+        ldy #<unknown_sq1_data2
         lda musicPauseSoundEffectCounter
         and #$01
         bne LE20F
@@ -727,7 +727,7 @@ LE51B:  sta DMC_LEN
 ; Unused
 soundEffectSlot3_donk:
         lda #$02
-        ldy #$4C
+        ldy #<soundEffectSlot3_unknown2InitData
         jmp initSoundEffectShared
 
 soundEffectSlot3Playing_advance:

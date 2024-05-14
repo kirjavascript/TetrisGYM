@@ -166,7 +166,7 @@ if (!fs.existsSync('clean.nes')) {
     const patcher = require('./tools/patch/create');
     const pct = patcher('clean.nes', 'tetris.nes', 'tetris.bps');
     console.timeEnd('patch');
-    console.log(`using ${pct}% of original file`);
+    console.log(`\nusing ${pct}% of original file`);
 }
 
 // stats
@@ -176,7 +176,11 @@ console.log();
 if (fs.existsSync('tetris.map')) {
     const memMap = fs.readFileSync('tetris.map', 'utf8');
 
-    console.log((memMap.match(/PRG_chunk\d+\s+0.+$/gm) || []).join('\n'));
+    false && console.log((memMap.match(/PRG_chunk\d+\s+0.+$/gm) || []).join('\n'));
+
+    const used = parseInt(memMap.match(/PRG_chunk1\s+\w+\s+\w+\s+(\w+)/)?.[1]??'', 16) + 0x100; // 0x100 for reset chunk
+
+    console.log(`${0x8000 - used} PRG bytes free`);
 }
 
 function hashFile(filename) {
