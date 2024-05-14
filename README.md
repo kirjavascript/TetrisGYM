@@ -48,7 +48,6 @@
 * [Qualifier Mode](#qual-mode)
 * [PAL Mode](#pal-mode)
 * [Development](#development)
-* [Resources](#resources)
 
 ## Getting Started
 
@@ -481,16 +480,12 @@ You cannot use the Block Tool and Qual mode at the same time.
 
 Dictate if the NTSC or PAL gameplay mechanics should be used. Should automatically detect region, but can be manually overwritten otherwise.
 
-## Development
+## Development / Resources
 
 To build, you need a copy of `node` installed on your system. No other dependencies are required.
 
 Provide a `clean.nes` file of the unpatched ROM and run `node build.js`
 
-This project descends from the TAUS disassembly of NES Tetris and has been heavily modified. Large parts have been replaced, lots of optimisations, removal of unused code, non-game-mechanics related bugfixes, tooling, and different approaches to the disassembly work itself has taken place.
+This project descends from ejona's [https://github.com/ejona86/taus](TAUS) disassembly and [https://github.com/CelestialAmber/TetrisNESDisasm](CelestialAmber's) subsequent take on it.
 
-
-## Resources
-
-* [https://github.com/ejona86/taus](https://github.com/ejona86/taus)  
-* [https://github.com/CelestialAmber/TetrisNESDisasm](https://github.com/CelestialAmber/TetrisNESDisasm)  
+The ROM has been heavily modified. Large parts have been replaced, lots of optimisations, removal of unused code, non-game-mechanics related bugfixes, tooling, and different approaches to the disassembly work itself has taken place.

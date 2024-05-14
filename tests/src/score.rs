@@ -25,6 +25,7 @@ pub fn get(emu: &mut NesState) -> u32 {
     emu.memory.iram_raw[binscore_addr as usize] as u32
         + ((emu.memory.iram_raw[(binscore_addr + 1) as usize] as u32) << 8)
         + ((emu.memory.iram_raw[(binscore_addr + 2) as usize] as u32) << 16)
+        + ((emu.memory.iram_raw[(binscore_addr + 3) as usize] as u32) << 24)
 }
 
 pub fn test() {
@@ -54,6 +55,20 @@ pub fn test() {
     for initial_score in 999499..=1000501 {
         assert_eq!(score(initial_score, 4, 18), initial_score + score_impl(4, 18));
     }
+
+    // keep adding scores
+    let mut accumulator = 0;
+    let mut emu = util::emulator(None);
+
+    for _ in 0..2000 {
+        accumulator += score_impl(4, 235);
+        emu.registers.pc = add_points;
+        emu.memory.iram_raw[completed_lines] = 4;
+        emu.memory.iram_raw[level_number] = 235;
+        util::run_to_return(&mut emu, false);
+        assert_eq!(score::get(&mut emu), accumulator);
+    }
+
 }
 
 pub fn score_impl(lines: u8, level: u8) -> u32 {
