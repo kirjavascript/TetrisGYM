@@ -66,9 +66,7 @@ ROM CRC32: 1394F57E
 
 A link to the BPS can be found on the [releases page](https://github.com/kirjavascript/TetrisGYM/releases).
 
-TetrisGYM supports being built for mappers NROM, MMC1, MMC3, MMC5, and CNROM.
-
-The default build produces a file with an MMC1 header, but it also works when treated as CNROM.
+The BPS produces a file with an MMC1 header, but it also works when treated as CNROM.
 
 ## Trainers
 
@@ -480,12 +478,16 @@ You cannot use the Block Tool and Qual mode at the same time.
 
 Dictate if the NTSC or PAL gameplay mechanics should be used. Should automatically detect region, but can be manually overwritten otherwise.
 
-## Development / Resources
+## Development
 
 To build, you need a copy of `node` installed on your system. No other dependencies are required.
 
 Provide a `clean.nes` file of the unpatched ROM and run `node build.js`
 
-This project descends from ejona's [https://github.com/ejona86/taus](TAUS) disassembly and [https://github.com/CelestialAmber/TetrisNESDisasm](CelestialAmber's) subsequent take on it.
+TetrisGYM supports being built for mappers NROM, MMC1, MMC3, MMC5, and CNROM.
 
-The ROM has been heavily modified. Large parts have been replaced, lots of optimisations, removal of unused code, non-game-mechanics related bugfixes, tooling, and different approaches to the disassembly work itself has taken place.
+Run `node build.js -h` for a list of build options.
+
+---
+
+This project descends from ejona's [TAUS](https://github.com/ejona86/taus) disassembly and [CelestialAmber's](https://github.com/CelestialAmber/TetrisNESDisasm) subsequent take on it.
