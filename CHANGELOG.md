@@ -14,6 +14,8 @@
 * Block Tool pieces wrap around
 * Always Next Box removed
 * 0001 seeds are ignored
+* Hz display correctly counts taps with Up and Down
+* Keep Hz display enabled when topped out
 * Floor no longer gobbled up by top line clear
 * Floor 0 has original no-burns behaviour again
 * [Fixed ingame score display at 8/9 million with Classic Scoring](https://www.youtube.com/watch?v=fYdXky2i5AE)
@@ -24,7 +26,6 @@
 * Fixed crashes in garbage mode 4
 * Fixed line clearing happening on pause
 * Fixed PAL colours
-* Keep hz display enabled when topped out
 * Famicom Keyboard support
 * Autodetect MMC1/CNROM
 * NROM Support
