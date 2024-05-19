@@ -15,6 +15,12 @@ gameModeState_initGameBackground:
         lda darkMode
         beq @notDarkMode
         jsr drawDarkMode
+        lda #$3F
+        sta PPUADDR
+        lda #$D
+        sta PPUADDR
+        lda #$2D
+        sta PPUDATA
 @notDarkMode:
 
         lda hzFlag
