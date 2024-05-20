@@ -12,15 +12,9 @@ gameModeState_initGameBackground:
         jsr scoringBackground
         jsr debugNametableUI
 
-        lda darkMode
+        ldy darkModifier
         beq @notDarkMode
         jsr drawDarkMode
-        lda #$3F
-        sta PPUADDR
-        lda #$D
-        sta PPUADDR
-        lda #$2D
-        sta PPUDATA
 @notDarkMode:
 
         lda hzFlag
@@ -238,6 +232,18 @@ DARK_CORNER_TILES := $80
 drawDarkMode:
 
 darkBuffer := playfield ; cleared right after in initGameState
+
+        ; set the border colour
+        lda #$3F
+        sta PPUADDR
+        lda #$D
+        sta PPUADDR
+        lda #$2D
+        cpy #3 ; teal
+        bne :+
+        lda #$C
+:
+        sta PPUDATA
 
         ; process the playfield in 60 chunks
         lda #60
