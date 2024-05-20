@@ -378,7 +378,9 @@ Flips A/B, Start/Select, and inverts DPad directions like a Goofy Foot controlle
 
 ![Dark Mode](./assets/screens/dark.png)
 
-Alternative pattern-less background.
+Alternative pattern-less backgrounds.
+
+Dark, Neon, and Teal versions are available.
 
 ## Block Tool
 
