@@ -125,7 +125,7 @@ CRASH_CRASH := 3
 LINECAP_WHEN_STRING_OFFSET := $10
 LINECAP_HOW_STRING_OFFSET := $12
 
-MENU_SPRITE_Y_BASE := $47
+MENU_SPRITE_Y_BASE := $46
 MENU_MAX_Y_SCROLL := $A0
 MENU_TOP_MARGIN_SCROLL := 7 ; in blocks
 
@@ -149,7 +149,7 @@ MENU_TOP_MARGIN_SCROLL := 7 ; in blocks
     .byte $4    ; MODE_GARBAGE
     .byte $12   ; MODE_DROUGHT
     .byte $10   ; MODE_DAS
-    .byte $0F   ; MODE_LOWSTACK
+    .byte $12   ; MODE_LOWSTACK
     .byte $0    ; MODE_KILLX2
     .byte $0    ; MODE_INVISIBLE
     .byte $0    ; MODE_HARDDROP
@@ -161,7 +161,7 @@ MENU_TOP_MARGIN_SCROLL := 7 ; in blocks
     .byte $1    ; MODE_INPUT_DISPLAY
     .byte $1    ; MODE_DISABLE_FLASH
     .byte $1    ; MODE_DISABLE_PAUSE
-    .byte $1    ; MODE_DARK
+    .byte $5    ; MODE_DARK
     .byte $1    ; MODE_GOOFY
     .byte $1    ; MODE_DEBUG
     .byte $1    ; MODE_LINECAP

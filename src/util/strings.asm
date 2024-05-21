@@ -97,6 +97,10 @@ stringLookup:
         .byte stringCrash-stringLookup
         .byte stringConfetti-stringLookup ;19
         .byte stringStrict-stringLookup
+        .byte stringNeon-stringLookup
+        .byte stringLite-stringLookup
+        .byte stringTeal-stringLookup
+        .byte stringOG-stringLookup
 stringClassic:
         .byte $7,'C','L','A','S','S','I','C'
 stringLetters:
@@ -153,3 +157,11 @@ stringConfetti:
         .byte $8,'C','O','N','F','E','T','T','I'
 stringStrict:
         .byte $6,'S','T','R','I','C','T'
+stringNeon:
+        .byte $4,'N','E','O','N'
+stringTeal:
+        .byte $4,'T','E','A','L'
+stringLite:
+        .byte $4,'L','I','T','E'
+stringOG:
+        .byte $2,'O','G'

@@ -1,4 +1,7 @@
 playState_checkStartGameOver:
+.if AUTO_WIN
+        jmp @exitGame
+.endif
         jsr hzControl
 .if !ALWAYS_CURTAIN
         ; skip curtain / rocket when not qualling

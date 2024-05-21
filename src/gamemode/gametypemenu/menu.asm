@@ -468,6 +468,8 @@ menuYTmp := tmp2
         cmp #MODE_CRASH
         beq @renderCrashMode
 
+        cmp #MODE_DARK
+        beq @renderDarkMode
 
         jsr menuItemY16Offset
         bne @loopNext
@@ -518,25 +520,26 @@ menuYTmp := tmp2
         lda scoringModifier
         sta spriteIndexInOamContentLookup
         lda #(MODE_SCORE_DISPLAY*8) + MENU_SPRITE_Y_BASE + 1
-        sbc menuScrollY
-        sta spriteYOffset
-        lda #$e9
-        sta spriteXOffset
-        jsr stringSpriteAlignRight
-        jmp @loopNext
+        jmp @renderOption
 
 @renderCrashMode:
         jsr menuItemY16Offset
         bne @loopNext
-@doRender:
-        lda crashModifier
-        cmp #CRASH_OFF
-        bne @notOff
-        lda #$F3
-@notOff:
-        adc #$14
+        ldx crashModifier
+        lda crashOptions, x
         sta spriteIndexInOamContentLookup
         lda #(MODE_CRASH*8) + MENU_SPRITE_Y_BASE + 1
+        jmp @renderOption
+
+@renderDarkMode:
+        jsr menuItemY16Offset
+        bne @loopNext
+        ldx darkModifier
+        lda darkOptions, x
+        sta spriteIndexInOamContentLookup
+        lda #(MODE_DARK*8) + MENU_SPRITE_Y_BASE + 1
+
+@renderOption:
         sec
         sbc menuScrollY
         sta spriteYOffset
@@ -544,6 +547,12 @@ menuYTmp := tmp2
         sta spriteXOffset
         jsr stringSpriteAlignRight
         jmp @loopNext
+
+crashOptions:
+        .byte $8, $16, $17, $18
+
+darkOptions:
+        .byte $8, $9, $1B, $1C, $1D, $1e
 
 ; <- menu item index in A
 ; -> high byte of offset in A

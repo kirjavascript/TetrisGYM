@@ -2,7 +2,11 @@ gameModeState_handleGameOver:
 .if AUTO_WIN
         lda newlyPressedButtons_player1
         and #BUTTON_SELECT
-        bne @gameOver
+        beq @continue
+        lda #$0A ; playState_checkStartGameOver
+        sta playState
+        jmp @ret
+@continue:
 .endif
         lda #$05
         sta generalCounter2
