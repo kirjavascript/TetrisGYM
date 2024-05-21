@@ -37,11 +37,10 @@ hzControl: ; called in playState_playerControlsActiveTetrimino, gameTypeLoopCont
 
         ; detect inputs
         lda newlyPressedButtons_player1
-        and #BUTTON_DPAD
+        and #BUTTON_LEFT+BUTTON_RIGHT
         cmp #BUTTON_LEFT
         beq hzTap
-        lda newlyPressedButtons_player1
-        and #BUTTON_DPAD
+        and #BUTTON_LEFT+BUTTON_RIGHT
         cmp #BUTTON_RIGHT
         beq hzTap
 
@@ -193,11 +192,11 @@ checkNegativeDelay:
         lda hzSpawnDelay
         bne @ret
         lda newlyPressedButtons_player1
-        and #BUTTON_DPAD
+        and #BUTTON_LEFT+BUTTON_RIGHT
         cmp #BUTTON_LEFT
         beq @setDelay
         lda newlyPressedButtons_player1
-        and #BUTTON_DPAD
+        and #BUTTON_LEFT+BUTTON_RIGHT
         cmp #BUTTON_RIGHT
         beq @setDelay
         rts

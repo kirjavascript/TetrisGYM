@@ -7,24 +7,30 @@ pub fn test() {
 }
 
 fn test_standard() {
-    let mut emu = util::emulator(None);
+    let boot = || {
+        let mut emu = util::emulator(None);
 
-    util::run_n_vblanks(&mut emu, 4);
+        util::run_n_vblanks(&mut emu, 4);
 
-    let hz_flag = labels::get("hzFlag") as usize;
-    let game_mode = labels::get("gameMode") as usize;
-    let main_loop = labels::get("mainLoop");
-    let level_number = labels::get("levelNumber") as usize;
+        let hz_flag = labels::get("hzFlag") as usize;
+        let game_mode = labels::get("gameMode") as usize;
+        let main_loop = labels::get("mainLoop");
+        let level_number = labels::get("levelNumber") as usize;
 
-    // turn on hz display
-    emu.memory.iram_raw[hz_flag] = 1;
-    // trick game into thinking it should start an a-type run
-    emu.memory.iram_raw[level_number] = 29;
-    emu.memory.iram_raw[game_mode] = 4;
-    emu.registers.pc = main_loop;
+        // turn on hz display
+        emu.memory.iram_raw[hz_flag] = 1;
+        // trick game into thinking it should start an a-type run
+        emu.memory.iram_raw[level_number] = 29;
+        emu.memory.iram_raw[game_mode] = 4;
+        emu.registers.pc = main_loop;
 
-    // wait for piece to become active
-    util::run_n_vblanks(&mut emu, 5);
+        // wait for piece to become active
+        util::run_n_vblanks(&mut emu, 5);
+
+        emu
+    };
+
+    let mut emu = boot();
     // test left input sequence with delay of 5
     run_input_string(&mut emu, ".....L.L..L.L.");
     assert_hz_display(&mut emu, HzSpeed(25, 75), 4, 5, Dir::Left);
@@ -53,6 +59,21 @@ fn test_standard() {
     util::run_n_vblanks(&mut emu, 2+12-4);
     run_input_string(&mut emu, "L.....");
     assert_hz_display(&mut emu, HzSpeed(18, 3), 4, -1, Dir::Right);
+
+    // check L+U etc is counted as a tap
+    let mut emu = boot();
+    {
+        use crate::input::*;
+        run_input_string(&mut emu, "LB.L.LL.");
+        util::set_controller_raw(&mut emu, LEFT + UP);
+        emu.run_until_vblank();
+        emu.run_until_vblank();
+        run_input_string(&mut emu, ".");
+        util::set_controller_raw(&mut emu, LEFT + UP);
+        emu.run_until_vblank();
+        emu.run_until_vblank();
+    }
+    assert_hz_display(&mut emu, HzSpeed(21, 85), 5, 0, Dir::Left);
 }
 
 fn test_tspin() {
