@@ -229,6 +229,9 @@ savestate_nametable:
 NORMAL_CORNER_TILES := $70
 DARK_CORNER_TILES := $80
 
+darkModeColors:
+        .byte $2D,$3C,$10,$0C,$3C
+
 drawDarkMode:
 
 darkBuffer := playfield ; cleared right after in initGameState
@@ -238,19 +241,8 @@ darkBuffer := playfield ; cleared right after in initGameState
         sta PPUADDR
         lda #$D
         sta PPUADDR
-        lda #$3C
-        cpy #4 ; teal
-        bne :+
-        lda #$C
-:
-        cpy #3 ; lite
-        bne :+
-        lda #$10
-:
-        cpy #1 ; dark / on
-        bne :+
-        lda #$2D
-:
+        ldx darkModifier
+        lda darkModeColors-1,x
         sta PPUDATA
 
         ; process the playfield in 60 chunks
