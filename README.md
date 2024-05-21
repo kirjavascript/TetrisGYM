@@ -338,7 +338,7 @@ Recreation of the crash conditions and behaviour seen in the original game.
 For example; crashing, level lag, confetti, satan spawn
 
 * Off  
-        "Normal Gym Mode" - no behaviour caused by the crash bug is present  
+        Normal Mode - No behaviour caused by the crash bug is present. Same behaviour as versions before v6.  
 * Show  
         Enable crash glitches. Instead of crashing, show an icon next to score and continue the game.  
 * Topout  
