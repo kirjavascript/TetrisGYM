@@ -552,7 +552,7 @@ crashOptions:
         .byte $8, $16, $17, $18
 
 darkOptions:
-        .byte $8, $9, $1B, $1C
+        .byte $8, $9, $1B, $1C, $1D, $1e
 
 ; <- menu item index in A
 ; -> high byte of offset in A

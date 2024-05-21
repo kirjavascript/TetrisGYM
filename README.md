@@ -380,7 +380,7 @@ Flips A/B, Start/Select, and inverts DPad directions like a Goofy Foot controlle
 
 Alternative pattern-less backgrounds.
 
-Dark, Neon, and Teal versions are available.
+Dark, Neon, Lite, Teal, and OG versions are available.
 
 ## Block Tool
 

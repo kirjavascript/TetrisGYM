@@ -238,10 +238,18 @@ darkBuffer := playfield ; cleared right after in initGameState
         sta PPUADDR
         lda #$D
         sta PPUADDR
-        lda #$2D
-        cpy #3 ; teal
+        lda #$3C
+        cpy #4 ; teal
         bne :+
         lda #$C
+:
+        cpy #3 ; lite
+        bne :+
+        lda #$10
+:
+        cpy #1 ; dark / on
+        bne :+
+        lda #$2D
 :
         sta PPUDATA
 

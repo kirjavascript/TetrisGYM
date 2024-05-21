@@ -161,7 +161,7 @@ MENU_TOP_MARGIN_SCROLL := 7 ; in blocks
     .byte $1    ; MODE_INPUT_DISPLAY
     .byte $1    ; MODE_DISABLE_FLASH
     .byte $1    ; MODE_DISABLE_PAUSE
-    .byte $3    ; MODE_DARK
+    .byte $5    ; MODE_DARK
     .byte $1    ; MODE_GOOFY
     .byte $1    ; MODE_DEBUG
     .byte $1    ; MODE_LINECAP
