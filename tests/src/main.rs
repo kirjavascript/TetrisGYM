@@ -20,6 +20,7 @@ mod tspins;
 mod hz_display;
 mod nmi;
 mod constants;
+mod patch;
 
 use gumdrop::Options;
 
@@ -50,7 +51,7 @@ struct TestOptions {
 fn main() {
     let options = TestOptions::parse_args_default_or_exit();
 
-    let tests: [(&str, fn()); 14] = [
+    let tests: [(&str, fn()); 15] = [
         ("garbage4", garbage::test_garbage4_crash),
         ("floor", floor::test),
         ("tspins", tspins::test),
@@ -65,6 +66,7 @@ fn main() {
         ("hz_display", hz_display::test),
         ("nmi", nmi::test),
         ("constants", constants::test),
+        ("patch", patch::test),
     ];
 
     // run tests
