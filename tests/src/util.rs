@@ -2,7 +2,7 @@ use rusticnes_core::nes::NesState;
 use rusticnes_core::{ cartridge, opcodes, opcode_info };
 use crate::{input, labels};
 
-static ROM: &'static [u8] = include_bytes!("../../tetris.nes");
+pub static ROM: &'static [u8] = include_bytes!("../../tetris.nes");
 
 pub fn rom_data() -> &'static [u8] {
     &ROM[0x10..]
