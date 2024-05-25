@@ -15,6 +15,10 @@ AUTO_WIN := 0
 KEYBOARD := 0
 .endif
 
+.ifndef INES_OVERRIDE
+INES_OVERRIDE := 0
+.endif
+
 .ifndef CNROM_OVERRIDE
 CNROM_OVERRIDE := 0
 .endif

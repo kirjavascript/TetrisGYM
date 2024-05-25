@@ -35,11 +35,19 @@ NES2_INPUT = 1 ; 1 = standard NES/FC controllers
     NES2_SUBMAPPER = 0 ; otherwise don't specify submapper
 .endif
 
+; Construct header
 .byte 'N', 'E', 'S', $1A ; ID
 .byte $02 ; 16k PRG chunk count
 .byte $02 ; 8k CHR chunk count
 .byte INES_MIRROR | (INES_SRAM << 1) | ((_INES_MAPPER & $f) << 4)
-.byte (_INES_MAPPER & %11110000) | %00001000 ; NES2.0 header identifier
-.byte ((NES2_SUBMAPPER & $f) << 4) ; submapper
-.byte $0, (NES2_SRAM_SHIFT << 4) ; PRG MSB, SRAM shift count
-.byte $0, NES2_REGION, $0, $0, NES2_INPUT ; misc. fields, region, input device
+
+.if INES_OVERRIDE = 0
+    .byte (_INES_MAPPER & %11110000) | %00001000 ; NES2.0 header identifier
+    .byte ((NES2_SUBMAPPER & $f) << 4) ; submapper
+    .byte $0, (NES2_SRAM_SHIFT << 4) ; PRG MSB, SRAM shift count
+    .byte $0, NES2_REGION, $0, $0, NES2_INPUT ; misc. fields, region, input device
+.else
+    .byte (_INES_MAPPER & %11110000)
+    .byte $0, $0, $0, $0, $0, $0, $0, $0 ; padding
+.endif
+

@@ -66,7 +66,7 @@ ROM CRC32: 1394F57E
 
 A link to the BPS can be found on the [releases page](https://github.com/kirjavascript/TetrisGYM/releases).
 
-The BPS produces a file with an NES2.0 header specifying MMC1 with fixed PRG (mapper 1:5), but it also works when specified as CNROM with bus conflicts (mapper 3:2).
+The BPS produces a file with its header specifying MMC1 with fixed PRG (mapper 1:5), but it also works when specified as CNROM with bus conflicts (mapper 3:2).
 
 ## Trainers
 
