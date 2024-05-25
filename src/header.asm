@@ -11,7 +11,7 @@
 .include "constants.asm" ; for INES_HEADER
 
 INES_MIRROR = 0 ; 0 = horizontal mirroring, 1 = vertical mirroring (ignored in MMC1)
-INES_SRAM   = 1 ; 1 = battery backed SRAM at $6000-7FFF
+INES_SRAM = SAVE_HIGHSCORES ; 1 = battery backed SRAM at $6000-7FFF
 NES2_SRAM_SHIFT = INES_SRAM * 7 ; if SRAM present, set shift to 7 for (64 << 7) = 8KiB size
 NES2_REGION = 2 ; 0 = NTSC, 1 = PAL, 2 = multi-region, 3 = UA6538 ("Dendy")
 
