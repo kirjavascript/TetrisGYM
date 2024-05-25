@@ -3,7 +3,6 @@ use crate::{
     labels,
     playfield,
     util,
-    // video,
 };
 use rusticnes_core::nes::NesState;
 
@@ -50,7 +49,14 @@ pub fn get_tile_select(emu: &mut NesState) -> u8 {
 }
 
 pub fn test() {
-    let mut emu = util::emulator(None);
+    test_tilesets(None);
+    let mut cnrom = util::ROM.to_vec();
+    cnrom[6] |= 0x20;
+    test_tilesets(Some(&cnrom));
+}
+
+pub fn test_tilesets(rom: Option<&[u8]>) {
+    let mut emu = util::emulator(rom);
     // let mut view = video::Video::new();
     let (tileset1, tileset2) = get_expected_tilesets();
 
