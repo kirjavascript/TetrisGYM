@@ -43,7 +43,7 @@ NES2_INPUT = 1 ; 1 = standard NES/FC controllers
 
 .if INES_OVERRIDE = 0
     .byte (_INES_MAPPER & %11110000) | %00001000 ; NES2.0 header identifier
-    .byte ((NES2_SUBMAPPER & $f) << 4) ; submapper
+    .byte ((NES2_SUBMAPPER & $f) << 4) | ((_INES_MAPPER & $f00) >> 8) ; submapper/mapper MSB
     .byte $0, (NES2_SRAM_SHIFT << 4) ; PRG MSB, SRAM shift count
     .byte $0, NES2_REGION, $0, $0, NES2_INPUT ; misc. fields, region, input device
 .else
