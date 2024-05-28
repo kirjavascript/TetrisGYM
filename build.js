@@ -80,6 +80,7 @@ if (args.includes('-k')) {
 
 if (args.includes('-s')) {
     compileFlags.push('-D', 'SAVE_HIGHSCORES=0');
+    compileFlags.push('-D', 'HAS_SRAM=0');
     console.log('highscore saving disabled');
 }
 
