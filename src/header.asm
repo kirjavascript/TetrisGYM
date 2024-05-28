@@ -14,13 +14,7 @@ INES_MIRROR = 0 ; 0 = horizontal mirroring, 1 = vertical mirroring (ignored in M
 INES_SRAM = SAVE_HIGHSCORES ; 1 = battery backed SRAM at $6000-7FFF
 NES2_SRAM_SHIFT = INES_SRAM * 7 ; if SRAM present, set shift to 7 for (64 << 7) = 8KiB size
 NES2_REGION = 2 ; 0 = NTSC, 1 = PAL, 2 = multi-region, 3 = UA6538 ("Dendy")
-
-; Pick default expansion device
-.if KEYBOARD = 1
-	NES2_INPUT = $23 ; Family BASIC Keyboard
-.else
-	NES2_INPUT = 1 ; standard NES/FC controllers
-.endif
+NES2_INPUT = 0 ; 0 = unspecified, 1 = standard NES/FC controllers, $23 = Family BASIC Keyboard
 
 ; Override INES_MAPPER for mode 1000 (auto detect)
 .if INES_MAPPER = 1000

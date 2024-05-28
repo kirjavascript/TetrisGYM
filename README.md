@@ -68,8 +68,6 @@ A link to the BPS can be found on the [releases page](https://github.com/kirjava
 
 The BPS produces a file with an MMC1 header, but it also works when treated as CNROM.
 
-If you are using a PowerPak, you will need to install an [alternate N.MAP loader](https://forums.nesdev.org/viewtopic.php?p=283943#p283943) so its header check passes.
-
 ## Trainers
 
 Some trainers have additional configuration values; use left and right in the main menu to change them.
