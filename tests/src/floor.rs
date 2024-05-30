@@ -56,7 +56,6 @@ fn test_floor() {
 }
 
 fn test_floor_linecap(mode: &str, linecap_when: u8) {
-
     let mut emu = util::emulator(None);
 
     for _ in 0..3 { emu.run_until_vblank(); }
@@ -97,8 +96,7 @@ fn test_floor_linecap(mode: &str, linecap_when: u8) {
 ##### ####
 ##### ####"##);
 
-        for _ in 0..40 { emu.run_until_vblank();}
-
+        for _ in 0..40 { emu.run_until_vblank(); }
     }
 
     // check rows aren't pulled from the top in linecap floor mode
