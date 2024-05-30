@@ -1,4 +1,4 @@
-use crate::{util, labels, playfield, video};
+use crate::{util, labels, playfield};
 
 pub fn test() {
     test_floor();
