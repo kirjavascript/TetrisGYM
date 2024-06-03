@@ -1,4 +1,4 @@
-levelUpPossible = generalCounter3
+; y reg tracks lines crossing multiple of 10 from @linesCleared until addPoints
 
 playState_updateLinesAndStatistics:
         jsr updateMusicSpeed
@@ -8,7 +8,6 @@ playState_updateLinesAndStatistics:
 
 @linesCleared:
         ldy #$00
-        sty levelUpPossible
         tax
         dec lineClearStatsByType-1,x
         bpl @noCarry
@@ -79,7 +78,7 @@ checkLevelUp:
         and #$0F
         bne @lineLoop
 
-        inc levelUpPossible ; used by floorcap check below
+        iny ; used by floorcap check below
         lda practiseType
         cmp #MODE_TAPQTY
         beq @lineLoop
@@ -173,7 +172,7 @@ checkLinecap: ; set linecapState
         cmp #LINECAP_FLOOR
         bne @floorLinecapEnd
         ; check level up was possible
-        lda levelUpPossible
+        tya
         beq @floorLinecapEnd
         lda #$A
         sta garbageHole
