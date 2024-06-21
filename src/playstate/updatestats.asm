@@ -348,17 +348,11 @@ addLineClearPoints:
         bne @notMarathon
         lda startLevel
 @notMarathon:
-        cmp #$FF
-        bne @noverflow
-        lda #1
-        sta factorA24+1
-        lda #0
         sta factorA24+0
-        jmp @multSetupEnd
+        inc factorA24+0
+        bne @noverflow
+        inc factorA24+1
 @noverflow:
-        adc #1
-        sta factorA24
-@multSetupEnd:
 
         lda completedLines
         beq addLineClearPoints_end ; skip with 0 completed lines
