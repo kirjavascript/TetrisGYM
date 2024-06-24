@@ -1,3 +1,5 @@
+; y reg tracks lines crossing multiple of 10 from @linesCleared until addPoints
+
 playState_updateLinesAndStatistics:
         jsr updateMusicSpeed
         lda completedLines
@@ -5,6 +7,7 @@ playState_updateLinesAndStatistics:
         jmp addPoints
 
 @linesCleared:
+        ldy #$00
         tax
         dec lineClearStatsByType-1,x
         bpl @noCarry
@@ -75,6 +78,7 @@ checkLevelUp:
         and #$0F
         bne @lineLoop
 
+        iny ; used by floorcap check below
         lda practiseType
         cmp #MODE_TAPQTY
         beq @lineLoop
@@ -115,7 +119,7 @@ checkLevelUp:
         lda crashState
         ora #$08
         sta crashState
-        lda #$06 ; checked in floor linecap stuff, just below
+        lda #$06
         sta soundEffectSlot1Init
         lda renderFlags
         ora #RENDER_LEVEL
@@ -167,10 +171,9 @@ checkLinecap: ; set linecapState
         lda linecapState
         cmp #LINECAP_FLOOR
         bne @floorLinecapEnd
-        ; check level up sound is happening
-        lda soundEffectSlot1Init
-        cmp #6
-        bne @floorLinecapEnd
+        ; check level up was possible
+        tya
+        beq @floorLinecapEnd
         lda #$A
         sta garbageHole
         lda #1

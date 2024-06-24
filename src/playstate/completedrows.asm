@@ -102,7 +102,7 @@ playState_checkForCompletedRows:
         tax
         ldy multBy10Table,x
         ldx #$0A
-        lda #BLOCK_TILES
+        lda #BLOCK_TILES+3
 @drawFloorSurface:
         sta playfield,y
         iny

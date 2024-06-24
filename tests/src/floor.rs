@@ -2,7 +2,8 @@ use crate::{util, labels, playfield};
 
 pub fn test() {
     test_floor();
-    test_floor_linecap();
+    test_floor_linecap("MODE_TRANSITION",0);
+    test_floor_linecap("MODE_TETRIS",1);
     test_floor0();
 }
 
@@ -54,7 +55,7 @@ fn test_floor() {
     assert_ne!(playfield::get(&mut emu, 0, 19), 0xEF);
 }
 
-fn test_floor_linecap() {
+fn test_floor_linecap(mode: &str, linecap_when: u8) {
     let mut emu = util::emulator(None);
 
     for _ in 0..3 { emu.run_until_vblank(); }
@@ -64,12 +65,15 @@ fn test_floor_linecap() {
     let main_loop = labels::get("mainLoop");
     let level_number = labels::get("levelNumber") as usize;
 
-    emu.memory.iram_raw[practise_type] = labels::get("MODE_TRANSITION") as _;
+    emu.memory.iram_raw[practise_type] = labels::get(mode) as _;
     emu.memory.iram_raw[level_number] = 19;
     emu.memory.iram_raw[game_mode] = 4;
 
     emu.memory.iram_raw[labels::get("linecapFlag") as usize] = 1;
+    emu.memory.iram_raw[labels::get("linecapWhen") as usize] = linecap_when;
     emu.memory.iram_raw[labels::get("linecapHow") as usize] = labels::get("LINECAP_FLOOR") as u8 - 1;
+    emu.memory.iram_raw[labels::get("linecapLines") as usize] = 0x10;
+    emu.memory.iram_raw[labels::get("linecapLines") as usize + 1] = 0;
     emu.memory.iram_raw[labels::get("linecapLevel") as usize] = 20;
 
     emu.registers.pc = main_loop;
