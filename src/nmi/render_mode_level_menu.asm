@@ -2,7 +2,7 @@ render_mode_level_menu:
         lda renderFlags
         and #RENDER_LINES
         beq @noCustomLevel
-        lda #$2E
+        lda #$22
         sta PPUADDR
         lda #$B9
         sta PPUADDR
