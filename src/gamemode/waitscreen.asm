@@ -6,18 +6,15 @@ waitScreenLoad:
         sta renderMode
         jsr updateAudioWaitForNmiAndDisablePpuRendering
         jsr disableNmi
-.if HAS_MMC
-        lda #$02
-        jsr changeCHRBank0
-        lda #$02
-        jsr changeCHRBank1
-.elseif INES_MAPPER = 3
-CNROM_CHR_LEGAL:
-        lda #0
-        sta CNROM_CHR_LEGAL+1
+        lda #NMIEnable
         sta currentPpuCtrl
+.if INES_MAPPER <> 0
+; NROM (and possibly FDS in the future) won't load the 2nd bankset
+; and will instead use the title/menu chrset letters.  This won't be noticeable
+; unless a graphic is added 
+        lda #CHRBankSet1
+        jsr changeCHRBanks
 .endif
-
         jsr bulkCopyToPpu
         .addr wait_palette
         jsr copyRleNametableToPpu
@@ -42,7 +39,7 @@ CNROM_CHR_LEGAL:
 
         lda #$FF
         ldx palFlag
-        cpx #0
+        ; cpx #0 ; ldx sets z flag
         beq @notPAL
         lda #$CC
 @notPAL:

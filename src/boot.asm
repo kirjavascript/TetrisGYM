@@ -1,14 +1,4 @@
-        ldy #$06
-        sty tmp2
-        ldy #$00
-        sty tmp1
-        lda #$00
-@zeroOutPages:
-        sta (tmp1),y
-        dey
-        bne @zeroOutPages
-        dec tmp2
-        bpl @zeroOutPages
+        ; $0000 through $06FF cleared during vblank wait
         lda initMagic
         cmp #$54
         bne @coldBoot
@@ -33,7 +23,7 @@
 @loop:
         dex
         sta menuRAM, x
-        cpx #0
+        ; cpx #0 ; dex sets z flag
         bne @loop
 
         ; default pace to A

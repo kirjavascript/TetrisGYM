@@ -1,3 +1,5 @@
+; y reg tracks lines crossing multiple of 10 from @linesCleared until addPoints
+
 playState_updateLinesAndStatistics:
         jsr updateMusicSpeed
         lda completedLines
@@ -5,23 +7,16 @@ playState_updateLinesAndStatistics:
         jmp addPoints
 
 @linesCleared:
+        ldy #$00
         tax
-        dex
-        lda lineClearStatsByType,x
-        clc
-        adc #$01
-        sta lineClearStatsByType,x
-        and #$0F
-        cmp #$0A
-        bmi @noCarry
-        lda lineClearStatsByType,x
-        clc
-        adc #$06
-        sta lineClearStatsByType,x
+        dec lineClearStatsByType-1,x
+        bpl @noCarry
+        lda #$09
+        sta lineClearStatsByType-1,x
 @noCarry:
-        lda outOfDateRenderFlags
-        ora #$01
-        sta outOfDateRenderFlags
+        lda renderFlags
+        ora #RENDER_LINES
+        sta renderFlags
 
 ; type-b lines decrement
         lda practiseType
@@ -50,12 +45,17 @@ playState_updateLinesAndStatistics:
 @notTypeB:
 
         ldx completedLines
+        lda lines
+        sta linesPrev
+        lda lines+1
+        sta linesPrev+1
 incrementLines:
         inc lines
         lda lines
         and #$0F
         cmp #$0A
         bmi checkLevelUp
+        inc crashState
         lda lines
         clc
         adc #$06
@@ -67,6 +67,9 @@ incrementLines:
         and #$0F
         sta lines
         inc lines+1
+        lda crashState
+        ora #$02
+        sta crashState
 
 checkLevelUp:
         jsr calcBCDLinesAndTileQueue
@@ -75,9 +78,16 @@ checkLevelUp:
         and #$0F
         bne @lineLoop
 
+        iny ; used by floorcap check below
         lda practiseType
         cmp #MODE_TAPQTY
         beq @lineLoop
+        cmp #MODE_MARATHON
+        bne @notMarathon
+        lda marathonModifier
+        beq @lineLoop ; marathon mode 0 does not transition
+        bne @notSXTOKL
+@notMarathon:
         cmp #MODE_TRANSITION
         bne @notSXTOKL
         lda transitionModifier
@@ -103,16 +113,21 @@ checkLevelUp:
         bpl @lineLoop
 
 @nextLevel:
+        lda levelNumber
+        sta levelPrev
         inc levelNumber
-        lda #$06 ; checked in floor linecap stuff, just below
+        lda crashState
+        ora #$08
+        sta crashState
+        lda #$06
         sta soundEffectSlot1Init
-        lda outOfDateRenderFlags
-        ora #$02
-        sta outOfDateRenderFlags
+        lda renderFlags
+        ora #RENDER_LEVEL
+        sta renderFlags
 
 @lineLoop:  dex
-        bne incrementLines
-
+        beq checkLinecap
+        jmp incrementLines
 
 checkLinecap: ; set linecapState
         ; check if enabled
@@ -156,39 +171,47 @@ checkLinecap: ; set linecapState
         lda linecapState
         cmp #LINECAP_FLOOR
         bne @floorLinecapEnd
-        ; check level up sound is happening
-        lda soundEffectSlot1Init
-        cmp #6
-        bne @floorLinecapEnd
+        ; check level up was possible
+        tya
+        beq @floorLinecapEnd
         lda #$A
         sta garbageHole
         lda #1
         sta pendingGarbage
+        inc currentFloor
 @floorLinecapEnd:
 
 addPoints:
         inc playState
-addPointsRaw:
-.if NO_SCORING
-        rts
-.endif
         lda practiseType
         cmp #MODE_CHECKERBOARD
         beq handlePointsCheckerboard
         cmp #MODE_TAPQTY
         bne @notTapQuantity
         lda completedLines
-        cmp #0
+        ; cmp #0 ; lda sets z flag
         bne @continueStreak
         jsr clearPoints
-        lda outOfDateRenderFlags
-        ora #$04
-        sta outOfDateRenderFlags
+        lda renderFlags
+        ora #RENDER_SCORE
+        sta renderFlags
         rts
 @continueStreak:
         lda #4
         sta completedLines
 @notTapQuantity:
+
+        lda crashModifier
+        cmp #CRASH_OFF
+        beq @crashDisabled
+        jsr testCrash
+@crashDisabled:
+
+addPointsRaw:
+.if NO_SCORING
+        rts
+.endif
+
         lda holdDownPoints
         cmp #$02
         bmi @noPushDown
@@ -216,9 +239,9 @@ handlePointsCheckerboard:
         sbc #0
         sta binScore+1
         jsr setupScoreForRender
-        lda outOfDateRenderFlags
-        ora #$04
-        sta outOfDateRenderFlags
+        lda renderFlags
+        ora #RENDER_SCORE
+        sta renderFlags
 @end:
         lda #$0
         sta completedLines
@@ -323,17 +346,16 @@ addLineClearPoints:
         sta factorA24+1
         sta factorA24+2
         lda levelNumber
-        cmp #$FF
-        bne @noverflow
-        lda #1
-        sta factorA24+1
-        lda #0
+        ldy practiseType
+        cpy #MODE_MARATHON
+        bne @notMarathon
+        lda startLevel
+@notMarathon:
         sta factorA24+0
-        jmp @multSetupEnd
+        inc factorA24+0
+        bne @noverflow
+        inc factorA24+1
 @noverflow:
-        adc #1
-        sta factorA24
-@multSetupEnd:
 
         lda completedLines
         beq addLineClearPoints_end ; skip with 0 completed lines
@@ -363,9 +385,9 @@ addLineClearPoints:
         sta binScore+3
 
 addLineClearPoints_end:
-        lda outOfDateRenderFlags
-        ora #$04
-        sta outOfDateRenderFlags
+        lda renderFlags
+        ora #RENDER_SCORE
+        sta renderFlags
         lda #$00
         sta completedLines
 

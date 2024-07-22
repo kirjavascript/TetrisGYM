@@ -1,7 +1,6 @@
 const {
-    readStripe,
     writeRLE,
-    printNT,
+    blankNT,
     drawTiles,
     drawRect,
     drawAttrs,
@@ -27,10 +26,8 @@ WXYZ-,˙>########
 ###############
 `);
 
-const buffer = readStripe(__dirname + '/game_type_menu_nametable.bin');
+const buffer = blankNT();
 const extra = [...buffer];
-
-printNT(buffer, lookup);
 
 drawTiles(buffer, lookup, `
 #a                            d#
@@ -41,7 +38,7 @@ drawTiles(buffer, lookup, `
 #a                            d#
 #a                            d#
 #a                            d#
-#a                       2023 d#
+#a                       2024 d#
 #a    TETRIS                  d#
 #a    T-SPINS                 d#
 #a    SEED                    d#
@@ -53,21 +50,26 @@ drawTiles(buffer, lookup, `
 #a    CRUNCH                  d#
 #a    (QUICK)TAP              d#
 #a    TRANSITION              d#
+#a    MARATHON                d#
 #a    TAP QUANTITY            d#
 #a    CHECKERBOARD            d#
 #a    GARBAGE                 d#
 #a    DROUGHT                 d#
 #a    DAS DELAY               d#
+#a    LOW STACK               d#
 #a    KILLSCREEN »2           d#
 #a    INVISIBLE               d#
 #a    HARD DROP               d#
+`);drawTiles(extra, lookup, `
 #a    TAP/ROLL SPEED          d#
 #a    SCORING                 d#
-`);drawTiles(extra, lookup, `
+#a    CRASH                   d#
+#a    STRICT CRASH            d#
 #a    HZ DISPLAY              d#
 #a    INPUT DISPLAY           d#
 #a    DISABLE FLASH           d#
 #a    DISABLE PAUSE           d#
+#a    DARK MODE               d#
 #a    GOOFY FOOT              d#
 #a    BLOCK TOOL              d#
 #a    LINECAP                 d#
@@ -76,10 +78,7 @@ drawTiles(buffer, lookup, `
 #a    PAL MODE                d#
 #a                            d#
 #a                            d#
-#a V5                         d#
-#a                            d#
-#a                            d#
-#a                            d#
+#a V6                         d#
 #a                            d#
 #a                            d#
 #a                            d#
@@ -96,12 +95,46 @@ drawTiles(buffer, lookup, `
 #a                            d#
 `);
 
+const background = `
+ɢ##############################ɳ
+ɲ##############################ɢ
+ɲ##############################ɲ
+ʂ##############################ʡ
+ʀ##############################ɢ
+ɢ##############################ɂ
+ɀ##############################ʂ
+ʂ##############################ɢ
+ʀ##############################ɂ
+ʐ##############################ʂ
+ɲ##############################ɡ
+ʂ##############################ɲ
+ɢ##############################ʂ
+ɲ##############################ʃ
+ʠ##############################ɡ
+ɠ##############################ʂ
+ɰ##############################ʃ
+ʁ##############################ʁ
+ɡ##############################ʃ
+ʂ##############################ɢ
+ɳ##############################ʠ
+ʃ##############################ɳ
+ɡ##############################ɡ
+ɱ##############################ʂ
+ɡ##############################ɡ
+ʂ##############################ɱ
+ɢ##############################ʁ
+ɲ##############################ɢ
+ɲ##############################ɲ
+ʂ##############################ʡ
+`;
+
+drawTiles(buffer, lookup, background);
+drawTiles(extra, lookup, background);
 
 drawRect(buffer, 8, 2, 12, 6, 0x92); // draw logo
-// drawRect(extra, 20, 0, 5, 5, 0x9A); // draw QR code
 
 const urlX = 3;
-const urlY = 12;
+const urlY = 17;
 drawRect(extra, urlX, urlY, 12, 1, 0x74);
 drawRect(extra, urlX+12, urlY, 12, 1, 0x84);
 
@@ -125,8 +158,6 @@ drawAttrs(buffer, [`
     2222222222222222
 `]);
 
-const line = '2'.repeat(16);
-const screen = Array.from({ length: 8 }, () => line).join('\n');
 drawAttrs(extra, [`
     2222222222222222
     2222222222222222
@@ -134,9 +165,18 @@ drawAttrs(extra, [`
     2222222222222222
     2222222222222222
     2222222222222222
+    2222222222222222
+    2222222222222222
+`, `
     2333333333333332
     2222222222222222
-`, screen]);
+    2222222222222222
+    2222222222222222
+    2222222222222222
+    2222222222222222
+    2222222222222222
+    2222222222222222
+`]);
 
 writeRLE(
     __dirname + '/game_type_menu_nametable_practise.bin',

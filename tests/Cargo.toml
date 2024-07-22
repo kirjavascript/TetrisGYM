@@ -1,0 +1,14 @@
+[package]
+name = "gym-tests"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+gumdrop = "0.8.1"
+rusticnes-core = { git = "https://github.com/zeta0134/rusticnes-core.git", version = "0.2.0" }
+minifb = "0.25"
+
+# for patch testing
+flips = "0.2.1"
+flips-sys = "0.2.1"
+md5 = "0.7.0"

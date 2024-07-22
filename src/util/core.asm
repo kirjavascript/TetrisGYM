@@ -7,6 +7,24 @@ clearPlayfield:
         bne @loop
         rts
 
+clearNametable:
+        lda #$20
+        sta PPUADDR
+        lda #$0
+        sta PPUADDR
+        lda #EMPTY_TILE
+        ldx #4
+        ldy #$BF
+@clearTile:
+        sta PPUDATA
+        dey
+        bne @clearTile
+        sta PPUDATA
+        ldy #$FF
+        dex
+        bne @clearTile
+        rts
+
 drawBlackBGPalette:
         lda #$3F
         sta PPUADDR
@@ -30,20 +48,7 @@ resetScroll:
 
 random10:
         ldx #rng_seed
-        ldy #$02
-        jsr generateNextPseudorandomNumber
-        ldx #rng_seed
-        ldy #$02
-        jsr generateNextPseudorandomNumber
-        ldx #rng_seed
-        ldy #$02
-        jsr generateNextPseudorandomNumber
-        ldx #rng_seed
-        ldy #$02
-        jsr generateNextPseudorandomNumber
-        ldx #rng_seed
-        ldy #$02
-        jsr generateNextPseudorandomNumber
+        jsr generateNextPseudorandomNumber5x
         lda rng_seed
         and #$0F
         cmp #$0A
@@ -59,10 +64,21 @@ updateAudioWaitForNmiAndResetOamStaging:
 @checkForNmi:
         lda verticalBlankingInterval
         beq @checkForNmi
+
+resetOAMStaging:
+; Hide a sprite by moving it down offscreen, by writing any values between #$EF-#$FF here.
+; Sprites are never displayed on the first line of the picture, and it is impossible to place
+; a sprite partially off the top of the screen.
+; https://www.nesdev.org/wiki/PPU_OAM
+        ldx #$00
         lda #$FF
-        ldx #$02
-        ldy #$02
-        jsr memset_page
+@hideY:
+        sta oamStaging,x
+        inx
+        inx
+        inx
+        inx
+        bne @hideY
         rts
 
 updateAudioAndWaitForNmi:
@@ -217,22 +233,28 @@ copyAddrAtReturnAddressToTmp_incrReturnAddrBy2:
         sta stack+4,x
         rts
 
-;reg x: zeropage addr of seed; reg y: size of seed
+;reg x: zeropage addr of seed
+generateNextPseudorandomNumber5x:
+        jsr generateNextPseudorandomNumber
+generateNextPseudorandomNumber4x:
+        jsr generateNextPseudorandomNumber
+generateNextPseudorandomNumber3x:
+        jsr generateNextPseudorandomNumber
+generateNextPseudorandomNumber2x:
+        jsr generateNextPseudorandomNumber
 generateNextPseudorandomNumber:
         lda tmp1,x
-        and #$02
-        sta tmp1
-        lda tmp2,x
-        and #$02
-        eor tmp1
-        clc
-        beq @updateNextByteInSeed
-        sec
-@updateNextByteInSeed:
+        eor tmp2,x
+        lsr
+        lsr
         ror tmp1,x
-        inx
-        dey
-        bne @updateNextByteInSeed
+        ror tmp2,x
+        lda oneThirdPRNG
+        sbc #$00
+        bpl @noReset
+        lda #$2
+@noReset:
+        sta oneThirdPRNG
         rts
 
 ; canon is initializeOAM
@@ -269,118 +291,13 @@ switch_s_plus_2a:
         tay
         iny
         pla
-        sta tmp1
+        sta switchTmp1
         pla
-        sta tmp2
-        lda (tmp1),y
+        sta switchTmp2
+        lda (switchTmp1),y
         tax
         iny
-        lda (tmp1),y
-        sta tmp2
-        stx tmp1
-        jmp (tmp1)
-
-        sei
-        RESET_MMC1
-        lda #$1A
-        jsr setMMC1Control
-        rts
-
-setMMC1Control:
-.if INES_MAPPER = 1
-        sta MMC1_Control
-        lsr a
-        sta MMC1_Control
-        lsr a
-        sta MMC1_Control
-        lsr a
-        sta MMC1_Control
-        lsr a
-        sta MMC1_Control
-.endif
-        rts
-
-changeCHRBank0:
-.if INES_MAPPER = 1
-        sta MMC1_CHR0
-        lsr a
-        sta MMC1_CHR0
-        lsr a
-        sta MMC1_CHR0
-        lsr a
-        sta MMC1_CHR0
-        lsr a
-        sta MMC1_CHR0
-.elseif INES_MAPPER = 4
-        asl a
-        asl a
-        ldx #$00
-        stx MMC3_BANK_SELECT
-        sta MMC3_BANK_DATA
-        inx
-        clc
-        adc #$02
-        stx MMC3_BANK_SELECT
-        sta MMC3_BANK_DATA
-.endif
-        rts
-
-changeCHRBank1:
-.if INES_MAPPER = 1
-        sta MMC1_CHR1
-        lsr a
-        sta MMC1_CHR1
-        lsr a
-        sta MMC1_CHR1
-        lsr a
-        sta MMC1_CHR1
-        lsr a
-        sta MMC1_CHR1
-.elseif INES_MAPPER = 4
-        asl a
-        asl a
-        ldx #$02
-        stx MMC3_BANK_SELECT
-        sta MMC3_BANK_DATA
-        inx
-        clc
-        adc #$01
-        stx MMC3_BANK_SELECT
-        sta MMC3_BANK_DATA
-        inx
-        clc
-        adc #$01
-        stx MMC3_BANK_SELECT
-        sta MMC3_BANK_DATA
-        inx
-        clc
-        adc #$01
-        stx MMC3_BANK_SELECT
-        sta MMC3_BANK_DATA
-.endif
-        rts
-
-changePRGBank:
-.if INES_MAPPER = 1
-        sta MMC1_PRG
-        lsr a
-        sta MMC1_PRG
-        lsr a
-        sta MMC1_PRG
-        lsr a
-        sta MMC1_PRG
-        lsr a
-        sta MMC1_PRG
-.elseif INES_MAPPER = 4
-        asl     a
-        asl     a
-        ldx     #$06
-        stx     MMC3_BANK_SELECT
-        sta     MMC3_BANK_DATA
-        inx
-        clc
-        adc     #$01
-        stx     MMC3_BANK_SELECT
-        sta     MMC3_BANK_DATA
-.endif
-        rts
+        lda (switchTmp1),y
+        sta switchTmp2
+        stx switchTmp1
+        jmp (switchTmp1)

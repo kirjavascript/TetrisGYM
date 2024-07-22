@@ -1,12 +1,12 @@
 render_mode_pause:
-        lda pausedOutOfDateRenderFlags
-        and #$02
+        lda renderFlags
+        and #RENDER_DEBUG
         beq @skipSaveSlotPatch
         jsr saveSlotNametablePatch
+        lda renderFlags
+        and #~RENDER_DEBUG
+        sta renderFlags
 @skipSaveSlotPatch:
-        lda #0
-        sta pausedOutOfDateRenderFlags
-
         lda playState
         cmp #$04
         beq @done

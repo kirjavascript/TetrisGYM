@@ -10,8 +10,9 @@ gameMode_speedTest:
         jsr hzStart
         jsr updateAudioWaitForNmiAndDisablePpuRendering
         jsr disableNmi
-        jsr copyRleNametableToPpu
-        .addr speedtest_nametable
+        jsr clearNametable
+        jsr bulkCopyToPpu
+        .addr speedtest_nametable_patch
         jsr bulkCopyToPpu
         .addr game_palette
         ; patch color
@@ -21,15 +22,11 @@ gameMode_speedTest:
         sta PPUADDR
         lda #$30
         sta PPUDATA
-.if HAS_MMC
-        lda #$01
-        jsr changeCHRBank0
-        lda #$01
-        jsr changeCHRBank1
-.elseif INES_MAPPER = 3
-        lda #%10011001
-        sta PPUCTRL
+        lda #NMIEnable|BGPattern1|SpritePattern1
         sta currentPpuCtrl
+.if INES_MAPPER <> 0
+        lda #CHRBankSet0
+        jsr changeCHRBanks
 .endif
 
         jsr waitForVBlankAndEnableNmi
@@ -61,8 +58,8 @@ speedTestControl:
         lda heldButtons_player1
         and #BUTTON_LEFT+BUTTON_RIGHT+BUTTON_B+BUTTON_A
         beq @noupdate
-        lda #$10
-        sta outOfDateRenderFlags
+        lda #RENDER_HZ
+        sta renderFlags
         lda newlyPressedButtons_player1
         and #BUTTON_LEFT+BUTTON_RIGHT
         beq @noupdate

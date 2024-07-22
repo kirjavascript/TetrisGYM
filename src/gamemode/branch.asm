@@ -6,7 +6,7 @@ branchOnGameMode:
         .addr   gameMode_gameTypeMenu
         .addr   gameMode_levelMenu
         .addr   gameMode_playAndEndingHighScore_jmp
-        .addr   gameMode_playAndEndingHighScore_jmp
+        .addr   gameMode_playAndEndingHighScore_jmp ; use to be demo
         .addr   gameMode_playAndEndingHighScore_jmp ; used to be startDemo
         .addr   gameMode_speedTest
 

@@ -109,24 +109,19 @@ copyHighscore:
         rts
 
 highScoreEntryScreen:
-        RESET_MMC1
-        lda #$10
-        jsr setMMC1Control
         lda #$09
         jsr setMusicTrack
         lda #$02
         sta renderMode
         jsr updateAudioWaitForNmiAndDisablePpuRendering
         jsr disableNmi
-        lda #$00
-        jsr changeCHRBank0
-        lda #$00
-        jsr changeCHRBank1
-.if INES_MAPPER = 3
-        lda #%10000000
+.if INES_MAPPER <> 0
+        lda #CHRBankSet0
+        jsr changeCHRBanks
+.endif
+        lda #NMIEnable
         sta PPUCTRL
         sta currentPpuCtrl
-.endif
         jsr bulkCopyToPpu
         .addr   menu_palette
         jsr copyRleNametableToPpu
@@ -279,8 +274,8 @@ highScoreEntryScreen:
         tax
         lda highscores,x
         sta highScoreEntryCurrentLetter
-        lda #$80
-        sta outOfDateRenderFlags
+        lda #RENDER_HIGH_SCORE_LETTER
+        sta renderFlags
         jsr updateAudioWaitForNmiAndResetOamStaging
         jmp @renderFrame
 

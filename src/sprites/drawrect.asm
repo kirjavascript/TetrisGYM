@@ -1,3 +1,16 @@
+.if INES_MAPPER = 0
+; compact graphic for smaller tileset capacity
+spriteCathedral: ; top of UFO
+        .byte $00, $00, $02, $01, $00, $94, $FF
+
+spriteCathedralFire0: ; bottom of UFO 1
+        .byte $00, $08, $02, $01, $00, $A4, $FF
+
+spriteCathedralFire1: ; bottom of UFO 2
+        .byte $00, $08, $02, $01, $00, $64, $FF
+
+.else
+
 spriteCathedral:
         .byte $15, $0, $3, $7, $20, $38
         .byte $FF
@@ -43,6 +56,7 @@ loadRectIntoOamStaging:
         ldx oamStagingLength
 
         lda rectY
+        clc
         adc spriteYOffset
         sta oamStaging,x
         lda rectAddr
@@ -50,6 +64,7 @@ loadRectIntoOamStaging:
         lda rectAttr
         sta oamStaging+2,x
         lda rectX
+        clc
         adc spriteXOffset
         sta oamStaging+3,x
 
@@ -61,6 +76,7 @@ loadRectIntoOamStaging:
 
         ; next rightwards tile
         lda #$8
+        clc
         adc rectX
         sta rectX
         inc rectAddr
@@ -76,11 +92,14 @@ loadRectIntoOamStaging:
         sta rectW
 
         lda rectAddr
+        sec
         sbc rectW
+        clc
         adc #$10
         sta rectAddr
 
         lda #$8
+        clc
         adc rectY
         sta rectY
 

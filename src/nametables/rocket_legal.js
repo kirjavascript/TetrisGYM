@@ -1,13 +1,13 @@
 const {
     writeRLE,
+    blankNT,
     drawTiles,
     flatLookup,
-    drawRect,
     drawAttrs,
 } = require('./nametables');
 
-const legal = Array.from({ length: 1024 }, () => 0xFF);
-const rocket = [...legal];
+const legal = blankNT();
+const rocket = blankNT();
 
 const lookup = flatLookup(`
 0123456789ABCDEF

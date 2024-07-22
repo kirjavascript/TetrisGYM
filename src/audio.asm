@@ -269,7 +269,7 @@ handlePausedAudio:  lda audioInitialized
         cmp #$03
         bne LE212
         inc musicPauseSoundEffectCounter
-        ldy #$10
+        ldy #<unknown_sq1_data2
         lda musicPauseSoundEffectCounter
         and #$01
         bne LE20F
@@ -566,7 +566,7 @@ soundEffectSlot1_rotateTetriminoPlaying:
 soundEffectSlot1_tetrisAchievedInit:
         lda #$05
         ldy palFlag
-        cpy #0
+        ; cpy #0 ; ldy sets z flag
         beq @ntsc
         lda #$4
 @ntsc:
@@ -584,7 +584,7 @@ LE417:  jmp initSoundEffectShared
 soundEffectSlot1_lineCompletedInit:
         lda #$05
         ldy palFlag
-        cpy #0
+        ; cpy #0 ; ldy sets z flag
         beq @ntsc
         lda #$4
 @ntsc:
@@ -600,7 +600,7 @@ soundEffectSlot1_lineCompletedPlaying:
 soundEffectSlot1_lineClearingInit:
         lda #$04
         ldy palFlag
-        cpy #0
+        ; cpy #0 ; ldy sets z flag
         beq @ntsc
         lda #$3
 @ntsc:
@@ -692,7 +692,7 @@ LE4E9:  jmp soundEffectSlot1Playing_stop
 soundEffectSlot1_levelUpInit:
         lda #$06
         ldy palFlag
-        cpy #0
+        ; cpy #0 ; ldy sets z flag
         beq @ntsc
         lda #$5
 @ntsc:
@@ -727,7 +727,7 @@ LE51B:  sta DMC_LEN
 ; Unused
 soundEffectSlot3_donk:
         lda #$02
-        ldy #$4C
+        ldy #<soundEffectSlot3_unknown2InitData
         jmp initSoundEffectShared
 
 soundEffectSlot3Playing_advance:
@@ -773,10 +773,16 @@ updateMusic_noSoundJmp:
 updateMusic:
         lda musicTrack
         tay
+        ; old:
+        ; cmp #$FF
+        ; beq updateMusic_noSoundJmp
+        ; cmp #$00
+        ; beq @checkIfAlreadyPlaying
+
+        ; new:
+        beq @checkIfAlreadyPlaying ; tay sets z flag
         cmp #$FF
         beq updateMusic_noSoundJmp
-        cmp #$00
-        beq @checkIfAlreadyPlaying
         sta currentAudioSlot
         sta musicTrack_dec
         dec musicTrack_dec
@@ -1127,7 +1133,7 @@ updateMusicFrame_progLoadRoutine:
         iny
         lda (musicChanTmpAddr),y
         sta musicDataChanPtrDeref+1,x
-        cmp #$00
+        ; cmp #$00 ; lda sets z flag
         beq updateMusicFrame_progEnd
         cmp #$FF
         beq updateMusicFrame_progLoadNextScript

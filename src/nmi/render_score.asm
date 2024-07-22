@@ -80,7 +80,6 @@ renderFloat:
         ror
         ror
         sta PPUDATA
-        jsr renderBCDScore
         rts
 
 renderLevelDash:
@@ -114,8 +113,8 @@ renderModernLines:
         inc linesTileQueue
 @endLinesTileQueue:
 
-        lda outOfDateRenderFlags
-        and #$01
+        lda renderFlags
+        and #RENDER_LINES
         beq @doneRenderLines
 
         ; 'normal' line drawing
@@ -152,7 +151,8 @@ renderClassicHighByte:
         stx tmpX
         sty tmpY
 
-        cpx #0
+        ; cpx #0
+        txa ; either branch clobbers accumulator.  txa sets z, saves 1 byte.
         bne @startWrap
         lda tmpY ; score+2
         jsr twoDigsToPPU
@@ -195,6 +195,7 @@ getScoreDiv100k:
         lsr
         lsr
         lsr
+        clc
         tax
         lda multBy100Table, x
         adc tmpZ
@@ -206,7 +207,8 @@ renderLettersHighByte:
         stx tmpX
         sty tmpY
 
-        cpx #0
+        ; cpx #0
+        txa ; either branch clobbers accumulator.  txa sets z, saves 1 byte.
         bne @startWrap
         lda tmpY ; score+2
         jsr twoDigsToPPU

@@ -1,21 +1,15 @@
 gameMode_levelMenu:
-        RESET_MMC1
-        lda #$10
-        jsr setMMC1Control
-.if INES_MAPPER = 3
-        lda currentPpuCtrl
-        and #%10000000
+        lda #NMIEnable
         sta currentPpuCtrl
-.endif
         jsr updateAudio2
         lda #$7
         sta renderMode
         jsr updateAudioWaitForNmiAndDisablePpuRendering
         jsr disableNmi
-        lda #$00
-        jsr changeCHRBank0
-        lda #$00
-        jsr changeCHRBank1
+.if INES_MAPPER <> 0
+        lda #CHRBankSet0
+        jsr changeCHRBanks
+.endif
         jsr bulkCopyToPpu
         .addr   menu_palette
         jsr copyRleNametableToPpu
@@ -30,9 +24,9 @@ gameMode_levelMenu:
         beq @noLinecapInfo
         jsr levelMenuLinecapInfo
 @noLinecapInfo:
-        ; render level when loading screen
-        lda #$1
-        sta outOfDateRenderFlags
+        ; render lines when loading screen
+        lda #RENDER_LINES
+        sta renderFlags
         jsr resetScroll
         jsr waitForVBlankAndEnableNmi
         jsr updateAudioWaitForNmiAndResetOamStaging
@@ -134,6 +128,14 @@ levelMenuCheckStartGame:
         sta startLevel
 @startGame:
         ; lda startLevel
+        ldy practiseType
+        cpy #MODE_MARATHON
+        bne @noLevelModification
+        ldy marathonModifier
+        cpy #2 ; marathon mode 2 starts at level 0
+        bne @noLevelModification
+        lda #0
+@noLevelModification:
         sta levelNumber
         lda #$00
         sta gameModeState
@@ -159,16 +161,14 @@ levelMenuCheckGoBack:
 shredSeedAndContinue:
         ; seed shredder
 @chooseRandomHole_player1:
-        ldx #$17
-        ldy #$02
+        ldx #rng_seed
         jsr generateNextPseudorandomNumber
         lda rng_seed
         and #$0F
         cmp #$0A
         bpl @chooseRandomHole_player1
 @chooseRandomHole_player2:
-        ldx #$17
-        ldy #$02
+        ldx #rng_seed
         jsr generateNextPseudorandomNumber
         lda rng_seed
         and #$0F
@@ -297,9 +297,9 @@ levelControlCustomLevel:
 @changeLevel:
         lda #$1
         sta soundEffectSlot1Init
-        lda outOfDateRenderFlags
-        ora #$1
-        sta outOfDateRenderFlags
+        lda renderFlags
+        ora #RENDER_LINES
+        sta renderFlags
         rts
 
 levelControlHearts:

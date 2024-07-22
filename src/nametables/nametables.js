@@ -22,15 +22,35 @@ function writeRLE(filename, buffer) {
     writeFileSync(filename, compressed);
 }
 
+const STR_OFFSET = 512;
+
 function printNT(buffer, lookup) {
-    const chars = [...buffer].map(value => lookup[value] || '__NOWAYNOWAY');
-    // console.log(chars.join('').match(/.{32}/g).join('\n'));
+    const chars = [...buffer].map(value => {
+        const char = lookup[value];
+
+        if (char === '#') {
+            return String.fromCharCode(value + STR_OFFSET);
+        }
+
+        return char;
+    });
+
+    console.log(chars.join('').match(/.{32}/g).join('\n'));
+}
+
+function blankNT() {
+    return Array.from({ length: 1024 }, () => 0xFF);
 }
 
 function drawTiles(buffer, lookup, tiles) {
     [...tiles.trim().split('\n').join('')].forEach((d, i) => {
         if (d !== '#') {
-            buffer[i] = lookup.indexOf(d);
+            const charCode = d.charCodeAt(0);
+            if (charCode > STR_OFFSET) {
+                buffer[i] = charCode - STR_OFFSET;
+            } else {
+                buffer[i] = lookup.indexOf(d);
+            }
         }
     });
 }
@@ -47,10 +67,10 @@ function drawRect(buffer, x, y, w, h, offset) {
 
 function drawAttrs(buffer, attrs) {
     const palettes = p => p.trim().match(/.+\n.+$/gm)
-        .flatMap(line=>(
-            [t,b]=line.split('\n'),
-            t.trim().match(r=/../g).map((d,i)=>d+b.trim().match(r)[i])
-        ))
+        .flatMap(line=>{
+            const [t,b]=line.split('\n');
+            return t.trim().match(r=/../g).map((d,i)=>d+b.trim().match(r)[i])
+        })
         .map(d=>+('0b'+[...d].reverse().map(d=>(+d).toString(2).padStart(2,0)).join``));
 
     [
@@ -70,6 +90,7 @@ module.exports = {
     readStripe,
     writeRLE,
     printNT,
+    blankNT,
     drawTiles,
     drawRect,
     drawAttrs,

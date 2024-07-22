@@ -9,7 +9,6 @@ hzDebounceThreshold := $10
 
 hzStart: ; called in playState_spawnNextTetrimino, gameModeState_initGameState, gameMode_gameTypeMenu
         lda #0
-        sta hzSpawnDelay
         sta hzTapCounter
         lda #hzDebounceThreshold
         sta hzDebounceCounter
@@ -38,11 +37,10 @@ hzControl: ; called in playState_playerControlsActiveTetrimino, gameTypeLoopCont
 
         ; detect inputs
         lda newlyPressedButtons_player1
-        and #BUTTON_DPAD
+        and #BUTTON_LEFT+BUTTON_RIGHT
         cmp #BUTTON_LEFT
         beq hzTap
-        lda newlyPressedButtons_player1
-        and #BUTTON_DPAD
+        and #BUTTON_LEFT+BUTTON_RIGHT
         cmp #BUTTON_RIGHT
         beq hzTap
 
@@ -50,7 +48,7 @@ hzControl: ; called in playState_playerControlsActiveTetrimino, gameTypeLoopCont
         bne @noDelayInc
         lda hzSpawnDelay
         cmp #$F
-        beq @noDelayInc
+        bcs @noDelayInc
         inc hzSpawnDelay
 @noDelayInc:
         rts
@@ -178,9 +176,36 @@ hzTap:
 @calcEnd:
 
         ; update game UI
-        lda outOfDateRenderFlags
-        ora #$10 ; @renderHz
-        sta outOfDateRenderFlags
+        lda renderFlags
+        ora #RENDER_HZ
+        sta renderFlags
+        rts
+
+; X: value to store if left or right is newly pressed
+checkNegativeDelay:
+        ; the tail of entry delay has two paths: a normal path, and one where
+        ; spawn delay is added (currently, tspins and debug mode)
+        ; if the spawn delay is too large, we shouldn't update here
+        lda spawnDelay
+        cmp #3
+        bcs @ret
+        lda hzSpawnDelay
+        bne @ret
+        lda newlyPressedButtons_player1
+        and #BUTTON_LEFT+BUTTON_RIGHT
+        cmp #BUTTON_LEFT
+        beq @setDelay
+        lda newlyPressedButtons_player1
+        and #BUTTON_LEFT+BUTTON_RIGHT
+        cmp #BUTTON_RIGHT
+        beq @setDelay
+        rts
+@setDelay:
+        stx hzSpawnDelay
+        lda renderFlags
+        ora #$10
+        sta renderFlags
+@ret:
         rts
 
 dasLimitLookup:

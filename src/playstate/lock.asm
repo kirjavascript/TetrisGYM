@@ -1,7 +1,10 @@
 playState_lockTetrimino:
         jsr isPositionValid
         beq @notGameOver
-; gameOver:
+@gameOver:
+        lda renderFlags ; Flag needed to reveal hidden score
+        ora #RENDER_SCORE
+        sta renderFlags
         lda #$02
         sta soundEffectSlot0Init
         lda #$0A ; playState_checkStartGameOver
@@ -39,7 +42,6 @@ playState_lockTetrimino:
         adc tetriminoX
         sta generalCounter
         lda currentPiece
-        sta currentPiece_copy
         asl a
         asl a
         sta generalCounter2
@@ -76,6 +78,27 @@ playState_lockTetrimino:
         inx
         dec generalCounter3
         bne @lockSquare
+        lda practiseType
+        cmp #MODE_LOWSTACK
+        bne @notAboveLowStack
+        jsr checkIfAboveLowStackLine
+        bcc @notAboveLowStack
+        ldx #<lowStackNopeGraphic
+        ldy #>lowStackNopeGraphic
+        sec
+        lda #19
+        sbc lowStackRowModifier
+        cmp #$09
+        bcs @drawOnUpperHalf
+; draw on lower half
+        adc #$03 ; carry already clear
+        bne @copyGraphic
+@drawOnUpperHalf:
+        sbc #$04 ; carry already set
+@copyGraphic:
+        jsr copyGraphicToPlayfieldAtCustomRow
+        jmp @gameOver
+@notAboveLowStack:
         lda #$00
         sta lineIndex
         jsr updatePlayfield

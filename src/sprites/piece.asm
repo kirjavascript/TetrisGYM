@@ -83,7 +83,7 @@ stageSpriteForCurrentPiece_actual:
         ldy oamStagingLength
         lda #$04
         sta generalCounter2
-@stageMino:  
+@stageMino:
         lda orientationTable,x
         asl a
         asl a
@@ -116,7 +116,7 @@ stageSpriteForCurrentPiece_actual:
         sta oamStaging,y
         jmp @finishLoop
 
-@validYCoordinate:  
+@validYCoordinate:
         inc oamStagingLength
         iny
         lda orientationTable,x
@@ -126,7 +126,7 @@ stageSpriteForCurrentPiece_actual:
         clc
         adc generalCounter3
         sta oamStaging,y
-@finishLoop:  
+@finishLoop:
         inc oamStagingLength
         iny
         inx
@@ -136,12 +136,10 @@ stageSpriteForCurrentPiece_return:
         rts
 
 stageSpriteForNextPiece:
-        lda qualFlag
-        beq @alwaysNextBox
-        lda displayNextPiece
-        bne @ret
+        lda hideNextPiece
+        bne @maybeDisplayNextPiece
 
-@alwaysNextBox:
+@displayNextPiece:
         lda #$C8
         sta spriteXOffset
         lda #$77
@@ -150,4 +148,11 @@ stageSpriteForNextPiece:
         lda orientationToSpriteTable,x
         sta spriteIndexInOamContentLookup
         jmp loadSpriteIntoOamStaging
-@ret:   rts
+
+@maybeDisplayNextPiece:
+        lda practiseType
+        cmp #MODE_HARDDROP
+        beq @displayNextPiece
+        lda debugFlag
+        bne @displayNextPiece
+        rts
