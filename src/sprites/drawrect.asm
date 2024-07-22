@@ -20,6 +20,7 @@ spriteCathedralFire0:
 
 spriteCathedralFire1:
         .byte $0, $F0, $4, $2, $1, $A2, $FF
+.endif
 
 rectBuffer := generalCounter
 rectX := rectBuffer+0

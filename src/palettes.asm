@@ -19,7 +19,7 @@ title_palette:
         .byte   $3F,$00
         .byte   $14
         .byte   $0F,$3C,$38,$00 ; bg
-        .byte   $0F,$0,$10,$30,
+        .byte   $0F,$0,$10,$30
         .byte   $0F,$30,MENU_HIGHLIGHT_COLOR,$00
         .byte   $0F,$22,$2A,$28
         .byte   $0F,$30,$29,$27 ; sprite

@@ -28,16 +28,11 @@ showHighScores:
         lda #$FF
         sta PPUDATA
 
-        lda #0 ; 8 digit flag
-        sta tmpZ
-
         ; score
         lda highscores,y
         cmp #$A
         bmi @scoreHighWrite
         jsr twoDigsToPPU
-        lda #1
-        sta tmpZ
         jmp @scoreEnd
 @scoreHighWrite:
         sta PPUDATA
