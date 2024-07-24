@@ -16,10 +16,10 @@ spriteCathedral:
         .byte $FF
 
 spriteCathedralFire0:
-        .byte $8, $F0, $2, $1, $1, $A0, $FF
+        .byte $8, $EB, $2, $1, $1, $A0, $FF
 
 spriteCathedralFire1:
-        .byte $0, $F0, $4, $2, $1, $A2, $FF
+        .byte $0, $EB, $4, $2, $1, $A2, $FF
 .endif
 
 rectBuffer := generalCounter
