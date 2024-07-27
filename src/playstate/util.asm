@@ -120,8 +120,7 @@ checkIfAboveLowStackLine:
         lda #19
         sbc lowStackRowModifier
         tax
-        lda multBy10Table,x
-        tay
+        ldy multBy10Table,x
         ldx #$0A
         sec
 @checkForBlockInRow:
