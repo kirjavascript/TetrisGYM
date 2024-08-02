@@ -1,10 +1,12 @@
 mod block;
-mod cycle_count;
 mod input;
 mod labels;
 mod playfield;
 mod util;
 mod video;
+
+mod cycle_count;
+mod crash;
 
 mod drought;
 mod floor;
@@ -37,6 +39,8 @@ struct TestOptions {
     test_single: Option<String>,
     #[options(help = "count cycles")]
     cycles: bool,
+    #[options(help = "fuzz crash")]
+    crash: bool,
     #[options(help = "set SPS seed", parse(try_from_str = "parse_hex"))]
     sps_seed: u32,
     #[options(help = "print SPS pieces")]
@@ -86,6 +90,11 @@ fn main() {
         } else {
             println!("no such test {name}");
         }
+    }
+
+    // fuzz crash
+    if options.crash {
+        crash::fuzz();
     }
 
     // count cycles
