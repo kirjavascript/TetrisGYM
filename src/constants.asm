@@ -20,6 +20,7 @@ CNROM_OVERRIDE := 0
 .endif
 
 NO_MUSIC := 1
+OCR_DOT := 1
 
 ; dev flags
 NO_SCORING := 0 ; breaks pace

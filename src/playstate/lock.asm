@@ -2,6 +2,10 @@ playState_lockTetrimino:
         jsr isPositionValid
         beq @notGameOver
 @gameOver:
+.if OCR_DOT
+        dec oamStaging+254 ; used to change tourney square color, no effect when tourney not enabled
+        ; (unless 64 sprites are in use)
+.endif
         lda renderFlags ; Flag needed to reveal hidden score
         ora #RENDER_SCORE
         sta renderFlags

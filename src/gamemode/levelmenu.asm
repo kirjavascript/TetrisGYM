@@ -1,4 +1,8 @@
 gameMode_levelMenu:
+.if OCR_DOT
+        lda #$01
+        sta oamStaging+254
+.endif
         lda #NMIEnable
         sta currentPpuCtrl
         jsr updateAudio2

@@ -13,6 +13,11 @@ gameModeState_initGameState:
         lda #$05
         sta tetriminoX
 
+.if OCR_DOT
+        lda #$01
+        sta oamStaging+254 ; used for tourney, no effect otherwise
+.endif
+
         ;init for crash frame parity
         lda frameCounter
         and #$01

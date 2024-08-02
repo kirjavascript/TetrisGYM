@@ -70,6 +70,17 @@ resetOAMStaging:
 ; Sprites are never displayed on the first line of the picture, and it is impossible to place
 ; a sprite partially off the top of the screen.
 ; https://www.nesdev.org/wiki/PPU_OAM
+.if OCR_DOT
+        ldx #$FC        ; leave last slot alone
+        lda #$FF
+@hideY:
+        dex
+        dex
+        dex
+        dex
+        sta oamStaging,x
+        bne @hideY
+.else
         ldx #$00
         lda #$FF
 @hideY:
@@ -79,6 +90,7 @@ resetOAMStaging:
         inx
         inx
         bne @hideY
+.endif
         rts
 
 updateAudioAndWaitForNmi:

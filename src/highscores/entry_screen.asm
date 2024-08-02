@@ -1,5 +1,9 @@
 ; Adjusts high score table and handles data entry, if necessary
 handleHighScoreIfNecessary:
+.if OCR_DOT
+        lda #$01
+        sta oamStaging+254
+.endif
         ldy #0
         sty highScoreEntryRawPos
 @compareWithPos:

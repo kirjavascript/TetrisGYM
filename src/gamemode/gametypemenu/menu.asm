@@ -41,6 +41,16 @@ gameTypeLoop:
 gameTypeLoopContinue:
         jsr menuConfigControls
         jsr practiseTypeMenuControls
+.if OCR_DOT
+        lda #$E7
+        sta oamStaging+252
+        lda #$FE
+        sta oamStaging+253
+        lda #$00
+        sta oamStaging+254
+        lda #$F8
+        sta oamStaging+255
+.endif
 
 gameTypeLoopCheckStart:
         lda newlyPressedButtons_player1
