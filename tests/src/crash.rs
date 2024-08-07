@@ -30,6 +30,7 @@ pub fn fuzz() {
     let play_state = 0x48;
     let p1_play_state = 0x68;
 
+    let nmi_label = 0x8005;
     emu.memory.iram_raw[game_mode] = 4;
     emu.registers.pc = main_loop;
 
@@ -85,28 +86,32 @@ pub fn fuzz() {
             break;
         }
 
-        let address = ((emu.registers.s) as u16) + 0x0100;
-        let address1 = ((emu.registers.s) as u16) + 0x0101;
+        let address = ((emu.registers.s) as u16) + 0x0102;
+        let address1 = ((emu.registers.s) as u16) + 0x0103;
 
 
-    println!("{}", emu.registers.pc);
-        emu.memory.iram_raw[0x100..0x200].iter().for_each(|b| {
-            print!("{:x} ", b);
+    println!("PC: {:04x}", emu.registers.pc);
+        emu.memory.iram_raw[0x100..0x200].iter().enumerate().for_each(|(i,b)| {
+            if (i % 16) == 0 {print!("\n{:04x}: ", i + 0x100);}
+            print!("{:02x} ", b);
         });
         println!("");
-    print!("{:x} ", emu.memory.iram_raw[address as usize]);
-    println!("{:x}", emu.memory.iram_raw[address1 as usize]);
-    println!("{:x}", emu.registers.s);
-    println!("{}", emu.ppu.current_scanline);
-        emu.run_until_vblank();
+    print!("{:02x} ", emu.memory.iram_raw[address as usize]);
+    println!("{:02x}", emu.memory.iram_raw[address1 as usize]);
+    println!("SP: {:02x}", emu.registers.s);
+    println!("SL: {:02x}", emu.ppu.current_scanline);
+    loop {
+        emu.cycle();
+        if emu.registers.pc == nmi_label { break };
+        }
     }
 
-    println!("{}", emu.registers.pc);
+    println!("PC: {:04x}", emu.registers.pc);
 
     video::preview(&mut emu);
 
 
-    println!("{}", emu.memory.iram_raw[p1_push_down]);
+    println!("PD: {:02x}", emu.memory.iram_raw[p1_push_down]);
 
     // uncrash by replacing the PC
 }
