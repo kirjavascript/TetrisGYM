@@ -78,11 +78,26 @@ pub fn fuzz() {
     // emu.memory.iram_raw[clear_count+2] = 5;
     // emu.memory.iram_raw[clear_count+3] = 5;
 
-    for _ in 0..100 {
+    // set framecounter, vramrow
+
+    for _ in 0..30 {
         if emu.memory.iram_raw[play_state] == 5 || emu.memory.iram_raw[p1_play_state] == 5 {
             break;
         }
+
+        let address = ((emu.registers.s) as u16) + 0x0100;
+        let address1 = ((emu.registers.s) as u16) + 0x0101;
+
+
     println!("{}", emu.registers.pc);
+        emu.memory.iram_raw[0x100..0x200].iter().for_each(|b| {
+            print!("{:x} ", b);
+        });
+        println!("");
+    print!("{:x} ", emu.memory.iram_raw[address as usize]);
+    println!("{:x}", emu.memory.iram_raw[address1 as usize]);
+    println!("{:x}", emu.registers.s);
+    println!("{}", emu.ppu.current_scanline);
         emu.run_until_vblank();
     }
 
