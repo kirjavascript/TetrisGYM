@@ -1,4 +1,4 @@
-use rusticnes_core::nes::NesState;
+pub use rusticnes_core::nes::NesState;
 use rusticnes_core::{ cartridge, opcodes, opcode_info };
 use crate::{input, labels};
 
