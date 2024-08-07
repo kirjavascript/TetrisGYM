@@ -31,6 +31,7 @@ pub fn fuzz() {
     let p1_play_state = 0x68;
 
     let nmi_label = 0x8005;
+    let switch_label = 0xAC82;
     emu.memory.iram_raw[game_mode] = 4;
     emu.registers.pc = main_loop;
 
@@ -81,7 +82,7 @@ pub fn fuzz() {
 
     // set framecounter, vramrow
 
-    for _ in 0..30 {
+    'outer: for _ in 0..30 {
         if emu.memory.iram_raw[play_state] == 5 || emu.memory.iram_raw[p1_play_state] == 5 {
             break;
         }
@@ -89,22 +90,40 @@ pub fn fuzz() {
         let address = ((emu.registers.s) as u16) + 0x0102;
         let address1 = ((emu.registers.s) as u16) + 0x0103;
 
+        loop {
+            emu.cycle();
+            if emu.registers.pc < 0x800 { println!("1"); break 'outer };
+            if emu.registers.pc == nmi_label { println!("2"); break };
+        }
 
-    println!("PC: {:04x}", emu.registers.pc);
-        emu.memory.iram_raw[0x100..0x200].iter().enumerate().for_each(|(i,b)| {
-            if (i % 16) == 0 {print!("\n{:04x}: ", i + 0x100);}
-            print!("{:02x} ", b);
-        });
-        println!("");
-    print!("{:02x} ", emu.memory.iram_raw[address as usize]);
-    println!("{:02x}", emu.memory.iram_raw[address1 as usize]);
-    println!("SP: {:02x}", emu.registers.s);
-    println!("SL: {:02x}", emu.ppu.current_scanline);
-    loop {
-        emu.cycle();
-        if emu.registers.pc == nmi_label { break };
+        println!("-----------------");
+        loop {
+            emu.cycle();
+            println!("0");
+            if emu.registers.pc < 0x800 { println!("1"); break 'outer };
+            if emu.registers.pc == 0xAc95 { println!("2");
+
+                println!("PC: {:04x}", emu.registers.pc);
+                emu.memory.iram_raw[0x100..0x200].iter().enumerate().for_each(|(i,b)| {
+                    if (i % 16) == 0 {print!("\n{:04x}: ", i + 0x100);}
+                    print!("{:02x} ", b);
+                });
+                println!("");
+                print!("{:02x} ", emu.memory.iram_raw[address as usize]);
+                println!("{:02x}", emu.memory.iram_raw[address1 as usize]);
+
+                print!("{:02x} ", emu.memory.iram_raw[0]);
+                println!("{:02x}", emu.memory.iram_raw[1]);
+                println!("SP: {:02x}", emu.registers.s);
+                println!("SL: {:02x}", emu.ppu.current_scanline);
+
+                break };
         }
     }
+    println!("-----------------");
+
+    print!("{:02x} ", emu.memory.iram_raw[0]);
+    println!("{:02x}", emu.memory.iram_raw[1]);
 
     println!("PC: {:04x}", emu.registers.pc);
 
