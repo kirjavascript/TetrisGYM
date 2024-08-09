@@ -1,36 +1,61 @@
-use crate::{util, video, playfield};
+use crate::{util, playfield};
 
 // enum for crash type
 // struct for crash params
 
 #[derive(Debug)]
 struct Params {
-    lines: u8,
+    cleared_lines: u8,
     pushdown: u8,
+    lines: (u8, u8),
+    level: u8,
+    cycles: u8,
+    clear_count: u8,
 }
-
 
 pub fn fuzz() {
     let mut emu = util::emulator(Some(util::OG_ROM));
 
-    for lines in 0..=4 {
+    for cleared_lines in 0..=4 {
+    for pushdown in 0..1 {
         let params = Params {
-            lines,
-            pushdown: 0, // 0 / 8
+            cleared_lines,
+            pushdown: if pushdown == 0 { 0 } else { 8 }, // 0 / 8
+            level: 155,
+            lines: get_lines(155),
+            clear_count: 0,
+            cycles: 0,
         };
         let result = check(&mut emu, &params);
 
         if result.is_some() {
             println!("crash @ {:?} {:?}", result.unwrap(), params);
         }
-    }
 
+        }
+    }
+    }
+}
+
+fn get_lines(level: u8) -> (u8, u8) {
+    let base_lines = 120;
+    let extra_lines = (level as u16 - 18) * 10;
+    let lines = base_lines + extra_lines;
+
+    let hi = lines / 100;
+    let lo = lines % 100;
+
+    (hi as u8, to_bcd(lo as u8))
+}
+
+fn to_bcd(byte: u8) -> u8 {
+    let high_nibble = (byte / 10) << 4;
+    let low_nibble = byte % 10;
+    high_nibble | low_nibble
 }
 
 fn check(emu: &mut util::NesState, params: &Params) -> Option<u16> {
     emu.reset();
-
-    util::run_n_vblanks(emu, 8);
 
     let p1_score = 0x73;
     let score = 0x53;
@@ -56,18 +81,21 @@ fn check(emu: &mut util::NesState, params: &Params) -> Option<u16> {
     let render_flags = 0xA3;
     let clear_count = 0xD8;
     let p1_play_state = 0x68;
+    let nnb = 0xDF;
+
+    util::run_n_vblanks(emu, 8);
 
     emu.memory.iram_raw[game_mode] = 4;
     emu.registers.pc = main_loop;
 
     util::run_n_vblanks(emu, 7);
 
-    emu.memory.iram_raw[level_number] = 154;
-    emu.memory.iram_raw[p1_level_number] = 154;
-    emu.memory.iram_raw[lines] = 0x89;
-    emu.memory.iram_raw[lines+1] = 0xE;
-    emu.memory.iram_raw[p1_lines] = 0x89;
-    emu.memory.iram_raw[p1_lines+1] = 0xE;
+    emu.memory.iram_raw[level_number] = params.level;
+    emu.memory.iram_raw[p1_level_number] = params.level;
+    emu.memory.iram_raw[lines] = params.lines.1;
+    emu.memory.iram_raw[lines+1] = params.lines.0;
+    emu.memory.iram_raw[p1_lines] = params.lines.1;
+    emu.memory.iram_raw[p1_lines+1] = params.lines.0;
     emu.memory.iram_raw[p1_score] = 0x99;
     emu.memory.iram_raw[p1_score+1] = 0x99;
     emu.memory.iram_raw[p1_score+2] = 0x99;
@@ -81,7 +109,7 @@ fn check(emu: &mut util::NesState, params: &Params) -> Option<u16> {
 
     // playfield::clear(&mut emu);
 
-    playfield::set_str_addr(emu, 0x400, match params.lines {
+    playfield::set_str_addr(emu, 0x400, match params.cleared_lines {
         0 => "",
         1 => "##### ####",
         2 => "##### ####\n##### ####",
@@ -103,10 +131,14 @@ fn check(emu: &mut util::NesState, params: &Params) -> Option<u16> {
     emu.memory.iram_raw[p1_vrow] = 0;
     emu.memory.iram_raw[push_down] = params.pushdown;
     emu.memory.iram_raw[p1_push_down] = params.pushdown;
-    // emu.memory.iram_raw[clear_count] = 9;
-    // emu.memory.iram_raw[clear_count+1] = 5;
-    // emu.memory.iram_raw[clear_count+2] = 5;
-    // emu.memory.iram_raw[clear_count+3] = 5;
+    emu.memory.iram_raw[clear_count] = params.clear_count;
+    emu.memory.iram_raw[clear_count+1] = params.clear_count;
+    emu.memory.iram_raw[clear_count+2] = params.clear_count;
+    emu.memory.iram_raw[clear_count+3] = params.clear_count;
+
+    for _ in 0..params.cycles {
+        emu.cycle();
+    }
 
     util::run_n_vblanks(emu, 28);
 
