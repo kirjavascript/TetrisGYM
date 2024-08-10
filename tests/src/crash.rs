@@ -1,8 +1,5 @@
 use crate::{util, playfield};
 
-// enum for crash type
-// struct for crash params
-
 #[derive(Debug)]
 struct Params {
     cleared_lines: u8,
@@ -11,28 +8,46 @@ struct Params {
     level: u8,
     cycles: u8,
     clear_count: u8,
+    nnb: u8,
 }
 
 pub fn fuzz() {
     let mut emu = util::emulator(Some(util::OG_ROM));
 
+    for level in 155..160 {
+    for transition in 0..=1 {
     for cleared_lines in 0..=4 {
-    for pushdown in 0..1 {
+    for pushdown in 0..=1 {
+    for clear_count in 0..=1 {
+    for nnb in 0..=1 {
+        let level = if transition == 0 { level } else { level - 1 };
+        let lines = if transition == 0 { get_lines(level) } else {
+            let (hi, lo) = get_lines(level);
+            if lo == 0 {
+                (hi - 1, 0x99)
+            } else {
+                (hi, lo - 7)
+            }
+        };
+
         let params = Params {
             cleared_lines,
-            pushdown: if pushdown == 0 { 0 } else { 8 }, // 0 / 8
-            level: 155,
-            lines: get_lines(155),
-            clear_count: 0,
+            pushdown: if pushdown == 0 { 0 } else { 8 },
+            level,
+            lines,
+            clear_count: if clear_count == 0 { 0 } else { 9 },
             cycles: 0,
+            nnb,
         };
         let result = check(&mut emu, &params);
 
         if result.is_some() {
-            println!("crash @ {:?} {:?}", result.unwrap(), params);
+            println!("*crash* tmp {:04x} {:?}", result.unwrap(), params);
         }
-
-        }
+    }
+    }
+    }
+    }
     }
     }
 }
@@ -107,8 +122,6 @@ fn check(emu: &mut util::NesState, params: &Params) -> Option<u16> {
 
     util::run_n_vblanks(emu, 1);
 
-    // playfield::clear(&mut emu);
-
     playfield::set_str_addr(emu, 0x400, match params.cleared_lines {
         0 => "",
         1 => "##### ####",
@@ -129,6 +142,7 @@ fn check(emu: &mut util::NesState, params: &Params) -> Option<u16> {
     emu.memory.iram_raw[frame_counter] = 0;
     emu.memory.iram_raw[vrow] = 0;
     emu.memory.iram_raw[p1_vrow] = 0;
+    emu.memory.iram_raw[nnb] = params.nnb;
     emu.memory.iram_raw[push_down] = params.pushdown;
     emu.memory.iram_raw[p1_push_down] = params.pushdown;
     emu.memory.iram_raw[clear_count] = params.clear_count;
