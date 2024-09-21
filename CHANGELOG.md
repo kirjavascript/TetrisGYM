@@ -1,5 +1,9 @@
 # Changelog
 
+## [unreleased]
+
+* Fixed line based floor caps outside of levelups
+
 ## v6
 * Crunch Trainer
 * Marathon Trainer
