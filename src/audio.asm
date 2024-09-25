@@ -137,15 +137,7 @@ advanceAudioSlotFrame:
         sta soundEffectSlot0FrameCounter,x
 @ret:   rts
 
-unreferenced_data3:
-        .byte   $FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF
-        .byte   $FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF
-        .byte   $FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF
-        .byte   $00,$00,$00,$00,$00,$00,$00,$00
-        .byte   $00,$00,$00,$00,$00,$00,$00,$00
-        .byte   $00,$00,$00,$00,$00,$00,$00,$00
-        .byte   $00,$00,$00,$00,$00,$00,$00,$00
-        .byte   $03,$7F,$0F,$C0
+.align $100
 ; Referenced by initSoundEffectShared
 soundEffectSlot0_gameOverCurtainInitData:
         .byte   $1F,$7F,$0F,$C0
