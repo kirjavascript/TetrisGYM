@@ -77,22 +77,21 @@ pollKeyboard:
 @ret:   rts
 
 ; Bit0  Bit1    Bit2    Bit3      Bit4    Bit5    Bit6     Bit7
-; ] 	[ 	RETURN 	F8 	  STOP 	  ¥ 	  RSHIFT   KANA
-; ; 	: 	@ 	F7 	  ^ 	  - 	  / 	   _
-; K 	L 	O 	F6 	  0 	  P 	  , 	   .
-; J 	U 	I 	F5 	  8 	  9 	  N 	   M
-; H 	G 	Y 	F4 	  6 	  7 	  V 	   B
-; D 	R 	T 	F3 	  4 	  5 	  C 	   F
-; A 	S 	W 	F2 	  3 	  E 	  Z 	   X
-; CTR 	Q 	ESC 	F1 	  2 	  1 	  GRPH 	   LSHIFT
-; LEFT 	RIGHT 	UP 	CLR HOME  INS 	  DEL 	  SPACE    DOWN
+; ]     [       RETURN  F8        STOP    ¥       RSHIFT   KANA
+; ;     :       @       F7        ^       -       /        _
+; K     L       O       F6        0       P       ,        .
+; J     U       I       F5        8       9       N        M
+; H     G       Y       F4        6       7       V        B
+; D     R       T       F3        4       5       C        F
+; A     S       W       F2        3       E       Z        X
+; CTR   Q       ESC     F1        2       1       GRPH     LSHIFT
+; LEFT  RIGHT   UP      CLR HOME  INS     DEL     SPACE    DOWN
 
 ; Read keys.  up/down/left/right are mapped directly
 
 
 mapKeysToButtons:
-        ldy #$08
-        ldx #$02
+        lda #$82
         jsr readKey
         beq @upNotPressed
         lda newlyPressedKeys
@@ -101,8 +100,7 @@ mapKeysToButtons:
         bne @skipDownRead
 @upNotPressed:
 
-        ldy #$08
-        ldx #$07
+        lda #$87
         jsr readKey
         beq @downNotPressed
         lda newlyPressedKeys
@@ -111,8 +109,7 @@ mapKeysToButtons:
 @skipDownRead:
 @downNotPressed:
 
-        ldy #$08
-        ldx #$00
+        lda #$80
         jsr readKey
         beq @leftNotPressed
         lda newlyPressedKeys
@@ -121,8 +118,7 @@ mapKeysToButtons:
         bne @skipRightRead
 @leftNotPressed:
 
-        ldy #$08
-        ldx #$01
+        lda #$81
         jsr readKey
         beq @rightNotPressed
         lda newlyPressedKeys
@@ -131,8 +127,7 @@ mapKeysToButtons:
 @skipRightRead:
 @rightNotPressed:
 
-        ldy #$07     ; grph -> B
-        ldx #$06
+        lda #$76     ; grph -> B
         jsr readKey
         beq @bNotPressed
         lda newlyPressedKeys
@@ -140,8 +135,7 @@ mapKeysToButtons:
         sta newlyPressedKeys
 @bNotPressed:
 
-        ldy #$08     ; space -> A
-        ldx #$06
+        lda #$86     ; space -> A
         jsr readKey
         beq @aNotPressed
         lda newlyPressedKeys
@@ -149,8 +143,7 @@ mapKeysToButtons:
         sta newlyPressedKeys
 @aNotPressed:
 
-        ldy #$00     ; right shift -> select
-        ldx #$06
+        lda #$06     ; right shift -> select
         jsr readKey
         beq @selectNotPressed
         lda newlyPressedKeys
@@ -158,8 +151,7 @@ mapKeysToButtons:
         sta newlyPressedKeys
 @selectNotPressed:
 
-        ldy #$00     ; return -> start
-        ldx #$02
+        lda #$02     ; return -> start
         jsr readKey
         beq @startNotPressed
         lda newlyPressedKeys
@@ -188,7 +180,17 @@ mapKeysToButtons:
 
 keyMask:
         .byte $80,$40,$20,$10,$08,$04,$02,$01
+
 readKey:
+    pha
+    lsr
+    lsr
+    lsr
+    lsr
+    tay
+    pla
+    and #$0F
+    tax
     lda keyboardInput,y
     and keyMask,x
     rts
