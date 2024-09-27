@@ -40,7 +40,7 @@
 ; Note that Family BASIC never writes to $4016 with bit 2 clear, there is no need to disable the keyboard matrix.
 
 kbReadWait:
-        ldy #$09
+        ldy #$08
 @avoidParasiticCapacitance:              ; wait approx 50 cycles after advancing rows
         dey
         bne @avoidParasiticCapacitance
