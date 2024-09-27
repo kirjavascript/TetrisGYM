@@ -1,5 +1,5 @@
 highScorePpuAddrTable:
-        .dbyt  $2284,$22C4,$2304
+        .dbyt   $2284,$22C4,$2304
 highScoreCharToTile:
         .byte   $FF ; Space
         .byte   $0A ; A
