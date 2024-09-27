@@ -45,6 +45,7 @@ pollKeyboard:
         stx newlyPressedKeys
         lda #KB_INIT
         sta JOY1
+        jsr @ret                         ; wait 12 cycles before first row
 @rowLoop:
         lda #KB_COL_0
         sta JOY1
