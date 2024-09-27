@@ -39,6 +39,12 @@
 
 ; Note that Family BASIC never writes to $4016 with bit 2 clear, there is no need to disable the keyboard matrix.
 
+kbReadWait:
+        ldy #$09
+@avoidParasiticCapacitance:              ; wait approx 50 cycles after advancing rows
+        dey
+        bne @avoidParasiticCapacitance
+        rts
 
 pollKeyboard:
         ldx #$00
@@ -49,15 +55,13 @@ pollKeyboard:
 @rowLoop:
         lda #KB_COL_0
         sta JOY1
-        ldy #$0A
-@avoidParasiticCapacitance:              ; wait approx 50 cycles after advancing rows
-        dey
-        bne @avoidParasiticCapacitance
+        jsr kbReadWait
         lda JOY2_APUFC
         and #KB_MASK
         sta generalCounter
         lda #KB_COL_1
         sta JOY1
+        jsr kbReadWait
         lda JOY2_APUFC
         and #KB_MASK
         lsr
