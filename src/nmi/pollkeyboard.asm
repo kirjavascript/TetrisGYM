@@ -76,23 +76,10 @@ pollKeyboard:
         jsr mapKeysToButtons
 @ret:   rts
 
-; Bit0  Bit1    Bit2    Bit3      Bit4    Bit5    Bit6     Bit7
-; ]     [       RETURN  F8        STOP    ¥       RSHIFT   KANA
-; ;     :       @       F7        ^       -       /        _
-; K     L       O       F6        0       P       ,        .
-; J     U       I       F5        8       9       N        M
-; H     G       Y       F4        6       7       V        B
-; D     R       T       F3        4       5       C        F
-; A     S       W       F2        3       E       Z        X
-; CTR   Q       ESC     F1        2       1       GRPH     LSHIFT
-; LEFT  RIGHT   UP      CLR HOME  INS     DEL     SPACE    DOWN
-
-; Read keys.  up/down/left/right are mapped directly
-
 
 mapKeysToButtons:
-        lda #$82
-        jsr readKey
+        lda keyboardInput+8
+        and #$20
         beq @upNotPressed
         lda newlyPressedKeys
         ora #BUTTON_UP
@@ -100,8 +87,8 @@ mapKeysToButtons:
         bne @skipDownRead
 @upNotPressed:
 
-        lda #$87
-        jsr readKey
+        lda keyboardInput+8
+        and #$01
         beq @downNotPressed
         lda newlyPressedKeys
         ora #BUTTON_DOWN
@@ -109,8 +96,8 @@ mapKeysToButtons:
 @skipDownRead:
 @downNotPressed:
 
-        lda #$80
-        jsr readKey
+        lda keyboardInput+8
+        and #$80
         beq @leftNotPressed
         lda newlyPressedKeys
         ora #BUTTON_LEFT
@@ -118,8 +105,8 @@ mapKeysToButtons:
         bne @skipRightRead
 @leftNotPressed:
 
-        lda #$81
-        jsr readKey
+        lda keyboardInput+8
+        and #$40
         beq @rightNotPressed
         lda newlyPressedKeys
         ora #BUTTON_RIGHT
@@ -127,32 +114,32 @@ mapKeysToButtons:
 @skipRightRead:
 @rightNotPressed:
 
-        lda #$76     ; grph -> B
-        jsr readKey
+        lda keyboardInput+7 ; grph -> B
+        and #$02
         beq @bNotPressed
         lda newlyPressedKeys
         ora #BUTTON_B
         sta newlyPressedKeys
 @bNotPressed:
 
-        lda #$86     ; space -> A
-        jsr readKey
+        lda keyboardInput+8 ; space -> A
+        and #$02
         beq @aNotPressed
         lda newlyPressedKeys
         ora #BUTTON_A
         sta newlyPressedKeys
 @aNotPressed:
 
-        lda #$06     ; right shift -> select
-        jsr readKey
+        lda keyboardInput+0 ; right shift -> select0
+        and #$02
         beq @selectNotPressed
         lda newlyPressedKeys
         ora #BUTTON_SELECT
         sta newlyPressedKeys
 @selectNotPressed:
 
-        lda #$02     ; return -> start
-        jsr readKey
+        lda keyboardInput+0 ; return -> start
+        and #$20
         beq @startNotPressed
         lda newlyPressedKeys
         ora #BUTTON_START
@@ -178,19 +165,179 @@ mapKeysToButtons:
         sta heldButtons_player1
         rts
 
-keyMask:
-        .byte $80,$40,$20,$10,$08,$04,$02,$01
+;     Bit0  Bit1    Bit2    Bit3      Bit4    Bit5    Bit6     Bit7
+; 0   ]     [       RETURN  F8        STOP    ¥       RSHIFT   KANA
+; 1   ;     :       @       F7        ^       -       /        _
+; 2   K     L       O       F6        0       P       ,        .
+; 3   J     U       I       F5        8       9       N        M
+; 4   H     G       Y       F4        6       7       V        B
+; 5   D     R       T       F3        4       5       C        F
+; 6   A     S       W       F2        3       E       Z        X
+; 7   CTR   Q       ESC     F1        2       1       GRPH     LSHIFT
+; 8   LEFT  RIGHT   UP      CLR HOME  INS     DEL     SPACE    DOWN
+
+shiftFlag := $08
+charToKbMap:
+        .byte $86 ; Space
+        .byte $60 ; A
+        .byte $47 ; B
+        .byte $56 ; C
+        .byte $50 ; D
+        .byte $65 ; E
+        .byte $57 ; F
+        .byte $41 ; G
+        .byte $40 ; H
+        .byte $32 ; I
+        .byte $30 ; J
+        .byte $20 ; K
+        .byte $21 ; L
+        .byte $37 ; M
+        .byte $36 ; N
+        .byte $22 ; O
+        .byte $25 ; P
+        .byte $71 ; Q
+        .byte $51 ; R
+        .byte $61 ; S
+        .byte $52 ; T
+        .byte $31 ; U
+        .byte $46 ; V
+        .byte $62 ; W
+        .byte $67 ; X
+        .byte $42 ; Y
+        .byte $66 ; Z
+        .byte $24 ; 0
+        .byte $75 ; 1
+        .byte $74 ; 2
+        .byte $64 ; 3
+        .byte $54 ; 4
+        .byte $55 ; 5
+        .byte $44 ; 6
+        .byte $45 ; 7
+        .byte $34 ; 8
+        .byte $35 ; 9
+        .byte $26 ; ,
+        .byte $16 ; /
+        .byte $01 ; (
+        .byte $00 ; )
+        .byte $07 ; <3
+        .byte $27 ; .
+        .byte $75 | shiftFlag ; !
+        .byte $16 | shiftFlag ; ?
+        .byte $15 ; -
+        .byte $85 ; del ; treated differently
+
+charToKbMapEnd:
+
+kbChars = <(charToKbMapEnd - charToKbMap) - 1
+kbInputThrottle := generalCounter4
+
+readKbScoreInput:
+; n - no input or throttled
+; z - ready to shift
+; 7F - backspace
+; new char otherwise
+
+; check if shift flag is set
+        lda kbShiftFlag ; 1 when ready to shift
+        beq @noShift
+        dec kbShiftFlag
+        beq @noBackspace
+        dec kbShiftFlag
+        lda #$7F
+@noBackspace:
+        rts
+
+@noShift:
+        ldx #kbChars
+
+@checkNextChar:
+        lda charToKbMap,x
+        jsr readKey
+        bne @keyPressed
+        dex
+        bpl @checkNextChar
+        stx kbHeldInput
+
+@noKeyPressed:
+; n flag set due to heldInput no keys byte or active throttle
+        rts
+
+@keyPressed:
+        cpx kbHeldInput
+        bne @newInput
+
+        inc kbInputThrottle
+        bne @noKeyPressed
+
+        lda #-4
+        bne @storeThrottle
+
+@newInput:
+        stx kbHeldInput
+        lda #-16
+
+@storeThrottle:
+        sta kbInputThrottle
+
+@placeInput:
+        lda highScoreEntryNameOffsetForLetter
+        clc
+        adc highScoreEntryNameOffsetForRow
+        tay
+        txa
+        cmp #kbChars
+        bne @notBackspace
+        lda #$00
+        inc kbShiftFlag ; +1 to indicate backspace
+@notBackspace:
+        sta highscores,y
+.if SAVE_HIGHSCORES
+        tax
+        jsr detectSRAM
+        beq @noSRAM
+        txa
+        sta SRAM_highscores,y
+@noSRAM:
+.endif
+; causes next frame to trigger shift ; clears z & n flags
+        inc kbShiftFlag
+        rts
+
+shiftCounter := generalCounter5
 
 readKey:
-    pha
-    lsr
-    lsr
-    lsr
-    lsr
-    tay
-    pla
-    and #$0F
-    tax
-    lda keyboardInput,y
-    and keyMask,x
-    rts
+; RRRRSCCC  - Row, Shift, Column
+        pha
+        lsr
+        lsr
+        lsr
+        lsr
+        tay
+        pla
+        pha
+        and #$07
+        sta shiftCounter
+        pla
+        and #$08
+        beq @checkInput
+
+; left shift
+        lda keyboardInput+7
+        and #$01
+        bne @checkInput
+
+; right shift
+        lda keyboardInput+0
+        and #$02
+        beq @ret
+
+@checkInput:
+        lda keyboardInput,y
+@shiftLoop:
+        asl
+        dec shiftCounter
+        bpl @shiftLoop
+        lda #$00
+        rol
+@ret:
+        rts

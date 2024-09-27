@@ -221,14 +221,21 @@ invisibleFlag: .res 1 ; $63B  ; 0 for normal mode, non-zero for Invisible playfi
 currentFloor: .res 1 ; $63C floorModifier is copied here at game init.  Set to 0 otherwise and incremented when linecap floor.
 mapperId: .res 1 ; $63D ; For INES_MAPPER 1000 (autodetect).  0 = CNROM.  1 = MMC1.
 
-    .res $37
+    .res $35
 
 .if KEYBOARD
+; used for high score entry to throttle input and to flag when a letter has been input
+kbShiftFlag: .res 1 ; $0673
+kbHeldInput: .res 1 ; $0674
+
+; controller equivalent, can possibly be removed
 newlyPressedKeys: .res 1 ; $0675
 heldKeys: .res 1 ; $0676
+
+; raw input from keyboard
 keyboardInput: .res 9 ; $0677
 .else
-    .res $B
+    .res $D
 .endif
 
 musicStagingSq1Lo: .res 1 ; $0680
