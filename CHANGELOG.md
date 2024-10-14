@@ -3,6 +3,7 @@
 ## [unreleased]
 
 * Fixed line based floor caps outside of levelups
+* Reset scores when no SRAM is present
 
 ## v6
 * Crunch Trainer
@@ -62,9 +63,9 @@
 * Start on any level
 * Rewrite of all scoring code
     * Classic scoring
-    * Millions counter 
+    * Millions counter
     * 7 digit score
-    * 999999 scorecap 
+    * 999999 scorecap
     * Fixed T-Spin scoring
     * Crash free with no long frames
 * Rewrite of all highscore code
@@ -87,7 +88,7 @@
 * Added option to disable tetris flashing
 * Changes made to more closely match the original ROM
     * Restore seed shredding on level menu
-    * Hold `select` to start in Qual Mode and reset level cursor 
+    * Hold `select` to start in Qual Mode and reset level cursor
     * Transition from Legal to Title screen after 512 frames
     * Hide next box between Curtain and Rocket
     * Persist Qual Mode (and menu config) between reset button presses
@@ -157,7 +158,7 @@
 - Garbage Trainer
     - Always Tetris Ready
     - Normal Garbage
-    - Smart Garbage 
+    - Smart Garbage
     - Hard Garbage
     - Infinite Digging
 - Piece distribution in Setups Trainer is now even
