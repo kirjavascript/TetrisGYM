@@ -81,6 +81,18 @@ updateMusicSpeed:
         ldx #$05
         lda multBy10Table,x ;this piece of code is parameterized for no reason but the crash checking code relies on the index being 50-59 so if you ever optimize this part out of the code please also adjust the crash test, specifically the part which handles cycles for allegro.
         tay
+
+; check if crunch mode
+        lda practiseType
+        cmp #MODE_CRUNCH
+        bne @notCrunch
+
+        ; start at first clear column and repeat only for playable columns
+        ldy crunchLeftColumns
+        ldx crunchClearColumns
+        bne @checkForBlockInRow ; unconditional, expected range 4 - 10
+
+@notCrunch:
         ldx #$0A
 @checkForBlockInRow:
         lda (playfieldAddr),y

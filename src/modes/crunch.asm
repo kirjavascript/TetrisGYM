@@ -17,66 +17,66 @@
 ; F - 3 left 3 right
 
 advanceGameCrunch:
-    lda #0
-    sta vramRow
-    lda #20
-advanceSides:
-    pha
-    sta tmp3
+; initialize vars
     lda crunchModifier
-    lsr a
-    lsr a
-    ldx #0
-    jsr advanceSide
-    pla
-    sta tmp3
+    lsr
+    lsr
+    sta crunchLeftColumns
     lda crunchModifier
-    and #%00000011
-    pha
-    eor #$FF
-    sec
-    adc #0
+    and #$03
     clc
-    adc #10
-    tax
-    pla
-    jsr advanceSide
+    adc crunchLeftColumns ; carry still clear
+    eor #$FF
+    adc #$0B ; 10 + 1 to get two's complement.  result is playable column count
+    sta crunchClearColumns
+
+; initialize playfield row 19 to 0
+    lda #$13
+    sta generalCounter
+@nextRow:
+    jsr advanceSidesInit
+    dec generalCounter
+    bpl @nextRow
+
+; restore playfieldAddr and set vramRow for rendering
+    lda #$00
+    sta vramRow
+    sta playfieldAddr
+crunchReturn:
     rts
 
-advanceSide:
-    cmp #0
-    beq @end
-    pha
-    ldy #0
-    txa
-    clc
-    adc #<playfield
-    sta tmp1
-    lda #>playfield
-    sta tmp2
-@rowLoop:
-    pla
-    pha
-    tax
-    beq @end
-@blockLoop:
+; for init only.  row determined by generalCounter
+advanceSidesInit:
+    ldy generalCounter
+    lda multBy10Table,y
+    sta playfieldAddr
+
+; after init, only top row is drawn.  using (playfieldAddr),y defaults to top row
+; as playfieldAddr is 0 when this is called (and most of the time)
+advanceSides:
+    ldy #$00
     lda #BLOCK_TILES
-    sta (tmp1), y
-    inc tmp1
+
+; x controls left tile count.  x can start at 0,1,2 or 3.
+    ldx crunchLeftColumns
+@leftLoop:
     dex
-    bne @blockLoop
-    pla
-    pha
-    eor #$FF
-    sec
-    adc #0
+    bmi @right
+    sta (playfieldAddr),y
+    iny
+    bne @leftLoop ; unconditional
+
+@right:
+    tya
     clc
-    adc tmp1
-    clc
-    adc #10
-    sta tmp1
-    dec tmp3
-    bne @rowLoop
-    pla
-@end:
-    rts
+    adc crunchClearColumns
+    tay
+    lda #BLOCK_TILES
+
+; y is replaced with crunchClearColumns + y and increments until y == 10.  y can start at 7,8,9 or 10.
+@rightLoop:
+    cpy #$0A
+    beq crunchReturn
+    sta (playfieldAddr),y
+    iny
+    bne @rightLoop ; unconditional
