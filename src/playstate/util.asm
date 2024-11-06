@@ -83,12 +83,14 @@ updateMusicSpeed:
         tay
 
 ; check if crunch mode
-        lda practiseType
-        cmp #MODE_CRUNCH
+        ldx practiseType
+        cpx #MODE_CRUNCH
         bne @notCrunch
 
         ; start at first clear column and repeat only for playable columns
-        ldy crunchLeftColumns
+        clc
+        adc crunchLeftColumns ; accumulator is still 50, offset with left columns
+        tay
         ldx crunchClearColumns
         bne @checkForBlockInRow ; unconditional, expected range 4 - 10
 
