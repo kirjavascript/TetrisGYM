@@ -16,25 +16,22 @@
 ; E - 3 left 2 right
 ; F - 3 left 3 right
 
-advanceGameCrunch:
-; initialize vars
-    lda crunchModifier
-    lsr
-    lsr
-    sta crunchLeftColumns
-    lda crunchModifier
-    and #$03
-    clc
-    adc crunchLeftColumns ; carry still clear
-    eor #$FF
-    adc #$0B ; 10 + 1 to get two's complement.  result is playable column count
-    sta crunchClearColumns
+; defined in playstate/completedrows.asm:
+;   crunchLeftColumns = generalCounter3
+;   crunchClearColumns = generalCounter4
 
+advanceGameCrunch:
+; populate vars
+    jsr unpackCrunchModifier
 ; initialize playfield row 19 to 0
     lda #$13
     sta generalCounter
 @nextRow:
-    jsr advanceSidesInit
+    ldy generalCounter
+    lda multBy10Table,y
+; playfieldAddr ends restored to 0 as top row is done last
+    sta playfieldAddr
+    jsr advanceSidesContinue
     dec generalCounter
     bpl @nextRow
 
@@ -44,16 +41,13 @@ advanceGameCrunch:
 crunchReturn:
     rts
 
-; for init only.  row determined by generalCounter
-; playfieldAddr ends restored to 0 as top row is done last
-advanceSidesInit:
-    ldy generalCounter
-    lda multBy10Table,y
-    sta playfieldAddr
-
-; after init, only top row is drawn.  using (playfieldAddr),y defaults to top row
-; as playfieldAddr is 0 when this is called (and most of the time)
 advanceSides:
+    ; called in playState_checkForCompletedRows
+    ; after init, only top row is drawn.  using (playfieldAddr),y defaults to top row
+    ; as playfieldAddr is 0 when this is called (and most of the time)
+    jsr unpackCrunchModifier
+
+advanceSidesContinue:
     ldy #$00
     lda #BLOCK_TILES
 
@@ -80,3 +74,18 @@ advanceSides:
     sta (playfieldAddr),y
     iny
     bne @rightLoop ; unconditional
+
+unpackCrunchModifier:
+ ; initialize vars
+    lda crunchModifier
+    lsr
+    lsr
+    sta crunchLeftColumns ; generalCounter3
+    lda crunchModifier
+    and #$03
+    clc
+    adc crunchLeftColumns ; carry still clear
+    eor #$FF
+    adc #$0B ; 10 + 1 to get two's complement.  result is playable column count
+    sta crunchClearColumns ; generalCounter4
+    rts

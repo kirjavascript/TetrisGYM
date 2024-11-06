@@ -88,10 +88,12 @@ updateMusicSpeed:
         bne @notCrunch
 
         ; start at first clear column and repeat only for playable columns
+        jsr unpackCrunchModifier
+        tya
         clc
-        adc crunchLeftColumns ; accumulator is still 50, offset with left columns
+        adc crunchLeftColumns ; offset y with left column count (generalCounter3)
         tay
-        ldx crunchClearColumns
+        ldx crunchClearColumns ; generalCounter4
         bne @checkForBlockInRow ; unconditional, expected range 4 - 10
 
 @notCrunch:
