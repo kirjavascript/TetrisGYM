@@ -38,14 +38,14 @@ advanceGameCrunch:
     dec generalCounter
     bpl @nextRow
 
-; restore playfieldAddr and set vramRow for rendering
+; set vramRow to render entire playfield
     lda #$00
     sta vramRow
-    sta playfieldAddr
 crunchReturn:
     rts
 
 ; for init only.  row determined by generalCounter
+; playfieldAddr ends restored to 0 as top row is done last
 advanceSidesInit:
     ldy generalCounter
     lda multBy10Table,y
