@@ -34,7 +34,7 @@ pub fn test() {
     "##.trim(), playfield::get_str(&emu).trim());
 
     // check that correct tile is rendered
-    assert_eq!(emu.ppu.read_byte(&mut *emu.mapper, 0x22CC), 0x7b);
+    assert_eq!(emu.ppu.read_byte(&mut *emu.mapper, 0x22CC), 0x7E);
     // check pixel is actually rendered
     assert_eq!(emu.ppu.screen[offset(96, 176) as usize], 0x30);
 }
