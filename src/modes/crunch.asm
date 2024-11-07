@@ -39,7 +39,6 @@ advanceSides:
 
     lda #BLOCK_TILES
 
-; y controls left tile count and offset into playfield
     ldy #$0
 @leftLoop:
     dec crunchLeftColumns
@@ -50,7 +49,6 @@ advanceSides:
 
 @initRight:
     ldy #$9
-; x controls right tile count, y controls offset into playfield
 @rightLoop:
     dec crunchRightColumns
     bmi crunchReturn
@@ -60,7 +58,6 @@ advanceSides:
 
 
 unpackCrunchModifier:
- ; initialize vars
     lda crunchModifier
     lsr
     lsr
