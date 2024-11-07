@@ -16,64 +16,48 @@
 ; E - 3 left 2 right
 ; F - 3 left 3 right
 
-; defined in playstate/completedrows.asm:
-;   crunchLeftColumns = generalCounter3
-;   crunchClearColumns = generalCounter4
+; clobbers generalCounter3 & generalCounter4 (defined in playstate/util.asm)
 
 advanceGameCrunch:
-; populate vars
-    jsr unpackCrunchModifier
 ; initialize playfield row 19 to 0
-    lda #$13
-    sta generalCounter
+    ldx #$13
 @nextRow:
-    ldy generalCounter
-    lda multBy10Table,y
-; playfieldAddr ends restored to 0 as top row is done last
-    sta playfieldAddr
-    jsr advanceSidesContinue
-    dec generalCounter
+    lda multBy10Table,x
+    sta playfieldAddr ; restored to 0 at end of loop
+    jsr advanceSides
+    dex
     bpl @nextRow
-
-; set vramRow to render entire playfield
-    lda #$00
-    sta vramRow
+    inx ; x is FF, increase to store 0 in vramRow
+    stx vramRow
 crunchReturn:
     rts
 
 advanceSides:
-    ; called in playState_checkForCompletedRows
-    ; after init, only top row is drawn.  using (playfieldAddr),y defaults to top row
-    ; as playfieldAddr is 0 when this is called (and most of the time)
+    ; called in playState_checkForCompletedRows and in advanceGameCrunch
+    ; draws to row defined in playfieldAddr, which defaults to 0
     jsr unpackCrunchModifier
 
-advanceSidesContinue:
-    ldy #$00
     lda #BLOCK_TILES
 
-; x controls left tile count.  x can start at 0,1,2 or 3.
-    ldx crunchLeftColumns
+; y controls left tile count and offset into playfield
+    ldy #$0
 @leftLoop:
-    dex
-    bmi @right
+    dec crunchLeftColumns
+    bmi @initRight
     sta (playfieldAddr),y
     iny
-    bne @leftLoop ; unconditional
+    bpl @leftLoop ; unconditional
 
-@right:
-    tya
-    clc
-    adc crunchClearColumns
-    tay
-    lda #BLOCK_TILES
-
-; y is replaced with crunchClearColumns + y and increments until y == 10.  y can start at 7,8,9 or 10.
+@initRight:
+    ldy #$9
+; x controls right tile count, y controls offset into playfield
 @rightLoop:
-    cpy #$0A
-    beq crunchReturn
+    dec crunchRightColumns
+    bmi crunchReturn
     sta (playfieldAddr),y
-    iny
-    bne @rightLoop ; unconditional
+    dey
+    bpl @rightLoop ; unconditional
+
 
 unpackCrunchModifier:
  ; initialize vars
@@ -83,9 +67,5 @@ unpackCrunchModifier:
     sta crunchLeftColumns ; generalCounter3
     lda crunchModifier
     and #$03
-    clc
-    adc crunchLeftColumns ; carry still clear
-    eor #$FF
-    adc #$0B ; 10 + 1 to get two's complement.  result is playable column count
-    sta crunchClearColumns ; generalCounter4
+    sta crunchRightColumns ; generalCounter4
     rts

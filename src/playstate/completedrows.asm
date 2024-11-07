@@ -1,5 +1,3 @@
-crunchLeftColumns := generalCounter3
-crunchClearColumns := generalCounter4
 activeFloorMode := generalCounter5
 
 playState_checkForCompletedRows:
@@ -146,7 +144,7 @@ playState_checkForCompletedRows:
         lda practiseType
         cmp #MODE_CRUNCH
         bne @crunchEnd
-        jsr advanceSides
+        jsr advanceSides ; clobbers generalCounter3 and generalCounter4
 @crunchEnd:
 
         lda completedLines
