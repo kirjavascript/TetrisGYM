@@ -29,6 +29,7 @@ if (args.includes('-h')) {
 -c  force PNG to CHR conversion
 -o  override autodetect mmc1 header with cnrom
 -t  run tests (requires cargo)
+-T  run single test
 -h  you are here
 `);
     process.exit(0);
@@ -202,4 +203,10 @@ console.timeEnd('build');
 if (args.includes('-t')) {
     console.log('\nrunning tests');
     exec('cargo run --release --manifest-path tests/Cargo.toml -- -t');
+}
+
+if (args.includes('-T')) {
+    const singleTest = args[1+args.indexOf('-T')];
+    console.log(`\nrunning single test: ${singleTest}`);
+    exec(`cargo run --release --manifest-path tests/Cargo.toml -- -T ${singleTest}`);
 }
