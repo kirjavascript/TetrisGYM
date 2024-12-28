@@ -49,6 +49,13 @@ harddrop_tetrimino:
         lda #0
         sta autorepeatY
         sta completedLines
+
+        ldy #$13
+@clearBuffer:
+        sta harddropBuffer,y
+        dey
+        bpl @clearBuffer
+
         jsr playState_lockTetrimino
 
         ; check for gameOver
