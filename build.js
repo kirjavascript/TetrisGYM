@@ -127,8 +127,7 @@ console.timeEnd('CHR');
 
 const { spawnSync } = require('child_process');
 
-function exec(cmd) {
-    const [exe, ...args] = cmd.split(' ');
+function execArgs(exe, args) {
     const output = spawnSync(exe, args).output.flatMap(
         (d) => d?.toString() || [],
     );
@@ -136,6 +135,11 @@ function exec(cmd) {
         console.log(output.join('\n'));
         process.exit(0);
     }
+}
+
+function exec(cmd) {
+    const [exe, ...args] = cmd.split(' ');
+    execArgs(exe, args)
 }
 
 const ca65bin = nativeCC65 ? 'ca65' : 'node ./tools/assemble/ca65.js';
@@ -208,5 +212,5 @@ if (args.includes('-t')) {
 if (args.includes('-T')) {
     const singleTest = args[1+args.indexOf('-T')];
     console.log(`\nrunning single test: ${singleTest}`);
-    exec(`cargo run --release --manifest-path tests/Cargo.toml -- -T ${singleTest}`);
+    execArgs('cargo', [...'run --release --manifest-path tests/Cargo.toml -- -T'.split(' '), singleTest]);
 }
