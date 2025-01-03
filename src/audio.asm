@@ -144,6 +144,8 @@ advanceAudioSlotFrame:
 @ret:   rts
 
 .align $100
+        .byte $00 ; pad so low byte is not zero.  See tya in initSoundEffectShared
+
 ; Referenced by initSoundEffectShared
 soundEffectSlot0_gameOverCurtainInitData:
         .byte   $1F,$7F,$0F,$C0
