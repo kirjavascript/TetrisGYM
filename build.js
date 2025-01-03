@@ -23,6 +23,7 @@ if (args.includes('-h')) {
 
 -m  mapper
 -a  faster aeppoz + press select to end game
+-A  build anydas
 -s  disable highscores/SRAM
 -k  Famicom Keyboard support
 -w  force WASM compiler
@@ -87,11 +88,16 @@ if (args.includes('-o')) {
     console.log('cnrom override for autodetect');
 }
 
+if (args.includes('-A')) {
+    compileFlags.push('-D', 'ANYDAS=1');
+    console.log('anydas enabled');
+}
 console.log();
 
 // build / compress nametables
 
 console.time('nametables');
+process.env['GYM_FLAGS'] = compileFlags.join(' ');
 require('./src/nametables/build');
 console.timeEnd('nametables');
 

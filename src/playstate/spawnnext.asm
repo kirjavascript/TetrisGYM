@@ -53,6 +53,12 @@ playState_spawnNextTetrimino:
         jsr incrementPieceStat
         jsr chooseNextTetrimino
         sta nextPiece
+.if ANYDAS = 1
+        lda anydasARECharge
+        beq :+
+        sta autorepeatX ; store 1 if ARE Charge is on
+:
+.endif
 @resetDownHold:
         lda #$00
         sta autorepeatY
