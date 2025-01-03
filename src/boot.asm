@@ -31,7 +31,13 @@
         sta paceModifier
 
         lda #$10
+.if ANYDAS <> 1
         sta dasModifier
+.else
+        sta anydasDASValue
+        lda #$06
+        sta anydasARRValue
+.endif
 
         lda #INITIAL_LINECAP_LEVEL
         sta linecapLevel

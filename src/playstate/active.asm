@@ -393,6 +393,7 @@ framesPerDropTablePAL:
         .byte   $02,$02,$02,$01,$01,$01,$01,$01
         .byte   $01,$01,$01,$01,$01,$01
 shift_tetrimino:
+.if ANYDAS <> 1
         ; dasOnlyFlag
         lda dasOnlyShiftDisabled
         beq @dasOnlyEnd
@@ -438,6 +439,7 @@ shift_tetrimino:
         lda #$08
         sta dasValuePeriod
 @shiftTetrimino:
+.endif
 
         lda tetriminoX
         sta originalY
@@ -450,6 +452,18 @@ shift_tetrimino:
         lda heldButtons
         and #$03
         beq @ret
+.if ANYDAS = 1
+        dec autorepeatX
+        lda autorepeatX
+        cmp #$01
+        bpl @ret
+        lda anydasARRValue
+        sta autorepeatX
+        beq @zeroArr
+        bne @buttonHeldDown
+@resetAutorepeatX:
+        lda anydasDASValue
+.else
         inc autorepeatX
         lda autorepeatX
         cmp dasValueDelay
@@ -460,6 +474,7 @@ shift_tetrimino:
 
 @resetAutorepeatX:
         lda #$00
+.endif
         sta autorepeatX
 @buttonHeldDown:
         lda heldButtons
@@ -486,6 +501,44 @@ shift_tetrimino:
 @restoreX:
         lda originalY
         sta tetriminoX
+.if ANYDAS = 1
+        lda #$01
+.else
         lda dasValueDelay
+.endif
         sta autorepeatX
 @ret:   rts
+
+.if ANYDAS = 1
+@zeroArr:
+        lda heldButtons
+        and #BUTTON_RIGHT
+        beq @checkLeftPressed
+@shiftRight:
+        inc tetriminoX
+        jsr isPositionValid
+        bne @shiftBackToLeft
+        lda #$03
+        sta soundEffectSlot1Init
+        jmp @shiftRight
+@checkLeftPressed:
+        lda heldButtons
+        and #BUTTON_LEFT
+        beq @leftNotPressed
+@shiftLeft:
+        dec tetriminoX
+        jsr isPositionValid
+        bne @shiftBackToRight
+        lda #$03
+        sta soundEffectSlot1Init
+        jmp @shiftLeft
+@shiftBackToLeft:
+        dec tetriminoX
+        dec tetriminoX
+@shiftBackToRight:
+        inc tetriminoX
+        lda #$01
+        sta autorepeatX
+@leftNotPressed:
+        rts
+.endif
