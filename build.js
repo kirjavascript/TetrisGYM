@@ -204,13 +204,15 @@ console.log();
 
 console.timeEnd('build');
 
+// tests
+
 if (args.includes('-t')) {
     console.log('\nrunning tests');
     exec('cargo run --release --manifest-path tests/Cargo.toml -- -t');
 }
 
 if (args.includes('-T')) {
-    const singleTest = args[1+args.indexOf('-T')];
+    const singleTest = args.slice(1+args.indexOf('-T')).join(' ');
     console.log(`\nrunning single test: ${singleTest}`);
     execArgs('cargo', [...'run --release --manifest-path tests/Cargo.toml -- -T'.split(' '), singleTest]);
 }
