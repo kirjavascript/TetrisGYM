@@ -8,6 +8,7 @@ mod video;
 mod cycle_count;
 mod crash;
 
+mod crunch;
 mod drought;
 mod floor;
 mod garbage;
@@ -55,7 +56,7 @@ struct TestOptions {
 fn main() {
     let options = TestOptions::parse_args_default_or_exit();
 
-    let tests: [(&str, fn()); 15] = [
+    let tests: [(&str, fn()); 16] = [
         ("garbage4", garbage::test_garbage4_crash),
         ("floor", floor::test),
         ("tspins", tspins::test),
@@ -71,6 +72,7 @@ fn main() {
         ("nmi", nmi::test),
         ("constants", constants::test),
         ("patch", patch::test),
+        ("crunch", crunch::test),
     ];
 
     // run tests

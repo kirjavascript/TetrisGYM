@@ -30,6 +30,7 @@ if (args.includes('-h')) {
 -c  force PNG to CHR conversion
 -o  override autodetect mmc1 header with cnrom
 -t  run tests (requires cargo)
+-T  run single test
 -h  you are here
 `);
     process.exit(0);
@@ -132,8 +133,7 @@ console.timeEnd('CHR');
 
 const { spawnSync } = require('child_process');
 
-function exec(cmd) {
-    const [exe, ...args] = cmd.split(' ');
+function execArgs(exe, args) {
     const output = spawnSync(exe, args).output.flatMap(
         (d) => d?.toString() || [],
     );
@@ -141,6 +141,11 @@ function exec(cmd) {
         console.log(output.join('\n'));
         process.exit(0);
     }
+}
+
+function exec(cmd) {
+    const [exe, ...args] = cmd.split(' ');
+    execArgs(exe, args)
 }
 
 const ca65bin = nativeCC65 ? 'ca65' : 'node ./tools/assemble/ca65.js';
@@ -205,7 +210,15 @@ console.log();
 
 console.timeEnd('build');
 
+// tests
+
 if (args.includes('-t')) {
     console.log('\nrunning tests');
     exec('cargo run --release --manifest-path tests/Cargo.toml -- -t');
+}
+
+if (args.includes('-T')) {
+    const singleTest = args.slice(1+args.indexOf('-T')).join(' ');
+    console.log(`\nrunning single test: ${singleTest}`);
+    execArgs('cargo', [...'run --release --manifest-path tests/Cargo.toml -- -T'.split(' '), singleTest]);
 }
