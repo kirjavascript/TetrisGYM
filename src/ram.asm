@@ -5,8 +5,6 @@ tmp3: .res 1
 tmpX: .res 1 ;  $0003
 tmpY: .res 1 ;  $0004
 tmpZ: .res 1 ;  $0005
-switchTmp1 := tmpX ; for switch_s_plus_2a
-switchTmp2 := tmpY
 
 tmpBulkCopyToPpuReturnAddr: .res 2 ;  $0006 ; 2 bytes
 binScore: .res 4 ;  $8 ; 4 bytes binary

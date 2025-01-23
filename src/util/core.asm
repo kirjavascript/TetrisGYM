@@ -285,19 +285,3 @@ memset_page:
         inx
         bne @setByte
         rts
-
-switch_s_plus_2a:
-        asl a
-        tay
-        iny
-        pla
-        sta switchTmp1
-        pla
-        sta switchTmp2
-        lda (switchTmp1),y
-        tax
-        iny
-        lda (switchTmp1),y
-        sta switchTmp2
-        stx switchTmp1
-        jmp (switchTmp1)

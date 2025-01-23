@@ -5,6 +5,7 @@
 ;
 ; TetrisGYM - A Tetris Practise ROM
 
+.include "macros.asm"
 .include "charmap.asm"
 .include "constants.asm"
 .include "io.asm"
@@ -13,6 +14,7 @@
 
 .setcpu "6502"
 .feature force_range
+.linecont
 
 .segment    "PRG_chunk1": absolute
 
