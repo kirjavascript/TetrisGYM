@@ -12,6 +12,7 @@ mod crunch;
 mod drought;
 mod floor;
 mod garbage;
+mod harddrop;
 mod mapper;
 mod palettes;
 mod pushdown;
@@ -56,7 +57,7 @@ struct TestOptions {
 fn main() {
     let options = TestOptions::parse_args_default_or_exit();
 
-    let tests: [(&str, fn()); 16] = [
+    let tests: [(&str, fn()); 17] = [
         ("garbage4", garbage::test_garbage4_crash),
         ("floor", floor::test),
         ("tspins", tspins::test),
@@ -73,6 +74,7 @@ fn main() {
         ("constants", constants::test),
         ("patch", patch::test),
         ("crunch", crunch::test),
+        ("harddrop", harddrop::test),
     ];
 
     // run tests
