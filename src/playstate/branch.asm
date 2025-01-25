@@ -1,3 +1,4 @@
+; prepareNext used to be bTypeGoalCheck
 branchOnPlayStatePlayer1:
         branchTo playState, \
             playState_unassignOrientationId, \
