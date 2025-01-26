@@ -92,7 +92,7 @@ if (args.includes('-o')) {
 if (args.includes('--')){
     const addlFlags = args.slice(1+args.indexOf('--'));
     compileFlags.push(...addlFlags);
-    args.splice(args.indexOf('--'), 1+compileFlags.length);
+    args.splice(args.indexOf('--'), 1+addlFlags.length);
     }
 
 console.log();
@@ -142,7 +142,7 @@ function execArgs(exe, args) {
     if (result.stdout.length) {
         console.log(result.stdout.toString());
     }
-    if (result.status !== 0){
+    if (result.status){
         process.exit(result.status);
     }
 }
