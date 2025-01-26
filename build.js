@@ -30,7 +30,6 @@ if (args.includes('-h')) {
 -o  override autodetect mmc1 header with cnrom
 -t  run tests (requires cargo)
 -T  run single test
--D  ca65 build arg
 -h  you are here
 `);
     process.exit(0);
@@ -89,11 +88,12 @@ if (args.includes('-o')) {
     console.log('cnrom override for autodetect');
 }
 
-args.forEach((arg, i) => {
-    if (arg === '-D') {
-        compileFlags.push(...args.slice(i, i+2));
-        }
-    })
+// pass additional arguments to ca65
+if (args.includes('--')){
+    const addlFlags = args.slice(1+args.indexOf('--'));
+    compileFlags.push(...addlFlags);
+    args.splice(args.indexOf('--'), 1+compileFlags.length);
+    }
 
 console.log();
 
