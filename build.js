@@ -143,7 +143,7 @@ function execArgs(exe, args) {
         console.log(result.stdout.toString());
     }
     if (result.status !== 0){
-        process.exit(1);
+        process.exit(result.status);
     }
 }
 
