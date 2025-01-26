@@ -135,12 +135,15 @@ console.timeEnd('CHR');
 const { spawnSync } = require('child_process');
 
 function execArgs(exe, args) {
-    const output = spawnSync(exe, args).output.flatMap(
-        (d) => d?.toString() || [],
-    );
-    if (output.length) {
-        console.log(output.join('\n'));
-        process.exit(0);
+    const result = spawnSync(exe, args);
+    if (result.stderr.length) {
+        console.error(result.stderr.toString());
+    }
+    if (result.stdout.length) {
+        console.log(result.stdout.toString());
+    }
+    if (result.status !== 0){
+        process.exit(1);
     }
 }
 
