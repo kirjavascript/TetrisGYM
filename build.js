@@ -19,7 +19,7 @@ const mappers = { // https://www.nesdev.org/wiki/Mapper
 const args = process.argv.slice(2);
 
 if (args.includes('-h')) {
-    console.log(`usage: node build.js [-h] [-v] [-m<${Object.keys(mappers).join('|')}>] [-a] [-s] [-k] [-w]
+    console.log(`usage: node build.js [-h] [-v] [-m<${Object.keys(mappers).join('|')}>] [-a] [-s] [-k] [-w] [-- (ca65 args)]
 
 -m  mapper
 -a  faster aeppoz + press select to end game
@@ -89,11 +89,11 @@ if (args.includes('-o')) {
 }
 
 // pass additional arguments to ca65
-if (args.includes('--')){
-    const addlFlags = args.slice(1+args.indexOf('--'));
-    compileFlags.push(...addlFlags);
-    args.splice(args.indexOf('--'), 1+addlFlags.length);
-    }
+if (args.includes('--')) {
+    const ca65Flags = args.slice(1+args.indexOf('--'));
+    compileFlags.push(...ca65Flags);
+    args.splice(args.indexOf('--'), 1+ca65Flags.length);
+}
 
 console.log();
 
@@ -142,7 +142,7 @@ function execArgs(exe, args) {
     if (result.stdout.length) {
         console.log(result.stdout.toString());
     }
-    if (result.status){
+    if (result.status) {
         process.exit(result.status);
     }
 }
