@@ -24,6 +24,10 @@ initRam:
 
 .include "boot.asm"
 
+        jmp menu
+
+.include "menu/menu.asm"
+
 mainLoop:
         jsr branchOnGameMode
         cmp gameModeState
@@ -31,6 +35,7 @@ mainLoop:
         jsr updateAudioWaitForNmiAndResetOamStaging
 @continue:
         jmp mainLoop
+
 
 .include "nmi/nmi.asm"
 .include "nmi/render.asm"

@@ -39,46 +39,46 @@ drawTiles(buffer, lookup, `
 #a                            d#
 #a                            d#
 #a                            d#
-#a    TETRIS                  d#
-#a    T-SPINS                 d#
-#a    SEED                    d#
-#a    STACKING                d#
-#a    PACE                    d#
-#a    SETUPS                  d#
-#a    B-TYPE                  d#
-#a    FLOOR                   d#
-#a    CRUNCH                  d#
-#a    (QUICK)TAP              d#
-#a    TRANSITION              d#
-#a    MARATHON                d#
-#a    TAP QUANTITY            d#
-#a    CHECKERBOARD            d#
-#a    GARBAGE                 d#
-#a    DROUGHT                 d#
-#a    DAS DELAY               d#
-#a    LOW STACK               d#
-#a    KILLSCREEN »2           d#
-#a    INVISIBLE               d#
-#a    HARD DROP               d#
+#a                            d#
+#a                            d#
+#a                            d#
+#a                            d#
+#a                            d#
+#a                            d#
+#a                            d#
+#a                            d#
+#a                            d#
+#a                            d#
+#a                            d#
+#a                            d#
+#a                            d#
+#a                            d#
+#a                            d#
+#a                            d#
+#a                            d#
+#a                            d#
+#a                            d#
+#a                            d#
+#a                            d#
 `);drawTiles(extra, lookup, `
-#a    TAP/ROLL SPEED          d#
-#a    SCORING                 d#
-#a    CRASH                   d#
-#a    STRICT CRASH            d#
-#a    HZ DISPLAY              d#
-#a    INPUT DISPLAY           d#
-#a    DISABLE FLASH           d#
-#a    DISABLE PAUSE           d#
-#a    DARK MODE               d#
-#a    GOOFY FOOT              d#
-#a    BLOCK TOOL              d#
-#a    LINECAP                 d#
-#a    DAS ONLY                d#
-#a    QUAL MODE               d#
-#a    PAL MODE                d#
 #a                            d#
 #a                            d#
-#a V6                         d#
+#a                            d#
+#a                            d#
+#a                            d#
+#a                            d#
+#a                            d#
+#a                            d#
+#a                            d#
+#a                            d#
+#a                            d#
+#a                            d#
+#a                            d#
+#a                            d#
+#a                            d#
+#a                            d#
+#a                            d#
+#a                            d#
 #a                            d#
 #a                            d#
 #a                            d#

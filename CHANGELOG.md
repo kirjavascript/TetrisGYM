@@ -2,7 +2,8 @@
 
 ## [unreleased]
 
-* Fixed a glitch when using Crash Mode + Crunch Mode
+* Fixed a storage bug where 'Crash' text is shown incorrectly
+* Fixed a inaccuracy when using Crash Mode + Crunch Mode
 * Fixed a glitch in Hard Drop Mode
 * Fixed line based floor caps outside of levelups
 * Reset scores when no SRAM is present
