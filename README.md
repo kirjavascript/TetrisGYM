@@ -1,7 +1,7 @@
 # TetrisGYM
 
 <div align="center">
-    <img src="./assets/screens/menu5.png" alt="Menuscreen">
+    <img src="./assets/screens/menu6.png" alt="Menuscreen">
     <br>
 </div>
 <br>
@@ -25,6 +25,7 @@
     * [Garbage](#garbage)
     * [Drought](#drought)
     * [DAS Delay](#das-delay)
+    * [Low Stack](#low-stack)
     * [Double Killscreen](#double-killscreen)
     * [Invisible](#invisible)
     * [Hard Drop](#hard-drop)
@@ -32,10 +33,12 @@
 * [Highscores](#highscores)
 * [Tap/Roll Speed Tester](#taproll-speed-tester)
 * [Scoring](#scoring)
+* [Crash](#crash)
 * [Hz Display](#hz-display)
 * [Input Display](#input-display)
 * [Disable Flash](#disable-flash)
 * [Disable Pause](#disable-pause)
+* [Dark Mode](#dark-mode)
 * [Goofy Foot](#goofy-foot)
 * [Block Tool](#block-tool)
     * [Level Editor](#level-editor)
@@ -45,7 +48,6 @@
 * [Qualifier Mode](#qual-mode)
 * [PAL Mode](#pal-mode)
 * [Development](#development)
-* [Resources](#resources)
 
 ## Getting Started
 
@@ -64,7 +66,7 @@ ROM CRC32: 1394F57E
 
 A link to the BPS can be found on the [releases page](https://github.com/kirjavascript/TetrisGYM/releases).
 
-TetrisGYM supports the mappers MMC1, MMC3, and CNROM. The default build is MMC1.
+The BPS produces a file with an MMC1 header, but it also works when treated as CNROM.
 
 ## Trainers
 
@@ -224,6 +226,12 @@ Create artificially inflated droughts. Increasing the value causes less I pieces
 
 Change the auto-shift delay rate.
 
+### Low Stack
+
+![Low-Stack](./assets/screens/lowstack.png)
+
+Choose a height limit for your stack and stay below or else it's game over.  
+
 ### Double Killscreen
 
 The pieces fall by two blocks every frame. It's hard.
@@ -307,7 +315,7 @@ __M__
 
 ![M](./assets/screens/score-m.png)
 
-Shows your score in millions, rolls over at 100 million.
+Same as Classic scoring, except additionally display your score in millions.
 
 __Capped__
 
@@ -320,6 +328,27 @@ __Hidden__
 ![Hidden](./assets/screens/score-hidden.png)
 
 Hides score until game over.
+
+## Crash
+
+![Crash](./assets/screens/crash.png)
+
+Recreation of the crash conditions and behaviour seen in the original game.
+
+For example; crashing, level lag, confetti, satan spawn
+
+* Off  
+        Normal Mode - No behaviour caused by the crash bug is present. Same behaviour as versions before v6.  
+* Show  
+        Enable crash glitches. Instead of crashing, show an icon next to score and continue the game.  
+* Topout  
+        Enable crash glitches. Instead of crashing, behave as if the player topped out.  
+* Crash  
+        Enable crash glitches, actually crash on crash triggers.
+
+## Strict Crash
+
+By enabling this option the crash triggers based on probabilities will always crash at the earliest opportunity.
 
 ## Hz Display
 
@@ -344,6 +373,14 @@ Disable the ability to pause the game.
 ## Goofy Foot
 
 Flips A/B, Start/Select, and inverts DPad directions like a Goofy Foot controller.
+
+## Dark Mode
+
+![Dark Mode](./assets/screens/dark.png)
+
+Alternative pattern-less backgrounds.
+
+Dark, Neon, Lite, Teal, and OG versions are available.
 
 ## Block Tool
 
@@ -449,10 +486,10 @@ To build, you need a copy of `node` installed on your system. No other dependenc
 
 Provide a `clean.nes` file of the unpatched ROM and run `node build.js`
 
-This project descends from the TAUS disassembly of NES Tetris and has been heavily modified. Large parts have been replaced, lots of optimisations, removal of unused code, non-game-mechanics related bugfixes, tooling, and different approaches to the disassembly work itself has taken place.
+TetrisGYM supports being built for mappers NROM, MMC1, MMC3, MMC5, and CNROM.
 
+Run `node build.js -h` for a list of build options.
 
-## Resources
+---
 
-* [https://github.com/ejona86/taus](https://github.com/ejona86/taus)  
-* [https://github.com/CelestialAmber/TetrisNESDisasm](https://github.com/CelestialAmber/TetrisNESDisasm)  
+This project descends from ejona's [TAUS](https://github.com/ejona86/taus) disassembly and [CelestialAmber's](https://github.com/CelestialAmber/TetrisNESDisasm) subsequent take on it.

@@ -71,9 +71,9 @@ typeBEndingStuffEnd:
         lda #$4
         sta soundEffectSlot1Init
 
-        lda outOfDateRenderFlags ; Flag needed to reveal hidden score
+        lda renderFlags ; Flag needed to reveal hidden score
         ora #$4
-        sta outOfDateRenderFlags
+        sta renderFlags
         lda #$0A ; playState_checkStartGameOver
         sta playState
         lda #$30
@@ -112,6 +112,8 @@ copyGraphicToPlayfieldAtCustomRow:
         rts
 
 ; $28 is ! in game tileset
+lowStackNopeGraphic:
+        .byte   "N","O","P","E",$FF,$28,$00
 haltEndingGraphic:
         .byte   $FF,'G','G',$FF,$28,$00
 typebSuccessGraphic:

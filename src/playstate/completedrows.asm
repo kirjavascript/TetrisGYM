@@ -102,7 +102,7 @@ playState_checkForCompletedRows:
         tax
         ldy multBy10Table,x
         ldx #$0A
-        lda #BLOCK_TILES
+        lda #BLOCK_TILES+3
 @drawFloorSurface:
         sta playfield,y
         iny
@@ -144,8 +144,7 @@ playState_checkForCompletedRows:
         lda practiseType
         cmp #MODE_CRUNCH
         bne @crunchEnd
-        lda #1
-        jsr advanceSides
+        jsr advanceSides ; clobbers generalCounter3 and generalCounter4
 @crunchEnd:
 
         lda completedLines

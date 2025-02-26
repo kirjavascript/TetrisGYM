@@ -48,6 +48,7 @@ gameModeState_initGameState:
         sta dasOnlyShiftDisabled
         sta invisibleFlag
         sta currentFloor
+        sta crashState
 
 ; initialize currentFloor if necessary
         lda practiseType
@@ -86,13 +87,8 @@ gameModeState_initGameState:
         sta lineClearStatsByType+2
         sta lineClearStatsByType+3
         sta allegro
-        sta demo_heldButtons
-        sta demo_repeats
-        sta demoIndex
-        sta demoButtonsAddr
+        sta holdDownPoints
         sta spawnID
-        lda #>demoButtonsTable
-        sta demoButtonsAddr+1
         lda #$03
         sta renderMode
         ldx #$A0
@@ -139,8 +135,8 @@ gameModeState_initGameState:
         jsr presetScoreFromBCD
 @noChecker:
 
-        lda #$57
-        sta outOfDateRenderFlags
+        lda #RENDER_STATS|RENDER_HZ|RENDER_SCORE|RENDER_LEVEL|RENDER_LINES
+        sta renderFlags
         jsr updateAudioWaitForNmiAndResetOamStaging
 
         lda practiseType
@@ -150,6 +146,8 @@ gameModeState_initGameState:
 @noTypeBPlayfield:
 
         jsr hzStart
+        lda #0
+        sta hzSpawnDelay
         jsr practiseInitGameState
         jsr resetScroll
 

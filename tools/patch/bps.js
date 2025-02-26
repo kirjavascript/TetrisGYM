@@ -794,4 +794,4 @@ MarcFile.prototype.writeString=function(str,len){
 	this.offset+=len;
 }
 
-module.exports = { MarcFile, createBPSFromFiles, parseBPSFile };
+module.exports = { MarcFile, createBPSFromFiles, parseBPSFile, crc32 };

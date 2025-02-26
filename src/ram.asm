@@ -88,9 +88,9 @@ spriteXOffset: .res 1 ; $00A0
 spriteYOffset: .res 1 ; $00A1
 stringIndexLookup:
 spriteIndexInOamContentLookup: .res 1 ; $00A2
-outOfDateRenderFlags: .res 1 ; $00A3
-; play/demo
-; Bit 0-lines 1-level 2-score 4-hz 6-stats 7-high score entry letter
+renderFlags: .res 1 ; $00A3
+; gameplay
+; Bit 0-lines 1-level 2-score 3-debug 4-hz 6-stats 7-high score entry letter
 ; speedtest
 ; 0 - hz
 ; level menu
@@ -121,7 +121,7 @@ pendingGarbage: .res 1 ; $00BB                    ; Garbage waiting to be delive
 renderMode: .res 1 ; $00BD
     .res 1
 nextPiece: .res 1 ; $00BF                        ; Stored by its orientation ID
-gameMode: .res 1 ; $00C0                        ; 0=legal, 1=title, 2=type menu, 3=level menu, 4=play and ending and high score, 5=demo, 6=start demo
+gameMode: .res 1 ; $00C0                        ; see gamemode/branch.asm
 screenStage: .res 1 ; $00C1                        ; used in gameMode_waitScreen, endingAnimation
 musicType: .res 1 ; $00C2                        ; 0-3; 3 is off
 sleepCounter: .res 1 ; $00C3                    ;
@@ -130,11 +130,7 @@ endingRocketCounter: .res 1 ; $00C6
 endingRocketX: .res 1 ; $C7
 endingRocketY: .res 1 ; $C8
     .res 5
-demo_heldButtons: .res 1 ; $00CE
-demo_repeats: .res 1 ; $00CF
-    .res 1
-demoButtonsAddr: .res 2 ; $00D1                    ; Current address within demoButtonsTable
-demoIndex: .res 1 ; $00D3
+    .res 6 ; used to be demo stuff
 highScoreEntryNameOffsetForLetter: .res 1 ; $00D4   ; Relative to current row
 highScoreEntryRawPos: .res 1 ; $00D5                ; High score position 0=1st type A, 1=2nd... 4=1st type B... 7=4th/extra type B
 highScoreEntryNameOffsetForRow: .res 1 ; $00D6      ; Relative to start of table
@@ -196,7 +192,7 @@ saveStateSlot: .res 1 ; $60B
 saveStateSpriteType: .res 1 ; $60C
 saveStateSpriteDelay: .res 1 ; $60D
 presetIndex: .res 1 ; $60E ; can be mangled in other modes
-pausedOutOfDateRenderFlags: .res 1 ; $60F ; 0 - statistics 1 - saveslot
+.res 1
 debugLevelEdit: .res 1 ; $610
 debugNextCounter: .res 1 ; $611
 paceResult: .res 3 ; $612 ; 3 bytes
@@ -226,9 +222,10 @@ linecapState: .res 1 ; $639 ; 0 if not triggered, 1 + linecapHow otherwise, rese
 dasOnlyShiftDisabled: .res 1 ; $63A
 
 invisibleFlag: .res 1 ; $63B  ; 0 for normal mode, non-zero for Invisible playfield rendering.  Reset on game init and game over.
-currentFloor: .res 1 ; floorModifier is copied here at game init.  Set to 0 otherwise and incremented when linecap floor.
-ntcRequest: .res 1 ; $63D Used by NestrisChamps to request data via everdrive edlink
-    .res $37
+currentFloor: .res 1 ; $63C floorModifier is copied here at game init.  Set to 0 otherwise and incremented when linecap floor.
+mapperId: .res 1 ; $63D ; For INES_MAPPER 1000 (autodetect).  0 = CNROM.  1 = MMC1.
+ntcRequest: .res 1 ; $63E Used by NestrisChamps to request data via everdrive edlink
+    .res $36
 
 .if KEYBOARD
 newlyPressedKeys: .res 1 ; $0675
@@ -343,12 +340,15 @@ checkerModifier: .res 1
 garbageModifier: .res 1
 droughtModifier: .res 1
 dasModifier: .res 1
+lowStackRowModifier: .res 1
 scoringModifier: .res 1
 crashModifier: .res 1
+strictFlag: .res 1 ;used for crash detection. If 1, the game will register a crash anytime there is a possibility of one.
 hzFlag: .res 1
 inputDisplayFlag: .res 1
 disableFlashFlag: .res 1
 disablePauseFlag: .res 1
+darkModifier: .res 1
 goofyFlag: .res 1
 debugFlag: .res 1
 linecapFlag: .res 1

@@ -11,8 +11,8 @@ linecapMenuCursorIndices := 3
         jsr bulkCopyToPpu
         .addr linecapMenuNametable
 
-        lda #1
-        sta outOfDateRenderFlags
+        lda #RENDER_LINES
+        sta renderFlags
 
         lda #$02
         sta soundEffectSlot1Init
@@ -115,8 +115,8 @@ linecapMenuControlsWhen:
         beq @ret
         lda #$01
         sta soundEffectSlot1Init
-        lda #1
-        sta outOfDateRenderFlags
+        lda #RENDER_LINES
+        sta renderFlags
         lda linecapWhen
         eor #1
         sta linecapWhen
@@ -153,8 +153,8 @@ linecapMenuControlsAdjLevel:
 linecapMenuControlsBoopAndRender:
         lda #$01
         sta soundEffectSlot1Init
-        lda #1
-        sta outOfDateRenderFlags
+        lda #RENDER_LINES
+        sta renderFlags
         rts
 
 linecapMenuControlsAdjLinesUp:

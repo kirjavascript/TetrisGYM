@@ -1,20 +1,30 @@
 mod block;
-mod cycle_count;
 mod input;
 mod labels;
 mod playfield;
 mod util;
 mod video;
 
+mod cycle_count;
+mod crash;
+
+mod crunch;
 mod drought;
 mod floor;
 mod garbage;
+mod harddrop;
+mod mapper;
+mod palettes;
 mod pushdown;
 mod rng;
 mod score;
 mod sps;
 mod toprow;
 mod tspins;
+mod hz_display;
+mod nmi;
+mod constants;
+mod patch;
 
 use gumdrop::Options;
 
@@ -27,8 +37,12 @@ struct TestOptions {
     help: bool,
     #[options(help = "run tests")]
     test: bool,
+    #[options(help = "run single tests")]
+    test_single: Option<String>,
     #[options(help = "count cycles")]
     cycles: bool,
+    #[options(help = "fuzz crash")]
+    crash: bool,
     #[options(help = "set SPS seed", parse(try_from_str = "parse_hex"))]
     sps_seed: u32,
     #[options(help = "print SPS pieces")]
@@ -43,26 +57,48 @@ struct TestOptions {
 fn main() {
     let options = TestOptions::parse_args_default_or_exit();
 
+    let tests: [(&str, fn()); 17] = [
+        ("garbage4", garbage::test_garbage4_crash),
+        ("floor", floor::test),
+        ("tspins", tspins::test),
+        ("top row bug", toprow::test),
+        ("score", score::test),
+        ("score_render", score::test_render),
+        ("mapper", mapper::test),
+        ("pushdown", pushdown::test),
+        ("rng seeds", rng::test),
+        ("sps", sps::test),
+        ("palettes", palettes::test),
+        ("hz_display", hz_display::test),
+        ("nmi", nmi::test),
+        ("constants", constants::test),
+        ("patch", patch::test),
+        ("crunch", crunch::test),
+        ("harddrop", harddrop::test),
+    ];
+
     // run tests
     if options.test {
-        // garbage::test_garbage4_crash();
-        // println!(">> garbage4 ✅");
-        floor::test();
-        println!(">> floor ✅");
-        tspins::test();
-        println!(">> tspins ✅");
-        toprow::test();
-        println!(">> top row bug ✅");
-        score::test();
-        println!(">> score ✅");
-        score::test_render();
-        println!(">> score rendering ✅");
-        pushdown::test();
-        println!(">> pushdown ✅");
-        rng::test();
-        println!(">> rng seeds ✅");
-        sps::test();
-        println!(">> sps ✅");
+        tests.iter().for_each(|(name, test)| {
+            test();
+            println!(">> {name} ✅");
+        });
+    }
+
+    // run single test
+    if let Some(name) = options.test_single {
+        let found = tests.iter().find(|&test| test.0 == name);
+        if let Some(test) = found {
+            test.1();
+            println!(">> {name} ✅");
+        } else {
+            println!("no such test {name}");
+        }
+    }
+
+    // fuzz crash
+    if options.crash {
+        crash::fuzz();
     }
 
     // count cycles

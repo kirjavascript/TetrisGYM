@@ -56,17 +56,20 @@ drawTiles(buffer, lookup, `
 #a    GARBAGE                 d#
 #a    DROUGHT                 d#
 #a    DAS DELAY               d#
+#a    LOW STACK               d#
 #a    KILLSCREEN »2           d#
 #a    INVISIBLE               d#
 #a    HARD DROP               d#
-#a    TAP/ROLL SPEED          d#
 `);drawTiles(extra, lookup, `
+#a    TAP/ROLL SPEED          d#
 #a    SCORING                 d#
 #a    CRASH                   d#
+#a    STRICT CRASH            d#
 #a    HZ DISPLAY              d#
 #a    INPUT DISPLAY           d#
 #a    DISABLE FLASH           d#
 #a    DISABLE PAUSE           d#
+#a    DARK MODE               d#
 #a    GOOFY FOOT              d#
 #a    BLOCK TOOL              d#
 #a    LINECAP                 d#
@@ -75,8 +78,7 @@ drawTiles(buffer, lookup, `
 #a    PAL MODE                d#
 #a                            d#
 #a                            d#
-#a V5                         d#
-#a                            d#
+#a V6                         d#
 #a                            d#
 #a                            d#
 #a                            d#
@@ -132,7 +134,7 @@ drawTiles(extra, lookup, background);
 drawRect(buffer, 8, 2, 10, 5, 0xB0); // draw logo
 
 const urlX = 3;
-const urlY = 14;
+const urlY = 17;
 drawRect(extra, urlX, urlY, 12, 1, 0x74);
 drawRect(extra, urlX+12, urlY, 12, 1, 0x84);
 
@@ -156,8 +158,6 @@ drawAttrs(buffer, [`
     2222222222222222
 `]);
 
-const line = '2'.repeat(16);
-const screen = Array.from({ length: 8 }, () => line).join('\n');
 drawAttrs(extra, [`
     2222222222222222
     2222222222222222
@@ -166,8 +166,17 @@ drawAttrs(extra, [`
     2222222222222222
     2222222222222222
     2222222222222222
+    2222222222222222
+`, `
     2333333333333332
-`, screen]);
+    2222222222222222
+    2222222222222222
+    2222222222222222
+    2222222222222222
+    2222222222222222
+    2222222222222222
+    2222222222222222
+`]);
 
 writeRLE(
     __dirname + '/game_type_menu_nametable_practise.bin',

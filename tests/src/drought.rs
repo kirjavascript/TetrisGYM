@@ -1,10 +1,19 @@
 use crate::{labels, util, block};
+use std::time::{SystemTime, UNIX_EPOCH};
+
+fn rand() -> u32 {
+    (SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .unwrap()
+        .subsec_nanos() % 9) + 4
+}
 
 pub fn print_probabilities() {
     let mut emu = util::emulator(None);
     let rng_seed = labels::get("rng_seed");
     let drought_modifier = labels::get("droughtModifier");
-    let next_rng = labels::get("pickRandomTetrimino");
+    let pick_next = labels::get("pickRandomTetrimino");
+    let prng = labels::get("generateNextPseudorandomNumber");
 
     emu.memory.iram_raw[labels::get("practiseType") as usize] = labels::get("MODE_DROUGHT") as u8;
 
@@ -19,7 +28,13 @@ pub fn print_probabilities() {
         let mut total = 0;
 
         for _ in 0..100000 {
-            emu.registers.pc = next_rng;
+            for _ in 3..rand() {
+                emu.registers.x = rng_seed as u8;
+                emu.registers.pc = prng;
+                util::run_to_return(&mut emu, false);
+            }
+
+            emu.registers.pc = pick_next;
 
             util::run_to_return(&mut emu, false);
 

@@ -6,6 +6,8 @@ nmi:    pha
         lda #$00
         sta oamStagingLength
         jsr render
+        lda currentPpuCtrl
+        sta PPUCTRL
         dec sleepCounter
         lda sleepCounter
         cmp #$FF

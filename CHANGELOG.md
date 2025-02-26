@@ -1,27 +1,46 @@
 # Changelog
 
 ## [unreleased]
-* Crash Behaviours
-* Crunch Mode
-* Marathon Mode
+
+* Fixed a glitch when using Crash Mode + Crunch Mode
+* Fixed a glitch in Hard Drop Mode
+* Fixed line based floor caps outside of levelups
+* Reset scores when no SRAM is present
+
+## v6
+* Crunch Trainer
+* Marathon Trainer
+* Low Stack Trainer
+* Crash Modes
 * Hidden Score Mode
+* Dark Mode
 * M Score changed to Classic Scoring + Millions counter
 * Invisible linecap turns entire playfield invisible
 * Invisible mode preserves original piece colors
-* Floor no longer gobbled up by top line clear
-* Floor 0 has original no-burns behaviour again
-* Fixed ingame score display at 8 million with Classic Scoring
-* Fixed CNROM legal screen CHR bank
-* Fixed CNROM legal to title flicker
-* Fixed piece skip when doing Sonic Drop then Hard Drop immediately
+* Added "negative delay" to the hz display
 * Block Tool pieces wrap around
 * Always Next Box removed
 * 0001 seeds are ignored
+* Hz display correctly counts taps with Up and Down
+* Keep Hz display enabled when topped out
+* Floor no longer gobbled up by top line clear
+* Floor 0 has original no-burns behaviour again
+* [Fixed ingame score display at 8/9 million with Classic Scoring](https://www.youtube.com/watch?v=fYdXky2i5AE)
+* Fixed highscore layout for 10million+ score games
+* Fixed CNROM legal screen CHR bank
+* Fixed CNROM legal to title flicker
+* Fixed piece skip when doing Sonic Drop then Hard Drop immediately
+* Fixed storage bug for push down points
+* Fixed crashes in garbage mode 4
+* Fixed line clearing happening on pause
+* Fixed PAL colours
 * Famicom Keyboard support
+* Autodetect MMC1/CNROM
+* NROM Support
 * MMC3 Support
 * MMC5 Support
 
-## [v5 tournament]
+## v5 tournament
 * Linecap Menu (from CTM Masters September 2022)
     * Trigger from any level or lines
     * Killscreen x2
@@ -37,7 +56,7 @@
 * Fixed the first mino becoming visible in Invisible
 * Other buttons can be pressed when using A+Start to add 10 levels
 
-## [v5]
+## v5
 * Tap Quantity Trainer
 * Checkerboard Trainer
 * Double Killscreen Trainer
@@ -46,9 +65,9 @@
 * Start on any level
 * Rewrite of all scoring code
     * Classic scoring
-    * Millions counter 
+    * Millions counter
     * 7 digit score
-    * 999999 scorecap 
+    * 999999 scorecap
     * Fixed T-Spin scoring
     * Crash free with no long frames
 * Rewrite of all highscore code
@@ -71,7 +90,7 @@
 * Added option to disable tetris flashing
 * Changes made to more closely match the original ROM
     * Restore seed shredding on level menu
-    * Hold `select` to start in Qual Mode and reset level cursor 
+    * Hold `select` to start in Qual Mode and reset level cursor
     * Transition from Legal to Title screen after 512 frames
     * Hide next box between Curtain and Rocket
     * Persist Qual Mode (and menu config) between reset button presses
@@ -98,12 +117,12 @@
 * Added input log to Speed Test
 * Fixed a bug where Rocket wouldn't show with a score between 1.0 and 1.03
 
-## [v4 classic]
+## v4 classic
 - Standard Pause in Qual Mode
 - No Next Box allowed in Qual Mode
 - Block Tool cannot be used in Qual Mode
 
-## [v4]
+## v4
 - B-Type Trainer (height 0-8)
 - Transition Trainer
 - Invisible Trainer
@@ -123,25 +142,25 @@
 - Added DAS-like movement to main menu
 - Added DAS-like movement to Block Tool
 
-## [v3.1]
+## v3.1
 - Added new setup (L/J doubletuck)
 - Improved seeds while retaining backwards compatibility
 - Improved region detection
 
-## [v3]
+## v3
 - Pace Trainer
 - Seed Trainer
 - Controller input can be enabled outside of Debug Mode
 - PAL Mode now has correct SFX
 - Tweaks to make Garbage Trainer more realistic
 
-## [v2]
+## v2
 - Savestates added to Debug Mode
 - Controller input added to Debug Mode
 - Garbage Trainer
     - Always Tetris Ready
     - Normal Garbage
-    - Smart Garbage 
+    - Smart Garbage
     - Hard Garbage
     - Infinite Digging
 - Piece distribution in Setups Trainer is now even
@@ -153,7 +172,7 @@
     - Tetrimino colours are correct past level 138
     - Game no longer crashes after ~1550 lines
 
-## [v1]
+## v1
 - Tetris Trainer
 - T-Spins Trainer
 - Stacking Trainer
