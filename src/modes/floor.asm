@@ -4,6 +4,7 @@ drawFloor:
         ; get correct offset
         sta tmp1
         lda #$D
+        sec
         sbc tmp1
         tax
         ; x10

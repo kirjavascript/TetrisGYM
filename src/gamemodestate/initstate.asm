@@ -46,6 +46,7 @@ gameModeState_initGameState:
         sta dasOnlyShiftDisabled
         sta invisibleFlag
         sta currentFloor
+        sta crashState
 
 ; initialize currentFloor if necessary
         lda practiseType

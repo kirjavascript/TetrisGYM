@@ -77,7 +77,6 @@ gameMode_levelMenu_processPlayer1Navigation:
         lda newlyPressedButtons_player1
         sta newlyPressedButtons
 
-.if SAVE_HIGHSCORES
         lda levelControlMode
         cmp #4
         bne @notClearingHighscores
@@ -89,11 +88,15 @@ gameMode_levelMenu_processPlayer1Navigation:
         lda #0
         sta levelControlMode
         jsr resetScores
+.if SAVE_HIGHSCORES
+        jsr detectSRAM
+        beq @notResettingSavedScores
         jsr resetSavedScores
+@notResettingSavedScores:
+.endif
         jsr updateAudioWaitForNmiAndResetOamStaging
         jmp gameMode_levelMenu
 @notClearingHighscores:
-.endif
 
         jsr levelControl
         jsr levelMenuRenderHearts
@@ -191,7 +194,6 @@ levelControl:
         .addr   levelControlClearHighScores
         .addr   levelControlClearHighScoresConfirm
 
-.if SAVE_HIGHSCORES
 levelControlClearHighScores:
         lda #$20
         sta spriteXOffset
@@ -238,13 +240,7 @@ highScoreClearUpOrLeave:
         sta levelControlMode
 @ret:
         rts
-.else
-levelControlClearHighScores:
-levelControlClearHighScoresConfirm:
-        lda #0
-        sta levelControlMode
-        rts
-.endif
+
 
 levelControlCustomLevel:
         jsr handleReadyInput
@@ -324,10 +320,7 @@ MAX_HEARTS := 7
         jsr @changeHearts
 @checkUpPressed:
 
-.if SAVE_HIGHSCORES
         ; to clear mode
-        jsr detectSRAM
-        beq @notClearMode
         lda newlyPressedButtons
         cmp #BUTTON_DOWN
         bne @notClearMode
@@ -336,7 +329,6 @@ MAX_HEARTS := 7
         lda #$3
         sta levelControlMode
 @notClearMode:
-.endif
 
         ; to normal mode
         lda newlyPressedButtons

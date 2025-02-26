@@ -18,6 +18,7 @@
 
 ; region code at start of page to keep cycle count consistent
 .include "util/check_region.asm"
+.include "audio.asm"
 
 initRam:
 
@@ -31,7 +32,6 @@ mainLoop:
 @continue:
         jmp mainLoop
 
-.include "audio.asm"
 .include "nmi/nmi.asm"
 .include "nmi/render.asm"
 .include "nmi/pollcontroller.asm"
