@@ -23,11 +23,8 @@ harddrop_tetrimino:
         beq playState_playerControlsActiveTetrimino_return
         lda tetriminoY
         sta tmpY
-@loop:
-        inc tetriminoY
-        jsr isPositionValid
-        beq @loop
-        dec tetriminoY
+        lda hardDropGhostY ; value set by previous frame's sprite staging
+        sta tetriminoY
 
         ; sonic drop
         lda newlyPressedButtons
@@ -119,16 +116,13 @@ harddropMarkCleared:
         sta harddropAddr
 
         ; check for empty row
-        ldy #$0
+        ldy #$9
 @minoLoop:
         lda (harddropAddr), y
-        cmp #EMPTY_TILE
-        beq @noLineClear
+        bmi @noLineClear ; EMPTY_TILE sets negative flag, normal tiles do not
 
-        iny
-        cpy #$A
-        beq @lineClear
-        jmp @minoLoop
+        dey
+        bpl @minoLoop
 
 @lineClear:
         lda #1
@@ -196,14 +190,13 @@ harddropShift:
         sbc lineOffset
         sta harddropAddr+2
 
-        ldy #0
+        ldy #9
 @shiftLineLoop:
         lda (harddropAddr+2), y
         sta (harddropAddr), y
 
-        iny
-        cpy #$A
-        bne @shiftLineLoop
+        dey
+        bpl @shiftLineLoop
 
 @nextLine:
         dec tmpY
