@@ -215,12 +215,11 @@ harddropShift:
         sta completedLines
         ; emty top row
         lda #EMPTY_TILE
-        ldx #0
+        ldx #9
 @topRowLoop:
         sta playfield, x
-        inx
-        cpx #$A
-        bne @topRowLoop
+        dex
+        bpl @topRowLoop
         ; lda #TETRIMINO_X_HIDE
         ; sta tetriminoX
 
