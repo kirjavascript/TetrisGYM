@@ -1,53 +1,38 @@
 isPositionValid:
-        lda tetriminoY
-        asl a
-        sta generalCounter
-        asl a
-        asl a
+        ldy tetriminoY
+        lda multBy10Table,y
         clc
-        adc generalCounter
         adc tetriminoX
         sta generalCounter
         lda currentPiece
         asl a
         asl a
-        sta generalCounter2
-        asl a
-        clc
-        adc generalCounter2
         tax
         ldy #$00
         lda #$04
         sta generalCounter3
 ; Checks one square within the tetrimino
 @checkSquare:
-        lda orientationTable,x
+        lda orientationTableY,x
         clc
         adc tetriminoY
-        adc #$02
+        adc #$02 ; carry may be set for this add but doesn't have any noticeable impact
 
         cmp #$16
         bcs @invalid
-        lda orientationTable,x
-        asl a
-        sta generalCounter4
-        asl a
-        asl a
-        clc
-        adc generalCounter4
-        clc
+
+        ldy orientationTableY,x
+        lda multBy10Table,y
+        ; clc omitted, carry is clear from cmp instruction above that branches away on carry set
         adc generalCounter
         sta positionValidTmp
-        inx
-        inx
-        lda orientationTable,x
+        lda orientationTableX,x
         clc
         adc positionValidTmp
         tay
-        lda (playfieldAddr),y
-        cmp #EMPTY_TILE
-        bcc @invalid
-        lda orientationTable,x
+        lda playfield,y
+        bpl @invalid ; tiles do not set negative flag
+        lda orientationTableX,x
         clc
         adc tetriminoX
         cmp #$0A

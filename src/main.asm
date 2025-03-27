@@ -66,8 +66,6 @@ mainLoop:
 .include "sprites/piece.asm"
 
 .include "data/bytebcd.asm"
-.include "data/orientation.asm"
-.include "data/mult.asm"
 
 .include "palettes.asm"
 .include "nametables.asm"
@@ -93,7 +91,9 @@ mainLoop:
 .include "modes/qtap.asm"
 .include "modes/garbage.asm"
 
-.code
+.align $100
+; these tables benefit from page alignment
+.include "data/mult_orient.asm"
 
 .segment    "PRG_chunk3": absolute
 
