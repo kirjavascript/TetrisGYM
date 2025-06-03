@@ -7,6 +7,7 @@
 menuIndex := menuRAM
 
 ; (!) figure out ram allocation from type alone
+; autogenerate it via JS???
 
 RENDER_MENU_ITEM := 1
 RENDER_MENU_FULL := 2

@@ -28,23 +28,29 @@ MENU_TYPE_SEED
 .endenum
 
 .enum
-MENU_ACTION_LINECAP
+MENU_ACTION_LINECAP_MENU
 .endenum
 
-menuList:
-    .addr menuMain
-    ; .addr menuLinecap
+; menuList:
+;     .addr menuMain
+;     ; .addr menuLinecap
 
-menuLenghts:
-    MENU_LENGTH (menuMain, menuMainEnd)
-    ; MENU_LENGTH(menuLinecapStart, menuLinecapEnd)
+; menuLenghts:
+;     MENU_LENGTH (menuMain, menuMainEnd)
+;     ; MENU_LENGTH(menuLinecapStart, menuLinecapEnd)
+
+menuRamAddrs:
+
 
 ;-- menus
 
 menuMain:
-    MENU_ITEM MENU_TYPE_ACTION, tetrisText, MENU_ACTION_LINECAP
+    MENU_ITEM MENU_TYPE_ACTION, tetrisText, MENU_ACTION_LINECAP_MENU
     MENU_ITEM MENU_TYPE_BYTE, fooText, $0A14
 menuMainEnd:
+
+; TODO: how is the data stored?
+; have an offset for each menu?
 
 ; -- settings
 
