@@ -144,7 +144,7 @@ MENU_TOP_MARGIN_SCROLL := 7 ; in blocks
     .byte $F    ; MODE_CRUNCH
     .byte $20   ; MODE_TAP
     .byte $10   ; MODE_TRANSITION
-    .byte $2    ; MODE_MARATHON
+    .byte $4    ; MODE_MARATHON
     .byte $1F   ; MODE_TAPQTY
     .byte $8    ; MODE_CHECKERBOARD
     .byte $4    ; MODE_GARBAGE

@@ -349,6 +349,9 @@ addLineClearPoints:
         ldy practiseType
         cpy #MODE_MARATHON
         bne @notMarathon
+        ldy marathonModifier
+        cpy #3 ; Marathon modes 3 + 4 score normally
+        bcs @notMarathon
         lda startLevel
 @notMarathon:
         sta factorA24+0

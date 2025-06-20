@@ -203,6 +203,8 @@ Play as long as you are able to survive at a consistent speed.
 0. Level transitions do not happen, game remains on the same level for as long as you are able to survive.
 1. Levels will transition normally, but speed and points will remain fixed based on your starting level.
 2. Similar to 1, speed and points will remain fixed based on the starting level you choose, but actual game will begin at level 0.
+3. Same as 1, but scoring scales normally
+4. Same as 2, but scoring scales normally
 
 ### Garbage
 
