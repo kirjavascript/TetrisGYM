@@ -1,14 +1,18 @@
 mod block;
-mod cycle_count;
 mod input;
 mod labels;
 mod playfield;
 mod util;
 mod video;
 
+mod cycle_count;
+mod crash;
+
+mod crunch;
 mod drought;
 mod floor;
 mod garbage;
+mod harddrop;
 mod mapper;
 mod palettes;
 mod pushdown;
@@ -37,6 +41,8 @@ struct TestOptions {
     test_single: Option<String>,
     #[options(help = "count cycles")]
     cycles: bool,
+    #[options(help = "fuzz crash")]
+    crash: bool,
     #[options(help = "set SPS seed", parse(try_from_str = "parse_hex"))]
     sps_seed: u32,
     #[options(help = "print SPS pieces")]
@@ -51,7 +57,7 @@ struct TestOptions {
 fn main() {
     let options = TestOptions::parse_args_default_or_exit();
 
-    let tests: [(&str, fn()); 15] = [
+    let tests: [(&str, fn()); 17] = [
         ("garbage4", garbage::test_garbage4_crash),
         ("floor", floor::test),
         ("tspins", tspins::test),
@@ -67,6 +73,8 @@ fn main() {
         ("nmi", nmi::test),
         ("constants", constants::test),
         ("patch", patch::test),
+        ("crunch", crunch::test),
+        ("harddrop", harddrop::test),
     ];
 
     // run tests
@@ -86,6 +94,11 @@ fn main() {
         } else {
             println!("no such test {name}");
         }
+    }
+
+    // fuzz crash
+    if options.crash {
+        crash::fuzz();
     }
 
     // count cycles

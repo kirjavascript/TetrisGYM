@@ -145,7 +145,9 @@ stageSpriteForNextPiece:
         lda #$77
         sta spriteYOffset
         ldx nextPiece
-        lda orientationToSpriteTable,x
+        lda tetriminoTypeFromOrientation,x
+        clc
+        adc #$6 ; piece sprites start at index 6
         sta spriteIndexInOamContentLookup
         jmp loadSpriteIntoOamStaging
 

@@ -144,8 +144,7 @@ playState_checkForCompletedRows:
         lda practiseType
         cmp #MODE_CRUNCH
         bne @crunchEnd
-        lda #1
-        jsr advanceSides
+        jsr advanceSides ; clobbers generalCounter3 and generalCounter4
 @crunchEnd:
 
         lda completedLines

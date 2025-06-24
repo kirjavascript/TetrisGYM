@@ -51,11 +51,11 @@ oamContentLookup:
         .addr   sprite02Blank
         .addr   sprite02Blank
         .addr   sprite06TPiece
-        .addr   sprite07SPiece
+        .addr   sprite07JPiece
         .addr   sprite08ZPiece
-        .addr   sprite09JPiece
-        .addr   sprite0ALPiece
-        .addr   sprite0BOPiece
+        .addr   sprite09OPiece
+        .addr   sprite0ASPiece
+        .addr   sprite0BLPiece
         .addr   sprite0CIPiece
         .addr   sprite0EHighScoreNameCursor
         .addr   sprite0EHighScoreNameCursor
@@ -95,25 +95,25 @@ sprite06TPiece:
         .byte   $00,$7B,$02,$FC,$00,$7B,$02,$04
         .byte   $00,$7B,$02,$0C,$08,$7B,$02,$04
         .byte   $FF
-sprite07SPiece:
-        .byte   $00,$7D,$02,$04,$00,$7D,$02,$0C
-        .byte   $08,$7D,$02,$FC,$08,$7D,$02,$04
+sprite07JPiece:
+        .byte   $00,$7D,$02,$FC,$00,$7D,$02,$04
+        .byte   $00,$7D,$02,$0C,$08,$7D,$02,$0C
         .byte   $FF
 sprite08ZPiece:
         .byte   $00,$7C,$02,$FC,$00,$7C,$02,$04
         .byte   $08,$7C,$02,$04,$08,$7C,$02,$0C
         .byte   $FF
-sprite09JPiece:
-        .byte   $00,$7D,$02,$FC,$00,$7D,$02,$04
-        .byte   $00,$7D,$02,$0C,$08,$7D,$02,$0C
-        .byte   $FF
-sprite0ALPiece:
-        .byte   $00,$7C,$02,$FC,$00,$7C,$02,$04
-        .byte   $00,$7C,$02,$0C,$08,$7C,$02,$FC
-        .byte   $FF
-sprite0BOPiece:
+sprite09OPiece:
         .byte   $00,$7B,$02,$00,$00,$7B,$02,$08
         .byte   $08,$7B,$02,$00,$08,$7B,$02,$08
+        .byte   $FF
+sprite0ASPiece:
+        .byte   $00,$7D,$02,$04,$00,$7D,$02,$0C
+        .byte   $08,$7D,$02,$FC,$08,$7D,$02,$04
+        .byte   $FF
+sprite0BLPiece:
+        .byte   $00,$7C,$02,$FC,$00,$7C,$02,$04
+        .byte   $00,$7C,$02,$0C,$08,$7C,$02,$FC
         .byte   $FF
 sprite0CIPiece:
         .byte   $04,$7B,$02,$F8,$04,$7B,$02,$00

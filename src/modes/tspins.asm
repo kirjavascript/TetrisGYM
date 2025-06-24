@@ -97,7 +97,7 @@ renderTSpin:
 
         lda tspinY
         clc
-        adc #2
+        adc #3
         jsr drawFloor
 
         ; get tspin offset

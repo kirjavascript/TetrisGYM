@@ -77,10 +77,38 @@ updatePlayfield:
         sta vramRow
 @ret:   rts
 
+crunchLeftColumns = generalCounter3
+crunchRightColumns = generalCounter4
+
 updateMusicSpeed:
-        ldx #$05
-        lda multBy10Table,x ;this piece of code is parameterized for no reason but the crash checking code relies on the index being 50-59 so if you ever optimize this part out of the code please also adjust the crash test, specifically the part which handles cycles for allegro.
+
+        ; ldx #$05
+        ; lda multBy10Table,x ;this piece of code is parameterized for no reason but the crash checking code relies on the index being 50-59 so if you ever optimize this part out of the code please also adjust the crash test, specifically the part which handles cycles for allegro.
+        ; tay
+
+        ldy #50 ; replaces above
+
+; check if crunch mode
+        ldx practiseType
+        cpx #MODE_CRUNCH
+        bne @notCrunch
+
+        ; add crunch left columns to y
+        jsr unpackCrunchModifier
+        tya
+        clc
+        adc crunchLeftColumns ; offset y with left column count (generalCounter3)
         tay
+
+        ; set x to playable column count
+        lda #$0A
+        sec
+        sbc crunchLeftColumns ; generalCounter3
+        sbc crunchRightColumns ; generalCounter4
+        tax
+        bne @checkForBlockInRow ; unconditional, expected range 4 - 10
+
+@notCrunch:
         ldx #$0A
 @checkForBlockInRow:
         lda (playfieldAddr),y
@@ -120,8 +148,7 @@ checkIfAboveLowStackLine:
         lda #19
         sbc lowStackRowModifier
         tax
-        lda multBy10Table,x
-        tay
+        ldy multBy10Table,x
         ldx #$0A
         sec
 @checkForBlockInRow:
