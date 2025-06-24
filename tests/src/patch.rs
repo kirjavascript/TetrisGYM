@@ -1,5 +1,5 @@
 pub fn test() {
-    let clean = include_bytes!("../../clean.nes");
+    let clean = crate::util::OG_ROM;
     let patch = include_bytes!("../../tetris.bps");
 
     // check original file hasn't changed

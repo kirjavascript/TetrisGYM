@@ -27,6 +27,7 @@ NO_SFX := 0
 NO_MENU := 0
 ALWAYS_CURTAIN := 0
 QUAL_BOOT := 0
+SWAP_DUTY_CYCLES := 0 ; counters the duty cycle swap present in some clone consoles
 
 INITIAL_CUSTOM_LEVEL := 18
 INITIAL_LINECAP_LEVEL := 39
@@ -143,7 +144,7 @@ MENU_TOP_MARGIN_SCROLL := 7 ; in blocks
     .byte $F    ; MODE_CRUNCH
     .byte $20   ; MODE_TAP
     .byte $10   ; MODE_TRANSITION
-    .byte $2    ; MODE_MARATHON
+    .byte $4    ; MODE_MARATHON
     .byte $1F   ; MODE_TAPQTY
     .byte $8    ; MODE_CHECKERBOARD
     .byte $4    ; MODE_GARBAGE
