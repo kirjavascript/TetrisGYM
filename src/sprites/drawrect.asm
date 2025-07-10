@@ -12,14 +12,14 @@ spriteCathedralFire1: ; bottom of UFO 2
 .else
 
 spriteCathedral:
-        .byte $15, $0, $3, $7, $20, $38
+        .byte $15, $0, $3, $8, $20, $38
         .byte $FF
 
 spriteCathedralFire0:
-        .byte $8, $EB, $2, $1, $1, $A0, $FF
+        .byte $8, $F8, $2, $1, $1, $A0, $FF
 
 spriteCathedralFire1:
-        .byte $0, $EB, $4, $2, $1, $A2, $FF
+        .byte $0, $F8, $4, $2, $1, $A2, $FF
 .endif
 
 rectBuffer := generalCounter
