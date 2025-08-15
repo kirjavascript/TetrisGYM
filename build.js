@@ -27,6 +27,7 @@ if (args.includes('-h')) {
 -k  Famicom Keyboard support
 -w  force WASM compiler
 -c  force PNG to CHR conversion
+-i  use iNES header instead of NES2.0
 -o  override autodetect mmc1 header with cnrom
 -t  run tests (requires cargo)
 -T  run single test
@@ -80,7 +81,13 @@ if (args.includes('-k')) {
 
 if (args.includes('-s')) {
     compileFlags.push('-D', 'SAVE_HIGHSCORES=0');
+    compileFlags.push('-D', 'HAS_SRAM=0');
     console.log('highscore saving disabled');
+}
+
+if (args.includes('-i')) {
+    compileFlags.push('-D', 'INES_OVERRIDE=1');
+    console.log('iNES header override');
 }
 
 if (args.includes('-o')) {
