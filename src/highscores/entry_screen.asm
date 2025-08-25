@@ -193,10 +193,6 @@ highScoreEntryScreen:
         lda #BUTTON_A
         jsr menuThrottle
         beq @checkForBOrLeftPressed
-.if KEYBOARD = 1
-        lda kbHeldInput ; due to space being mapped to A, skip if space is currently pressed
-        beq @checkForBOrLeftPressed
-.endif
 @nextTile:
         lda #$01
         sta soundEffectSlot1Init
