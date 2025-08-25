@@ -6,6 +6,7 @@
 * Fixed a glitch in Hard Drop Mode
 * Fixed line based floor caps outside of levelups
 * Reset scores when no SRAM is present
+* Add Marathon modes 3 & 4 where scoring scales normally
 
 ## v6
 * Crunch Trainer
