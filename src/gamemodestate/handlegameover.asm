@@ -17,9 +17,13 @@ gameModeState_handleGameOver:
 @gameOver:
         lda #$03
         sta renderMode
+.if KEYBOARD = 1
         inc entryActive
         jsr handleHighScoreIfNecessary
         dec entryActive
+.else
+        jsr handleHighScoreIfNecessary
+.endif
         lda #$01
         sta playState
         lda #$EF
