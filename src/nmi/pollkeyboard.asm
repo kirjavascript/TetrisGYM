@@ -93,14 +93,14 @@ pollKeyboard:
 ; 7   CTR   Q       ESC     F1        2       1       GRPH     LSHIFT
 ; 8   LEFT  RIGHT   UP      CLR HOME  INS     DEL     SPACE    DOWN
 
-kbUp = $0820
-kbDown = $0801
-kbLeft = $0880
-kbRight = $0840
-kbB = $0702      ; grph -> B
-kbA = $0802      ; space -> A
-kbSelect = $0002 ; right shift -> select0
-kbStart = $0020  ; return -> start
+kbUp = $0280     ; k
+kbDown = $0380   ; j
+kbLeft = $0480   ; h
+kbRight = $0240  ; l
+kbB = $0580      ; d
+kbA = $0501      ; f
+kbSelect = $0701 ; lshift
+kbStart = $0020  ; return
 
 
 mapKeysToButtons:
