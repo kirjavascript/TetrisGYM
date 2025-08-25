@@ -17,7 +17,9 @@ gameModeState_handleGameOver:
 @gameOver:
         lda #$03
         sta renderMode
+        inc entryActive
         jsr handleHighScoreIfNecessary
+        dec entryActive
         lda #$01
         sta playState
         lda #$EF

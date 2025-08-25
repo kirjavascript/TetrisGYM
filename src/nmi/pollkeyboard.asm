@@ -104,6 +104,8 @@ kbStart = $0020  ; return
 
 
 mapKeysToButtons:
+        lda entryActive
+        bne @startOnly
         lda keyboardInput+>kbUp
         and #<kbUp
         beq @upNotPressed
@@ -162,6 +164,7 @@ mapKeysToButtons:
         ora #BUTTON_SELECT
         sta newlyPressedKeys
 @selectNotPressed:
+@startOnly:
 
         lda keyboardInput+>kbStart
         and #<kbStart
