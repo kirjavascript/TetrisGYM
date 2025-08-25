@@ -82,9 +82,30 @@ pollKeyboard:
 @ret:   rts
 
 
+;     Bit0  Bit1    Bit2    Bit3      Bit4    Bit5    Bit6     Bit7
+; 0   ]     [       RETURN  F8        STOP    ¥       RSHIFT   KANA
+; 1   ;     :       @       F7        ^       -       /        _
+; 2   K     L       O       F6        0       P       ,        .
+; 3   J     U       I       F5        8       9       N        M
+; 4   H     G       Y       F4        6       7       V        B
+; 5   D     R       T       F3        4       5       C        F
+; 6   A     S       W       F2        3       E       Z        X
+; 7   CTR   Q       ESC     F1        2       1       GRPH     LSHIFT
+; 8   LEFT  RIGHT   UP      CLR HOME  INS     DEL     SPACE    DOWN
+
+kbUp = $0820
+kbDown = $0801
+kbLeft = $0880
+kbRight = $0840
+kbB = $0702      ; grph -> B
+kbA = $0802      ; space -> A
+kbSelect = $0002 ; right shift -> select0
+kbStart = $0020  ; return -> start
+
+
 mapKeysToButtons:
-        lda keyboardInput+8
-        and #$20
+        lda keyboardInput+>kbUp
+        and #<kbUp
         beq @upNotPressed
         lda newlyPressedKeys
         ora #BUTTON_UP
@@ -92,17 +113,16 @@ mapKeysToButtons:
         bne @skipDownRead
 @upNotPressed:
 
-        lda keyboardInput+8
-        and #$01
+        lda keyboardInput+>kbDown
+        and #<kbDown
         beq @downNotPressed
         lda newlyPressedKeys
         ora #BUTTON_DOWN
         sta newlyPressedKeys
 @skipDownRead:
 @downNotPressed:
-
-        lda keyboardInput+8
-        and #$80
+        lda keyboardInput+>kbLeft
+        and #<kbLeft
         beq @leftNotPressed
         lda newlyPressedKeys
         ora #BUTTON_LEFT
@@ -110,8 +130,8 @@ mapKeysToButtons:
         bne @skipRightRead
 @leftNotPressed:
 
-        lda keyboardInput+8
-        and #$40
+        lda keyboardInput+>kbRight
+        and #<kbRight
         beq @rightNotPressed
         lda newlyPressedKeys
         ora #BUTTON_RIGHT
@@ -119,32 +139,32 @@ mapKeysToButtons:
 @skipRightRead:
 @rightNotPressed:
 
-        lda keyboardInput+7 ; grph -> B
-        and #$02
+        lda keyboardInput+>kbB
+        and #<kbB
         beq @bNotPressed
         lda newlyPressedKeys
         ora #BUTTON_B
         sta newlyPressedKeys
 @bNotPressed:
 
-        lda keyboardInput+8 ; space -> A
-        and #$02
+        lda keyboardInput+>kbA
+        and #<kbA
         beq @aNotPressed
         lda newlyPressedKeys
         ora #BUTTON_A
         sta newlyPressedKeys
 @aNotPressed:
 
-        lda keyboardInput+0 ; right shift -> select0
-        and #$02
+        lda keyboardInput+>kbSelect
+        and #<kbSelect
         beq @selectNotPressed
         lda newlyPressedKeys
         ora #BUTTON_SELECT
         sta newlyPressedKeys
 @selectNotPressed:
 
-        lda keyboardInput+0 ; return -> start
-        and #$20
+        lda keyboardInput+>kbStart
+        and #<kbStart
         beq @startNotPressed
         lda newlyPressedKeys
         ora #BUTTON_START
@@ -169,17 +189,6 @@ mapKeysToButtons:
         ora heldKeys
         sta heldButtons_player1
         rts
-
-;     Bit0  Bit1    Bit2    Bit3      Bit4    Bit5    Bit6     Bit7
-; 0   ]     [       RETURN  F8        STOP    ¥       RSHIFT   KANA
-; 1   ;     :       @       F7        ^       -       /        _
-; 2   K     L       O       F6        0       P       ,        .
-; 3   J     U       I       F5        8       9       N        M
-; 4   H     G       Y       F4        6       7       V        B
-; 5   D     R       T       F3        4       5       C        F
-; 6   A     S       W       F2        3       E       Z        X
-; 7   CTR   Q       ESC     F1        2       1       GRPH     LSHIFT
-; 8   LEFT  RIGHT   UP      CLR HOME  INS     DEL     SPACE    DOWN
 
 shiftFlag := $08
 charToKbMap:
