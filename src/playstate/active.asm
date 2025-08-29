@@ -464,12 +464,14 @@ shift_tetrimino:
         lda autorepeatX
         cmp #$01
         bpl @ret
+@zeroDas:
         lda anydasARRValue
         sta autorepeatX
         beq @zeroArr
         bne @buttonHeldDown
 @resetAutorepeatX:
         lda anydasDASValue
+        beq @zeroDas
 .else
         inc autorepeatX
         lda autorepeatX
