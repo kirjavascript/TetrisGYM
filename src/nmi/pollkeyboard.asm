@@ -1,3 +1,16 @@
+.include "keyboardmap.asm"
+
+; for remapping, see above map file for full list
+kbMappedUp     = keyK
+kbMappedDown   = keyJ
+kbMappedLeft   = keyH
+kbMappedRight  = keyL
+kbMappedB      = keyD
+kbMappedA      = keyF
+kbMappedSelect = keyShiftLeft
+kbMappedStart  = keyReturn
+
+
 ; https://www.nesdev.org/wiki/Family_BASIC_Keyboard
 
 ; Input ($4016 write)
@@ -82,92 +95,63 @@ pollKeyboard:
 @ret:   rts
 
 
-;     Bit0  Bit1    Bit2    Bit3      Bit4    Bit5    Bit6     Bit7
-; 0   ]     [       RETURN  F8        STOP    ¥       RSHIFT   KANA
-; 1   ;     :       @       F7        ^       -       /        _
-; 2   K     L       O       F6        0       P       ,        .
-; 3   J     U       I       F5        8       9       N        M
-; 4   H     G       Y       F4        6       7       V        B
-; 5   D     R       T       F3        4       5       C        F
-; 6   A     S       W       F2        3       E       Z        X
-; 7   CTR   Q       ESC     F1        2       1       GRPH     LSHIFT
-; 8   LEFT  RIGHT   UP      CLR HOME  INS     DEL     SPACE    DOWN
-
-kbUp = $0280     ; k
-kbDown = $0380   ; j
-kbLeft = $0480   ; h
-kbRight = $0240  ; l
-kbB = $0580      ; d
-kbA = $0501      ; f
-kbSelect = $0701 ; lshift
-kbStart = $0020  ; return
-
-
 mapKeysToButtons:
         lda entryActive
-        bne @startOnly
-        lda keyboardInput+>kbUp
-        and #<kbUp
+        ; ignore all keys except for start/return during high score entry
+        bne @readStart
+
+        readKeyDirect kbMappedUp
         beq @upNotPressed
         lda newlyPressedKeys
         ora #BUTTON_UP
         sta newlyPressedKeys
-        bne @skipDownRead
+        bne @downNotPressed ; skip down read if up is pressed
 @upNotPressed:
 
-        lda keyboardInput+>kbDown
-        and #<kbDown
+        readKeyDirect kbMappedDown
         beq @downNotPressed
         lda newlyPressedKeys
         ora #BUTTON_DOWN
         sta newlyPressedKeys
-@skipDownRead:
 @downNotPressed:
-        lda keyboardInput+>kbLeft
-        and #<kbLeft
+
+        readKeyDirect kbMappedLeft
         beq @leftNotPressed
         lda newlyPressedKeys
         ora #BUTTON_LEFT
         sta newlyPressedKeys
-        bne @skipRightRead
+        bne @rightNotPressed ; skip right read if left is pressed
 @leftNotPressed:
 
-        lda keyboardInput+>kbRight
-        and #<kbRight
+        readKeyDirect kbMappedRight
         beq @rightNotPressed
         lda newlyPressedKeys
         ora #BUTTON_RIGHT
         sta newlyPressedKeys
-@skipRightRead:
 @rightNotPressed:
 
-        lda keyboardInput+>kbB
-        and #<kbB
+        readKeyDirect kbMappedB
         beq @bNotPressed
         lda newlyPressedKeys
         ora #BUTTON_B
         sta newlyPressedKeys
 @bNotPressed:
 
-        lda keyboardInput+>kbA
-        and #<kbA
+        readKeyDirect kbMappedA
         beq @aNotPressed
         lda newlyPressedKeys
         ora #BUTTON_A
         sta newlyPressedKeys
 @aNotPressed:
 
-        lda keyboardInput+>kbSelect
-        and #<kbSelect
-        beq @selectNotPressed
+        readKeyDirect kbMappedSelect
+        beq @readStart
         lda newlyPressedKeys
         ora #BUTTON_SELECT
         sta newlyPressedKeys
-@selectNotPressed:
-@startOnly:
+@readStart:
 
-        lda keyboardInput+>kbStart
-        and #<kbStart
+        readKeyDirect kbMappedStart
         beq @startNotPressed
         lda newlyPressedKeys
         ora #BUTTON_START
@@ -193,7 +177,21 @@ mapKeysToButtons:
         sta heldButtons_player1
         rts
 
-shiftFlag := $08
+;     Bit0  Bit1    Bit2    Bit3      Bit4    Bit5    Bit6     Bit7
+; 0   ]     [       RETURN  F8        STOP    ¥       RSHIFT   KANA
+; 1   ;     :       @       F7        ^       -       /        _
+; 2   K     L       O       F6        0       P       ,        .
+; 3   J     U       I       F5        8       9       N        M
+; 4   H     G       Y       F4        6       7       V        B
+; 5   D     R       T       F3        4       5       C        F
+; 6   A     S       W       F2        3       E       Z        X
+; 7   CTR   Q       ESC     F1        2       1       GRPH     LSHIFT
+; 8   LEFT  RIGHT   UP      CLR_HOME  INS     DEL     SPACE    DOWN
+
+; each byte represents row, column and if shift should be read
+; only keys supported by the score entry routine are included
+
+shiftFlag = $08
 charToKbMap:
         .byte $86 ; Space
         .byte $60 ; A
@@ -242,6 +240,7 @@ charToKbMap:
         .byte $16 | shiftFlag ; ?
         .byte $15 ; -
         .byte $85 ; del ; treated differently
+        ; future feature: read left and right to shift cursor position
 
 charToKbMapEnd:
 
