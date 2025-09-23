@@ -12,98 +12,104 @@
 ; """
 ; for row, keys in enumerate(kbmap.strip().splitlines()):
 ;     for mask, key in enumerate(keys.split()):
-;         mask = 0x80 >> mask
-;         print(f"key{key:<12} = ${row:02x}{mask:02x}")
-
-
-; 2 bytes to represent each key
-; hi byte is an index into keyboardInput and represents row
-; lo byte is a bitmask to single out key's bit
-; result is not zero if key pressed
+;         print(f"key{key:<12} = ${((8 - row) << 3) | mask:02X}")
 
 .macro readKeyDirect keyMap
-        lda keyboardInput+>keyMap
-        and #<keyMap
+        lda keyboardInput + (keyMap >> 3)
+        and #$80 >> (keyMap & 7)
 .endmacro
 
-keyF1           = $0710
-keyF2           = $0610
-keyF3           = $0510
-keyF4           = $0410
-keyF5           = $0310
-keyF6           = $0210
-keyF7           = $0110
-keyF8           = $0010
+.macro expandKeyRow keyMap
+        .byte keyMap >> 3
+.endmacro
 
-keyStop         = $0008
-keyReturn       = $0020
+.macro expandKeyMask keyMap
+        .byte $80 >> (keyMap & 7)
+.endmacro
 
-keyShiftRight   = $0002
-keyShiftLeft    = $0701
 
-keyESC          = $0720
-keyCTR          = $0780
-keyGRPH         = $0702
+; each key is represented by a byte 0RRRRCCC
+; row is 0-8 and is inverted
+; col is byte position from left to right
 
-keyCLR_HOME     = $0810
-keyINS          = $0808
-keyDEL          = $0804
+keyF1           = $0B
+keyF2           = $13
+keyF3           = $1B
+keyF4           = $23
+keyF5           = $2B
+keyF6           = $33
+keyF7           = $3B
+keyF8           = $43
 
-keyUp           = $0820
-keyLeft         = $0880
-keyRight        = $0840
-keyDown         = $0801
+keyStop         = $44
+keyReturn       = $42
 
-keyCloseBracket = $0080 ; ]
-keyOpenBracket  = $0040 ; [
-keyYen          = $0004 ; ¥
-keySemicolon    = $0180 ; ;
-keyColon        = $0140 ; :
-keyatSign       = $0120 ; @
-keyCaret        = $0108 ; ^
-keySlash        = $0102 ; /
-keyUnderscore   = $0101 ; _
-keyComma        = $0202 ; ,
-keyPeriod       = $0201 ; .
-keyDash         = $0104 ; -
-keyKana         = $0001
+keyShiftRight   = $46
+keyShiftLeft    = $0F
 
-keySpace        = $0802
+keyESC          = $0A
+keyCTR          = $08
+keyGRPH         = $0E
 
-key0            = $0208
-key1            = $0704
-key2            = $0708
-key3            = $0608
-key4            = $0508
-key5            = $0504
-key6            = $0408
-key7            = $0404
-key8            = $0308
-key9            = $0304
+keyCLR_HOME     = $03
+keyINS          = $04
+keyDEL          = $05
 
-keyA            = $0680
-keyB            = $0401
-keyC            = $0502
-keyD            = $0580
-keyE            = $0604
-keyF            = $0501
-keyG            = $0440
-keyH            = $0480
-keyI            = $0320
-keyJ            = $0380
-keyK            = $0280
-keyL            = $0240
-keyM            = $0301
-keyN            = $0302
-keyO            = $0220
-keyP            = $0204
-keyQ            = $0740
-keyR            = $0540
-keyS            = $0640
-keyT            = $0520
-keyU            = $0340
-keyV            = $0402
-keyW            = $0620
-keyX            = $0601
-keyY            = $0420
-keyZ            = $0602
+keyUp           = $02
+keyLeft         = $00
+keyRight        = $01
+keyDown         = $07
+
+keyCloseBracket = $40 ; ]
+keyOpenBracket  = $41 ; [
+keyYen          = $45 ; ¥
+keySemicolon    = $38 ; ;
+keyColon        = $39 ; :
+keyatSign       = $3A ; @
+keyCaret        = $3C ; ^
+keySlash        = $3E ; /
+keyUnderscore   = $3F ; _
+keyComma        = $36 ; ,
+keyPeriod       = $37 ; .
+keyDash         = $3D ; -
+keyKana         = $47
+
+keySpace        = $06
+
+key0            = $34
+key1            = $0D
+key2            = $0C
+key3            = $14
+key4            = $1C
+key5            = $1D
+key6            = $24
+key7            = $25
+key8            = $2C
+key9            = $2D
+
+keyA            = $10
+keyB            = $27
+keyC            = $1E
+keyD            = $18
+keyE            = $15
+keyF            = $1F
+keyG            = $21
+keyH            = $20
+keyI            = $2A
+keyJ            = $28
+keyK            = $30
+keyL            = $31
+keyM            = $2F
+keyN            = $2E
+keyO            = $32
+keyP            = $35
+keyQ            = $09
+keyR            = $19
+keyS            = $11
+keyT            = $1A
+keyU            = $29
+keyV            = $26
+keyW            = $12
+keyX            = $17
+keyY            = $22
+keyZ            = $16

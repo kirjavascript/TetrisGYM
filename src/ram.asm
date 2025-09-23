@@ -226,7 +226,7 @@ entryActive: .res 1  ; todo: find better way to track high score entry screen
 
 .if KEYBOARD
 ; used for high score entry to throttle input and to flag when a letter has been input
-kbShiftFlag: .res 1 ; $0673
+kbReadState: .res 1 ; $0673
 kbHeldInput: .res 1 ; $0674
 
 ; controller equivalent, can possibly be removed
