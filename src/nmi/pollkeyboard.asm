@@ -201,6 +201,47 @@ pollKeyboard:
 ; each byte represents row, column and if shift should be read
 ; only keys supported by the score entry routine are included
 
+charToSeedMap:
+        .byte key0
+        .byte key1
+        .byte key2
+        .byte key3
+        .byte key4
+        .byte key5
+        .byte key6
+        .byte key7
+        .byte key8
+        .byte key9
+        .byte keyA
+        .byte keyB
+        .byte keyC
+        .byte keyD
+        .byte keyE
+        .byte keyF
+charToSeedMapEnd:
+
+seedChars = <(charToSeedMapEnd - charToSeedMap) - 1
+
+readKbSeedEntry:
+        ldx #seedChars
+@readLoop:
+        lda charToSeedMap,x
+        jsr readKey
+        bne @seedEntered
+        dex
+        bpl @readLoop
+@seedEntered:
+        txa
+        cmp kbHeldInput
+        beq @noInput
+        sta kbHeldInput
+        lda kbHeldInput
+        rts
+@noInput:
+        lda #$FF
+        rts
+
+
 charToKbMap:
         .byte keySpace
         .byte keyA

@@ -140,6 +140,7 @@ seedControls:
         lda #BUTTON_RIGHT
         jsr menuThrottle
         beq @skipSeedRight
+@moveRight:
         lda #$01
         sta soundEffectSlot1Init
         inc menuSeedCursorIndex
@@ -151,7 +152,38 @@ seedControls:
 @skipSeedRight:
 
         lda menuSeedCursorIndex
+.if KEYBOARD <> 1
         beq @skipSeedControl
+.else
+        bne @readKeys
+        jmp @skipSeedControl
+@readKeys:
+        jsr readKbSeedEntry
+        bmi @noKeysPressed
+        sta generalCounter
+        ldy menuSeedCursorIndex
+        dey
+        tya
+        lsr
+        tay ; save seed offset
+        bcc @highByte
+        lda set_seed_input,y
+        and #$F0
+        ora generalCounter
+        sta set_seed_input,y
+        jmp @moveRight
+@highByte:
+        lda set_seed_input,y
+        and #$0F
+        asl generalCounter
+        asl generalCounter
+        asl generalCounter
+        asl generalCounter
+        ora generalCounter
+        sta set_seed_input,y
+        jmp @moveRight
+@noKeysPressed:
+.endif
 
         lda menuSeedCursorIndex
         sbc #1
