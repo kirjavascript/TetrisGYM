@@ -54,7 +54,6 @@ kbMappedStart  = keyReturn
 
 
 pollKeyboard:
-@kbTmp1 = generalCounter
 @upDown = BUTTON_UP|BUTTON_DOWN
 @leftRight = BUTTON_LEFT|BUTTON_RIGHT
 
@@ -88,7 +87,7 @@ pollKeyboard:
         asl
         asl
         beq @ret ; assume 4 simultaneously pressed keys in one row indicates no keyboard
-        sta @kbTmp1
+        sta generalCounter
 
         ldy #3
         jsr @keyboardReadWait
@@ -96,7 +95,7 @@ pollKeyboard:
 
         and #KB_MASK
         lsr
-        ora @kbTmp1
+        ora generalCounter
         eor #$FF
         sta keyboardInput,x
         dex
@@ -111,6 +110,7 @@ pollKeyboard:
 @readKeyLoop:
         clc
         ldy @mappedRows,x
+        lda keyboardInput,y
         and @mappedMasks,x
         beq @notPressed
         sec
@@ -339,6 +339,7 @@ readKbScoreInput:
 @checkRight:
         cmp #kbScoreRight
         beq @signalCursorShift
+        bne @normal
 
 @delete:
         lda #$00
@@ -376,7 +377,7 @@ readKey:
         lsr
         lsr
         lsr
-        and $0F
+        and #$0F
         tay
 
 ; determine if char is shifted
