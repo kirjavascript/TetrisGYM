@@ -1,16 +1,3 @@
-.include "keyboardmap.asm"
-
-; for remapping, see above map file for full list
-kbMappedUp     = keyK
-kbMappedDown   = keyJ
-kbMappedLeft   = keyH
-kbMappedRight  = keyL
-kbMappedB      = keyD
-kbMappedA      = keyF
-kbMappedSelect = keyShiftLeft
-kbMappedStart  = keyReturn
-
-
 ; https://www.nesdev.org/wiki/Family_BASIC_Keyboard
 
 ; Input ($4016 write)
