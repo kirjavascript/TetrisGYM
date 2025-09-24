@@ -37,21 +37,22 @@ kbMappedStart  = keyReturn
 
 ; ($4016 reads from the data recorder.)
 
-; Similar to the Family Trainer Mat, there are parasitic capacitances that the program must wait for to get a valid result. Family
-; BASIC waits approximately 50 cycles after advancing rows before assuming the output is valid.
+; Similar to the Family Trainer Mat, there are parasitic capacitances that the program must wait for to get a valid result. Family BASIC and the FDS BIOS wait at least 12 cycles (16 if load instructions are considered) between resetting the keyboard and reselecting column 0, and approximately 50 cycles after selecting each column before assuming the output is valid.
+
 ; Usage
+; Family BASIC and the FDS BIOS read the keyboard state with the following procedure:
 
-; Family BASIC reads the keyboard state with the following procedure:
+; Write $05 to $4016 (reset to row 0, column 0), followed by 6 NOPs (12 cycles)
+; Write $04 to $4016 (select column 0, next row if not just reset), followed by a delay of ~50 cycles
+; Read column 0 data from $4017
+; Write $06 to $4016 (select column 1), followed by a delay of ~50 cycles
+; Read column 1 data from $4017
+; Repeat steps 2-5 eight more times
+; Differences between Family BASIC and the FDS BIOS:
 
-;     Write $05 to $4016 (reset to row 0, column 0)
-;     Write $04 to $4016 (select column 0, next row if not just reset)
-;     Read column 0 data from $4017
-;     Write $06 to $4016 (select column 1)
-;     Read column 1 data from $4017
-;     Repeat steps 2-5 eight more times
-
-; Note that Family BASIC never writes to $4016 with bit 2 clear, there is no need to disable the keyboard matrix.
-
+; The FDS BIOS terminates the routine early if all keys are pressed on column 0 of any row (it determines that the keyboard is disconnected). Family BASIC always reads all rows/columns.
+; The FDS BIOS writes to $4016 with bit 2 clear at the end of the routine (thus disabling the keyboard matrix), but Family BASIC does not.
+; There are currently no known commercial FDS games which use the BIOS routine for keyboard reading[footnotes 1].
 
 pollKeyboard:
 @upDown = BUTTON_UP|BUTTON_DOWN
