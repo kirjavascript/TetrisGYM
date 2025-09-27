@@ -18,9 +18,10 @@ gameModeState_handleGameOver:
         lda #$03
         sta renderMode
 .if KEYBOARD = 1
-        inc entryActive
+        ; flag for keyboard poll to ignore mapped keys except start/return
+        inc highScoreEntryActive
         jsr handleHighScoreIfNecessary
-        dec entryActive
+        dec highScoreEntryActive
 .else
         jsr handleHighScoreIfNecessary
 .endif

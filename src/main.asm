@@ -36,8 +36,6 @@ mainLoop:
 .include "nmi/render.asm"
 .include "nmi/pollcontroller.asm"
 .if KEYBOARD
-.include "keyboard/map.asm"
-.include "keyboard/buttonmap.asm"
 .include "keyboard/poll.asm"
 .endif
 

@@ -1,57 +1,19 @@
 ; https://www.nesdev.org/wiki/Family_BASIC_Keyboard
-
-; Input ($4016 write)
-
-; 7  bit  0
-; ---- ----
-; xxxx xKCR
-;       |||
-;       ||+-- Reset the keyboard to the first row.
-;       |+--- Select column, row is incremented if this bit goes from high to low.
-;       +---- Enable keyboard matrix (if 0, all voltages inside the keyboard will be 5V, reading back as logical 0 always)
-
-; Incrementing the row from the (keyless) 10th row will cause it to wrap back to the first row.
-
-; Output ($4017 read)
-
-; 7  bit  0
-; ---- ----
-; xxxK KKKx
-;    | |||
-;    +-+++--- Receive key status of currently selected row/column.
-
-; Any key that is held down, will read back as 0.
-
-; ($4016 reads from the data recorder.)
-
-; Similar to the Family Trainer Mat, there are parasitic capacitances that the program must wait for to get a valid result. Family BASIC and the FDS BIOS wait at least 12 cycles (16 if load instructions are considered) between resetting the keyboard and reselecting column 0, and approximately 50 cycles after selecting each column before assuming the output is valid.
-
-; Usage
-; Family BASIC and the FDS BIOS read the keyboard state with the following procedure:
-
-; Write $05 to $4016 (reset to row 0, column 0), followed by 6 NOPs (12 cycles)
-; Write $04 to $4016 (select column 0, next row if not just reset), followed by a delay of ~50 cycles
-; Read column 0 data from $4017
-; Write $06 to $4016 (select column 1), followed by a delay of ~50 cycles
-; Read column 1 data from $4017
-; Repeat steps 2-5 eight more times
-; Differences between Family BASIC and the FDS BIOS:
-
-; The FDS BIOS terminates the routine early if all keys are pressed on column 0 of any row (it determines that the keyboard is disconnected). Family BASIC always reads all rows/columns.
-; The FDS BIOS writes to $4016 with bit 2 clear at the end of the routine (thus disabling the keyboard matrix), but Family BASIC does not.
-; There are currently no known commercial FDS games which use the BIOS routine for keyboard reading[footnotes 1].
+.include "keyboard/constants.asm"
+.include "keyboard/buttonmap.asm"
+.include "keyboard/tables.asm"
 
 pollKeyboard:
-@upDown = BUTTON_UP|BUTTON_DOWN
-@leftRight = BUTTON_LEFT|BUTTON_RIGHT
-
-
+        lda keyboardFlag
+        bne @init
+        rts
+@init:
         lda #KB_INIT
         sta JOY1
 
         ; wait 12 cycles before first row
         lda #$00
-        sta newlyPressedKeys
+        sta kbNewKeys
         ldx #8
         nop
         nop
@@ -62,7 +24,7 @@ pollKeyboard:
         sty JOY1
 
         ldy #6
-        jsr @keyboardReadWait
+        jsr keyboardReadWait
         lda JOY2_APUFC
 
         ; start second column read
@@ -74,146 +36,127 @@ pollKeyboard:
         asl
         asl
         asl
-        beq @ret ; assume 4 simultaneously pressed keys in one row indicates no keyboard
+        beq @disconnected
         sta generalCounter
 
         ldy #3
-        jsr @keyboardReadWait
+        jsr keyboardReadWait
         lda JOY2_APUFC
 
         and #KB_MASK
         lsr
         ora generalCounter
         eor #$FF
-        sta keyboardInput,x
+        sta kbRawInput,x
         dex
         bpl @rowLoop
 
 ; map keys to buttons
         lda #$00
-        sta newlyPressedKeys
+        sta kbNewKeys
         ldx #7
 
 ; build a byte that looks like controller input
 @readKeyLoop:
         clc
-        ldy @mappedRows,x
-        lda keyboardInput,y
-        and @mappedMasks,x
+        ldy kbMappedKeyRows,x
+        lda kbRawInput,y
+        and kbMappedKeyMasks,x
         beq @notPressed
         sec
 @notPressed:
-        rol newlyPressedKeys
+        rol kbNewKeys
         dex
         bpl @readKeyLoop
 
 ; prevent SOCD (Simultaneous Opposite Cardinal Direction
         ldx #$01
 @antiSocd:
-        lda newlyPressedKeys
-        and @antiSocdMatch,x
-        cmp @antiSocdMatch,x
+        lda kbNewKeys
+        and kbAntiSocd,x
+        cmp kbAntiSocd,x
         bne @noMatch
         eor #$FF
-        and newlyPressedKeys
-        sta newlyPressedKeys
+        and kbNewKeys
+        sta kbNewKeys
 @noMatch:
         dex
         bpl @antiSocd
 
 ; determine which are new
-        lda newlyPressedKeys
+        lda kbNewKeys
 
 ; ignore everything except start during score entry
-        ldy entryActive
+        ldy highScoreEntryActive
         beq @entryNotActive
         and #BUTTON_START
 @entryNotActive:
 
         tay
-        eor heldKeys
-        and newlyPressedKeys
-        sta newlyPressedKeys
-        sty heldKeys
+        eor kbHeldKeys
+        and kbNewKeys
+        sta kbNewKeys
+        sty kbHeldKeys
 
 ; Copy to controller buttons
         lda newlyPressedButtons_player1
-        ora newlyPressedKeys
+        ora kbNewKeys
         sta newlyPressedButtons_player1
 
         lda heldButtons_player1
-        ora heldKeys
+        ora kbHeldKeys
         sta heldButtons_player1
 @ret:   rts
 
-@keyboardReadWait:
-    ; consumes (y * 5) + 16
+@disconnected:
+        ldy #8
+        lda #$00
+        sta keyboardFlag
+@clearInput:
+        sta kbRawInput,y
         dey
-        bpl @keyboardReadWait
+        bpl @clearInput
         rts
 
-@antiSocdMatch:
-        .byte @upDown,@leftRight
+keyboardReadWait:
+    ; consumes (y * 5) + 16
+        dey
+        bpl keyboardReadWait
+        rts
 
-@mappedRows:
-        expandKeyRow kbMappedRight
-        expandKeyRow kbMappedLeft
-        expandKeyRow kbMappedDown
-        expandKeyRow kbMappedUp
-        expandKeyRow kbMappedStart
-        expandKeyRow kbMappedSelect
-        expandKeyRow kbMappedB
-        expandKeyRow kbMappedA
-@mappedMasks:
-        expandKeyMask kbMappedRight
-        expandKeyMask kbMappedLeft
-        expandKeyMask kbMappedDown
-        expandKeyMask kbMappedUp
-        expandKeyMask kbMappedStart
-        expandKeyMask kbMappedSelect
-        expandKeyMask kbMappedB
-        expandKeyMask kbMappedA
+detectKeyboard:
+; read 10th row, expect 1E
+; disable keyboard, expect 00
+; see https://www.nesdev.org/wiki/Family_BASIC_Keyboard#Keyboard_detection_in_other_games
+        jsr pollKeyboard
+        ldy #KB_COL_0
+        sty JOY1
+        ldy #6
+        jsr keyboardReadWait
+        lda JOY2_APUFC
+        and #KB_MASK
+        cmp #KB_MASK
+        bne @noKeyboard
+        ldy #6
+        jsr keyboardReadWait
+        lda #KB_DISABLE
+        sta JOY1
+        ldy #6
+        jsr keyboardReadWait
+        lda JOY2_APUFC
+        and #KB_MASK
+        bne @noKeyboard
+        inc keyboardFlag
+@noKeyboard:
+        rts
 
+; Seed Entry
 
-;     Bit0  Bit1    Bit2    Bit3      Bit4    Bit5    Bit6     Bit7
-; 0   ]     [       RETURN  F8        STOP    ¥       RSHIFT   KANA
-; 1   ;     :       @       F7        ^       -       /        _
-; 2   K     L       O       F6        0       P       ,        .
-; 3   J     U       I       F5        8       9       N        M
-; 4   H     G       Y       F4        6       7       V        B
-; 5   D     R       T       F3        4       5       C        F
-; 6   A     S       W       F2        3       E       Z        X
-; 7   CTR   Q       ESC     F1        2       1       GRPH     LSHIFT
-; 8   LEFT  RIGHT   UP      CLR_HOME  INS     DEL     SPACE    DOWN
-
-; each byte represents row, column and if shift should be read
-; only keys supported by the score entry routine are included
-
-charToSeedMap:
-        .byte key0
-        .byte key1
-        .byte key2
-        .byte key3
-        .byte key4
-        .byte key5
-        .byte key6
-        .byte key7
-        .byte key8
-        .byte key9
-        .byte keyA
-        .byte keyB
-        .byte keyC
-        .byte keyD
-        .byte keyE
-        .byte keyF
-charToSeedMapEnd:
-
-seedChars = <(charToSeedMapEnd - charToSeedMap) - 1
 
 readKbSeedEntry:
-        ldx #seedChars
+        ldx #seedEntryCharCount
 @readLoop:
-        lda charToSeedMap,x
+        lda seedEntryTable,x
         jsr readKey
         bne @seedEntered
         dex
@@ -230,67 +173,11 @@ readKbSeedEntry:
         rts
 
 
-charToKbMap:
-        .byte keySpace
-        .byte keyA
-        .byte keyB
-        .byte keyC
-        .byte keyD
-        .byte keyE
-        .byte keyF
-        .byte keyG
-        .byte keyH
-        .byte keyI
-        .byte keyJ
-        .byte keyK
-        .byte keyL
-        .byte keyM
-        .byte keyN
-        .byte keyO
-        .byte keyP
-        .byte keyQ
-        .byte keyR
-        .byte keyS
-        .byte keyT
-        .byte keyU
-        .byte keyV
-        .byte keyW
-        .byte keyX
-        .byte keyY
-        .byte keyZ
-        .byte key0
-        .byte key1
-        .byte key2
-        .byte key3
-        .byte key4
-        .byte key5
-        .byte key6
-        .byte key7
-        .byte key8
-        .byte key9
-        .byte keyComma
-        .byte keySlash
-        .byte keyOpenBracket
-        .byte keyCloseBracket
-        .byte keyKana          ; <3
-        .byte keyPeriod
-        .byte key1 | $80       ; !
-        .byte keySlash | $80   ; ?
-        .byte keyDash
-        ; treated differently
-        .byte keyRight
-        .byte keyLeft
-        .byte keyDEL
-charToKbMapEnd:
+; high score entry
 
-kbChars         = <(charToKbMapEnd - charToKbMap) - 1
-kbScoreDelete   = kbChars
-kbScoreLeft     = kbChars - 1
-kbScoreRight    = kbChars - 2
 
-kbInputThrottle := generalCounter4
-
-readKbScoreInput:
+readKbHighScoreEntry:
+@kbInputThrottle := generalCounter4
 ; 2 frames to complete action
 ; first reads key, determines action and stores key (unless key is action only)
 ; second returns cursor action
@@ -308,7 +195,7 @@ readKbScoreInput:
 
 ; check if shift flag is set
         lda kbReadState
-        beq @readScoreInput
+        beq @readChar
         dec kbReadState
         beq @signalRight
         dec kbReadState ; reset to 0
@@ -317,11 +204,11 @@ readKbScoreInput:
 @signalRight:
         rts
 
-@readScoreInput:
-        ldx #kbChars
+@readChar:
+        ldx #scoreEntryCharCount
 
 @checkNextChar:
-        lda charToKbMap,x
+        lda scoreEntryTable,x
         jsr readKey
         bne @keyPressed
         dex
@@ -336,7 +223,7 @@ readKbScoreInput:
         cpx kbHeldInput
         bne @newInput
 
-        inc kbInputThrottle
+        inc @kbInputThrottle
         bne @noKeyPressed
 
         lda #-4
@@ -347,7 +234,7 @@ readKbScoreInput:
         lda #-16
 
 @storeThrottle:
-        sta kbInputThrottle
+        sta @kbInputThrottle
 
 @placeInput:
         lda highScoreEntryNameOffsetForLetter
@@ -398,7 +285,7 @@ readKey:
 ; extract mask
         and #07
         tay
-        lda @readKeyMasks,y
+        lda kbColumnMaskTable,y
         sta @readKeyMask
 
 ; extract row index
@@ -421,10 +308,7 @@ readKey:
         beq @ret
 
 @readKey:
-        lda keyboardInput,y
+        lda kbRawInput,y
         and @readKeyMask
 @ret:
         rts
-
-@readKeyMasks:
-    .byte $80,$40,$20,$10,$08,$04,$02,$01

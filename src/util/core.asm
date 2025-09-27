@@ -65,7 +65,7 @@ updateAudioWaitForNmiAndResetOamStaging:
         lda verticalBlankingInterval
         beq @checkForNmi
 
-.if KEYBOARD
+.if KEYBOARD = 1
 ; Read Family BASIC Keyboard
         jsr pollKeyboard
 .endif

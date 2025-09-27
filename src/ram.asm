@@ -221,22 +221,24 @@ invisibleFlag: .res 1 ; $63B  ; 0 for normal mode, non-zero for Invisible playfi
 currentFloor: .res 1 ; $63C floorModifier is copied here at game init.  Set to 0 otherwise and incremented when linecap floor.
 mapperId: .res 1 ; $63D ; For INES_MAPPER 1000 (autodetect).  0 = CNROM.  1 = MMC1.
 
-entryActive: .res 1  ; todo: find better way to track high score entry screen
     .res $34
 
 .if KEYBOARD
-; used for high score entry to throttle input and to flag when a letter has been input
-kbReadState: .res 1 ; $0673
-kbHeldInput: .res 1 ; $0674
+kbReadState: .res 1 ; $0673 - used for high score entry
+kbHeldInput: .res 1 ; $0674 - high score input throttling
 
-; controller equivalent, can possibly be removed
-newlyPressedKeys: .res 1 ; $0675
-heldKeys: .res 1 ; $0676
+ ; mapped buttons stored like a controller byte
+ ; player2 controller can possibly be used instead
+kbNewKeys: .res 1 ; $0675
+kbHeldKeys: .res 1 ; $0676
 
-; raw input from keyboard
-keyboardInput: .res 9 ; $0677
+kbRawInput: .res 9 ; $0677  - all 72 keys' input
+
+; used to track state of high score entry screen.  Can possibly use the address of the nmi interrupted
+; routine in the stack to track instead
+highScoreEntryActive: .res 1  ; $0675
 .else
-    .res $D
+    .res $B
 .endif
 
 musicStagingSq1Lo: .res 1 ; $0680
@@ -359,5 +361,8 @@ linecapFlag: .res 1
 dasOnlyFlag: .res 1
 qualFlag: .res 1
 palFlag: .res 1
+.if KEYBOARD = 1
+keyboardFlag: .res 1
+.endif
 
 ; ... $7FF

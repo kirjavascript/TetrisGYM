@@ -178,7 +178,7 @@ highScoreEntryScreen:
 @checkForAOrRightPressed:
 
 .if KEYBOARD = 1
-        jsr readKbScoreInput
+        jsr readKbHighScoreEntry
         bmi @noKeyboardInput
         beq @nextTile
         cmp #$7F

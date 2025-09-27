@@ -1,35 +1,5 @@
-; Assisted with the following python:
-; kbmap = """
-; CloseBracket OpenBracket RETURN  F8        STOP    Yen     SHIFTRight   KANA
-; Semicolon    Colon       atSign  F7        Caret   Dash    Slash        Underscore
-; K            L           O       F6        0       P       Comma        Period
-; J            U           I       F5        8       9       N            M
-; H            G           Y       F4        6       7       V            B
-; D            R           T       F3        4       5       C            F
-; A            S           W       F2        3       E       Z            X
-; CTR          Q           ESC     F1        2       1       GRPH         SHIFTLeft
-; Left         Right       UP      CLR_HOME  INS     DEL     Space        Down
-; """
-; for row, keys in enumerate(kbmap.strip().splitlines()):
-;     for mask, key in enumerate(keys.split()):
-;         print(f"key{key:<12} = ${((8 - row) << 3) | mask:02X}")
-
-.macro readKeyDirect keyMap
-        lda keyboardInput + (keyMap >> 3)
-        and #$80 >> (keyMap & 7)
-.endmacro
-
-.macro expandKeyRow keyMap
-        .byte keyMap >> 3
-.endmacro
-
-.macro expandKeyMask keyMap
-        .byte $80 >> (keyMap & 7)
-.endmacro
-
-
 ; each key is represented by a byte 0RRRRCCC
-; row is 0-8 and is inverted
+; row is 0-8
 ; col is byte position from left to right
 
 keyF1           = $0B
@@ -113,3 +83,27 @@ keyW            = $12
 keyX            = $17
 keyY            = $22
 keyZ            = $16
+
+
+KB_DISABLE = $00
+KB_INIT = $05
+KB_COL_0 = $04
+KB_COL_1 = $06
+KB_MASK  = $1E
+
+UPDOWN = BUTTON_UP | BUTTON_DOWN
+LEFTRIGHT = BUTTON_LEFT | BUTTON_RIGHT
+
+.macro readKeyDirect keyMap
+; not zero - key is pressed
+        lda kbRawInput + (keyMap >> 3)
+        and #$80 >> (keyMap & 7)
+.endmacro
+
+.macro expandKeyRow keyMap
+        .byte keyMap >> 3
+.endmacro
+
+.macro expandKeyMask keyMap
+        .byte $80 >> (keyMap & 7)
+.endmacro

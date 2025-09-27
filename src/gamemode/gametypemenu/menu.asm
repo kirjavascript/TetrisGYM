@@ -152,37 +152,43 @@ seedControls:
 @skipSeedRight:
 
         lda menuSeedCursorIndex
-.if KEYBOARD <> 1
-        beq @skipSeedControl
-.else
-        bne @readKeys
+
+.if KEYBOARD = 1
+@kbSeedLow = generalCounter
+@kbSeedHigh = generalCounter2
+        bne @checkForKbSeedEntry
         jmp @skipSeedControl
-@readKeys:
+@checkForKbSeedEntry:
         jsr readKbSeedEntry
         bmi @noKeysPressed
-        sta generalCounter
+        sta @kbSeedLow
+        asl
+        asl
+        asl
+        asl
+        sta @kbSeedHigh
         ldy menuSeedCursorIndex
         dey
         tya
         lsr
-        tay ; save seed offset
+        tay
+        ; y = (index-1) // 2
+        ; c = (index-1) % 2
+        lda set_seed_input,y
         bcc @highByte
-        lda set_seed_input,y
+; low byte:
         and #$F0
-        ora generalCounter
-        sta set_seed_input,y
-        jmp @moveRight
+        ora @kbSeedLow
+        bcs @storeSeed
 @highByte:
-        lda set_seed_input,y
         and #$0F
-        asl generalCounter
-        asl generalCounter
-        asl generalCounter
-        asl generalCounter
-        ora generalCounter
+        ora @kbSeedHigh
+@storeSeed:
         sta set_seed_input,y
         jmp @moveRight
 @noKeysPressed:
+.else
+        beq @skipSeedControl
 .endif
 
         lda menuSeedCursorIndex

@@ -248,7 +248,7 @@ Blocks are invisible until the end of the game.
 
 ![Hard Drop](./assets/screens/harddrop.png)
 
-Press `up` to hard drop and `select` to soft drop.
+Press `up` to hard drop and `select` to sonic drop.
 
 ## Level Menu
 
