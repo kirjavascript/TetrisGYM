@@ -5,9 +5,9 @@
 
 pollKeyboard:
         lda keyboardFlag
-        bne @init
+        bne pollKeyboardInit
         rts
-@init:
+pollKeyboardInit:
         lda #KB_INIT
         sta JOY1
 
@@ -128,7 +128,7 @@ detectKeyboard:
 ; read 10th row, expect 1E
 ; disable keyboard, expect 00
 ; see https://www.nesdev.org/wiki/Family_BASIC_Keyboard#Keyboard_detection_in_other_games
-        jsr pollKeyboard
+        jsr pollKeyboardInit
         ldy #KB_COL_0
         sty JOY1
         ldy #6
