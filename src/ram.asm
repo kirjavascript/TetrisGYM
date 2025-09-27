@@ -224,19 +224,19 @@ mapperId: .res 1 ; $63D ; For INES_MAPPER 1000 (autodetect).  0 = CNROM.  1 = MM
     .res $34
 
 .if KEYBOARD
-kbReadState: .res 1 ; $0673 - used for high score entry
-kbHeldInput: .res 1 ; $0674 - high score input throttling
+kbReadState: .res 1 ; $0672 - used for high score entry
+kbHeldInput: .res 1 ; $0673 - high score input throttling
 
  ; mapped buttons stored like a controller byte
  ; player2 controller can possibly be used instead
-kbNewKeys: .res 1 ; $0675
-kbHeldKeys: .res 1 ; $0676
+kbNewKeys: .res 1 ; $0674
+kbHeldKeys: .res 1 ; $0675
 
-kbRawInput: .res 9 ; $0677  - all 72 keys' input
+kbRawInput: .res 9 ; $0676  - all 72 keys' input
 
 ; used to track state of high score entry screen.  Can possibly use the address of the nmi interrupted
 ; routine in the stack to track instead
-highScoreEntryActive: .res 1  ; $0675
+highScoreEntryActive: .res 1  ; $067F
 .else
     .res $B
 .endif
