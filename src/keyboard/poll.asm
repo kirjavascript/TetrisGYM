@@ -226,12 +226,12 @@ readKbHighScoreEntry:
         inc @kbInputThrottle
         bne @noKeyPressed
 
-        lda #-4
+        lda #<-4
         bne @storeThrottle
 
 @newInput:
         stx kbHeldInput
-        lda #-16
+        lda #<-16
 
 @storeThrottle:
         sta @kbInputThrottle
