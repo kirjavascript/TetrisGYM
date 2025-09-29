@@ -4,7 +4,7 @@ render_mode_pause:
         beq @skipSaveSlotPatch
         jsr saveSlotNametablePatch
         lda renderFlags
-        and #~RENDER_DEBUG
+        and #<~RENDER_DEBUG
         sta renderFlags
 @skipSaveSlotPatch:
         lda playState
