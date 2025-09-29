@@ -47,9 +47,9 @@ function drawTiles(buffer, lookup, tiles, offset = 0) {
         if (d !== '#') {
             const charCode = d.charCodeAt(0);
             if (charCode > STR_OFFSET) {
-                buffer[o + i] = charCode - STR_OFFSET;
+                buffer[offset + i] = charCode - STR_OFFSET;
             } else {
-                buffer[o + i] = lookup.indexOf(d);
+                buffer[offset + i] = lookup.indexOf(d);
             }
         }
     });
