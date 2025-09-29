@@ -238,7 +238,7 @@ kbRawInput: .res 9 ; $0676  - all 72 keys' input
 ; routine in the stack to track instead
 highScoreEntryActive: .res 1  ; $067F
 .else
-    .res $B
+    .res $E
 .endif
 
 musicStagingSq1Lo: .res 1 ; $0680
