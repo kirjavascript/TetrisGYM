@@ -42,8 +42,7 @@ function blankNT() {
     return Array.from({ length: 1024 }, () => 0xFF);
 }
 
-function drawTiles(buffer, lookup, tiles, offset) {
-    const o = offset ? offset : 0;
+function drawTiles(buffer, lookup, tiles, offset = 0) {
     [...tiles.trim().split('\n').join('')].forEach((d, i) => {
         if (d !== '#') {
             const charCode = d.charCodeAt(0);
