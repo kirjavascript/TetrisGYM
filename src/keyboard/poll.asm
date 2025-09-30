@@ -162,11 +162,10 @@ readKbSeedEntry:
         dex
         bpl @readLoop
 @seedEntered:
-        txa
-        cmp kbHeldInput
+        cpx kbHeldInput
         beq @noInput
-        sta kbHeldInput
-        lda kbHeldInput
+        stx kbHeldInput
+        txa
         rts
 @noInput:
         lda #$FF
