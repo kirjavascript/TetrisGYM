@@ -42,14 +42,14 @@ function blankNT() {
     return Array.from({ length: 1024 }, () => 0xFF);
 }
 
-function drawTiles(buffer, lookup, tiles) {
+function drawTiles(buffer, lookup, tiles, offset = 0) {
     [...tiles.trim().split('\n').join('')].forEach((d, i) => {
         if (d !== '#') {
             const charCode = d.charCodeAt(0);
             if (charCode > STR_OFFSET) {
-                buffer[i] = charCode - STR_OFFSET;
+                buffer[offset + i] = charCode - STR_OFFSET;
             } else {
-                buffer[i] = lookup.indexOf(d);
+                buffer[offset + i] = lookup.indexOf(d);
             }
         }
     });
