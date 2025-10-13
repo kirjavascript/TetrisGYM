@@ -537,7 +537,7 @@ menuYTmp := tmp2
         ldx darkModifier
         lda darkOptions, x
         sta spriteIndexInOamContentLookup
-        lda #(MODE_DARK*8) + MENU_SPRITE_Y_BASE + 1
+        lda #<((MODE_DARK*8) + MENU_SPRITE_Y_BASE + 1)
 
 @renderOption:
         sec
