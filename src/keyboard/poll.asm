@@ -13,8 +13,9 @@ pollKeyboardInit:
 
         ; wait 12 cycles before first row
         lda #$00
-        sta kbNewKeys
+        sta newlyPressedButtons_player1
         ldx #8
+        nop
         nop
         nop
         nop
@@ -52,8 +53,6 @@ pollKeyboardInit:
         bpl @rowLoop
 
 ; map keys to buttons
-        lda #$00
-        sta kbNewKeys
         ldx #7
 
 ; build a byte that looks like controller input
@@ -65,53 +64,43 @@ pollKeyboardInit:
         beq @notPressed
         sec
 @notPressed:
-        rol kbNewKeys
+        rol newlyPressedButtons_player1
         dex
         bpl @readKeyLoop
 
 ; prevent SOCD (Simultaneous Opposite Cardinal Direction
         ldx #$01
 @antiSocd:
-        lda kbHeldKeys
+        lda heldButtons_player1
         and kbAntiSocd,x
         sta generalCounter
-        lda kbNewKeys
+        lda newlyPressedButtons_player1
         and kbAntiSocd,x
         cmp kbAntiSocd,x
         bne @noMatch
         eor #$FF
-        and kbNewKeys
-        ; allow previously held input to continue to be held, prevents yutaps
+        and newlyPressedButtons_player1
+        ; allow previously held input to continue, prevents yutaps
         ora generalCounter
-        sta kbNewKeys
+        sta newlyPressedButtons_player1
 @noMatch:
         dex
         bpl @antiSocd
 
 ; determine which are new
-        lda kbNewKeys
+        lda newlyPressedButtons_player1
 
 ; ignore everything except start during score entry
         ldy highScoreEntryActive
         beq @entryNotActive
         and #BUTTON_START
 @entryNotActive:
-
         tay
-        eor kbHeldKeys
-        and kbNewKeys
-        sta kbNewKeys
-        sty kbHeldKeys
-
-; Copy to controller buttons
-        lda newlyPressedButtons_player1
-        ora kbNewKeys
+        eor heldButtons_player1
+        and newlyPressedButtons_player1
         sta newlyPressedButtons_player1
-
-        lda heldButtons_player1
-        ora kbHeldKeys
-        sta heldButtons_player1
-@ret:   rts
+        sty heldButtons_player1
+        rts
 
 @disconnected:
         ldy #8

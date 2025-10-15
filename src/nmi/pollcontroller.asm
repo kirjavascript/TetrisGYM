@@ -78,7 +78,7 @@ diffOldAndNewButtons:
         lda #$00
         sta newlyPressedButtons_player1
         plp
-        bne @diffForPlayer
+        bne @ret
         sta keyboardFlag
 .endif
 @diffForPlayer:
@@ -90,4 +90,4 @@ diffOldAndNewButtons:
         sty heldButtons_player1,x
         dex
         bpl @diffForPlayer
-        rts
+@ret:   rts
