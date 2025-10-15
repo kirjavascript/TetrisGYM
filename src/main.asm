@@ -35,7 +35,7 @@ mainLoop:
 .include "nmi/render.asm"
 .include "nmi/pollcontroller.asm"
 .if KEYBOARD
-.include "nmi/pollkeyboard.asm"
+.include "keyboard/poll.asm"
 .endif
 
 .include "gamemode/branch.asm"
