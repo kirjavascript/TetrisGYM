@@ -72,12 +72,17 @@ pollKeyboardInit:
 ; prevent SOCD (Simultaneous Opposite Cardinal Direction
         ldx #$01
 @antiSocd:
+        lda kbHeldKeys
+        and kbAntiSocd,x
+        sta generalCounter
         lda kbNewKeys
         and kbAntiSocd,x
         cmp kbAntiSocd,x
         bne @noMatch
         eor #$FF
         and kbNewKeys
+        ; allow previously held input to continue to be held, prevents yutaps
+        ora generalCounter
         sta kbNewKeys
 @noMatch:
         dex
