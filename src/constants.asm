@@ -189,7 +189,7 @@ MENU_TOP_MARGIN_SCROLL := 7 ; in blocks
 .if ANYDAS = 1
     .byte $40   ; MODE_DAS_VALUE
     .byte $40   ; MODE_ARR_VALUE
-    .byte $1    ; MODE_ARE_CHARGE
+    .byte $2    ; MODE_ARE_CHARGE
 .endif
 .endmacro
 
