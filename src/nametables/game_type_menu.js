@@ -75,7 +75,7 @@ PAL MODE
 if (anydas) {
     modes.splice(modes.indexOf('DAS DELAY'), 1);
     modes.splice(modes.indexOf('DAS ONLY'), 1);
-    modes.push('DAS', 'ARR', 'ARE CHARGE');
+    modes.push('DAS', 'ARR', 'ENTRY CHARGE');
 }
 
 const modeStartRow = 9;
