@@ -10,37 +10,37 @@ gameModeState_updatePlayer1:
         jsr checkDebugGameplay
         jsr practiseAdvanceGame
         jsr practiseGameHUD
-        jsr branchOnPlayStatePlayer1
 .if ANYDAS = 1
 ; do nothing while piece is active (playstate = 1)
         ldx playState
         dex
-        beq @stageSprite
+        beq @branchOnPlaystate
 ; do nothing if not kitaru charge
         lda anydasARECharge
         cmp #2
-        bne @stageSprite
+        bne @branchOnPlaystate
 ; do nothing when down is held
         lda heldButtons
         and #BUTTON_DOWN
-        bne @stageSprite
+        bne @branchOnPlaystate
 ; reset das on new input
         lda newlyPressedButtons
         and #BUTTON_LEFT|BUTTON_RIGHT
         bne @resetDas
         lda heldButtons
         and #BUTTON_LEFT|BUTTON_RIGHT
-        beq @stageSprite
+        beq @branchOnPlaystate
 ; charge das (unless charged)
         ldx autorepeatX
         dex
-        beq @stageSprite
+        beq @branchOnPlaystate
         dec autorepeatX ; will clear zero flag
-        bne @stageSprite
+        bne @branchOnPlaystate
 @resetDas:
         lda anydasDASValue
         sta autorepeatX
-@stageSprite:
+@branchOnPlaystate:
+        jsr branchOnPlayStatePlayer1
 .endif
         jsr stageSpriteForCurrentPiece
         jsr stageSpriteForNextPiece
