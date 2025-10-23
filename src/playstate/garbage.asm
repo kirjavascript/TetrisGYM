@@ -37,8 +37,12 @@ playState_receiveGarbage:
         lda #$00
         sta pendingGarbage
         sta vramRow
-@ret:  inc playState
-@delay:  rts
+@ret:   inc playState
+        lda #$00 ; earliest possible measured point
+        sta hzSpawnDelay
+        ldx #$83 ; -3 tap delay
+        jsr checkNegativeDelay
+        rts
 
 
 garbageLines:

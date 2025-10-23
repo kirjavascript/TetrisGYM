@@ -10,7 +10,7 @@
 ;       |+--- Select column, row is incremented if this bit goes from high to low.
 ;       +---- Enable keyboard matrix (if 0, all voltages inside the keyboard will be 5V, reading back as logical 0 always)
 
-; Incrementing the row from the (keyless) 10th row will cause it to wrap back to the first row. 
+; Incrementing the row from the (keyless) 10th row will cause it to wrap back to the first row.
 
 ; Output ($4017 read)
 
@@ -50,14 +50,14 @@ pollKeyboard:
         sta JOY1
         ldy #$0A
 @avoidParasiticCapacitance:              ; wait approx 50 cycles after advancing rows
-        dey                 
+        dey
         bne @avoidParasiticCapacitance
         lda JOY2_APUFC
         and #KB_MASK
         sta generalCounter
         lda #KB_COL_1
         sta JOY1
-        lda JOY2_APUFC      
+        lda JOY2_APUFC
         and #KB_MASK
         lsr
         sta keyboardInput,x
@@ -129,7 +129,7 @@ mapKeysToButtons:
         ora #BUTTON_RIGHT
         sta newlyPressedKeys
 @skipRightRead:
-@rightNotPressed: 
+@rightNotPressed:
 
         ldy #$07     ; grph -> B
         ldx #$06
@@ -168,7 +168,7 @@ mapKeysToButtons:
 @startNotPressed:
 
 
-; Separate Newly Pressed from Held 
+; Separate Newly Pressed from Held
         lda newlyPressedKeys
         tay
         eor heldKeys
@@ -189,6 +189,6 @@ mapKeysToButtons:
 keyMask:
         .byte $80,$40,$20,$10,$08,$04,$02,$01
 readKey:
-	lda keyboardInput,y
-	and keyMask,x
-	rts
+    lda keyboardInput,y
+    and keyMask,x
+    rts

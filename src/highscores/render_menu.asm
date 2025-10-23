@@ -28,11 +28,16 @@ showHighScores:
         lda #$FF
         sta PPUDATA
 
+        lda #0 ; 8 digit flag
+        sta tmpZ
+
         ; score
         lda highscores,y
         cmp #$A
         bmi @scoreHighWrite
         jsr twoDigsToPPU
+        lda #1
+        sta tmpZ
         jmp @scoreEnd
 @scoreHighWrite:
         sta PPUDATA
@@ -63,8 +68,19 @@ showHighScores:
         sta PPUDATA
 
         ; levels
+        lda tmpZ
+        beq @normalLevel
+        lda highscores,y
+        cmp #100
+        bpl @normalLevel
+        tax
+        lda byteToBcdTable, x
+        jsr twoDigsToPPU
+        jmp @levelContinue
+@normalLevel:
         lda highscores,y ; startlevel
         jsr renderByteBCD
+@levelContinue:
         iny
 
         ; update PPUADDR for start level

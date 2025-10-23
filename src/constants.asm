@@ -1,8 +1,6 @@
 .ifndef INES_MAPPER ; is set via ca65 flags
-INES_MAPPER := 1 ; supports 1, 3 and 4 (MMC1 / CNROM / MMC3)
+INES_MAPPER := 1000 ; 0 (NROM), 1 (MMC1), 3 (CNROM), 4 (MMC3), 5 (MMC5), and 1000 (autodetect 1/3)
 .endif
-
-HAS_MMC = INES_MAPPER = 1 || INES_MAPPER = 4 || INES_MAPPER = 5
 
 .ifndef SAVE_HIGHSCORES
 SAVE_HIGHSCORES := 1
@@ -17,6 +15,10 @@ AUTO_WIN := 0
 KEYBOARD := 0
 .endif
 
+.ifndef CNROM_OVERRIDE
+CNROM_OVERRIDE := 0
+.endif
+
 NO_MUSIC := 1
 
 ; dev flags
@@ -25,6 +27,7 @@ NO_SFX := 0
 NO_MENU := 0
 ALWAYS_CURTAIN := 0
 QUAL_BOOT := 1
+SWAP_DUTY_CYCLES := 0 ; counters the duty cycle swap present in some clone consoles
 
 INITIAL_CUSTOM_LEVEL := 29
 INITIAL_LINECAP_LEVEL := 39
@@ -34,11 +37,12 @@ BTYPE_START_LINES := $25 ; bcd
 MENU_HIGHLIGHT_COLOR := $27 ; $12 in gym, $16 in original
 BLOCK_TILES := $7B
 EMPTY_TILE := $EF
+LOW_STACK_LINE := $DF
 TETRIMINO_X_HIDE := $EF
 
 PAUSE_SPRITE_X := $74
 PAUSE_SPRITE_Y := $58
-; yobi-style
+; jazzthief-style
 ; PAUSE_SPRITE_X := $C4
 ; PAUSE_SPRITE_Y := $16
 
@@ -51,6 +55,14 @@ BUTTON_A := $80
 BUTTON_SELECT := $20
 BUTTON_START := $10
 BUTTON_DPAD := BUTTON_UP | BUTTON_DOWN | BUTTON_LEFT | BUTTON_RIGHT
+
+RENDER_LINES = $01
+RENDER_LEVEL = $02
+RENDER_SCORE = $04
+RENDER_DEBUG = $08
+RENDER_HZ = $10
+RENDER_STATS = $40
+RENDER_HIGH_SCORE_LETTER = $80
 
 .enum
 MODE_TETRIS
@@ -70,15 +82,19 @@ MODE_CHECKERBOARD
 MODE_GARBAGE
 MODE_DROUGHT
 MODE_DAS
+MODE_LOWSTACK
 MODE_KILLX2
 MODE_INVISIBLE
 MODE_HARDDROP
 MODE_SPEED_TEST
 MODE_SCORE_DISPLAY
+MODE_CRASH
+MODE_STRICT
 MODE_HZ_DISPLAY
 MODE_INPUT_DISPLAY
 MODE_DISABLE_FLASH
 MODE_DISABLE_PAUSE
+MODE_DARK
 MODE_GOOFY
 MODE_DEBUG
 MODE_LINECAP
@@ -102,16 +118,21 @@ LINECAP_FLOOR := 2
 LINECAP_INVISIBLE := 3
 LINECAP_HALT := 4
 
+CRASH_OFF := 0
+CRASH_SHOW := 1
+CRASH_TOPOUT := 2
+CRASH_CRASH := 3
+
 LINECAP_WHEN_STRING_OFFSET := $10
 LINECAP_HOW_STRING_OFFSET := $12
 
-MENU_SPRITE_Y_BASE := $47
-MENU_MAX_Y_SCROLL := $78
+MENU_SPRITE_Y_BASE := $46
+MENU_MAX_Y_SCROLL := $A0
 MENU_TOP_MARGIN_SCROLL := 7 ; in blocks
 
 ; menuConfigSizeLookup
 ; menu ram is defined at menuRAM in ./ram.asm
-.macro MENUSIZES 
+.macro MENUSIZES
     .byte $0    ; MODE_TETRIS
     .byte $0    ; MODE_TSPINS
     .byte $0    ; MODE_SEED
@@ -123,21 +144,25 @@ MENU_TOP_MARGIN_SCROLL := 7 ; in blocks
     .byte $F    ; MODE_CRUNCH
     .byte $20   ; MODE_TAP
     .byte $10   ; MODE_TRANSITION
-    .byte $0    ; MODE_MARATHON
+    .byte $4    ; MODE_MARATHON
     .byte $1F   ; MODE_TAPQTY
     .byte $8    ; MODE_CHECKERBOARD
     .byte $4    ; MODE_GARBAGE
     .byte $12   ; MODE_DROUGHT
     .byte $10   ; MODE_DAS
+    .byte $12   ; MODE_LOWSTACK
     .byte $0    ; MODE_KILLX2
     .byte $0    ; MODE_INVISIBLE
     .byte $0    ; MODE_HARDDROP
     .byte $0    ; MODE_SPEED_TEST
     .byte $5    ; MODE_SCORE_DISPLAY
+    .byte $3	; MODE_CRASH
+    .byte $1	; MODE_STRICT
     .byte $1    ; MODE_HZ_DISPLAY
     .byte $1    ; MODE_INPUT_DISPLAY
     .byte $1    ; MODE_DISABLE_FLASH
     .byte $1    ; MODE_DISABLE_PAUSE
+    .byte $5    ; MODE_DARK
     .byte $1    ; MODE_GOOFY
     .byte $1    ; MODE_DEBUG
     .byte $1    ; MODE_LINECAP
@@ -164,6 +189,7 @@ MENU_TOP_MARGIN_SCROLL := 7 ; in blocks
     .byte   "GARBGE"
     .byte   "LOBARS"
     .byte   "DASDLY"
+    .byte   "LOWSTK"
     .byte   "KILLX2"
     .byte   "INVZBL"
     .byte   "HRDDRP"

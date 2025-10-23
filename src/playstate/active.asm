@@ -38,8 +38,6 @@ harddrop_tetrimino:
         bne @sonic
         rts
 @sonic:
-        lda #0
-        sta vramRow
         lda #$D0
         sta autorepeatY
         rts
@@ -51,6 +49,13 @@ harddrop_tetrimino:
         lda #0
         sta autorepeatY
         sta completedLines
+
+        ldy #$13
+@clearBuffer:
+        sta harddropBuffer,y
+        dey
+        bpl @clearBuffer
+
         jsr playState_lockTetrimino
 
         ; check for gameOver
@@ -378,7 +383,7 @@ lookupDropSpeed:
         bcs @noTableLookup
         lda framesPerDropTableNTSC,x
         ldy palFlag
-        cpy #0
+        ; cpy #0 ; ldy sets z flag
         beq @noTableLookup
         lda framesPerDropTablePAL,x
 @noTableLookup:
@@ -433,7 +438,7 @@ shift_tetrimino:
         lda #$A
         sta dasValuePeriod
         ldy palFlag
-        cpy #0
+        ; cpy #0 ; ldy sets z flag
         beq @shiftTetrimino
         lda #$0C
         sta dasValueDelay

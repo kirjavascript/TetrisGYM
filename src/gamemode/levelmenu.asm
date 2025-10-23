@@ -1,21 +1,15 @@
 gameMode_levelMenu:
-        RESET_MMC1
-        lda #$10
-        jsr setMMC1Control
-.if INES_MAPPER = 3
-        lda currentPpuCtrl
-        and #%10000000
+        lda #NMIEnable
         sta currentPpuCtrl
-.endif
         jsr updateAudio2
         lda #$7
         sta renderMode
         jsr updateAudioWaitForNmiAndDisablePpuRendering
         jsr disableNmi
-        lda #$00
-        jsr changeCHRBank0
-        lda #$00
-        jsr changeCHRBank1
+.if INES_MAPPER <> 0
+        lda #CHRBankSet0
+        jsr changeCHRBanks
+.endif
         jsr bulkCopyToPpu
         .addr   menu_palette
         jsr copyRleNametableToPpu
@@ -30,9 +24,9 @@ gameMode_levelMenu:
         beq @noLinecapInfo
         jsr levelMenuLinecapInfo
 @noLinecapInfo:
-        ; render level when loading screen
-        lda #$1
-        sta outOfDateRenderFlags
+        ; render lines when loading screen
+        lda #RENDER_LINES
+        sta renderFlags
         jsr resetScroll
         jsr waitForVBlankAndEnableNmi
         jsr updateAudioWaitForNmiAndResetOamStaging
@@ -83,7 +77,6 @@ gameMode_levelMenu_processPlayer1Navigation:
         lda newlyPressedButtons_player1
         sta newlyPressedButtons
 
-.if SAVE_HIGHSCORES
         lda levelControlMode
         cmp #4
         bne @notClearingHighscores
@@ -95,11 +88,15 @@ gameMode_levelMenu_processPlayer1Navigation:
         lda #0
         sta levelControlMode
         jsr resetScores
+.if SAVE_HIGHSCORES
+        jsr detectSRAM
+        beq @notResettingSavedScores
         jsr resetSavedScores
+@notResettingSavedScores:
+.endif
         jsr updateAudioWaitForNmiAndResetOamStaging
         jmp gameMode_levelMenu
 @notClearingHighscores:
-.endif
 
         jsr levelControl
         jsr levelMenuRenderHearts
@@ -132,6 +129,17 @@ levelMenuCheckStartGame:
         sta startLevel
 @startGame:
         ; lda startLevel
+        ldy practiseType
+        cpy #MODE_MARATHON
+        bne @noLevelModification
+        ldy marathonModifier
+        cpy #2 ; marathon modes 2 & 4 starts at level 0
+        beq @startAtZero
+        cpy #4
+        bne @noLevelModification
+@startAtZero:
+        lda #0
+@noLevelModification:
         sta levelNumber
         lda #$00
         sta gameModeState
@@ -157,16 +165,14 @@ levelMenuCheckGoBack:
 shredSeedAndContinue:
         ; seed shredder
 @chooseRandomHole_player1:
-        ldx #$17
-        ldy #$02
+        ldx #rng_seed
         jsr generateNextPseudorandomNumber
         lda rng_seed
         and #$0F
         cmp #$0A
         bpl @chooseRandomHole_player1
 @chooseRandomHole_player2:
-        ldx #$17
-        ldy #$02
+        ldx #rng_seed
         jsr generateNextPseudorandomNumber
         lda rng_seed
         and #$0F
@@ -191,7 +197,6 @@ levelControl:
         .addr   levelControlClearHighScores
         .addr   levelControlClearHighScoresConfirm
 
-.if SAVE_HIGHSCORES
 levelControlClearHighScores:
         lda #$20
         sta spriteXOffset
@@ -238,13 +243,7 @@ highScoreClearUpOrLeave:
         sta levelControlMode
 @ret:
         rts
-.else
-levelControlClearHighScores:
-levelControlClearHighScoresConfirm:
-        lda #0
-        sta levelControlMode
-        rts
-.endif
+
 
 levelControlCustomLevel:
         jsr handleReadyInput
@@ -295,9 +294,9 @@ levelControlCustomLevel:
 @changeLevel:
         lda #$1
         sta soundEffectSlot1Init
-        lda outOfDateRenderFlags
-        ora #$1
-        sta outOfDateRenderFlags
+        lda renderFlags
+        ora #RENDER_LINES
+        sta renderFlags
         rts
 
 levelControlHearts:
@@ -324,10 +323,7 @@ MAX_HEARTS := 7
         jsr @changeHearts
 @checkUpPressed:
 
-.if SAVE_HIGHSCORES
         ; to clear mode
-        jsr detectSRAM
-        beq @notClearMode
         lda newlyPressedButtons
         cmp #BUTTON_DOWN
         bne @notClearMode
@@ -336,7 +332,6 @@ MAX_HEARTS := 7
         lda #$3
         sta levelControlMode
 @notClearMode:
-.endif
 
         ; to normal mode
         lda newlyPressedButtons

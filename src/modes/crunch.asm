@@ -16,67 +16,53 @@
 ; E - 3 left 2 right
 ; F - 3 left 3 right
 
+; clobbers generalCounter3 & generalCounter4 (defined in playstate/util.asm)
+
 advanceGameCrunch:
-    lda #0
-    sta vramRow
-    lda #20
-advanceSides:
-    pha
-    sta tmp3
-    lda crunchModifier
-    lsr a
-    lsr a
-    ldx #0
-    jsr advanceSide
-    pla
-    sta tmp3
-    lda crunchModifier
-    and #%00000011
-    pha
-    eor #$FF
-    sec
-    adc #0
-    clc
-    adc #10
-    tax
-    pla
-    jsr advanceSide
+; initialize playfield row 19 to 0
+    ldx #$13
+@nextRow:
+    lda multBy10Table,x
+    sta playfieldAddr ; restored to 0 at end of loop
+    jsr advanceSides
+    dex
+    bpl @nextRow
+    inx ; x is FF, increase to store 0 in vramRow
+    stx vramRow
+crunchReturn:
     rts
 
-advanceSide:
-    cmp #0
-    beq @end
-    pha
-    ldy #0
-    txa
-    clc
-    adc #<playfield
-    sta tmp1
-    lda #>playfield
-    sta tmp2
-@rowLoop:
-    pla
-    pha
-    tax
-    beq @end
-@blockLoop:
+advanceSides:
+    ; called in playState_checkForCompletedRows and in advanceGameCrunch
+    ; draws to row defined in playfieldAddr, which defaults to 0
+    jsr unpackCrunchModifier
+
     lda #BLOCK_TILES
-    sta (tmp1), y
-    inc tmp1
-    dex
-    bne @blockLoop
-    pla
-    pha
-    eor #$FF
-    sec
-    adc #0
-    clc
-    adc tmp1
-    clc
-    adc #10
-    sta tmp1
-    dec tmp3
-    bne @rowLoop
-    pla
-@end:
+
+    ldy #$0
+@leftLoop:
+    dec crunchLeftColumns
+    bmi @initRight
+    sta (playfieldAddr),y
+    iny
+    bpl @leftLoop ; unconditional
+
+@initRight:
+    ldy #$9
+@rightLoop:
+    dec crunchRightColumns
+    bmi crunchReturn
+    sta (playfieldAddr),y
+    dey
+    bpl @rightLoop ; unconditional
+
+
+unpackCrunchModifier:
+    lda crunchModifier
+    lsr
+    lsr
+    sta crunchLeftColumns ; generalCounter3
+    lda crunchModifier
+    and #$03
+    sta crunchRightColumns ; generalCounter4
     rts

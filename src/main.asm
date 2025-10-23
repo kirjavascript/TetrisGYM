@@ -15,6 +15,10 @@
 
 .segment    "PRG_chunk1": absolute
 
+; region code at start of page to keep cycle count consistent
+.include "util/check_region.asm"
+.include "audio.asm"
+
 initRam:
 
 .include "boot.asm"
@@ -46,15 +50,18 @@ mainLoop:
 .include "highscores/entry_screen.asm"
 
 .include "util/core.asm"
-.include "util/check_region.asm"
-.include "util/bytesprite.asm"
 .include "util/strings.asm"
 .include "util/math.asm"
 .include "util/menuthrottle.asm"
 .include "util/modetext.asm"
+.include "util/mapper.asm"
+.if INES_MAPPER = 1000
+.include "util/autodetect.asm"
+.endif
 
-.include "sprites/loadsprite.asm"
+.include "sprites/bytesprite.asm"
 .include "sprites/drawrect.asm"
+.include "sprites/loadsprite.asm"
 .include "sprites/piece.asm"
 
 .include "data/bytebcd.asm"
@@ -72,14 +79,7 @@ mainLoop:
 .include "modes/pace.asm"
 .include "modes/debug.asm"
 .include "modes/saveslots.asm"
-
-.code
-
-.segment    "PRG_chunk2": absolute
-
-.include "data/demo.asm"
-.include "audio.asm"
-
+.include "modes/crash.asm"
 .include "modes/events.asm"
 .include "modes/controllerinput.asm"
 .include "modes/tapqty.asm"

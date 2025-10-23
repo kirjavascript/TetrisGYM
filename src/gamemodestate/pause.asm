@@ -30,18 +30,12 @@ pause:
 @pauseSetupClassic:
         lda #$16
         sta PPUMASK
-        jmp @pauseSetupPart2
-
 @pauseSetupNotClassic:
         lda #$04 ; render_mode_pause
         sta renderMode
 
 @pauseSetupPart2:
-        jsr updateAudioAndWaitForNmi
-        lda #$FF
-        ldx #$02
-        ldy #$02
-        jsr memset_page
+        jsr updateAudioWaitForNmiAndResetOamStaging
 
 @pauseLoop:
         lda qualFlag

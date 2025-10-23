@@ -24,9 +24,9 @@ advanceGameTSpins:
 
         jsr clearPoints
 
-        lda outOfDateRenderFlags
-        ora #$04
-        sta outOfDateRenderFlags
+        lda renderFlags
+        ora #RENDER_SCORE
+        sta renderFlags
 @continue:
 
 advanceGameTSpins_actual:
@@ -65,12 +65,11 @@ advanceGameTSpins_actual:
 @notSuccessful:
         ; check if a tspin is setup
         lda tspinX
-        cmp #0
+        ; cmp #0 ; lda sets z flag
         bne renderTSpin
 
 generateNewTSpin:
         ldx #rng_seed
-        ldy #$2
         jsr generateNextPseudorandomNumber
         lda rng_seed
         tax
@@ -97,7 +96,8 @@ renderTSpin:
         jsr clearPlayfield
 
         lda tspinY
-        adc #1
+        clc
+        adc #3
         jsr drawFloor
 
         ; get tspin offset
@@ -117,7 +117,7 @@ renderTSpin:
         sta $03c7, x
         sta $03b3, x
         ldy tspinType
-        cpy #0
+        ; cpy #0 ; ldy sets z flag
         bne @noInc
         inx
         inx

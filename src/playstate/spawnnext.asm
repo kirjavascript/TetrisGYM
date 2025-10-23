@@ -3,11 +3,24 @@ SPAWN_NEXT_ADDONS := 1
 playState_spawnNextTetrimino:
         lda vramRow
         cmp #$20
-        bmi @ret
+        bpl :+
+        ldx #$82 ; -2 tap delay
+        jsr checkNegativeDelay
+        rts
 
+:
 .if SPAWN_NEXT_ADDONS
         lda spawnDelay
         beq @notDelaying
+        ; here, spawnDelay=1 means hzSpawnDelay=-2, 2 implies -3, and etc.
+        cmp #3 ; if spawnDelay is >= 3, don't update
+        bcs @noCheck
+        clc
+        adc #1
+        ora #$80 ; mark delay as negative
+        tax
+        jsr checkNegativeDelay
+@noCheck:
         dec spawnDelay
         jmp @ret
 .endif
@@ -24,7 +37,8 @@ playState_spawnNextTetrimino:
         sta saveStateDirty
         rts
 @noSaveState:
-
+        ldx #$81 ; -1 tap delay
+        jsr checkNegativeDelay
         jsr hzStart
 .endif
 
@@ -33,8 +47,7 @@ playState_spawnNextTetrimino:
         sta tetriminoY
         lda #$05
         sta tetriminoX
-        ldx nextPiece
-        lda spawnOrientationFromOrientation,x
+        lda nextPiece
         sta currentPiece
         jsr incrementPieceStat
         jsr chooseNextTetrimino
@@ -61,7 +74,6 @@ pickRandomTetrimino:
         bne useNewSpawnID
 @invalidIndex:
         ldx #rng_seed
-        ldy #$02
         jsr generateNextPseudorandomNumber
         lda rng_seed
         and #$07
@@ -84,16 +96,16 @@ pickTetriminoPre:
         lda practiseType
         cmp #MODE_TSPINS
         beq pickTetriminoT
-        lda practiseType
+        ; lda practiseType ; accumulator is still practiseType
         cmp #MODE_SEED
         beq pickTetriminoSeed
-        lda practiseType
+        ; lda practiseType
         cmp #MODE_TAPQTY
         beq pickTetriminoLongbar
-        lda practiseType
+        ; lda practiseType
         cmp #MODE_TAP
         beq pickTetriminoLongbar
-        lda practiseType
+        ; lda practiseType
         cmp #MODE_PRESETS
         beq pickTetriminoPreset
         jmp pickRandomTetrimino
@@ -120,7 +132,7 @@ pickTetriminoSeed:
         ror
         and #$F
         ; v3
-        cmp #0
+        ; cmp #0 ; and sets z flag
         bne @notZero
         lda #$10
 @notZero:
@@ -128,6 +140,8 @@ pickTetriminoSeed:
         ; cmp #0
         ; beq @compatMode
 
+; without cmp #0, carry bit is unknown and needs set.
+        sec
         adc #1
         sta tmp3 ; step + 1 in tmp3
 @loop:
@@ -150,7 +164,6 @@ pickTetriminoSeed:
         bne @useNewSpawnID
 @invalidIndex:
         ldx #set_seed
-        ldy #$02
         jsr generateNextPseudorandomNumber
         lda set_seed
         and #$07
@@ -172,7 +185,6 @@ pickTetriminoSeed:
 
 setSeedNextRNG:
         ldx #set_seed
-        ldy #$02
         jsr generateNextPseudorandomNumber
         rts
 

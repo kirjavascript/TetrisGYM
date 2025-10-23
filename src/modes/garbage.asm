@@ -93,7 +93,7 @@ randomGarbage:
         bcc @done
 
         lda garbageDelay
-        cmp #0
+        ; cmp #0 ; lda sets z flag
         bne @delay
 
         jsr random10
