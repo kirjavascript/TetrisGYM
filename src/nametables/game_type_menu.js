@@ -37,7 +37,7 @@ drawTiles(buffer, lookup, `
 #a                            d#
 #a                            d#
 #a                            d#
-#a    CTEC 2023               d#
+#a    CTEC                    d#
 #a                            d#
 #a    EUROPEAN CHAMPIONSHIP   d#
 #a                            d#
