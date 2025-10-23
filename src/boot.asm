@@ -33,6 +33,11 @@
         lda #$10
         sta dasModifier
 
+        ; CTEC stuff
+        lda #1
+        sta linecapFlag
+        sta disablePauseFlag
+
         lda #INITIAL_LINECAP_LEVEL
         sta linecapLevel
         lda #INITIAL_LINECAP_LINES
