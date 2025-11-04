@@ -26,11 +26,11 @@ NO_SCORING := 0 ; breaks pace
 NO_SFX := 0
 NO_MENU := 0
 ALWAYS_CURTAIN := 0
-QUAL_BOOT := 1
+QUAL_BOOT := 0
 SWAP_DUTY_CYCLES := 0 ; counters the duty cycle swap present in some clone consoles
 
 INITIAL_CUSTOM_LEVEL := 29
-INITIAL_LINECAP_LEVEL := 39
+INITIAL_LINECAP_LEVEL := 29
 INITIAL_LINECAP_LINES := $30 ; bcd
 INITIAL_LINECAP_LINES_1 := 3 ; hex (lol)
 BTYPE_START_LINES := $25 ; bcd
