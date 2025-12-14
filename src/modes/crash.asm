@@ -1,6 +1,8 @@
 ; Hydrant's crash theory sheet https://docs.google.com/spreadsheets/d/1zAQIo_mnkk0c9e4-hpeDvVxrl9r_HvLSx8V4h4ttmrs/edit#gid=1013692687
 
 testCrash:
+		lda #$00
+		sta lagState ;clearing lag state between calculations
         lda #$1C ; setting all cycles which always happen. for optimizing, this can be removed if all compared numbers are reduced by $6F1C.
         sta cycleCount
         lda #$6F
@@ -308,7 +310,7 @@ testCrash:
         dex
         bne @loop
         ;562 has been added to the cycle count
-        ;confettiA at 30405-30754 76C5-7822
+        ;confettiA at 30407-30746 76C7-781A
         lda hideNextPiece
         beq @nextOn
         lda cycleCount+1 ; add 394 cycles for nextbox if not added earlier. Necessary because we're checking for pre-nextbox NMI now.
@@ -326,25 +328,25 @@ testCrash:
         lda cycleCount+1
         ldx strictFlag
         beq @notStrict_confetti
-        cmp #$BD
+        cmp #$BF
         bcc @allegroJump
         bcs @confettiA
 @notStrict_confetti:
-        cmp #$C5 ;low byte min
+        cmp #$C7 ;low byte min
         bcc @allegroClear
         bcs @confettiA
 @not76: cmp #$78 ;high byte max
         bcc @confettiA
         bne @nextCheck
         lda cycleCount+1
-        cmp #$23 ;low byte max
+        cmp #$1A ;low byte max
         bcs @nextCheck
 @confettiA:
         lda #$E0 ;E0 = limited confetti
         sta crashState
         jmp confettiHandler
 @nextCheck:
-        ;levellag at 30877 = 0x789D
+        ;levellag at 30879 = 0x789F
         lda cycleCount
         cmp #$78 ;high byte min
         bcc @allegroClear
@@ -352,16 +354,16 @@ testCrash:
         lda cycleCount+1
         ldx strictFlag
         beq @notStrict_level
-        cmp #$95
+        cmp #$97
         bcc @allegroClear
         bcs @levelLag
 @notStrict_level:
-        cmp #$9D;low byte min
+        cmp #$9F;low byte min
         bcc @allegroClear
 @levelLag:
         lda #$01
         sta lagState
-        ;linelag at 31072 = 0x7960
+        ;linelag at 31074 = 0x7962
         lda cycleCount
         cmp #$79;high byte min
         bcc @allegroClear
@@ -369,16 +371,16 @@ testCrash:
         lda cycleCount+1
         ldx strictFlag
         beq @notStrict_lines
-        cmp #$58
+        cmp #$5A
         bcc @allegroClear
         bcs @lineLag
 @notStrict_lines:
-        cmp #$60;low byte min
+        cmp #$62;low byte min
         bcc @allegroClear
 @lineLag:
         lda #$03
         sta lagState
-        ;confettiB at 31327-31755 7A5F-7C0B
+        ;confettiB at 31329-31757 7A61-7C0D
         lda cycleCount
         cmp #$7A ;high byte min
         bcc @allegroClear
@@ -386,18 +388,18 @@ testCrash:
         lda cycleCount+1
         ldx strictFlag
         beq @notStrict_B
-        cmp #$57
+        cmp #$59
         bcc @allegroClear
         bcs @confettiB
 @notStrict_B:
-        cmp #$5F ;low byte min
+        cmp #$61 ;low byte min
         bcc @allegroClear
         bcs @confettiB
 @not7A: cmp #$7C ;high byte max
         bcc @confettiB
         bne @allegroClear
         lda cycleCount+1
-        cmp #$0C ;low byte max
+        cmp #$0D ;low byte max
         bcs @allegroClear
 @confettiB:
         lda #$D0 ;D0 = infinite confetti
@@ -410,7 +412,6 @@ testCrash:
         beq @noLag ;if lag should happen, wait a frame here so that sprite staging doesn't happen.
         lda #$00
         sta verticalBlankingInterval
-        sta lagState ;clear lagstate for next
 @checkForNmi:
         lda verticalBlankingInterval ;busyloop
         beq @checkForNmi
