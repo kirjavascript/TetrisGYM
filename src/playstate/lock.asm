@@ -2,6 +2,23 @@ playState_lockTetrimino:
         jsr isPositionValid
         beq @notGameOver
 @gameOver:
+        lda practiseType
+        cmp #MODE_TYPEB
+        bne @revealScore
+
+        ; bonus points if score >= 30000
+        lda binScore+2
+        bne @typeBBonus
+        lda binScore+3
+        bne @typeBBonus
+        lda binScore
+        cmp #<30000
+        lda binScore+1
+        sbc #>30000
+        bcc @revealScore
+@typeBBonus:
+        jsr addBTypeBonus
+@revealScore:
         lda renderFlags ; Flag needed to reveal hidden score
         ora #RENDER_SCORE
         sta renderFlags
