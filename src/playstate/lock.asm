@@ -7,14 +7,10 @@ playState_lockTetrimino:
         bne @revealScore
 
         ; bonus points if score >= 30000
-        lda binScore+2
+        lda score+3
         bne @typeBBonus
-        lda binScore+3
-        bne @typeBBonus
-        lda binScore
-        cmp #<30000
-        lda binScore+1
-        sbc #>30000
+        lda score+2
+        cmp #$03
         bcc @revealScore
 @typeBBonus:
         jsr addBTypeBonus
