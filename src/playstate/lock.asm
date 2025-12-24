@@ -1,4 +1,5 @@
 playState_lockTetrimino:
+@currentTile = generalCounter5
         jsr isPositionValid
         beq @notGameOver
 @gameOver:
@@ -45,49 +46,35 @@ playState_lockTetrimino:
         lda vramRow
         cmp #$20
         bmi @ret
-        lda tetriminoY
-        asl a
-        sta generalCounter
-        asl a
-        asl a
+        ldy tetriminoY
+        lda multBy10Table,y
         clc
-        adc generalCounter
         adc tetriminoX
         sta generalCounter
-        lda currentPiece
+        ldx currentPiece
+        lda tetriminoTileFromOrientation,x
+        sta @currentTile
+        txa
         asl a
         asl a
-        sta generalCounter2
-        asl a
-        clc
-        adc generalCounter2
         tax
         ldy #$00
         lda #$04
         sta generalCounter3
 ; Copies a single square of the tetrimino to the playfield
 @lockSquare:
-        lda orientationTable,x
-        asl a
-        sta generalCounter4
-        asl a
-        asl a
-        clc
-        adc generalCounter4
+        ldy orientationTableY,x
+        lda multBy10Table,y
         clc
         adc generalCounter
         sta positionValidTmp
-        inx
-        lda orientationTable,x
-        sta generalCounter5
-        inx
-        lda orientationTable,x
+        lda orientationTableX,x
         clc
         adc positionValidTmp
         tay
-        lda generalCounter5
+        lda @currentTile
         ; BLOCK_TILES
-        sta (playfieldAddr),y
+        sta playfield,y
         inx
         dec generalCounter3
         bne @lockSquare
