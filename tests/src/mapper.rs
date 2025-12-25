@@ -4,7 +4,7 @@ use crate::{
     playfield,
     util,
 };
-use rusticnes_core::nes::NesState;
+use rustico_core::nes::NesState;
 
 pub fn get_expected_tilesets() -> (Vec<u8>, Vec<u8>) {
 

@@ -1,5 +1,5 @@
 use crate::{util, labels, playfield};
-use rusticnes_core::memory::read_byte;
+use rustico_core::memory::read_byte;
 
 pub fn test_garbage4_crash() {
     let mut emu = util::emulator(None);

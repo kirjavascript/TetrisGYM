@@ -1,4 +1,4 @@
-use rusticnes_core::nes::NesState;
+use rustico_core::nes::NesState;
 use minifb::{Window, WindowOptions, Key, KeyRepeat};
 
 pub const WIDTH: usize = 256;
