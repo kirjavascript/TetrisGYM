@@ -104,11 +104,10 @@ linecapMenuControls:
         rts
 
 linecapMenuControlsLR:
-        lda linecapCursorIndex
-        jsr switch_s_plus_2a
-        .addr   linecapMenuControlsWhen
-        .addr   linecapMenuControlsLinesLevel
-        .addr   linecapMenuControlsHow
+        branchTo linecapCursorIndex, \
+            linecapMenuControlsWhen, \
+            linecapMenuControlsLinesLevel, \
+            linecapMenuControlsHow
 linecapMenuControlsWhen:
         lda newlyPressedButtons_player1
         and #BUTTON_LEFT|BUTTON_RIGHT

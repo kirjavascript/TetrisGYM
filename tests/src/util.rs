@@ -1,5 +1,5 @@
-pub use rusticnes_core::nes::NesState;
-use rusticnes_core::{ cartridge, opcodes, opcode_info };
+pub use rustico_core::nes::NesState;
+use rustico_core::{ cartridge, opcodes, opcode_info };
 use crate::{input, labels};
 
 pub static ROM: &'static [u8] = include_bytes!("../../tetris.nes");

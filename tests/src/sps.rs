@@ -1,5 +1,5 @@
 use crate::{block, labels, util};
-use rusticnes_core::nes::NesState;
+use rustico_core::nes::NesState;
 
 pub struct SPS {
     emu: NesState,
