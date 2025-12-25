@@ -19,7 +19,7 @@ const mappers = { // https://www.nesdev.org/wiki/Mapper
 const args = process.argv.slice(2);
 
 if (args.includes('-h')) {
-    console.log(`usage: node build.js [-h] [-v] [-m<${Object.keys(mappers).join('|')}>] [-a] [-s] [-k] [-w]
+    console.log(`usage: node build.js [-h] [-v] [-m<${Object.keys(mappers).join('|')}>] [-a] [-s] [-k] [-w] [-- (ca65 args)]
 
 -m  mapper
 -a  faster aeppoz + press select to end game
@@ -88,6 +88,13 @@ if (args.includes('-o')) {
     console.log('cnrom override for autodetect');
 }
 
+// pass additional arguments to ca65
+if (args.includes('--')) {
+    const ca65Flags = args.slice(1+args.indexOf('--'));
+    compileFlags.push(...ca65Flags);
+    args.splice(args.indexOf('--'), 1+ca65Flags.length);
+}
+
 console.log();
 
 // build / compress nametables
@@ -128,12 +135,15 @@ console.timeEnd('CHR');
 const { spawnSync } = require('child_process');
 
 function execArgs(exe, args) {
-    const output = spawnSync(exe, args).output.flatMap(
-        (d) => d?.toString() || [],
-    );
-    if (output.length) {
-        console.log(output.join('\n'));
-        process.exit(0);
+    const result = spawnSync(exe, args);
+    if (result.stderr.length) {
+        console.error(result.stderr.toString());
+    }
+    if (result.stdout.length) {
+        console.log(result.stdout.toString());
+    }
+    if (result.status) {
+        process.exit(result.status);
     }
 }
 

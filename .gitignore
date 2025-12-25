@@ -11,3 +11,4 @@ tetris.map
 tetris.dbg
 release/*
 target
+.env

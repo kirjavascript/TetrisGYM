@@ -47,8 +47,7 @@ playState_spawnNextTetrimino:
         sta tetriminoY
         lda #$05
         sta tetriminoX
-        ldx nextPiece
-        lda spawnOrientationFromOrientation,x
+        lda nextPiece
         sta currentPiece
         jsr incrementPieceStat
         jsr chooseNextTetrimino

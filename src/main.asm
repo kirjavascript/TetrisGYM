@@ -13,7 +13,6 @@
 .include "chr.asm"
 
 .setcpu "6502"
-.feature force_range
 .linecont
 
 .segment    "PRG_chunk1": absolute

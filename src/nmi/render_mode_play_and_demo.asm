@@ -40,7 +40,7 @@ render_mode_play_and_demo:
         jsr renderModernLines
 @doneRenderingLines:
         lda renderFlags
-        and #~RENDER_LINES
+        and #<~RENDER_LINES
         sta renderFlags
 
 @renderLevel:
@@ -85,7 +85,7 @@ render_mode_play_and_demo:
 @renderLevelEnd:
         jsr updatePaletteForLevel
         lda renderFlags
-        and #~RENDER_LEVEL
+        and #<~RENDER_LEVEL
         sta renderFlags
 
 @renderScore:
@@ -164,7 +164,7 @@ render_mode_play_and_demo:
 
 @clearScoreRenderFlags:
         lda renderFlags
-        and #~RENDER_SCORE
+        and #<~RENDER_SCORE
         sta renderFlags
 
 @renderHz:
@@ -175,7 +175,7 @@ render_mode_play_and_demo:
         beq @renderStatsHz
         jsr renderHz
         lda renderFlags
-        and #~RENDER_HZ
+        and #<~RENDER_HZ
         sta renderFlags
 
         ; run a patched version of the stats
@@ -207,7 +207,7 @@ render_mode_play_and_demo:
         lda statsByType,x
         jsr twoDigsToPPU
         lda renderFlags
-        and #~RENDER_STATS
+        and #<~RENDER_STATS
         sta renderFlags
 @renderTetrisFlashAndSound:
         lda #$3F
