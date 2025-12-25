@@ -209,9 +209,11 @@ fn test_harddropped_piece(emu: &mut NesState, start: &str, finish: &str, piece: 
 
     // stage ghost piece
     let temp_pc = emu.registers.pc;
+    let temp_tick = emu.cpu.tick;
     emu.registers.pc = stage_sprite;
     let stage_cycles = util::cycles_to_return(emu);
     emu.registers.pc = temp_pc;
+    emu.cpu.tick = temp_tick;
 
     util::run_n_vblanks(emu, 1);
 
