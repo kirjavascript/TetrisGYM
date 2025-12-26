@@ -7,6 +7,8 @@ const {
     flatLookup,
 } = require('./nametables');
 
+const anydas = !!process.env['GYM_FLAGS']?.match(/-D ANYDAS=1/);
+
 const lookup = flatLookup(`
 0123456789ABCDEF
 GHIJKLMNOPQRSTUV
@@ -29,71 +31,72 @@ WXYZ-,˙>########
 const buffer = blankNT();
 const extra = [...buffer];
 
-drawTiles(buffer, lookup, `
-#a                            d#
-#a                            d#
-#a                            d#
-#a                            d#
-#a                            d#
-#a                            d#
-#a                            d#
-#a                            d#
-#a                            d#
-#a    TETRIS                  d#
-#a    T-SPINS                 d#
-#a    SEED                    d#
-#a    STACKING                d#
-#a    PACE                    d#
-#a    SETUPS                  d#
-#a    B-TYPE                  d#
-#a    FLOOR                   d#
-#a    CRUNCH                  d#
-#a    (QUICK)TAP              d#
-#a    TRANSITION              d#
-#a    MARATHON                d#
-#a    TAP QUANTITY            d#
-#a    CHECKERBOARD            d#
-#a    GARBAGE                 d#
-#a    DROUGHT                 d#
-#a    DAS DELAY               d#
-#a    LOW STACK               d#
-#a    KILLSCREEN »2           d#
-#a    INVISIBLE               d#
-#a    HARD DROP               d#
-`);drawTiles(extra, lookup, `
-#a    TAP/ROLL SPEED          d#
-#a    SCORING                 d#
-#a    CRASH                   d#
-#a    STRICT CRASH            d#
-#a    HZ DISPLAY              d#
-#a    INPUT DISPLAY           d#
-#a    DISABLE FLASH           d#
-#a    DISABLE PAUSE           d#
-#a    DARK MODE               d#
-#a    GOOFY FOOT              d#
-#a    BLOCK TOOL              d#
-#a    LINECAP                 d#
-#a    DAS ONLY                d#
-#a    QUAL MODE               d#
-#a    PAL MODE                d#
-#a                            d#
-#a                            d#
-#a V6                         d#
-#a                            d#
-#a                            d#
-#a                            d#
-#a                            d#
-#a                            d#
-#a                            d#
-#a                            d#
-#a                            d#
-#a                            d#
-#a                            d#
-#a                            d#
-#a                            d#
-#a                            d#
-#a                            d#
-`);
+modes = `
+TETRIS
+T-SPINS
+SEED
+STACKING
+PACE
+SETUPS
+B-TYPE
+FLOOR
+CRUNCH
+(QUICK)TAP
+TRANSITION
+MARATHON
+TAP QUANTITY
+CHECKERBOARD
+GARBAGE
+DROUGHT
+DAS DELAY
+LOW STACK
+KILLSCREEN »2
+INVISIBLE
+HARD DROP
+TAP/ROLL SPEED
+SCORING
+CRASH
+STRICT CRASH
+HZ DISPLAY
+INPUT DISPLAY
+DISABLE FLASH
+DISABLE PAUSE
+DARK MODE
+GOOFY FOOT
+BLOCK TOOL
+LINECAP
+DAS ONLY
+QUAL MODE
+PAL MODE
+`
+    .trim()
+    .split('\n');
+
+if (anydas) {
+    modes.splice(modes.indexOf('DAS DELAY'), 1);
+    modes.splice(modes.indexOf('DAS ONLY'), 1);
+    modes.push('DAS', 'ARR', 'ENTRY CHARGE');
+}
+
+const modeStartRow = 9;
+const modeOffset = 6;
+const modeIdx = modeStartRow * 32 + modeOffset;
+
+const urlX = 3;
+const urlY = 17;
+
+menuScreens = [...Array(30 * 2)]
+    .map(() => '#a                            d#'.split(''))
+    .flat();
+
+modes.forEach((mode, i) =>
+    menuScreens.splice(i * 32 + modeIdx, mode.length, ...mode),
+);
+
+menuScreens.splice((30 + urlY) * 32 + urlX, 2, ...'V6');
+
+drawTiles(buffer, lookup, menuScreens.splice(0, 32*30).join(''));
+drawTiles(extra, lookup, menuScreens.join(''));
 
 const background = `
 ɢ##############################ɳ
@@ -133,8 +136,6 @@ drawTiles(extra, lookup, background);
 
 drawRect(buffer, 8, 2, 10, 5, 0xB0); // draw logo
 
-const urlX = 3;
-const urlY = 17;
 drawRect(extra, urlX, urlY, 12, 1, 0x74);
 drawRect(extra, urlX+12, urlY, 12, 1, 0x84);
 

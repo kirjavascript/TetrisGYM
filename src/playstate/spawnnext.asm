@@ -52,6 +52,15 @@ playState_spawnNextTetrimino:
         jsr incrementPieceStat
         jsr chooseNextTetrimino
         sta nextPiece
+.if ANYDAS = 1
+        ldx anydasARECharge
+        beq @noCharge
+        txa
+        dex
+        bne @noCharge ; kitaru charge handled in playstate branch
+        sta autorepeatX ; store 1 if ARE Charge is on (hydrant charge)
+@noCharge:
+.endif
 @resetDownHold:
         lda #$00
         sta autorepeatY
