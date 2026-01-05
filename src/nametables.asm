@@ -1,7 +1,5 @@
 game_type_menu_nametable: ; RLE
         .incbin "nametables/game_type_menu_nametable_practise.bin"
-game_type_menu_nametable_extra: ; RLE
-        .incbin "nametables/game_type_menu_nametable_extra.bin"
 level_menu_nametable: ; RLE
         .incbin "nametables/level_menu_nametable_practise.bin"
 game_nametable: ; RLE

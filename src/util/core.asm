@@ -257,15 +257,6 @@ generateNextPseudorandomNumber:
         sta oneThirdPRNG
         rts
 
-; canon is initializeOAM
-copyOamStagingToOam:
-        lda #$00
-        sta OAMADDR
-        lda #$02
-        sta OAMDMA
-        rts
-
-
 ; reg a: value; reg x: start page; reg y: end page (inclusive)
 memset_page:
         pha
