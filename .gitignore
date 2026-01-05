@@ -5,6 +5,7 @@
 *.chr
 *.pyc
 *.bin
+*.txt
 tetris.lst
 tetris.lbl
 tetris.map

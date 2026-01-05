@@ -97,6 +97,13 @@ if (args.includes('--')) {
 
 console.log();
 
+// build menu
+if (!args.includes('-M')) {
+    console.time('menu');
+    require('./src/gamemode/gametypemenu/menu');
+    console.timeEnd('menu');
+}
+
 // build / compress nametables
 
 console.time('nametables');
@@ -226,3 +233,5 @@ if (args.includes('-T')) {
     console.log(`\nrunning single test: ${singleTest}`);
     execArgs('cargo', [...'run --release --manifest-path tests/Cargo.toml -- -T'.split(' '), singleTest]);
 }
+
+require('./tools/disasm');
