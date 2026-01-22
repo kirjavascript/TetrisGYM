@@ -220,20 +220,21 @@ dasOnlyShiftDisabled: .res 1 ; $63A
 invisibleFlag: .res 1 ; $63B  ; 0 for normal mode, non-zero for Invisible playfield rendering.  Reset on game init and game over.
 currentFloor: .res 1 ; $63C floorModifier is copied here at game init.  Set to 0 otherwise and incremented when linecap floor.
 mapperId: .res 1 ; $63D ; For INES_MAPPER 1000 (autodetect).  0 = CNROM.  1 = MMC1.
+hardDropGhostY: .res 1 ; ghost Y used as a shortcut for hard/sonic drop
 
 .if KEYBOARD
-kbReadState: .res 1 ; $063E - used for high score entry
-kbHeldInput: .res 1 ; $063E - high score input throttling
-kbRawInput: .res 9 ; $0640  - all 72 keys' input
+kbReadState: .res 1 ; $063F - used for high score entry
+kbHeldInput: .res 1 ; $0640 - high score input throttling
+kbRawInput: .res 9 ; $0641  - all 72 keys' input
 
 ; used to track state of high score entry screen.  Can possibly use the address of the nmi interrupted
 ; routine in the stack to track instead
-highScoreEntryActive: .res 1  ; $0649
+highScoreEntryActive: .res 1  ; $064A
 .else
     .res $C
 .endif
 
-    .res $36
+    .res $35
 
 musicStagingSq1Lo: .res 1 ; $0680
 musicStagingSq1Hi: .res 1 ; $0681
