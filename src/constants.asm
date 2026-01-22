@@ -101,9 +101,17 @@ MODE_LINECAP
 MODE_DASONLY
 MODE_QUAL
 MODE_PAL
+.if KEYBOARD = 1
+MODE_KEYBOARD
+.endif
 .endenum
 
+.if KEYBOARD = 1
+MODE_QUANTITY = MODE_KEYBOARD + 1
+.else
 MODE_QUANTITY = MODE_PAL + 1
+.endif
+
 MODE_GAME_QUANTITY = MODE_HARDDROP + 1
 
 SCORING_CLASSIC := 0 ; for scoringModifier
@@ -169,6 +177,9 @@ MENU_TOP_MARGIN_SCROLL := 7 ; in blocks
     .byte $1    ; MODE_DASONLY
     .byte $1    ; MODE_QUAL
     .byte $1    ; MODE_PAL
+.if KEYBOARD = 1
+    .byte $1    ; MODE_KEYBOARD
+.endif
 .endmacro
 
 .macro MODENAMES
