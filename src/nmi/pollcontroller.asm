@@ -66,6 +66,21 @@ pollController:
 
 diffOldAndNewButtons:
         ldx #$01
+.if KEYBOARD = 1
+; clear controller input when keyboard is active
+; disable keyboard when reset sequence is pressed
+        lda keyboardFlag
+        beq @diffForPlayer
+        lda newlyPressedButtons_player1
+        and #BUTTON_B|BUTTON_A|BUTTON_SELECT|BUTTON_START
+        cmp #BUTTON_B|BUTTON_A|BUTTON_SELECT|BUTTON_START
+        php
+        lda #$00
+        sta newlyPressedButtons_player1
+        plp
+        bne @ret
+        sta keyboardFlag
+.endif
 @diffForPlayer:
         lda newlyPressedButtons_player1,x
         tay
@@ -75,4 +90,4 @@ diffOldAndNewButtons:
         sty heldButtons_player1,x
         dex
         bpl @diffForPlayer
-        rts
+@ret:   rts

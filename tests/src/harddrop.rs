@@ -1,4 +1,3 @@
-
 use rustico_core::nes::NesState;
 
 use crate::{ util, labels, playfield};
