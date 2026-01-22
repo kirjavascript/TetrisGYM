@@ -160,8 +160,8 @@ fn main() {
             emu.memory.iram_raw[rng_seed] = (seed >> 8) as u8;
             emu.memory.iram_raw[rng_seed + 1] = *seed as u8;
 
-            rusticnes_core::opcodes::push(&mut emu, (main_loop >> 8) as u8);
-            rusticnes_core::opcodes::push(&mut emu, main_loop as u8);
+            rustico_core::opcodes::push(&mut emu, (main_loop >> 8) as u8);
+            rustico_core::opcodes::push(&mut emu, main_loop as u8);
 
             for _ in 0..23 {
                 emu.run_until_vblank();

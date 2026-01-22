@@ -1,4 +1,4 @@
-use rusticnes_core::nes::NesState;
+use rustico_core::nes::NesState;
 
 use crate::{util, labels, playfield};
 
