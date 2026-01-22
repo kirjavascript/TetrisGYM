@@ -222,15 +222,19 @@ currentFloor: .res 1 ; $63C floorModifier is copied here at game init.  Set to 0
 mapperId: .res 1 ; $63D ; For INES_MAPPER 1000 (autodetect).  0 = CNROM.  1 = MMC1.
 hardDropGhostY: .res 1 ; ghost Y used as a shortcut for hard/sonic drop
 
-    .res $36
-
 .if KEYBOARD
-newlyPressedKeys: .res 1 ; $0675
-heldKeys: .res 1 ; $0676
-keyboardInput: .res 9 ; $0677
+kbReadState: .res 1 ; $063F - used for high score entry
+kbHeldInput: .res 1 ; $0640 - high score input throttling
+kbRawInput: .res 9 ; $0641  - all 72 keys' input
+
+; used to track state of high score entry screen.  Can possibly use the address of the nmi interrupted
+; routine in the stack to track instead
+highScoreEntryActive: .res 1  ; $064A
 .else
-    .res $B
+    .res $C
 .endif
+
+    .res $35
 
 musicStagingSq1Lo: .res 1 ; $0680
 musicStagingSq1Hi: .res 1 ; $0681
@@ -352,5 +356,8 @@ linecapFlag: .res 1
 dasOnlyFlag: .res 1
 qualFlag: .res 1
 palFlag: .res 1
+.if KEYBOARD = 1
+keyboardFlag: .res 1
+.endif
 
 ; ... $7FF

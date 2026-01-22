@@ -15,6 +15,10 @@ gameMode_bootScreen: ; boot
         jsr updateAudioAndWaitForNmi
         jsr checkRegion
 
+.if KEYBOARD = 1
+        jsr detectKeyboard
+.endif
+
 .if !QUAL_BOOT
         ; check if qualMode is already set
         lda qualFlag

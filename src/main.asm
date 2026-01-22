@@ -12,7 +12,6 @@
 .include "chr.asm"
 
 .setcpu "6502"
-.feature force_range
 
 .segment    "PRG_chunk1": absolute
 
@@ -36,7 +35,7 @@ mainLoop:
 .include "nmi/render.asm"
 .include "nmi/pollcontroller.asm"
 .if KEYBOARD
-.include "nmi/pollkeyboard.asm"
+.include "keyboard/poll.asm"
 .endif
 
 .include "gamemode/branch.asm"

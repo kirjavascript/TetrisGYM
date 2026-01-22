@@ -4,19 +4,20 @@ playState_prepareNext:
         bne @checkBType
         lda completedRow+3
         cmp #$13
-        bne @endOfEndingCode
+        bne endOfEndingCode
         jsr typeBEndingStuff
         rts
 
         ; bTypeGoalCheck
 @checkBType:
         cmp #MODE_TYPEB
-        bne @endOfEndingCode
+        bne endOfEndingCode
         lda lines
-        bne @endOfEndingCode
+        bne endOfEndingCode
 
         jsr typeBEndingStuff
 
+addBTypeBonus:
         ; patch levelNumber with score multiplier
         ldx levelNumber
         stx tmp3 ; and save a copy
@@ -39,7 +40,7 @@ playState_prepareNext:
         sta levelNumber
 
         rts
-@endOfEndingCode:
+endOfEndingCode:
 
         lda linecapState
         cmp #LINECAP_HALT
