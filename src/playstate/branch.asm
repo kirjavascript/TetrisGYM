@@ -1,18 +1,18 @@
+; prepareNext used to be bTypeGoalCheck
 branchOnPlayStatePlayer1:
-        lda playState
-        jsr switch_s_plus_2a
-        .addr   playState_unassignOrientationId
-        .addr   playState_playerControlsActiveTetrimino
-        .addr   playState_lockTetrimino
-        .addr   playState_checkForCompletedRows
-        .addr   playState_noop
-        .addr   playState_updateLinesAndStatistics
-        .addr   playState_prepareNext ; used to be bTypeGoalCheck
-        .addr   playState_receiveGarbage
-        .addr   playState_spawnNextTetrimino
-        .addr   playState_noop
-        .addr   playState_checkStartGameOver
-        .addr   playState_incrementPlayState
+        branchTo playState, \
+            playState_unassignOrientationId, \
+            playState_playerControlsActiveTetrimino, \
+            playState_lockTetrimino, \
+            playState_checkForCompletedRows, \
+            playState_noop, \
+            playState_updateLinesAndStatistics, \
+            playState_prepareNext , \
+            playState_receiveGarbage, \
+            playState_spawnNextTetrimino, \
+            playState_noop, \
+            playState_checkStartGameOver, \
+            playState_incrementPlayState
 
 playState_unassignOrientationId:
         lda #$13
