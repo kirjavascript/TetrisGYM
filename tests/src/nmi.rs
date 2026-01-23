@@ -57,7 +57,7 @@ pub fn test() {
 
     for _ in 0..50 {
         // loop until pc is at the instruction after the jsr copyOamStagingToOam
-        while emu.registers.pc != labels::get("@jumpOverIncrement") + 3 {
+        while emu.registers.pc != labels::get("renderComplete") {
             emu.step();
             if emu.ppu.current_scanline == 261 {
                 panic!("render took too long!");
