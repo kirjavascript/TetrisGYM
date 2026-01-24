@@ -1,6 +1,6 @@
 stringLineCapWhen:
         ldx linecapWhen
-        lda choiceSetLineslevel, x
+        lda choiceSetOfflineslevel, x
         jmp stringBackground
 stringLineCapHow:
         ldx linecapHow

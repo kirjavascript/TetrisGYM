@@ -43,7 +43,7 @@ function checkStringSanity(string) {
     if (string.length > MAX_LENGTH_VALUE) {
         throw new Error(`${string} is more than MAX_LENGTH_VALUE chars`);
     }
-    if ((match = string.match(/[^- a-z0-9_?!*]/i))) {
+    if ((match = string.match(/[^-\/ a-z0-9_?!*]/i))) {
         throw new Error(`${string} has invalid char '${match[0]}'`);
     }
 }
