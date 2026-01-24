@@ -189,13 +189,12 @@ makeNotReady:
         rts
 
 levelControl:
-        lda levelControlMode
-        jsr switch_s_plus_2a
-        .addr   levelControlNormal
-        .addr   levelControlCustomLevel
-        .addr   levelControlHearts
-        .addr   levelControlClearHighScores
-        .addr   levelControlClearHighScoresConfirm
+        branchTo levelControlMode, \
+            levelControlNormal, \
+            levelControlCustomLevel, \
+            levelControlHearts, \
+            levelControlClearHighScores, \
+            levelControlClearHighScoresConfirm
 
 levelControlClearHighScores:
         lda #$20

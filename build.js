@@ -107,6 +107,7 @@ if (!args.includes('-M')) {
 // build / compress nametables
 
 console.time('nametables');
+process.env['GYM_FLAGS'] = compileFlags.join(' ');
 require('./src/nametables/build');
 console.timeEnd('nametables');
 

@@ -62,6 +62,10 @@ drawTiles(buffer, lookup, `
 #a                            d#
 `);
 
+if (process.env['GYM_FLAGS']?.match(/-D KEYBOARD=1/)) {
+    drawTiles(extra, lookup, "KEYBOARD", 32 * 15 + 6);
+    }
+
 const background = `
 ɢ##############################ɳ
 ɲ##############################ɢ

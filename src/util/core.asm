@@ -65,6 +65,10 @@ updateAudioWaitForNmiAndResetOamStaging:
         lda verticalBlankingInterval
         beq @checkForNmi
 
+.if KEYBOARD = 1
+; Read Family BASIC Keyboard
+        jsr pollKeyboard
+.endif
 resetOAMStaging:
 ; Hide a sprite by moving it down offscreen, by writing any values between #$EF-#$FF here.
 ; Sprites are never displayed on the first line of the picture, and it is impossible to place
@@ -276,19 +280,3 @@ memset_page:
         inx
         bne @setByte
         rts
-
-switch_s_plus_2a:
-        asl a
-        tay
-        iny
-        pla
-        sta switchTmp1
-        pla
-        sta switchTmp2
-        lda (switchTmp1),y
-        tax
-        iny
-        lda (switchTmp1),y
-        sta switchTmp2
-        stx switchTmp1
-        jmp (switchTmp1)

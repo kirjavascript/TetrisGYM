@@ -14,26 +14,29 @@ nmi:    pha
         sta OAMADDR
         lda #$02
         sta OAMDMA
+
+renderComplete:
         lda sleepCounter
         beq @noSleep
         dec sleepCounter
 @noSleep:
+
         inc frameCounter
         bne @noCarry
         inc frameCounter+1
 @noCarry:
+
         ldx #rng_seed
         jsr generateNextPseudorandomNumber
+
         jsr pollControllerButtons
+
         lda #$00
         sta oamStagingLength
         sta lagState ; clear flag after lag frame achieved
-.if KEYBOARD
-; Read Family BASIC Keyboard
-        jsr pollKeyboard
-.endif
         lda #$01
         sta verticalBlankingInterval
+
         pla
         tay
         tsx
