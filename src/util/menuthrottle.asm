@@ -1,11 +1,11 @@
 menuThrottle: ; add DAS-like movement to the menu
         sta menuThrottleTmp
         lda newlyPressedButtons_player1
-        cmp menuThrottleTmp
-        beq menuThrottleNew
+        and menuThrottleTmp
+        bne menuThrottleNew
         lda heldButtons_player1
-        cmp menuThrottleTmp
-        bne @endThrottle
+        and menuThrottleTmp
+        beq @endThrottle
         dec menuMoveThrottle
         beq menuThrottleContinue
 @endThrottle:
