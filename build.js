@@ -227,3 +227,5 @@ if (args.includes('-T')) {
     console.log(`\nrunning single test: ${singleTest}`);
     execArgs('cargo', [...'run --release --manifest-path tests/Cargo.toml -- -T'.split(' '), singleTest]);
 }
+
+require('./tools/disasm');
