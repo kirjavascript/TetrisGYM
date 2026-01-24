@@ -221,7 +221,7 @@ testCrash:
         inc allegroIndex
 @newBit0:
         lda nmiReturnAddr
-        cmp #<updateAudioWaitForNmiAndResetOamStaging+10
+        cmp #<(updateAudioWaitForNmiAndResetOamStaging+10)
         beq @returnLate ; checking which instruction returned to. if so, add 3 cycles
         lda #$03
         clc
@@ -460,7 +460,7 @@ confettiHandler:
         sta spriteYOffset ;either frameCounter or 80 loaded to A depending on confetti type
         lda #$A8 ;center of playfield
         sta spriteXOffset
-        lda #$19 ;ID for "confetti" text
+        lda #STRING_CONFETTI
         sta spriteIndexInOamContentLookup
         jsr stringSpriteAlignRight ;draw to screen
         lda #$00

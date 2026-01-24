@@ -1,651 +1,959 @@
-.include "linecap.asm"
+; to do
+; get into game
+; do arbitrary action
+; get back into menu from game or level menu
+; get back into menu from game w/block tool on
+; each title associated with action
+; more sanity checks
+; set defaults
+; save/restore to/from sram
+
+
+AUTO_MENU_VARS_HI = >autoMenuVars
+
+; valid background chars are 0-253
+EOL = $FE
+EOF = $FF
+NORAM = $00
+
+MENU_TITLE_PPU = $2106
+MENU_STRIPE_WIDTH = 20
+MENU_ROWS = 9
+MENU_STACK = $DF ; $01C8 - $01DF intended range
+
+MODE_DEFAULT = 0 ; needs to be auto generated
+
+menuDataStart:
+.include "menudata.asm"
+.out .sprintf("Menu data: %d", *-menuDataStart)
+
+; tttnnnnnn n = mode
+PAGE_DEFAULT = %00000000
+
+; table of first items instead
+; + table of item counts
+
+VALUE_MASK = %00011111
+TYPE_MASK = %11100000
+
+; tttnnnnn
+TYPE_UNUSED = %00000000
+TYPE_NUMBER = %00100000  ; n = limit
+TYPE_CHOICES = %01000000 ; n = wordlist index
+TYPE_FF_OFF = %01100000  ; n = limit
+
+TYPE_HEX = %10000000 ; n = digits
+TYPE_MODE_ONLY = %10100000 ; n = mode
+TYPE_BCD = %11000000 ; n = digits, v bit to differentiate from hex
+TYPE_SUBMENU = %11100000 ; n = menu index
+
+DIGIT_MASK = %10100000
+DIGIT_COMPARE = %10000000
+
+
 
 gameMode_gameTypeMenu:
 .if NO_MENU
-        inc gameMode
-        rts
+    inc gameMode
+    rts
 .endif
-        jsr makeNotReady
-        jsr calc_menuScrollY
-        sta menuScrollY
-        lda #0
-        sta hideNextPiece
-        lda #$1
-        sta renderMode
-        jsr updateAudioWaitForNmiAndDisablePpuRendering
-        jsr disableNmi
-        jsr bulkCopyToPpu
-        .addr   title_palette
-        jsr copyRleNametableToPpu
-        .addr   game_type_menu_nametable
-        lda #$28
-        sta tmp3
-        jsr copyRleNametableToPpuOffset
-        .addr   game_type_menu_nametable_extra
+    jsr updateAudioWaitForNmiAndDisablePpuRendering
+    jsr disableNmi
+    jsr bulkCopyToPpu
+    .addr title_palette
+    jsr copyRleNametableToPpu
+    .addr game_type_menu_nametable
 .if INES_MAPPER <> 0
-        lda #CHRBankSet0
-        jsr changeCHRBanks
+    lda #CHRBankSet0
+    jsr changeCHRBanks
 .endif
-        lda #NMIEnable
-        sta currentPpuCtrl
-        jsr waitForVBlankAndEnableNmi
-        jsr updateAudioWaitForNmiAndResetOamStaging
-        jsr updateAudioWaitForNmiAndEnablePpuRendering
-        jsr updateAudioWaitForNmiAndResetOamStaging
+    lda #NMIEnable
+    sta currentPpuCtrl
+    jsr waitForVBlankAndEnableNmi
+    jsr updateAudioWaitForNmiAndResetOamStaging
+    jsr updateAudioWaitForNmiAndEnablePpuRendering
+    jsr updateAudioWaitForNmiAndResetOamStaging
+
+    lda #AUTO_MENU_VARS_HI
+    sta byteSpriteAddr+1
+    lda #$1
+    sta renderMode
+    lda #0
+    sta hideNextPiece
+    sta byteSpriteTile
+    sta gameStarted
+    jsr makeNotReady
+
+; check to see if returning from level menu or game
+    ldy activeMenu
+    iny
+    bne @initMenu
+    jsr exitSubmenuNoSfx
+    jmp gameTypeLoop
+@initMenu:
+    lda #MENU_STACK
+    sta menuStackPtr
+    lda #0
+    jsr enterMenu
 
 gameTypeLoop:
-        ; memset FF-02 used to happen every loop
-        ; but it's done in ResetOamStaging anyway?
-        jmp seedControls
+    lda gameStarted
+    beq @noGame
+    inc gameMode
+    lda #$2
+    sta soundEffectSlot1Init
+    rts
+@noGame:
+    ; todo: write down which vars are used by which func
+    jsr collectControllerInput
+    jsr setScratch
+    jsr addInputs
+    jsr respondToInput
+    jsr stageCursor
 
-gameTypeLoopContinue:
-        jsr menuConfigControls
-        jsr practiseTypeMenuControls
+    ; scratch is not important anymore
+    jsr stageBackgroundTiles
+    jsr stageCurrentValues
+gameTypeLoopWait:
+    jsr updateAudioWaitForNmiAndResetOamStaging
+    jmp gameTypeLoop
 
-gameTypeLoopCheckStart:
-        lda newlyPressedButtons_player1
-        cmp #BUTTON_START
-        bne gameTypeLoopNext
 
-        ; check double killscreen
-        lda practiseType
-        cmp #MODE_KILLX2
-        bne @checkSpeedTest
-        lda #29
-        sta startLevel
-        sta levelNumber
-        lda #$00
-        sta gameModeState
-        lda #$02
-        sta soundEffectSlot1Init
+.out .sprintf("bg setup & loop: %d", *-gameMode_gameTypeMenu)
 
-        jsr bufferScreen ; hides glitchy scroll
+.macro switchToMenuStack
+    tsx
+    stx stackPtr
+    ldx menuStackPtr
+    txs
+.endmacro
 
-        inc gameMode
-        inc gameMode
-        rts
+.macro switchToNormalStack
+    tsx
+    stx menuStackPtr
+    ldx stackPtr
+    txs
+.endmacro
 
-@checkSpeedTest:
-        ; check if speed test mode
-        cmp #MODE_SPEED_TEST
-        beq changeGameTypeToSpeedTest
-        cmp #MODE_LINECAP
-        beq gotoLinecapMenu
+enterSubMenu:
+    ldy #$02
+    sty soundEffectSlot1Init
+    pha
+    switchToMenuStack
+    lda activeRow
+    pha
+    lda activePage
+    pha
+    lda activeMenu
+    pha
+    switchToNormalStack
+    pla
+enterMenu:
+    sta activeMenu
+    tay
+    iny
+    bne @normalMenu
+    rts
+@normalMenu:
+    lda #0
+enterPage:
+    sta activePage
+    sta originalPage
+    ldy activeMenu
+    clc
+    adc startPageByMenu,y
+    sta actualPage
+    tax
 
-        ; check for seed of 0000XX
-        cmp #MODE_SEED
-        bne @checkSelectable
-        lda set_seed_input
-        bne @checkSelectable
-        lda set_seed_input+1
-        and #$FE ; treat 0001 like 0000
-        beq gameTypeLoopNext
+    lda pageTypes,x
+    and #VALUE_MASK
+    sta unpackedPageValue ; always 0 for now
 
-@checkSelectable:
-        lda practiseType
-        cmp #MODE_GAME_QUANTITY
-        bpl gameTypeLoopNext
+    lda pageTypes,x
+    and #TYPE_MASK
+    sta unpackedPageType
 
-        lda #$02
-        sta soundEffectSlot1Init
-        inc gameMode
-        rts
+    lda pageCountByMenu,y
+    ldy #$00
+    sty activeColumn
+    cmp #$1
+    beq @storeRow
+    dey ; start at page select row for multipage
+    dec unpackedPageType ; hack for now
+@storeRow:
+    sty activeRow
 
-changeGameTypeToSpeedTest:
-        lda #$02
-        sta soundEffectSlot1Init
-        lda #7
-        sta gameMode
-        rts
+setScratch:
+    ldx actualPage
+    lda activeRow
+    clc
+    adc startItemByPage,x
+    sta activeItem
+    tax
+    lda itemTypes,x
+    tay
+    and #VALUE_MASK
+    sta unpackedItemValue
 
-gotoLinecapMenu:
-        jmp linecapMenu
+    tya
+    and #TYPE_MASK
+    sta unpackedItemType
 
-gameTypeLoopNext:
-        jsr renderMenuVars
-        jsr updateAudioWaitForNmiAndResetOamStaging
-        jmp gameTypeLoop
+    jsr setupLR
+    jmp setupUD
 
-seedControls:
-        lda practiseType
-        cmp #MODE_SEED
-        bne gameTypeLoopContinue
+exitSubmenu:
+    ldy #$02
+    sty soundEffectSlot1Init
 
-        lda newlyPressedButtons_player1
-        cmp #BUTTON_SELECT
-        bne @skipSeedSelect
-        lda rng_seed
-        sta set_seed_input
-        lda rng_seed+1
-        sta set_seed_input+1
-        lda rng_seed+1
-        eor #$77
-        ror
-        sta set_seed_input+2
-@skipSeedSelect:
+exitSubmenuNoSfx:
+    switchToMenuStack
+    pla
+    switchToNormalStack
 
-        lda #BUTTON_LEFT
-        jsr menuThrottle
-        beq @skipSeedLeft
-        lda #$01
-        sta soundEffectSlot1Init
-        lda menuSeedCursorIndex
-        bne @noSeedLeftWrap
-        lda #7
-        sta menuSeedCursorIndex
-@noSeedLeftWrap:
-        dec menuSeedCursorIndex
-@skipSeedLeft:
+    jsr enterMenu
 
-        lda #BUTTON_RIGHT
-        jsr menuThrottle
-        beq @skipSeedRight
-@moveRight:
-        lda #$01
-        sta soundEffectSlot1Init
-        inc menuSeedCursorIndex
-        lda menuSeedCursorIndex
-        cmp #7
-        bne @skipSeedRight
-        lda #0
-        sta menuSeedCursorIndex
-@skipSeedRight:
+    switchToMenuStack
+    pla
+    switchToNormalStack
 
-        lda menuSeedCursorIndex
+    jsr enterPage
 
 .if KEYBOARD = 1
-@kbSeedLow = generalCounter
-@kbSeedHigh = generalCounter2
-        bne @checkForKbSeedEntry
-        jmp @skipSeedControl
-@checkForKbSeedEntry:
-        jsr readKbSeedEntry
-        bmi @noKeysPressed
-        sta @kbSeedLow
-        asl
-        asl
-        asl
-        asl
-        sta @kbSeedHigh
-        ldy menuSeedCursorIndex
-        dey
-        tya
-        lsr
-        tay
-        ; y = (index-1) // 2
-        ; c = (index-1) % 2
-        lda set_seed_input,y
-        bcc @highByte
-; low byte:
-        and #$F0
-        ora @kbSeedLow
-        bcs @storeSeed
-@highByte:
-        and #$0F
-        ora @kbSeedHigh
-@storeSeed:
-        sta set_seed_input,y
-        jmp @moveRight
-@noKeysPressed:
-.else
-        beq @skipSeedControl
+.warning "keyboard menu seed code is broken"
+; @kbSeedLow = generalCounter
+; @kbSeedHigh = generalCounter2
+;         bne @checkForKbSeedEntry
+;         jmp @skipSeedControl
+; @checkForKbSeedEntry:
+;         jsr readKbSeedEntry
+;         bmi @noKeysPressed
+;         sta @kbSeedLow
+;         asl
+;         asl
+;         asl
+;         asl
+;         sta @kbSeedHigh
+;         ldy menuSeedCursorIndex
+;         dey
+;         tya
+;         lsr
+;         tay
+;         ; y = (index-1) // 2
+;         ; c = (index-1) % 2
+;         lda set_seed_input,y
+;         bcc @highByte
+; ; low byte:
+;         and #$F0
+;         ora @kbSeedLow
+;         bcs @storeSeed
+; @highByte:
+;         and #$0F
+;         ora @kbSeedHigh
+; @storeSeed:
+;         sta set_seed_input,y
+;         jmp @moveRight
+; @noKeysPressed:
+; .else
+;         beq @skipSeedControl
 .endif
 
-        lda menuSeedCursorIndex
-        sbc #1
-        lsr
-        tax ; save seed offset
+    switchToMenuStack
+    pla
+    switchToNormalStack
 
-        ; handle changing seed vals
+    sta activeRow
+    jmp setScratch
 
-        lda #BUTTON_UP
-        jsr menuThrottle
-        beq @skipSeedUp
-        lda #$01
-        sta soundEffectSlot1Init
-        lda menuSeedCursorIndex
-        and #1
-        beq @lowNybbleUp
 
-        lda set_seed_input, x
-        clc
-        adc #$10
-        sta set_seed_input, x
+setupUD:
+    ldy activeColumn
+    bne setupUDDigitChange
 
-        jmp @skipSeedUp
-@lowNybbleUp:
-        lda set_seed_input, x
-        clc
-        tay
-        and #$F
-        cmp #$F
-        bne @noWrapUp
-        tya
-        and #$F0
-        sta set_seed_input, x
-        jmp @skipSeedUp
-@noWrapUp:
-        tya
-        adc #1
-        sta set_seed_input, x
-@skipSeedUp:
+setupUDRowChange:
+; ud change row 1/2 - activeColumn == 0
+    ldy #$00
+    lda unpackedPageType
+    bpl @storeMin ; no page select row for single page
+    dey
+@storeMin:
+    sty udMin
+    ldx actualPage
+    lda itemCountByPage,x
+    sta udMax
 
-        lda #BUTTON_DOWN
-        jsr menuThrottle
-        beq @skipSeedDown
-        lda #$01
-        sta soundEffectSlot1Init
-        lda menuSeedCursorIndex
-        and #1
-        beq @lowNybbleDown
+    lda #>activeRow
+    sta udPointer+1
+    lda #<activeRow
+    sta udPointer
 
-        lda set_seed_input, x
-        sbc #$10
-        clc
-        sta set_seed_input, x
+    lda udAdjust
+    eor #$FF
+    clc
+    adc #$01
+    sta udAdjust
+    rts
 
-        jmp @skipSeedDown
-@lowNybbleDown:
-        lda set_seed_input, x
-        tay
-        and #$F
-        ; cmp #$0 ; and sets z flag
-        bne @noWrapDown
-        tya
-        and #$F0
-        clc
-        adc #$F
-        sta set_seed_input, x
-        jmp @skipSeedDown
-@noWrapDown:
-        tya
-        sec
-        sbc #1
-        sta set_seed_input, x
-@skipSeedDown:
+setupUDDigitChange:
+; ud change digit 2/2 - activeColumn > 0
+    dey
+    tya
+    lsr
+    tay ; y points to digit
+    php ; save for later, carry clear if hi byte
+    lda #$0
+    sta udMin
+    sta udPointer+1 ; won't work if nybbleTemp is not zeropage
+    lda #<nybbleTemp
+    sta udPointer
+    lda #$10
+    bit unpackedItemType ; check if bcd
+    bvc @storeDigitMax
+    lda #$A
+@storeDigitMax:
+    sta udMax
 
-        jmp gameTypeLoopCheckStart
-@skipSeedControl:
-        jmp gameTypeLoopContinue
+    lda #AUTO_MENU_VARS_HI
+    sta digitPtr+1
+    ldx activeItem
+    lda memoryOffsets,x
 
-menuConfigControls:
-        ; account for 'gaps' in config items of size zero
-        ; previously the offset was just set on X directly
+    sta digitPtr
+    lda (digitPtr),y
+    plp
+    bcs @storeNybble
 
-        ldx #0 ; memory offset we want
-        ldy #0 ; cursor
-@searchByte:
-        cpy practiseType
-        bne @notYet
-        lda menuConfigSizeLookup, y
-        beq @configEnd
-        ; if zero, caller will beq to skip the config
-        jmp @searchEnd
-@notYet:
-        lda menuConfigSizeLookup, y
-        beq @noMem
-        inx
-@noMem:
-        iny
-        jmp @searchByte
-@searchEnd:
+    lsr
+    lsr
+    lsr
+    lsr
+@storeNybble:
+    and #$F
+    sta nybbleTemp
+    rts
 
-        ; actual offset now in Y
-        ; RAM offset now in X
+setupLR:
+    lda activeRow
+    bmi setupLRPageSelect
 
-        ; check if pressing left
-        lda #BUTTON_LEFT
-        jsr menuThrottle
-        beq @skipLeftConfig
-        ; check if zero
-        lda menuVars, x
-        ; cmp #0 ; lda sets z flag
-        beq @skipLeftConfig
-        ; dec value
-        dec menuVars, x
-        lda #$01
-        sta soundEffectSlot1Init
-        jsr assertValues
-@skipLeftConfig:
+    lda unpackedItemType
+    bpl setupLRValueChange
 
-        ; check if pressing right
-        lda #BUTTON_RIGHT
-        jsr menuThrottle
-        beq @skipRightConfig
-        ; check if within the offset
-        lda menuVars, x
-        cmp menuConfigSizeLookup, y
-        bpl @skipRightConfig
-        inc menuVars, x
-        lda #$01
-        sta soundEffectSlot1Init
-        jsr assertValues
-@skipRightConfig:
-@configEnd:
-        rts
+    and #DIGIT_MASK
+    cmp #DIGIT_COMPARE
+    beq setupLRColumnChange
 
-menuConfigSizeLookup:
-        MENUSIZES
+    lda #$00
+    sta lrAdjust
+    rts
 
-assertValues:
-        ; make sure you can only have block or qual
-        lda practiseType
-        cmp #MODE_QUAL
-        bne @noQual
-        lda menuVars, x
-        beq @noQual
-        lda #0
-        sta debugFlag
-@noQual:
-        lda practiseType
-        cmp #MODE_DEBUG
-        bne @noDebug
-        lda menuVars, x
-        beq @noDebug
-        lda #0
-        sta qualFlag
-@noDebug:
-        ; goofy
-        lda practiseType
-        cmp #MODE_GOOFY
-        bne @noFlip
-        lda heldButtons_player1
-        asl
-        and #$AA
-        sta tmp3
-        lda heldButtons_player1
-        and #$AA
-        lsr
-        ora tmp3
-        sta heldButtons_player1
-@noFlip:
-        rts
 
-practiseTypeMenuControls:
-        ; down
-        lda #BUTTON_DOWN
-        jsr menuThrottle
-        beq @downEnd
-        lda #$01
-        sta soundEffectSlot1Init
+setupLRPageSelect:
+; setupLRPageSelect  - activeRow < 0
+    lda #>activePage
+    sta lrPointer+1
+    lda #<activePage
+    sta lrPointer
+    ldy activeMenu
+    lda pageCountByMenu,y
+    sta lrMax
+    lda #0
+    sta lrMin
+    rts
 
-        inc practiseType
-        lda practiseType
-        cmp #MODE_QUANTITY
-        bne @downEnd
-        lda #0
-        sta practiseType
-@downEnd:
 
-        ; up
-        lda #BUTTON_UP
-        jsr menuThrottle
-        beq @upEnd
-        lda #$01
-        sta soundEffectSlot1Init
-        lda practiseType
-        bne @noWrap
-        lda #MODE_QUANTITY
-        sta practiseType
-@noWrap:
-        dec practiseType
-@upEnd:
-        rts
+setupLRValueChange:
+; setupLRValueChange - activeRow >= 0 && itemType < 128
+    lda #AUTO_MENU_VARS_HI
+    sta lrPointer+1
+    ldx activeItem
+    lda memoryOffsets,x
+    sta lrPointer
+    ldy #$0
+    lda unpackedItemType
+    and #TYPE_MASK
+    cmp #TYPE_FF_OFF
+    bne @storeMin
+    dey
+@storeMin:
+    sty lrMin
+    ldx unpackedItemValue
+    cmp #TYPE_CHOICES
+    bne @storeMax
+    lda choiceSetCounts,x
+    tax
+@storeMax:
+    stx lrMax
+    rts
 
-renderMenuVars:
+setupLRColumnChange:
+; setupLRColumnChange itemType & %10100000 == %10000000
+    lda #0
+    sta lrMin
+    lda #>activeColumn
+    sta lrPointer+1
+    lda #<activeColumn
+    sta lrPointer
+    lda unpackedItemValue
+    tay
+    iny
+    sty lrMax
+    rts
 
-        ; playType / seed cursors
 
-        lda menuSeedCursorIndex
-        bne @seedCursor
+.out .sprintf("setup: %d", *-enterSubMenu)
 
-        lda practiseType
-        jsr menuItemY16Offset
-        bne @cursorFinished
-        stx spriteYOffset
-        lda #$17
-        sta spriteXOffset
-        lda #$1D
-        sta spriteIndexInOamContentLookup
-        jsr loadSpriteIntoOamStaging
-        jmp @cursorFinished
 
-@seedCursor:
-        clc
-        lda #MENU_SPRITE_Y_BASE + 7
-        sbc menuScrollY
-        sta spriteYOffset
-        lda menuSeedCursorIndex
-        asl a
-        asl a
-        asl a
-        adc #$B1
-        sta spriteXOffset
-        lda #$1B
-        sta spriteIndexInOamContentLookup
-        jsr loadSpriteIntoOamStaging
+collectControllerInput:
+    lda #$00
+    sta selectPressed
+    sta APressed
+    sta startPressed
+    sta startOrAPressed
+    sta BPressed
+    sta udAdjust
+    sta lrAdjust
 
-        ; indicator
+    lda newlyPressedButtons_player1
+    tax
 
-        lda set_seed_input
-        bne @renderIndicator
-        lda set_seed_input+1
-        and #$FE ; treat 0001 like 0000
-        beq @cursorFinished
-@renderIndicator:
-        ldx #$E
-        lda set_seed_input+2
-        and #$F0
-        beq @v5
-        lda set_seed_input
-        bne @v4
-        lda set_seed_input+1
-        beq @v5
-        jmp @v4
-@v5:
-        ldx #$F
-@v4:
-        stx spriteIndexInOamContentLookup
-        sec
-        lda #(MODE_SEED*8) + MENU_SPRITE_Y_BASE + 1
-        sbc menuScrollY
-        sta spriteYOffset
-        lda #$A0
-        sta spriteXOffset
-        jsr stringSprite
+    and #BUTTON_START
+    beq @checkA
+    inc startPressed
+    inc startOrAPressed
+    jmp @checkCardinals
+@checkA:
+    txa
+    and #BUTTON_A ; do different things for these instead?
+    beq @checkB
+    inc APressed
+    inc startOrAPressed
+    jmp @checkCardinals
+@checkB:
+    txa
+    and #BUTTON_B
+    beq @checkSelect
+    inc BPressed
+    jmp @checkCardinals
+@checkSelect:
+    txa
+    and #BUTTON_SELECT
+    beq @checkCardinals
+    inc selectPressed
 
-@cursorFinished:
+@checkCardinals:
 
-menuCounter := tmp1
-menuRAMCounter := tmp3
-menuYTmp := tmp2
 
-        ; render seed
+; maybe also folded saves bytes?
+    lda #BUTTON_UP
+    jsr menuThrottle
+    beq @upNotPressed
+    inc udAdjust
+    rts
+@upNotPressed:
+    lda #BUTTON_DOWN
+    jsr menuThrottle
+    beq @downNotPressed
+    dec udAdjust
+    rts
+@downNotPressed:
+    lda #BUTTON_LEFT
+    jsr menuThrottle
+    beq @leftNotPressed
+    dec lrAdjust
+    rts
+@leftNotPressed:
+    lda #BUTTON_RIGHT
+    jsr menuThrottle
+    beq @rightNotPressed
+    inc lrAdjust
+    rts
+@rightNotPressed:
+    rts
 
-        lda #$b8
-        sta spriteXOffset
-        lda #MODE_SEED
-        jsr menuItemY16Offset
-        bne @notSeed
-        stx spriteYOffset
-        lda #set_seed_input
-        sta byteSpriteAddr
-        lda #0
-        sta byteSpriteAddr+1
-        lda #0
-        sta byteSpriteTile
-        lda #3
-        sta byteSpriteLen
-        jsr byteSprite
-@notSeed:
 
-        ; render config vars
+respondToInput:
+    ldy activeColumn
+    beq enterNewPage
+    lda udAdjust
+    beq enterNewPage
 
-        ; YTAX
-        lda #0
-        sta menuCounter
-        sta menuRAMCounter
+rePackDigit:
+    dey
+    tya
+    lsr
+    tay
+    bcs @smallDigit
+    lda (digitPtr),y
+    and #$0F
+    sta (digitPtr),y
+    lda nybbleTemp
+    asl
+    asl
+    asl
+    asl
+    ora (digitPtr),y
+    sta (digitPtr),y
+
+    jmp enterNewPage
+
+@smallDigit:
+    lda (digitPtr),y
+    and #$F0
+    ora nybbleTemp
+    sta (digitPtr),y
+
+enterNewPage:
+    lda activePage
+    cmp originalPage
+    beq checkIfGameStartOrSubmenu
+    jmp enterPage
+
+checkIfGameStartOrSubmenu:
+    lda startOrAPressed
+    beq checkIfExitSubmenu
+
+    lda activeRow
+    bmi checkPageMode
+
+    lda unpackedItemType
+    cmp #TYPE_MODE_ONLY
+    beq startGameFromItem
+
+    cmp #TYPE_SUBMENU
+    beq goToSubMenu
+    jmp checkPageMode
+
+goToSubMenu:
+    lda unpackedItemValue
+    jmp enterSubMenu
+
+startGameFromItem:
+    lda unpackedPageValue
+    rts
+
+checkPageMode:
+    ; lda unpackedPageValue ; 0 right now
+    lda startPressed
+    beq @noGame
+    jmp setGameStartedFlag
+
+@noGame:
+
+    rts
+
+checkIfExitSubmenu:
+    lda BPressed
+    beq doSomethingWithSelect
+    lda activeMenu
+    beq doSomethingWithSelect
+    jmp exitSubmenu
+
+
+doSomethingWithSelect:
+    ; lda selectPressed
+    ; placeholder
+    rts
+
+setGameStartedFlag:
+    inc gameStarted
+    lda #$FF
+    jmp enterSubMenu
+
+
+addInputs:
+    ldx #0 ; upDown
+    jsr @doActualAdd
+    ldx #MENU_PTR_DISTANCE ; leftRight
+@doActualAdd:
+    lda soundEffectSlot1Init
+    bne @ret ; skip leftRight if up/down input was received
+    lda udAdjust,x
+    beq @ret ; skip if nothing to do
+    clc
+    adc (udPointer,x)
+    sta (udPointer,x)
+    ldy udMax,x
+    beq @sfx ; 0 means unlimited.  expected values 2-31
+    cmp udMax,x
+    beq @rollToMin
+    clc
+    adc #$1
+    cmp udMin,x
+    bne @sfx
+    ldy udMax,x
+    dey
+    tya
+    bne @storeDigit
+@rollToMin:
+    lda udMin,x
+@storeDigit:
+    sta (udPointer,x)
+@sfx:
+    inc soundEffectSlot1Init
+@ret:
+    rts
+
+
+.out .sprintf("input handling: %d", *-collectControllerInput)
+
+
+stageBackgroundTiles:
+; page index points to split address tables
+; tables are pointers into strings
+; word1,0,word2,0,word3,-1
+
+    ldx actualPage
+
+    @blankCounter = blankCounter
+    @rowCounter = rowCounter
+    @stringPtr = stringSetPtr
+
+    lda pageLabelsLo,x
+    sta @stringPtr
+    lda pageLabelsHi,x
+    sta @stringPtr+1
+
+    lda #>MENU_TITLE_PPU
+    sta stack
+    lda #<MENU_TITLE_PPU
+    sta stack+1
+    lda #MENU_ROWS
+    sta @rowCounter
+    ldx #$2
+
+@nextRow:
+    lda #MENU_STRIPE_WIDTH
+    sta @blankCounter
+
 @loop:
-        ldy menuRAMCounter ; gap support
+    ldy #0
+    lda (@stringPtr),y
+    tay
+    iny
+    beq @fillBlank ; stop advancing pointer when $FF is reached
+    inc @stringPtr
+    bne @noCarry
+    inc @stringPtr+1
+@noCarry:
+    iny
+    beq @fillBlank ; $FE also blanks line but after advancing pointer
+    sta stack,x
+    dec @blankCounter
+    inx
+    bne @loop ; always taken
+@fillBlank: ; should only be entered directly when end of string reached
+    dec @blankCounter
+    bmi @finishRow
+    lda #$FF
+    sta stack,x
+    inx
+    bne @fillBlank ; always taken
 
-        ; handle boolean
-        lda menuCounter
-        tax ; used to get loaded into Y
-        lda menuConfigSizeLookup, x
+@finishRow:
+; check if all rows drawn
+    dec @rowCounter
+    beq @shiftTitleRow
 
-        beq @loopNext ; gap support
-        inc menuRAMCounter ; only increment RAM when config size isnt zero
+; set next row based on last row
+    lda stack-((MENU_STRIPE_WIDTH+2)-1),x
+    clc
+    adc #$40
+    sta stack+1,x
+    lda stack-(MENU_STRIPE_WIDTH+2),x
+    adc #$00
+    sta stack,x
+    inx
+    inx
+    bne @nextRow ; always taken
+@shiftTitleRow:
+; bump title row 4 tiles to the right
+    lda stack+1
+    eor #%1111
+    sta stack+1
+    rts
 
-        cmp #1
-        beq @renderBool
 
-        lda menuCounter
-        cmp #MODE_SCORE_DISPLAY
-        beq @renderScoreName
+.out .sprintf("background staging: %d", *-stageBackgroundTiles)
 
-        cmp #MODE_CRASH
-        beq @renderCrashMode
 
-        cmp #MODE_DARK
-        beq @renderDarkMode
+stageCurrentValues:
+    @counter = blankCounter
+    @itemCount = rowCounter
 
-        jsr menuItemY16Offset
-        bne @loopNext
-        txa
+    lda #$00
+    sta @counter
+    lda #AUTO_MENU_VARS_HI
 
-        ldx oamStagingLength
+    ldx actualPage
+    lda startItemByPage,x
 
-        sta oamStaging, x
-        inx
-        lda menuVars, y
-        sta oamStaging, x
-        inx
-        lda #$00
-        sta oamStaging, x
-        inx
-        lda #$E0
-        sta oamStaging, x
-        inx
-        ; increase OAM index
-        lda #$04
-        clc
-        adc oamStagingLength
-        sta oamStagingLength
+    sta activeItem
+    lda itemCountByPage,x
 
-@loopNext:
-        inc menuCounter
-        lda menuCounter
-        cmp #MODE_QUANTITY
-        bne @loop
-        rts
+    sta @itemCount
 
-@renderBool:
-        lda menuCounter
-        jsr menuItemY16Offset
-        bne @boolOutOfRange
-        stx spriteYOffset
-        lda #$E9
-        sta spriteXOffset
-        clc
-        lda menuVars, y
-        adc #$8
-        sta spriteIndexInOamContentLookup
-        jsr stringSpriteAlignRight
-@boolOutOfRange:
-        jmp @loopNext
+    lda#(MENU_STRIPE_WIDTH+2) - 8
+    sta stackPtr
 
-@renderScoreName:
-        lda scoringModifier
-        sta spriteIndexInOamContentLookup
-        lda #(MODE_SCORE_DISPLAY*8) + MENU_SPRITE_Y_BASE + 1
-        jmp @renderOption
+@memoryStageLoop:
+    lda stackPtr
+    clc
+    adc #MENU_STRIPE_WIDTH+2
+    sta stackPtr
+    tax
 
-@renderCrashMode:
-        jsr menuItemY16Offset
-        bne @loopNext
-        ldx crashModifier
-        lda crashOptions, x
-        sta spriteIndexInOamContentLookup
-        lda #(MODE_CRASH*8) + MENU_SPRITE_Y_BASE + 1
-        jmp @renderOption
+    ldy activeItem
+    lda memoryOffsets,y
+    sta byteSpriteAddr
+    lda #AUTO_MENU_VARS_HI
+    sta byteSpriteAddr+1
+    lda itemTypes,y
+    tax
+    ldy #0
+    and #TYPE_MASK
+    bmi @digitInputOrEdge
 
-@renderDarkMode:
-        jsr menuItemY16Offset
-        bne @loopNext
-        ldx darkModifier
-        lda darkOptions, x
-        sta spriteIndexInOamContentLookup
-        lda #<((MODE_DARK*8) + MENU_SPRITE_Y_BASE + 1)
+    cmp #TYPE_CHOICES
+    beq @drawString
 
-@renderOption:
-        sec
-        sbc menuScrollY
-        sta spriteYOffset
-        lda #$e9
-        sta spriteXOffset
-        jsr stringSpriteAlignRight
-        jmp @loopNext
+    cmp #TYPE_NUMBER
+    bne @drawFFOff
+@setupOneByte:
+    lda #$02
+    bne @drawOneByte
 
-crashOptions:
-        .byte $8, $16, $17, $18
+@drawFFOff:
+    lda (byteSpriteAddr),y
+    bpl @setupOneByte
+    ldx #CHOICESET_OFFON
+    jsr @setStringList
+    jmp @startCopy
 
-darkOptions:
-        .byte $8, $9, $1B, $1C, $1D, $1e
+@drawString:
+    txa
+    and #%11111
+    tax
+    jsr @setStringList
+    lda (byteSpriteAddr),y
+    tay
+@startCopy:
+    lda (stringSetPtr),y
+    tay
+    lda choiceSetTable,y
+    beq @endCopy
+    sta generalCounter
+    jsr setStackOffset
+    iny
+@nextChar:
+    lda choiceSetTable,y
+    sta stack,x
+    inx
+    iny
+    dec generalCounter
+    bne @nextChar
 
-; <- menu item index in A
-; -> high byte of offset in A
-; -> low byte in X
-menuItemY16Offset:
-        sta tmpY
-        lda #8
-        sta tmpX
-        ; get 16bit menuitem * 8 in tmpX/tmpY
-        lda #$0
-        ldx #$8
-        clc
-@mulLoop:
-        bcc @mulLoop1
-        clc
-        adc tmpY
-@mulLoop1:
-        ror
-        ror tmpX
-        dex
-        bpl @mulLoop
-        sta tmpY
-        ; add offset
-        clc
-        lda tmpX
-        adc #MENU_SPRITE_Y_BASE + 1
-        sta tmpX
-        lda tmpY
-        adc #0
-        sta tmpY
-        ; remove menuscroll
-        sec
-        lda tmpX
-        sbc menuScrollY
-        sta tmpX
-        tax
-        lda tmpY
-        sbc #0
-        rts
+@endCopy:
+    jmp @nextByte
 
-bufferScreen:
-        lda #$0
-        sta renderMode
-        jsr updateAudioWaitForNmiAndDisablePpuRendering
-        jsr disableNmi
-        jsr drawBlackBGPalette
-        jsr resetScroll
-        jsr waitForVBlankAndEnableNmi
-        jsr updateAudioWaitForNmiAndResetOamStaging
-        jsr updateAudioWaitForNmiAndEnablePpuRendering
-        jsr updateAudioWaitForNmiAndResetOamStaging
-        lda #$3
-        sta sleepCounter
-@endLoop:
-        jsr updateAudioWaitForNmiAndResetOamStaging
-        lda sleepCounter
-        bne @endLoop
-        rts
+@setStringList:
+    lda choiceSetIndexes,x
+    clc
+    adc #<choiceSets
+    sta stringSetPtr
+    lda #$00
+    adc #>choiceSets
+    sta stringSetPtr+1
+    rts
+
+@digitInputOrEdge:
+    and #TYPE_MASK
+    cmp #TYPE_MODE_ONLY
+    beq @nextByte
+    cmp #TYPE_SUBMENU
+    beq @nextByte
+    txa
+    and #%11111
+@drawOneByte:
+    pha
+    sec
+    sbc #1
+    lsr
+    clc
+    adc #$1
+    sta generalCounter
+    pla
+
+    jsr setStackOffset
+    ldy #$00
+@digitLoop:
+    lda (byteSpriteAddr),y
+    pha
+    lsr
+    lsr
+    lsr
+    lsr
+    sta stack,x
+    inx
+    pla
+    and #$0F
+    sta stack,x
+    inx
+    iny
+    dec generalCounter
+    bne @digitLoop
+    jmp @nextByte
+
+@nextByte:
+    inc activeItem
+    inc @counter
+    lda @counter
+    cmp @itemCount
+    beq @ret
+    jmp @memoryStageLoop
+@ret:
+    rts
+
+setStackOffset:
+    eor #$FF
+    clc
+    adc #$09
+    clc
+    adc stackPtr
+    tax
+    rts
+
+
+.out .sprintf("value staging: %d", *-stageCurrentValues)
+
+
+stageCursor:
+    ldx activeMenu
+    lda pageCountByMenu,x
+    cmp #$1
+    beq @singlePage
+    ldx oamStagingLength
+    sta oamStaging+9,x
+    lda #$4F
+    sta oamStaging+5,x
+
+    lda #$CB
+    sta oamStaging+0,x
+    sta oamStaging+4,x
+    sta oamStaging+8,x
+
+    lda #$C8
+    sta oamStaging+3,x
+    clc
+    adc #$08
+    sta oamStaging+7,x
+    adc #$08
+    sta oamStaging+11,x
+
+    lda #$00
+    sta oamStaging+2,x
+    sta oamStaging+6,x
+    sta oamStaging+10,x
+
+    ldy activePage
+    iny
+    tya
+    sta oamStaging+1,x
+    txa
+    clc
+    adc #$C
+    sta oamStagingLength
+
+@singlePage:
+
+    lda activeRow
+    bpl @notTitle
+
+    lda #$3F
+    sta spriteYOffset
+    lda #$10
+    sta spriteXOffset
+    lda #$23 ; page select
+    sta spriteIndexInOamContentLookup
+    jmp loadSpriteIntoOamStaging
+
+@notTitle:
+    asl
+    asl
+    asl
+    asl
+    clc
+    adc #$4F
+    sta spriteYOffset
+; digit input
+    ldx activeColumn
+    beq @notColumn
+    sec
+    sbc #$09
+    sta spriteYOffset
+    txa
+    asl
+    asl
+    asl
+    clc
+    adc #$B9
+    sta spriteXOffset
+    ldx activeItem
+    lda itemTypes,x
+    and #VALUE_MASK
+    sec
+    sbc #1
+    lsr
+    asl
+    asl
+    asl
+    asl
+    eor #$FF
+    clc
+    adc #$01
+    clc
+    adc spriteXOffset
+    sta spriteXOffset
+    lda #$1B  ; digit select
+    bne @store
+@notColumn:
+    lda #$14
+    sta spriteXOffset
+    lda #$1D  ; option select
+@store:
+    sta spriteIndexInOamContentLookup
+@stage:
+    jmp loadSpriteIntoOamStaging
+gotoEdgeCase:
+    rts
+
+
+.out .sprintf("cursor staging: %d", *-stageCursor)
+
+
+render_mode_menu:
+    tsx
+    txa
+    ldx #$ff
+    txs
+    tax
+    ldy #MENU_ROWS
+@nextRow:
+    pla
+    sta PPUADDR
+    pla
+    sta PPUADDR
+    .repeat MENU_STRIPE_WIDTH
+    pla
+    sta PPUDATA
+    .endrepeat
+    dey
+    bne @nextRow
+    txs
+    rts
+
+
+.out .sprintf("render dump: %d", *-render_mode_menu)
+
+
+.out .sprintf("total: %d", *-gameMode_gameTypeMenu)

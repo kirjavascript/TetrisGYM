@@ -3,35 +3,40 @@ nmi:    pha
         pha
         tya
         pha
-        lda #$00
-        sta oamStagingLength
         jsr render
+        lda ppuScrollX
+        sta PPUSCROLL
+        lda ppuScrollY
+        sta PPUSCROLL
         lda currentPpuCtrl
         sta PPUCTRL
-        dec sleepCounter
-        lda sleepCounter
-        cmp #$FF
-        bne @jumpOverIncrement
-        inc sleepCounter
-@jumpOverIncrement:
-        jsr copyOamStagingToOam
+        lda #$00
+        sta OAMADDR
+        lda #$02
+        sta OAMDMA
 
 renderComplete:
-        lda frameCounter
-        clc
-        adc #$01
-        sta frameCounter
-        lda #$00
-        adc frameCounter+1
-        sta frameCounter+1
+        lda sleepCounter
+        beq @noSleep
+        dec sleepCounter
+@noSleep:
+
+        inc frameCounter
+        bne @noCarry
+        inc frameCounter+1
+@noCarry:
+
         ldx #rng_seed
         jsr generateNextPseudorandomNumber
-        jsr copyCurrentScrollAndCtrlToPPU
+
         jsr pollControllerButtons
+
         lda #$00
+        sta oamStagingLength
         sta lagState ; clear flag after lag frame achieved
         lda #$01
         sta verticalBlankingInterval
+
         pla
         tay
         tsx

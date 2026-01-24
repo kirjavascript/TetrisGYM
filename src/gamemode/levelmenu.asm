@@ -49,21 +49,21 @@ levelMenuLinecapInfo:
         sta PPUADDR
         lda #$F5
         sta PPUADDR
-        clc
-        lda #LINECAP_WHEN_STRING_OFFSET
-        adc linecapWhen
-        sta stringIndexLookup
-        jsr stringBackground
+        ; clc
+        ; lda #LINECAP_WHEN_STRING_OFFSET
+        ; adc linecapWhen
+        jsr stringLineCapWhen
 
         lda #$21
         sta PPUADDR
         lda #$15
         sta PPUADDR
-        clc
-        lda #LINECAP_HOW_STRING_OFFSET
-        adc linecapHow
-        sta stringIndexLookup
-        jsr stringBackground
+        ; clc
+        ; lda #LINECAP_HOW_STRING_OFFSET
+        ; adc linecapHow
+        ; sta stringIndexLookup
+        ; jsr stringBackground
+        jsr stringLineCapHow
 
         lda #$20
         sta PPUADDR
@@ -201,7 +201,7 @@ levelControlClearHighScores:
         sta spriteXOffset
         lda #$C8
         sta spriteYOffset
-        lda #$C
+        lda #STRING_CLEAR
         sta spriteIndexInOamContentLookup
         jsr stringSprite
 
@@ -222,7 +222,7 @@ levelControlClearHighScoresConfirm:
         sta spriteXOffset
         lda #$C8
         sta spriteYOffset
-        lda #$D
+        lda #STRING_SURE
         sta spriteIndexInOamContentLookup
         jsr stringSprite
 
