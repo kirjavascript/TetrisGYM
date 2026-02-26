@@ -6,6 +6,10 @@ INES_MAPPER := 1000 ; 0 (NROM), 1 (MMC1), 3 (CNROM), 4 (MMC3), 5 (MMC5), and 100
 SAVE_HIGHSCORES := 1
 .endif
 
+.ifndef HAS_SRAM
+HAS_SRAM := 1
+.endif
+
 .ifndef AUTO_WIN
 ; faster aeppoz + press select to end game
 AUTO_WIN := 0
@@ -13,6 +17,10 @@ AUTO_WIN := 0
 
 .ifndef KEYBOARD
 KEYBOARD := 0
+.endif
+
+.ifndef INES_OVERRIDE
+INES_OVERRIDE := 0
 .endif
 
 .ifndef CNROM_OVERRIDE
