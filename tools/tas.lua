@@ -1,7 +1,7 @@
-﻿-- uses https://tasvideos.org/7625S
+﻿-- https://tasvideos.org/7625S
 local rom = emu.getRomInfo()
 local romPath, _ = string.gsub(rom.path, rom.name, "")
-local filename =  romPath .. "r57shell_archanfel-tetris-maxscore.fm2"
+local filename =  romPath .. "r57shell-Archanfel-Tetris-fastest999999.fm2"
 
 local inputs = {}
 for line in io.lines(filename) do

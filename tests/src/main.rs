@@ -6,6 +6,7 @@ mod util;
 mod video;
 
 mod cycle_count;
+mod cycle_parity;
 mod crash;
 
 mod crunch;
@@ -57,7 +58,7 @@ struct TestOptions {
 fn main() {
     let options = TestOptions::parse_args_default_or_exit();
 
-    let tests: [(&str, fn()); 17] = [
+    let tests: [(&str, fn()); 18] = [
         ("garbage4", garbage::test_garbage4_crash),
         ("floor", floor::test),
         ("tspins", tspins::test),
@@ -75,6 +76,7 @@ fn main() {
         ("patch", patch::test),
         ("crunch", crunch::test),
         ("harddrop", harddrop::test),
+        ("parity", cycle_parity::test),
     ];
 
     // run tests
