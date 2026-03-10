@@ -6,7 +6,6 @@ mod util;
 mod video;
 
 mod cycle_count;
-mod cycle_parity;
 mod crash;
 
 mod crunch;
@@ -16,6 +15,7 @@ mod garbage;
 mod harddrop;
 mod mapper;
 mod palettes;
+mod parity;
 mod pushdown;
 mod rng;
 mod score;
@@ -76,7 +76,7 @@ fn main() {
         ("patch", patch::test),
         ("crunch", crunch::test),
         ("harddrop", harddrop::test),
-        ("parity", cycle_parity::test),
+        ("parity", parity::test),
     ];
 
     // run tests

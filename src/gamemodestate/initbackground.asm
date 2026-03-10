@@ -45,12 +45,14 @@ gameModeState_initGameBackground:
         sta PPUDATA
 @heartEnd:
 
+
         lda #NMIEnable|BGPattern1|SpritePattern1
         sta PPUCTRL
         sta currentPpuCtrl
         jsr resetScroll
         jsr waitForVBlankAndEnableNmi
-        jsr updateAudioWaitForNmiAndResetOamStaging
+        ; gym setup takes longer than vanilla, skip a frame to line up
+        ; jsr updateAudioWaitForNmiAndResetOamStaging
         jsr updateAudioWaitForNmiAndEnablePpuRendering
         jsr updateAudioWaitForNmiAndResetOamStaging
         lda #$01

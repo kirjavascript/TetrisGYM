@@ -80,9 +80,19 @@
         jsr disableNmi
         jsr drawBlackBGPalette
         ; instead of clearing vram like the original, blank out the palette
+; align with vanilla at frame 0004
+        ldx #$0
+        ldy #$20
+@wait:
+        dex
+        bne @wait
+        dey
+        bne @wait
+
         lda #$EF
         ldx #$04
         ldy #$04 ; used to be 5, but we dont need to clear 2p playfield
+
         jsr memset_page
         jsr waitForVBlankAndEnableNmi
         jsr updateAudioWaitForNmiAndResetOamStaging

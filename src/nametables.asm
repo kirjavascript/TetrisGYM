@@ -12,9 +12,27 @@ rocket_nametable: ; RLE
         .incbin "nametables/rocket_nametable.bin"
 legal_nametable: ; RLE
         .incbin "nametables/legal_nametable.bin"
-title_nametable_patch: ; stripe
-        .byte $21, $69, $5, $1D, $12, $1D, $15, $E
+
+
+
+; added for timing test
+legal_nametable_patch: ; stripe
+        .byte $21, $69, $5, "LEGAL"
+        .byte $21, $89, $9, "GAMEMODE0"
         .byte $FF
+
+; modified for timing test
+title_nametable_patch: ; stripe
+        .byte $21, $69, $5, "TITLE"
+        .byte $21, $89, $9, "GAMEMODE1"
+        .byte $FF
+
+; blank tile + MENU, temporary for timing test framework
+menu_nametable_patch: ; stripe
+        .byte $21, $69, $5, "MENU", $FF
+        .byte $21, $89, $9, "GAMEMODE2"
+        .byte $FF
+
 rocket_nametable_patch: ; stripe
         .byte $20, $83, 5, $19, $1B, $E, $1c, $1c
         .byte $20, $A3, 5, $1c, $1d, $a, $1b, $1d

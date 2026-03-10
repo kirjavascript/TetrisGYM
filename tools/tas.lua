@@ -24,6 +24,7 @@ for line in io.lines(filename) do
         table.insert(inputs, input)
     end
 end
+table.insert(inputs, {})
 
 function applyInputs()
     local state = emu.getState()
