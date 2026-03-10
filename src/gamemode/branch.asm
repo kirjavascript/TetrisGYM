@@ -3,7 +3,7 @@ branchOnGameMode:
         branchTo gameMode, \
             gameMode0, \
             gameMode1, \
-            gameMode2, \
+            gameMode_gameTypeMenu, \
             gameMode_levelMenu, \
             gameMode_playAndEndingHighScore_jmp, \
             gameMode_playAndEndingHighScore_jmp, \
