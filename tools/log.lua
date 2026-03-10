@@ -3,8 +3,9 @@
 local OFFSET = -2
 -- local TEST_LENGTH = 1794
 -- local START_FRAMES = {265, 270, 274, 286}
-local TEST_LENGTH = 2000
-local START_FRAMES = {1794, 1800, 1900}
+local TEST_LENGTH = 700
+local START_FRAMES = {300, 400, 500, 600}
+-- local START_FRAMES = {}
 
 local BREAK_FRAME = nil
 
@@ -25,8 +26,9 @@ function logFrame()
         emu.breakExecution()
     end
 
-    if startIdx[1] < #START_FRAMES then
+    if startIdx[1] < #START_FRAMES + 1 then
         if frameCount == START_FRAMES[startIdx[1]] then
+            emu.log(string.format("%04d", frameCount) .. " pressing start")
             emu.setInput({start = true})
             startIdx[1] = startIdx[1] + 1
         end
