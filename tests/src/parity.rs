@@ -3,12 +3,13 @@ use crate::{input, labels, util};
 
 pub fn test() {
     // 1795 is frame vanilla enters demo mode (gameMode = 5)
+    run_and_press_start(291, &[265, 270, 274, 286]);
+    run_and_press_start(291, &[264, 269, 273, 286]);
+    run_and_press_start(700, &[300, 400, 500, 600]);
     run_and_press_start(1794, &[]);
     run_and_press_start(1905, &[1794, 1800, 1900]);
 
     // fastest999999 pattern
-    run_and_press_start(291, &[265, 270, 274, 286]);
-    run_and_press_start(291, &[264, 269, 273, 286]);
     run_and_press_start(2000, &[265, 1000, 1500, 1900]);
 
     // other test cases
