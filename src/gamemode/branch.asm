@@ -139,7 +139,6 @@ gameMode1:
         jsr updateAudioWaitForNmiAndEnablePpuRendering
         lda #$00
         sta frameCounter+1
-        dec sleepCounter
 
 gameMode1Loop:
         jsr stageBootSprites
