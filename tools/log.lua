@@ -1,23 +1,49 @@
-﻿-- line up with cycle_parity.rs indexing
+﻿-- line up with parity.rs indexing
 -- frameCount starts at 2
 local OFFSET = -2
+
 -- local TEST_LENGTH = 1794
 -- local START_FRAMES = {265, 270, 274, 286}
-local TEST_LENGTH = 700
+local TEST_LENGTH = 1000
 local START_FRAMES = {300, 400, 500, 600}
 -- local START_FRAMES = {}
 
 local BREAK_FRAME = nil
 
+local COMPARE = true
+
 local rom = emu.getRomInfo()
 local romPath, _ = string.gsub(rom.path, rom.name, "")
 local filename = rom.name:gsub("%.%w+$", "") .. ".log"
 local path = string.gsub(rom.path, rom.name, filename)
-emu.log("Opening " .. path)
-local file = io.open(path, "w")
 
+emu.log("Opening " .. path)
+local original_results = {}
+local file
+if COMPARE then
+    local og_path = string.gsub(rom.path, rom.name, "clean.log")
+    for line in io.lines(og_path) do
+        line_nos = {}
+        for num in string.gmatch(line, "%S+") do
+            table.insert(line_nos, num)
+        end
+        emu.log(table.concat(line_nos, " "))
+        table.insert(
+            original_results,
+            {
+                tonumber(line_nos[2], 16),
+                tonumber(line_nos[3], 16),
+                tonumber(line_nos[4], 16)
+            })
+    end
+    emu.log("Comparing.  Loaded " .. #original_results .. " lines")
+end
+local file = io.open(path, "w")
 -- workaround to get a global state
 local startIdx = {1}
+local cmpIdx = {1}
+
+
 function logFrame()
     state = emu.getState()
     local frameCount = state.frameCount + OFFSET
@@ -34,34 +60,69 @@ function logFrame()
         end
     end
 
-    local rng_addr = emu.getLabelAddress('rng_seed')
-    local rng_seed = emu.read16(rng_addr.address, rng_addr.memType)
+    local rng_seed = valueAtLabel16('rng_seed')
+    local frameCounter = valueAtLabel16('frameCounter')
+    local gameMode = valueAtLabel('gameMode')
+    local generalCounter = valueAtLabel('generalCounter')
+    local sleepCounter = valueAtLabel('sleepCounter')
 
-    local fc_addr = emu.getLabelAddress('frameCounter')
-    local frameCounter = emu.read16(fc_addr.address, fc_addr.memType)
+    if COMPARE then
+        if not original_results[cmpIdx[1]] then
+            emu.log("Ran out of frames to compare")
+            emu.breakExecution()
+            return
+        end
+        expected_rng = original_results[cmpIdx[1]][1]
+        expected_fc = original_results[cmpIdx[1]][2]
+        expected_gm = original_results[cmpIdx[1]][3]
+        cmpIdx[1] = cmpIdx[1] + 1
 
-    local gm_addr = emu.getLabelAddress('gameMode')
-    local gameMode = emu.read(gm_addr.address, gm_addr.memType)
+        if (
+            expected_rng ~= rng_seed or
+            expected_fc & 0xFF ~= frameCounter & 0xFF or
+            expected_gm ~= gameMode
+        ) then
+        emu.log(
+            "Expect: "
+            .. string.format("%04X", expected_rng) .. " "
+            .. string.format("%04X", expected_fc) .. " "
+            .. string.format("%02X", expected_gm)
+        )
+        emu.log(
+            "Actual: "
+            .. string.format("%04X", rng_seed) .. " "
+            .. string.format("%04X", frameCounter) .. " "
+            .. string.format("%02X", gameMode)
+        )
+            emu.breakExecution()
+        end
+    else
 
-    local gc_addr = emu.getLabelAddress('generalCounter')
-    local generalCounter = emu.read(gc_addr.address, gc_addr.memType)
+        file:write(
+            string.format("%04d", frameCount) .. " "
+            .. string.format("%04X", rng_seed) .. " "
+            .. string.format("%04X", frameCounter) .. " "
+            -- .. string.format("%02X", sleepCounter) .. " "
+            -- .. string.format("%02X", generalCounter) .. " "
+            .. string.format("%02X", gameMode) .. "\n"
+        )
 
-    local sc_addr = emu.getLabelAddress('sleepCounter')
-    local sleepCounter = emu.read(sc_addr.address, sc_addr.memType)
-    file:write(
-        string.format("%04d", frameCount) .. " "
-        .. string.format("%04X", rng_seed) .. " "
-        .. string.format("%04X", frameCounter) .. " "
-        -- .. string.format("%02X", sleepCounter) .. " "
-        -- .. string.format("%02X", generalCounter) .. " "
-        .. string.format("%02X", gameMode) .. "\n"
-    )
-
-    if frameCount >= TEST_LENGTH then
-        file:close()
-        emu.breakExecution()
-        emu.log("Wrote " .. frameCount + 1 .. " lines to " .. path)
+        if frameCount >= TEST_LENGTH then
+            file:close()
+            emu.breakExecution()
+            emu.log("Wrote " .. frameCount + 1 .. " lines to " .. path)
+        end
     end
+end
+
+function valueAtLabel(label)
+    local addr = emu.getLabelAddress(label)
+    return emu.read(addr.address, addr.memType)
+end
+
+function valueAtLabel16(label)
+    local addr = emu.getLabelAddress(label)
+    return emu.read16(addr.address, addr.memType)
 end
 
 emu.addEventCallback(logFrame, emu.eventType.inputPolled);

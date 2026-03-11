@@ -8,9 +8,8 @@ pub fn test() {
     run_and_press_start(700, &[300, 400, 500, 600]);
     run_and_press_start(1794, &[]);
     run_and_press_start(1905, &[1794, 1800, 1900]);
-
-    // fastest999999 pattern
     run_and_press_start(2000, &[265, 1000, 1500, 1900]);
+    // fastest999999 pattern
 
     // other test cases
 }
