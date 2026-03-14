@@ -2,8 +2,10 @@ use gag::Gag;
 use crate::{input, labels, util};
 
 pub fn test() {
-    // 1795 is frame vanilla enters demo mode (gameMode = 5)
+    run_and_press_start(10000, &[265]);
     run_and_press_start(291, &[265, 270, 274, 286]);
+    run_and_press_start(5000, &[]);
+    // 1795 is frame vanilla enters demo mode (gameMode = 5)
     run_and_press_start(291, &[264, 269, 273, 286]);
     run_and_press_start(700, &[300, 400, 500, 600]);
     run_and_press_start(1794, &[]);
@@ -91,7 +93,7 @@ fn run_and_press_start(test_length: usize, start_frames: &[usize]) {
             || (og_fc1 != gym_fc1)
             // this one doesn't matter (pretty sure anyway)
             // || (og_fc2 != gym_fc2)
-            || (og_gm != gym_gm)
+            // || (og_gm != gym_gm)
         {
             println!(
                 "Expected:\n{:04} {:02X}{:02X} {:02X}{:02X} {:02X} {:02X} {:02X}",

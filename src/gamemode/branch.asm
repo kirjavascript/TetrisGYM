@@ -3,7 +3,7 @@ branchOnGameMode:
         branchTo gameMode, \
             gameMode0, \
             gameMode1, \
-            gameMode_gameTypeMenu, \
+            gameMode2, \
             gameMode_levelMenu, \
             gameMode_playAndEndingHighScore_jmp, \
             gameMode_playAndEndingHighScore_jmp, \
@@ -152,8 +152,11 @@ gameMode1Loop:
 ; go to game select menu page instead
         lda frameCounter+1
         cmp #$05
-        beq @goToGameMode2
         bne gameMode1Loop
+
+        ; use this for now to signal demo start
+        lda #$01
+        sta qualFlag
 
 @goToGameMode2:
         inc gameMode
@@ -199,6 +202,15 @@ gameMode2:
         jsr updateAudioWaitForNmiAndResetOamStaging
         jsr stageBootSprites
         jsr updateAudioWaitForNmiAndEnablePpuRendering
+
+
+        lda qualFlag
+        beq @skipDemoShuffle
+        ldx #rng_seed
+        jsr generateNextPseudorandomNumber
+        lda qualFlag ; temporary use to signal demo start
+@skipDemoShuffle:
+
 gameMode2Loop:
         lda newlyPressedButtons_player1
         and #BUTTON_START

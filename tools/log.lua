@@ -4,8 +4,8 @@ local OFFSET = -2
 
 -- local TEST_LENGTH = 1794
 -- local START_FRAMES = {265, 270, 274, 286}
-local TEST_LENGTH = 1000
-local START_FRAMES = {300, 400, 500, 600}
+local TEST_LENGTH = 50000
+local START_FRAMES = {}
 -- local START_FRAMES = {}
 
 local BREAK_FRAME = nil
@@ -79,8 +79,8 @@ function logFrame()
 
         if (
             expected_rng ~= rng_seed or
-            expected_fc & 0xFF ~= frameCounter & 0xFF or
-            expected_gm ~= gameMode
+            expected_fc & 0xFF ~= frameCounter & 0xFF -- or
+            -- expected_gm ~= gameMode
         ) then
         emu.log(
             "Expect: "
