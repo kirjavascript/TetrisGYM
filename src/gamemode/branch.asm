@@ -10,9 +10,9 @@ branchOnGameMode:
             gameMode_playAndEndingHighScore_jmp, \
             gameMode_speedTest
 
-.include "bootscreen.asm"
-.include "waitscreen.asm"
-.include "gametypemenu/menu.asm"
+; .include "bootscreen.asm"
+; .include "waitscreen.asm"
+; .include "gametypemenu/menu.asm"
 .include "levelmenu.asm"
 
 gameMode0:
