@@ -6,7 +6,7 @@ branchOnGameMode:
             gameMode2, \
             gameMode_levelMenu, \
             gameMode_playAndEndingHighScore_jmp, \
-            gameMode_playAndEndingHighScore_jmp, \
+            gameMode2, \
             gameMode_playAndEndingHighScore_jmp, \
             gameMode_speedTest
 
@@ -157,12 +157,31 @@ gameMode1Loop:
         ; use this for now to signal demo start
         lda #$01
         sta qualFlag
+        lda #$5
+        sta gameMode
+        rts
 
 @goToGameMode2:
         inc gameMode
         rts
 
-gameMode2:
+
+gameMode2: ; also game mode 5
+        ; check to see if really demo
+        lda gameMode
+        cmp #$5
+        bne @actually2
+
+        @DEMO_FRAMES = 4759
+        lda #>@DEMO_FRAMES
+        sta endingSleepCounter+1
+        lda #<@DEMO_FRAMES
+        sta endingSleepCounter
+
+
+@actually2:
+
+
         lda #$00
         sta renderMode
 
@@ -212,6 +231,31 @@ gameMode2:
 @skipDemoShuffle:
 
 gameMode2Loop:
+        ; check to see if really demo
+        lda gameMode
+        cmp #$5
+        bne @still2
+
+        dec endingSleepCounter
+        bne :+
+        dec endingSleepCounter+1
+        bne :+
+
+; end demo
+        lda #$2
+        sta gameMode
+
+        lda #rng_seed
+        jsr generateNextPseudorandomNumber
+
+        lda #rng_seed
+        jsr generateNextPseudorandomNumber
+:
+
+
+
+@still2:
+
         lda newlyPressedButtons_player1
         and #BUTTON_START
         bne @goToGameMode3

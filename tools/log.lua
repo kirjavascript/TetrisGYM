@@ -4,8 +4,8 @@ local OFFSET = -2
 
 -- local TEST_LENGTH = 1794
 -- local START_FRAMES = {265, 270, 274, 286}
-local TEST_LENGTH = 50000
-local START_FRAMES = {}
+local TEST_LENGTH = 10000
+local START_FRAMES = {265}
 -- local START_FRAMES = {}
 
 local BREAK_FRAME = nil
@@ -27,7 +27,6 @@ if COMPARE then
         for num in string.gmatch(line, "%S+") do
             table.insert(line_nos, num)
         end
-        emu.log(table.concat(line_nos, " "))
         table.insert(
             original_results,
             {
