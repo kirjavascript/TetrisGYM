@@ -8,6 +8,7 @@ gumdrop = "0.8.1"
 rustico-core = { git = "https://github.com/zeta0134/rustico.git", rev = "d31d380b1e15bf7cc80e8827730e56a6df77ae46" }
 minifb = "0.27"
 gag = "1.0.0"
+regex = "1.12.3"
 
 # for patch testing
 flips = "0.2.1"

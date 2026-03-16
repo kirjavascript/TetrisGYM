@@ -16,6 +16,7 @@ oneThirdPRNG: .res 1 ; $0014 ; used for crash
     .res $2
 
 rng_seed: .res 2 ; $0017
+rng_seed_hi := rng_seed + 1
 spawnID: .res 1 ; $0019
 spawnCount: .res 1 ; $001A
 pointerAddr: .res 2 ; $001B ; used in debug, harddrop
@@ -103,6 +104,7 @@ originalY: .res 1 ; $00AE
 dropSpeed: .res 1 ; $00AF
 tmpCurrentPiece: .res 1 ; $00B0                    ; Only used as a temporary
 frameCounter: .res 2 ; $00B1
+frameCounterHi := frameCounter + 1
 oamStagingLength: .res 1 ; $00B3
     .res 1
 newlyPressedButtons: .res 1 ; $00B5                 ; Active player's buttons
