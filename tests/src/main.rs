@@ -46,6 +46,10 @@ struct ParityOptions {
     tasfile: PathBuf,
     #[options(help = "Write logfiles")]
     write: bool,
+    #[options(help = "Be printy")]
+    verbose: bool,
+    #[options(help = "Show video")]
+    render: bool,
 }
 
 #[derive(Debug, Options)]
@@ -105,6 +109,8 @@ fn main() {
             parity::compare(
                 &opts.tasfile,
                 &opts.write,
+                &opts.verbose,
+                &opts.render,
             )
         }
     }
