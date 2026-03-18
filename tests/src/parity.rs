@@ -5,6 +5,7 @@ use std::fs::File;
 use std::io::BufWriter;
 use std::io::Result;
 use std::io::Write;
+use std::io::stdout;
 use std::path::PathBuf;
 
 use gag::Gag;
@@ -34,9 +35,12 @@ pub fn compare(tasfile: &PathBuf, write: &bool, verbose: &bool, render: &bool) {
         let _ = write_bytes_to_file(&get_new_filename(tasfile, "clean"), &vanilla);
         let _ = write_bytes_to_file(&get_new_filename(tasfile, "gym"), &gym);
     } else {
+        print!(">> comparing results for {tasfile:?}... ");
+        stdout().flush().unwrap();
         let vanilla_logfile = get_new_filename(tasfile, "clean");
         let compare_bytes: Vec<u8> = read_bytes_from_file(&vanilla_logfile);
         compare_with_vanilla(&tas_buttons, &compare_bytes, &verbose, &render);
+        println!(" ✅");
     }
 }
 
@@ -115,7 +119,7 @@ fn extract_values_from_labels(emu: &mut NesState) -> Vec<u8> {
 fn compare_with_vanilla(
     tas_buttons: &Vec<u8>,
     compare_bytes: &Vec<u8>,
-    verbose: &bool,
+    _verbose: &bool,
     render: &bool,
 ) {
     let mut gym;
@@ -130,8 +134,9 @@ fn compare_with_vanilla(
         ptr += COMPARE_BYTES.len();
         let values = extract_values_from_labels(&mut gym);
         if expected != values {
-            println!("Gym: {:?}", values);
-            println!("Vog: {:?}", expected);
+            eprintln!("❌");
+            eprintln!("Gym: {:?}", values);
+            eprintln!("Vog: {:?}", expected);
             panic!("Mismatch on line {}!", i + 1);
         }
 

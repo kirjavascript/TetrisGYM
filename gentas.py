@@ -1,5 +1,7 @@
 import argparse
 import logging
+import pathlib
+import sys
 
 logger = logging.getLogger(__name__)
 OFFSET=2
@@ -29,6 +31,7 @@ def get_tas_line(input_byte: int):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("frames", type=int, help="length of tas")
+    parser.add_argument("-f", "--file", type=pathlib.Path, help="output file (stdout otherwise)")
     parser.add_argument(
         "-R",
         "--right",
@@ -94,7 +97,13 @@ def main():
             #     raise RuntimeError(f"{frame} needs to be less than {OFFSET}")
             output[frame+OFFSET] |= value
 
-    print('\n'.join(get_tas_line(f) for f in output))
+
+    output = ('\n'.join(get_tas_line(f) for f in output))
+    if args.file:
+        with open(args.file, 'w+') as file:
+            print(output, file=file)
+    else:
+        print(output)
 
 
 if __name__ == "__main__":

@@ -1,6 +1,6 @@
 ﻿-- https://tasvideos.org/7625S
 -- local TASFILE = "tases/r57shell-Archanfel-Tetris-fastest999999.fm2"
-local TASFILE = "heh.fm2"
+local TASFILE = "tases/start-pattern-a.fm2"
 
 local rom = emu.getRomInfo()
 local romPath, _ = string.gsub(rom.path, rom.name, "")
