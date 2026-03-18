@@ -280,7 +280,7 @@ stageBootSprites:
         ldx #frameCounter
         jsr stageZeroPage
 
-        ldx #rng_seed+1
+        ldx #rng_seed_hi
         jsr stageZeroPage
         ldx #rng_seed
         jsr stageZeroPage

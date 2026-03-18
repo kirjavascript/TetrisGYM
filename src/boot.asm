@@ -30,6 +30,10 @@
         lda #$A
         sta paceModifier
 
+        inc hzFlag
+        inc inputDisplayFlag
+        ; inc darkModifier
+
         lda #$10
         sta dasModifier
 
