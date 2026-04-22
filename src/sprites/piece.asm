@@ -107,7 +107,7 @@ stageSpriteForCurrentPiece_actual:
         inc oamStagingLength
         dey
         lda #$FF
-        sta oamStaging,y
+        sta oamStaging-1,y
         iny
         iny
         lda #$00

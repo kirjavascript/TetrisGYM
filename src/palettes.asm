@@ -13,7 +13,7 @@ game_palette:
         .byte   $0F,$16,$2A,$22 ; sprite
         .byte   $0F,$10,$16,$2D
         .byte   $0F,$2C,$16,$29
-        .byte   $0F,$3C,$00,$30
+        .byte   $0F,$2A,$27,$16
         .byte   $FF
 title_palette:
         .byte   $3F,$00
