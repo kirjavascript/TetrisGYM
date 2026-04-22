@@ -182,6 +182,7 @@ checkLinecap: ; set linecapState
 @floorLinecapEnd:
 
 addPoints:
+        jsr trtCalculate
         inc playState
         lda practiseType
         cmp #MODE_CHECKERBOARD
@@ -211,7 +212,6 @@ addPointsRaw:
 .if NO_SCORING
         rts
 .endif
-
         lda holdDownPoints
         cmp #$02
         bmi @noPushDown

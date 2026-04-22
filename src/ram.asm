@@ -162,7 +162,10 @@ currentPpuCtrl: .res 1 ; $00FF
 stack: .res $FF ; $0100
     .res 1
 oamStaging: .res $100 ; $0200                        ; format: https://wiki.nesdev.com/w/index.php/PPU_programmer_reference#OAM
-    .res $F0
+trtLineCounter: .res $2
+trtScratch: .res $6
+trtRam: .res $8
+    .res $E0
 statsByType: .res $E ; $03F0
     .res 2
 playfield: .res $c8 ; $0400
