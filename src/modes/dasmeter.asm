@@ -1,7 +1,9 @@
 stageDasMeterSprites:
 @dasValue = generalCounter
 @tile = generalCounter2
-    lda #$CE
+@yCoordinate = 211
+@xStart = 103
+    lda #$FE
     sta @tile
     lda autorepeatX
     lsr
@@ -16,14 +18,14 @@ stageDasMeterSprites:
 @stageSprites:
     ldx oamStagingLength
     lda #0
-    ldy #103
+    ldy #@xStart
 
 @loop:
     lda @tile
     sta oamStaging+1,x
     tya
     sta oamStaging+3,x
-    lda #35
+    lda #@yCoordinate
     sta oamStaging+0,x
     lda #3
     sta oamStaging+2,x
@@ -42,13 +44,13 @@ stageDasMeterSprites:
     bcc @ret
     lda @tile
     sec
-    sbc #16
+    sbc #32
     sta oamStaging+1,x
     tya
     sta oamStaging+3,x
     lda #3
     sta oamStaging+2,x
-    lda #35
+    lda #@yCoordinate
     sta oamStaging+0,x
     inx
     inx

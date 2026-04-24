@@ -27,7 +27,6 @@ gameModeState_next: ; used to be updatePlayer2
         rts
 
 gameModeState_vblankThenRunState2:
-        jsr stageDasMeterSprites
         lda #$02
         sta gameModeState
         rts
