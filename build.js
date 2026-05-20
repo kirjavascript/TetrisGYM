@@ -97,6 +97,13 @@ if (args.includes('--')) {
 
 console.log();
 
+// build menu
+if (!args.includes('-M')) {
+    console.time('menu');
+    require('./src/gamemode/gametypemenu/menu');
+    console.timeEnd('menu');
+}
+
 // build / compress nametables
 
 console.time('nametables');
