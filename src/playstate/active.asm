@@ -1,7 +1,6 @@
 playState_playerControlsActiveTetrimino:
-        lda practiseType
-        cmp #MODE_HARDDROP
-        bne @notHard
+        lda hardDropFlag
+        beq @notHard
         jsr harddrop_tetrimino
         lda playState
         cmp #8
@@ -13,6 +12,12 @@ playState_playerControlsActiveTetrimino:
         jsr rotate_tetrimino
 
         jsr drop_tetrimino
+        lda playState
+        cmp #1
+        beq playState_playerControlsActiveTetrimino_return
+        lda noEntryDelayFlag
+        beq playState_playerControlsActiveTetrimino_return
+        jmp noEntryDelay
 
 playState_playerControlsActiveTetrimino_return:
         rts
@@ -37,10 +42,14 @@ harddrop_tetrimino:
 @sonic:
         lda #$D0
         sta autorepeatY
+@ret:
         rts
 @noSonic:
+        lda noEntryDelayFlag
+        beq @ret
 
-        ; hard drop
+noEntryDelay:
+        sta vramRow
         lda #1
         sta playState
         lda #0
