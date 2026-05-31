@@ -25,7 +25,7 @@ const darkMode = [
     ["off", "on", "neon", "lite", "teal", "og"],
     "darkModifier",
 ];
-const paletteSelection = ["TYPE_CHOICES", "palette", ["vanilla", "pride"]];
+const paletteSelection = ["TYPE_CHOICES", "palette", ["vanilla", "pride", "white",], "paletteFlag"];
 
 const crashModifier = [
     "TYPE_CHOICES",

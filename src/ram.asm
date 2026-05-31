@@ -402,6 +402,7 @@ linecapFlag: .res 1
 dasOnlyFlag: .res 1
 qualFlag: .res 1
 palFlag: .res 1
+paletteFlag: .res 1
 .if KEYBOARD = 1
 keyboardFlag: .res 1
 .endif
