@@ -403,6 +403,10 @@ dasOnlyFlag: .res 1
 qualFlag: .res 1
 palFlag: .res 1
 paletteFlag: .res 1
+seedEnabled: .res 1
+seededPieces: .res 1
+
+
 .if KEYBOARD = 1
 keyboardFlag: .res 1
 .endif

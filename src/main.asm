@@ -91,6 +91,7 @@ mainLoop:
 .include "modes/crunch.asm"
 .include "modes/qtap.asm"
 .include "modes/garbage.asm"
+.include "seeds.asm"
 
 .align $100
 ; these tables benefit from page alignment

@@ -1,5 +1,5 @@
-const seedToggle = ["TYPE_BOOL", "Seed Enabled"];
-const seedInput = ["TYPE_HEX", "seed", 6];
+const seedToggle = ["TYPE_BOOL", "Seed Enabled", "seedEnabled"];
+const seedInput = ["TYPE_HEX", "seed", 6, "set_seed_input"];
 const linecapWhen = ["TYPE_CHOICES", "linecap when", ["off", "lines", "level"]];
 const linecapHow = [
     "TYPE_CHOICES",
@@ -14,6 +14,7 @@ const scoringModifier = [
     "TYPE_CHOICES",
     "scoring",
     ["classic", "letters", "7digit", "m", "capped", "hidden"],
+    "scoringModifier",
 ];
 const paceModifier = ["TYPE_FF_OFF", "Pace", 16, "paceModifier"];
 const hzFlag = ["TYPE_BOOL", "HZ DISPLAY", "hzFlag",];
@@ -31,8 +32,9 @@ const crashModifier = [
     "TYPE_CHOICES",
     "crash",
     ["off", "show", "top", "crash"],
+    "crashModifier",
 ];
-const strictCrashFlag = ["TYPE_BOOL", "strict crash"];
+const strictCrashFlag = ["TYPE_BOOL", "strict crash", "strictFlag"];
 const disablePause = ["TYPE_BOOL", "disable pause"];
 const goofyFlag = ["TYPE_BOOL", "goofy foot"];
 const debugFlag = ["TYPE_BOOL", "block tool"];

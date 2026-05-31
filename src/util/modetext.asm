@@ -1,19 +1,5 @@
 displayModeText:
         ldx practiseType
-        cpx #MODE_SEED
-        bne @drawModeName
-        ; draw seed instead
-        lda tmp1
-        sta PPUADDR
-        lda tmp2
-        sta PPUADDR
-        lda set_seed_input
-        jsr twoDigsToPPU
-        lda set_seed_input+1
-        jsr twoDigsToPPU
-        lda set_seed_input+2
-        jsr twoDigsToPPU
-        rts
 
 @drawModeName:
         ; ldx practiseType
@@ -42,3 +28,71 @@ displayModeText:
         dey
         bne @writeChar
         rts
+
+patchSeed:
+        ; skip if not seeded
+        lda seedEnabled
+        beq @ret
+        lda seededPieces
+        beq @ret
+        sty PPUADDR
+        stx PPUADDR
+        lda gameMode
+        cmp #3
+        beq @setupGameTiles
+
+; hack
+        lda #$35
+        sta PPUDATA
+        lda set_seed_input
+        jsr twoDigsToPPU
+        lda set_seed_input+1
+        jsr twoDigsToPPU
+        lda set_seed_input+2
+        jsr twoDigsToPPU
+        lda #$36
+        jmp @nextRow
+
+@setupGameTiles:
+        lda #$3B
+        sta PPUDATA
+        lda set_seed_input
+        jsr twoDigsToPPU
+        lda set_seed_input+1
+        jsr twoDigsToPPU
+        lda set_seed_input+2
+        jsr twoDigsToPPU
+        lda #$3C
+
+@nextRow:
+        sta PPUDATA
+        sty PPUADDR
+        txa
+        clc
+        adc #$20
+        sta PPUADDR
+
+        ldx #$07
+        lda gameMode
+        cmp #3
+        beq @menuBoxLoop
+@gameBoxLoop:
+        lda bottomOfBoxGame,x
+        sta PPUDATA
+        dex
+        bpl @gameBoxLoop
+        rts
+
+
+@menuBoxLoop:
+        lda bottomOfBoxMenu,x
+        sta PPUDATA
+        dex
+        bpl @menuBoxLoop
+@ret:   rts
+
+
+bottomOfBoxMenu:
+        .byte $3F,$3E,$3E,$3E,$3E,$3E,$3E,$3D
+bottomOfBoxGame:
+        .byte $77,$37,$37,$37,$37,$37,$37,$76

@@ -17,7 +17,7 @@ practiseInitGameState:
         rts
 
 practisePrepareNext:
-        lda practiseType
+        lda paceModifier
         bmi @skipPace
         jmp prepareNextPace
 @skipPace:
@@ -61,7 +61,7 @@ practiseGameHUD:
         jsr controllerInputDisplay
 @noInput:
 
-        lda practiseType
+        lda paceModifier
         bmi @skipPace
         jsr gameHUDPace
 @skipPace:

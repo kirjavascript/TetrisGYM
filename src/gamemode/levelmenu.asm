@@ -24,6 +24,12 @@ gameMode_levelMenu:
         beq @noLinecapInfo
         jsr levelMenuLinecapInfo
 @noLinecapInfo:
+        jsr checkIfSeeded
+        ; patch if seeded
+        ldy #$20
+        ldx #$B5
+        jsr patchSeed
+
         ; render lines when loading screen
         lda #RENDER_LINES
         sta renderFlags
