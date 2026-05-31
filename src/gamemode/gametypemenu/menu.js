@@ -1,6 +1,7 @@
 const { mainMenu, extraSpriteStrings } = require("./menudata");
 const { writeFileSync } = require("fs");
 
+
 MAX_LENGTH_NAME = 14;
 MAX_LENGTH_VALUE = 8;
 DEBUG = false;

@@ -31,7 +31,10 @@
         sta paceModifier
 
         lda #$10
-        sta dasModifier
+
+        sta menuVarDas
+        lda #$06
+        sta menuVarArr
 
         lda #INITIAL_LINECAP_LEVEL
         sta linecapLevel
