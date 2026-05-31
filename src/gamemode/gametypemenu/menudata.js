@@ -15,8 +15,8 @@ const scoringModifier = [
     "scoring",
     ["classic", "letters", "7digit", "m", "capped", "hidden"],
 ];
-const paceModifier = ["TYPE_FF_OFF", "Pace", 16];
-const hzFlag = ["TYPE_BOOL", "HZ DISPLAY"];
+const paceModifier = ["TYPE_FF_OFF", "Pace", 16, "paceModifier"];
+const hzFlag = ["TYPE_BOOL", "HZ DISPLAY", "hzFlag",];
 const inputDisplayFlag = ["TYPE_BOOL", "Input Display"];
 const disableFlash = ["TYPE_BOOL", "Disable Flash"];
 const darkMode = [

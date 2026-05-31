@@ -179,9 +179,8 @@ statisticsNametablePatch:
         rts
 
 showPaceDiffText:
-        lda practiseType
-        cmp #MODE_PACE
-        bne @done
+        lda paceModifier
+        bmi @done
         jsr bulkCopyToPpu
         .addr paceDiffText
         lda #0

@@ -18,8 +18,7 @@ practiseInitGameState:
 
 practisePrepareNext:
         lda practiseType
-        cmp #MODE_PACE
-        bne @skipPace
+        bmi @skipPace
         jmp prepareNextPace
 @skipPace:
         cmp #MODE_GARBAGE
@@ -63,8 +62,7 @@ practiseGameHUD:
 @noInput:
 
         lda practiseType
-        cmp #MODE_PACE
-        bne @skipPace
+        bmi @skipPace
         jsr gameHUDPace
 @skipPace:
 
