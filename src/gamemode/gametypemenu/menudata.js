@@ -17,12 +17,13 @@ const scoringModifier = [
 ];
 const paceModifier = ["TYPE_FF_OFF", "Pace", 16, "paceModifier"];
 const hzFlag = ["TYPE_BOOL", "HZ DISPLAY", "hzFlag",];
-const inputDisplayFlag = ["TYPE_BOOL", "Input Display"];
-const disableFlash = ["TYPE_BOOL", "Disable Flash"];
+const inputDisplayFlag = ["TYPE_BOOL", "Input Display", "inputDisplayFlag",];
+const disableFlash = ["TYPE_BOOL", "Disable Flash", "disableFlashFlag"];
 const darkMode = [
     "TYPE_CHOICES",
     "dark mode",
     ["off", "on", "neon", "lite", "teal", "og"],
+    "darkModifier",
 ];
 const paletteSelection = ["TYPE_CHOICES", "palette", ["vanilla", "pride"]];
 
