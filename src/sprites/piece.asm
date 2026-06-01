@@ -2,10 +2,10 @@ stageSpriteForCurrentPiece:
         lda #$0
         sta pieceTileModifier
         jsr stageSpriteForCurrentPiece_actual
-        lda hardDropFlag
-        bne ghostPiece
-        lda ghostPieceFlag
-        bne ghostPiece
+
+        lda practiseType
+        cmp #MODE_HARDDROP
+        beq ghostPiece
         rts
 
 ghostPiece:
@@ -24,9 +24,6 @@ ghostPiece:
         sta hardDropGhostY
         ; check if equal to current position
         cmp tmp3
-        beq @noGhost
-
-        lda ghostPieceFlag
         beq @noGhost
 
         lda frameCounter

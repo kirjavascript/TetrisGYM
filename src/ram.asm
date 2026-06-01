@@ -405,9 +405,6 @@ palFlag: .res 1
 paletteFlag: .res 1
 seedEnabled: .res 1
 seededPieces: .res 1
-ghostPieceFlag: .res 1
-hardDropFlag: .res 1
-noEntryDelayFlag: .res 1
 
 
 .if KEYBOARD = 1
@@ -423,7 +420,7 @@ activePage: .res 1
 activeRow: .res 1
 activeColumn: .res 1
 menuStackPtr: .res 1
-; cursorToggle:    .res 1  ; change this to flag if you need it later
+; cursorToggle:    .res 1
 
 .include "gamemode/gametypemenu/menuram.asm"
 
