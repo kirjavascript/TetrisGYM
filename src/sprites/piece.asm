@@ -1,14 +1,14 @@
 stageSpriteForCurrentPiece:
         lda #$0
         sta pieceTileModifier
-        jsr stageSpriteForCurrentPiece_actual
         lda hardDropFlag
-        bne ghostPiece
-        lda ghostPieceFlag
-        bne ghostPiece
-        rts
+        ora ghostPieceFlag
+        beq @actual
+        jsr @ghostPiece
+@actual:
+        jmp stageSpriteForCurrentPiece_actual
 
-ghostPiece:
+@ghostPiece:
         lda playState
         cmp #3
         bpl @noGhost
@@ -35,7 +35,7 @@ ghostPiece:
         asl
         adc #$0D
         sta pieceTileModifier
-        jsr stageSpriteForCurrentPiece_actual
+        ; jsr stageSpriteForCurrentPiece_actual
         lda tmp3
         sta tetriminoY
 @noGhost:
