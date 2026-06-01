@@ -40,7 +40,8 @@ harddrop_tetrimino:
         rts
 @noSonic:
 
-        ; hard drop
+        ; lda #$20
+        sta vramRow
         lda #1
         sta playState
         lda #0

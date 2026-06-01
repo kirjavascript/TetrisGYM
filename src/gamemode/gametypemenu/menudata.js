@@ -1,4 +1,4 @@
-const seedToggle = ["TYPE_BOOL", "Seed Enabled", "seedEnabled"];
+const seedFlag = ["TYPE_BOOL", "Seed Enabled", "seedEnabled"];
 const seedInput = ["TYPE_HEX", "seed", 6, "set_seed_input"];
 const linecapWhen = ["TYPE_CHOICES", "linecap when", ["off", "lines", "level"]];
 const linecapHow = [
@@ -45,9 +45,9 @@ const qualFlag = ["TYPE_BOOL", "qual"];
 const floorModifier = ["TYPE_NUMBER", "floor", 16];
 const crunchModifier = ["TYPE_NUMBER", "crunch", 16];
 const invisibleFlag = ["TYPE_BOOL", "invisible"];
-const ghostPiece = ["TYPE_BOOL", "ghost"];
-const hardDrop = ["TYPE_BOOL", "hardDrop"];
-const instantClear = ["TYPE_BOOL", "no line clear"];
+const ghostPiece = ["TYPE_BOOL", "ghost", "ghostPieceFlag"];
+const hardDrop = ["TYPE_BOOL", "hardDrop", "hardDropFlag"];
+const instantClear = ["TYPE_BOOL", "no entry delay", "noEntryDelayFlag"];
 
 const scrolltris = ["TYPE_BOOL", "scrolltris"];
 const horizMirror = ["TYPE_BOOL", "mirror horiz"];
@@ -105,7 +105,7 @@ const displaySubMenu = {
     ],
 };
 
-const settingsSubMenu = {
+const moreSubMenu = {
     "settings[mode=default]": [
         crashModifier,
         strictCrashFlag,
@@ -120,7 +120,7 @@ const settingsSubMenu = {
 
 const tournamentSubMenu = {
     "tournament[mode=default]": [
-        seedToggle,
+        seedFlag,
         seedInput,
         linecapHow,
         linecapWhen,
@@ -133,25 +133,24 @@ const tournamentSubMenu = {
 const goToTournament = ["TYPE_SUBMENU", "tournament", tournamentSubMenu];
 const goToMods = ["TYPE_SUBMENU", "board", modsSubMenu];
 const goToCursed = ["TYPE_SUBMENU", "cursed", cursedSubmenu];
-const goToSettings = ["TYPE_SUBMENU", "settings", settingsSubMenu];
+const goToMore = ["TYPE_SUBMENU", "more", moreSubMenu];
 const goToDisplay = ["TYPE_SUBMENU", "display", displaySubMenu];
 const goToAnydas = ["TYPE_SUBMENU", "anydas", anydasSubMenu];
 
 const optionsSubmenu = {
     "options[mode=tetris]": [
-        goToTournament,
         goToMods,
         goToCursed,
-        goToSettings,
         goToDisplay,
         goToAnydas,
+        goToMore,
     ],
 };
 
 const goToOptions = ["TYPE_SUBMENU", "options", optionsSubmenu];
 
 const mainMenu = {
-    "play tetris[mode=tetris]": [goToOptions],
+    "play tetris[mode=tetris]": [goToOptions, goToTournament],
     "t-spins[mode=tspins]": [goToOptions],
     "setups[mode=presets]": [presetModifier, goToOptions],
     "b-type[mode=typeb]": [typeBModifier, goToOptions],
