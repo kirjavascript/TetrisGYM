@@ -407,6 +407,7 @@ seedEnabled: .res 1
 seededPieces: .res 1
 ghostPieceFlag: .res 1
 hardDropFlag: .res 1
+noEntryDelayFlag: .res 1
 
 
 .if KEYBOARD = 1

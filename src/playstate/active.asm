@@ -1,6 +1,7 @@
 playState_playerControlsActiveTetrimino:
-        lda hardDropFlag
-        beq @notHard
+        lda practiseType
+        cmp #MODE_HARDDROP
+        bne @notHard
         jsr harddrop_tetrimino
         lda playState
         cmp #8

@@ -47,6 +47,7 @@ const crunchModifier = ["TYPE_NUMBER", "crunch", 16];
 const invisibleFlag = ["TYPE_BOOL", "invisible"];
 const ghostPiece = ["TYPE_BOOL", "ghost", "ghostPieceFlag"];
 const hardDrop = ["TYPE_BOOL", "hardDrop", "hardDropFlag"];
+const instantClear = ["TYPE_BOOL", "no entry delay", "noEntryDelayFlag"];
 
 const scrolltris = ["TYPE_BOOL", "scrolltris"];
 const horizMirror = ["TYPE_BOOL", "mirror horiz"];
@@ -80,6 +81,7 @@ const modsSubMenu = {
         invisibleFlag,
         ghostPiece,
         hardDrop,
+        instantClear,
     ],
 };
 

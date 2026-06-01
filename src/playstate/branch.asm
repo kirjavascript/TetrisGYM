@@ -12,13 +12,7 @@ branchOnPlayStatePlayer1:
             playState_spawnNextTetrimino, \
             playState_noop, \
             playState_checkStartGameOver, \
-            playState_incrementPlayState, \
-            playState_oneFrameDelay
-
-
-playState_oneFrameDelay:
-    ; do harddrop lineclear here
-    rts
+            playState_incrementPlayState
 
 playState_unassignOrientationId:
         lda #$13
