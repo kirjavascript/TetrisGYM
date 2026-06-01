@@ -20,7 +20,7 @@ gameMode_levelMenu:
         sta tmp2
         jsr displayModeText
         jsr showHighScores
-        lda linecapFlag
+        lda linecapWhen
         beq @noLinecapInfo
         jsr levelMenuLinecapInfo
 @noLinecapInfo:
@@ -55,21 +55,21 @@ levelMenuLinecapInfo:
         sta PPUADDR
         lda #$F5
         sta PPUADDR
-        ; clc
-        ; lda #LINECAP_WHEN_STRING_OFFSET
-        ; adc linecapWhen
-        jsr stringLineCapWhen
+        clc
+        lda #LINECAP_WHEN_STRING_OFFSET
+        adc linecapWhen
+        sta stringIndexLookup
+        jsr stringBackground
 
         lda #$21
         sta PPUADDR
         lda #$15
         sta PPUADDR
-        ; clc
-        ; lda #LINECAP_HOW_STRING_OFFSET
-        ; adc linecapHow
-        ; sta stringIndexLookup
-        ; jsr stringBackground
-        jsr stringLineCapHow
+        clc
+        lda #LINECAP_HOW_STRING_OFFSET
+        adc linecapHow
+        sta stringIndexLookup
+        jsr stringBackground
 
         lda #$20
         sta PPUADDR

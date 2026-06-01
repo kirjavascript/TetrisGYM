@@ -1,13 +1,14 @@
 const seedFlag = ["TYPE_BOOL", "Seed Enabled", "seedEnabled"];
 const seedInput = ["TYPE_HEX", "seed", 6, "set_seed_input"];
-const linecapWhen = ["TYPE_CHOICES", "linecap when", ["off", "lines", "level"]];
+const linecapWhen = ["TYPE_CHOICES", "linecap", ["off", "level", "lines"], "linecapWhen"];
 const linecapHow = [
     "TYPE_CHOICES",
     "linecap how",
     ["ks*2", "floor", "inviz", "halt"],
+    "linecapHow",
 ];
-const linecapLevel = ["TYPE_NUMBER", "linecap level", 0];
-const linecapLines = ["TYPE_HEX", "linecap lines", 4];
+const linecapLevel = ["TYPE_NUMBER", "linecap level", 0, "linecapLevel"];
+const linecapLines = ["TYPE_BCD", "linecap lines", 4, "linecapLines"];
 const dasOnly = ["TYPE_BOOL", "das only"];
 
 const scoringModifier = [
@@ -106,7 +107,7 @@ const displaySubMenu = {
 };
 
 const moreSubMenu = {
-    "settings[mode=default]": [
+    "more options[mode=default]": [
         crashModifier,
         strictCrashFlag,
         disablePause,
@@ -120,10 +121,10 @@ const moreSubMenu = {
 
 const tournamentSubMenu = {
     "tournament[mode=default]": [
-        seedFlag,
         seedInput,
-        linecapHow,
+        seedFlag,
         linecapWhen,
+        linecapHow,
         linecapLevel,
         linecapLines,
         dasOnly,

@@ -38,10 +38,10 @@
 
         lda #INITIAL_LINECAP_LEVEL
         sta linecapLevel
-        lda #INITIAL_LINECAP_LINES
-        sta linecapLines
-        lda #INITIAL_LINECAP_LINES_1
+        lda #INITIAL_LINECAP_LINES_LO
         sta linecapLines+1
+        lda #INITIAL_LINECAP_LINES_HI
+        sta linecapLines
 
         jsr resetScores
 

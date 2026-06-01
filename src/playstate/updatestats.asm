@@ -131,22 +131,21 @@ checkLevelUp:
 
 checkLinecap: ; set linecapState
         ; check if enabled
-        lda linecapFlag
+        ldx linecapWhen
         beq @linecapEnd
-        ; skip check if already set
         lda linecapState
         bne @linecapEnd
-
-        lda linecapWhen
+        dex
         beq @linecapLevelCheck
 
 ;linecapLinesCheck
+@linecapLines:
 
         lda lines+1
-        cmp linecapLines+1
+        cmp linecapLines
         bcc @linecapEnd
         lda lines
-        cmp linecapLines
+        cmp linecapLines+1
         bcc @linecapEnd
         bcs @linecapApply
 
