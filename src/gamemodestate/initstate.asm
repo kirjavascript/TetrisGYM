@@ -56,9 +56,8 @@ gameModeState_initGameState:
         sta currentFloor
 @notFloor:
 
-        lda practiseType
-        cmp #MODE_INVISIBLE
-        bne @notInvisible
+        lda invisibleOptionFlag
+        beq @notInvisible
         sta invisibleFlag
 @notInvisible:
 

@@ -44,7 +44,7 @@ const qualFlag = ["TYPE_BOOL", "qual"];
 
 const floorModifier = ["TYPE_NUMBER", "floor", 16];
 const crunchModifier = ["TYPE_NUMBER", "crunch", 16];
-const invisibleFlag = ["TYPE_BOOL", "invisible"];
+const invisibleFlag = ["TYPE_BOOL", "invisible", "invisibleOptionFlag"];
 const ghostPiece = ["TYPE_BOOL", "ghost", "ghostPieceFlag"];
 const hardDrop = ["TYPE_BOOL", "hardDrop", "hardDropFlag"];
 const instantClear = ["TYPE_BOOL", "no entry delay", "noEntryDelayFlag"];
