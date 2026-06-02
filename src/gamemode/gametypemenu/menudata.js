@@ -54,7 +54,7 @@ const scrolltris = ["TYPE_BOOL", "scrolltris"];
 const horizMirror = ["TYPE_BOOL", "mirror horiz"];
 const vertMirror = ["TYPE_BOOL", "mirror vert"];
 
-const presetModifier = ["TYPE_NUMBER", "setups", 8];
+const presetModifier = ["TYPE_NUMBER", "setups", 8, "presetModifier"];
 const typeBModifier = ["TYPE_NUMBER", "type-b height", 9];
 const checkerModifier = ["TYPE_NUMBER", "checker height", 9];
 const quickTapLeftModifier = ["TYPE_NUMBER", "left cols", 20];

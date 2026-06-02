@@ -20,6 +20,7 @@ practisePrepareNext:
         bmi @skipPace
         jmp prepareNextPace
 @skipPace:
+        lda practiseType
         cmp #MODE_GARBAGE
         bne @skipGarbo
         jmp prepareNextGarbage
@@ -40,6 +41,7 @@ practiseAdvanceGame:
         rts
 
 practiseEachPiece: ; only used in this file
+        lda practiseType ; not necessary, but explicit
         cmp #MODE_TAPQTY
         bne @skipTapQuantity
         jsr prepareNextTapQuantity
