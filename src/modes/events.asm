@@ -5,13 +5,12 @@ practiseInitGameState:
         jsr initChecker
 @skipChecker:
         jsr practiseEachPiece
-        cmp #MODE_FLOOR
-        bne @skipFloor
+        lda floorModifier
+        bmi @skipFloor
         jmp advanceGameFloor
 @skipFloor:
-        lda practiseType
-        cmp #MODE_CRUNCH
-        bne @skipCrunch
+        lda crunchModifier
+        beq @skipCrunch
         jsr advanceGameCrunch
 @skipCrunch:
         rts
@@ -25,7 +24,7 @@ practisePrepareNext:
         bne @skipGarbo
         jmp prepareNextGarbage
 @skipGarbo:
-        cmp #MODE_PARITY
+        cmp #MODE_STACKING
         bne @skipParity
         jmp prepareNextParity
 @skipParity:

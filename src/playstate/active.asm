@@ -1,7 +1,6 @@
 playState_playerControlsActiveTetrimino:
-        lda practiseType
-        cmp #MODE_HARDDROP
-        bne @notHard
+        lda hardDropFlag
+        beq @notHard
         jsr harddrop_tetrimino
         lda playState
         cmp #8
@@ -283,9 +282,8 @@ drop_tetrimino:
         lda linecapState
         cmp #LINECAP_KILLX2
         beq @killX2
-        lda practiseType
-        cmp #MODE_KILLX2
-        bne @normal
+        lda killX2Flag
+        beq @normal
 @killX2:
         jsr lookupDropSpeed
         sta tmpY
@@ -411,19 +409,6 @@ shift_tetrimino:
 :
         rts
 @dasOnlyEnd:
-
-        lda practiseType
-        cmp #MODE_DAS
-        bne @normalDAS
-        lda dasModifier
-        sta dasValueDelay
-        lda palFlag
-        eor #1
-        asl
-        adc #$8
-        sta dasValuePeriod
-        jmp @shiftTetrimino
-@normalDAS:
 
         ; region stuff
         lda #$10

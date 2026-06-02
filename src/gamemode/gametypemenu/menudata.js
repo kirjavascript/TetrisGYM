@@ -9,7 +9,7 @@ const linecapHow = [
 ];
 const linecapLevel = ["TYPE_NUMBER", "linecap level", 0, "linecapLevel"];
 const linecapLines = ["TYPE_BCD", "linecap lines", 4, "linecapLines"];
-const dasOnly = ["TYPE_BOOL", "das only"];
+const dasOnly = ["TYPE_BOOL", "das only", "dasOnlyFlag"];
 
 const scoringModifier = [
     "TYPE_CHOICES",
@@ -43,12 +43,12 @@ const palFlag = ["TYPE_BOOL", "pal mode"];
 const keyboardFlag = ["TYPE_BOOL", "keyboard"];
 const qualFlag = ["TYPE_BOOL", "qual"];
 
-const floorModifier = ["TYPE_NUMBER", "floor", 16];
-const crunchModifier = ["TYPE_NUMBER", "crunch", 16];
+const floorModifier = ["TYPE_FF_OFF", "floor", 16, "floorModifier"];
+const crunchModifier = ["TYPE_NUMBER", "crunch", 16, "crunchModifier"];
 const invisibleFlag = ["TYPE_BOOL", "invisible", "invisibleOptionFlag"];
 const ghostPiece = ["TYPE_BOOL", "ghost", "ghostPieceFlag"];
 const hardDrop = ["TYPE_BOOL", "hardDrop", "hardDropFlag"];
-const instantClear = ["TYPE_BOOL", "no entry delay", "noEntryDelayFlag"];
+const killX2 = ["TYPE_BOOL", "killX2", "killX2Flag"];
 
 const scrolltris = ["TYPE_BOOL", "scrolltris"];
 const horizMirror = ["TYPE_BOOL", "mirror horiz"];
@@ -63,9 +63,9 @@ const transitionModifier = ["TYPE_NUMBER", "transition", 16];
 const marathonModifier = ["TYPE_NUMBER", "marathon", 5];
 const tapqtyModifier = ["TYPE_NUMBER", "qty height", 16];
 const tapqtyLineClear = ["TYPE_BOOL", "lineclear", 16];
-const garbageModifier = ["TYPE_NUMBER", "garbage", 5];
+const garbageModifier = ["TYPE_NUMBER", "garbage", 5, "garbageModifier"];
 const droughtModifier = ["TYPE_NUMBER", "drought", 20];
-const lowStackRowModifier = ["TYPE_NUMBER", "lowstack", 20];
+const lowStackRowModifier = ["TYPE_NUMBER", "lowstack", 20, "lowStackRowModifier"];
 
 const anydasDas = ["TYPE_NUMBER", "das", 32];
 const anydasArr = ["TYPE_NUMBER", "arr", 32];
@@ -82,7 +82,7 @@ const modsSubMenu = {
         invisibleFlag,
         ghostPiece,
         hardDrop,
-        instantClear,
+        killX2,
     ],
 };
 
@@ -139,7 +139,7 @@ const goToDisplay = ["TYPE_SUBMENU", "display", displaySubMenu];
 const goToAnydas = ["TYPE_SUBMENU", "anydas", anydasSubMenu];
 
 const optionsSubmenu = {
-    "options[mode=tetris]": [
+    "options[mode=default]": [
         goToMods,
         goToCursed,
         goToDisplay,
@@ -154,6 +154,7 @@ const mainMenu = {
     "play tetris[mode=tetris]": [goToOptions, goToTournament],
     "t-spins[mode=tspins]": [goToOptions],
     "setups[mode=presets]": [presetModifier, goToOptions],
+    "stacking[mode=stacking]": [goToOptions],
     "b-type[mode=typeb]": [typeBModifier, goToOptions],
     "(quick)tap[mode=tap]": [
         quickTapLeftModifier,
@@ -166,8 +167,8 @@ const mainMenu = {
     "drought[mode=drought]": [droughtModifier, goToOptions],
     "checkerboard[mode=checkerboard]": [checkerModifier, goToOptions],
     "garbage[mode=garbage]": [garbageModifier, goToOptions],
-    "lowstack[mode=garbage]": [lowStackRowModifier, goToOptions],
-    "tap/roll speed[mode=speed_test]": [lowStackRowModifier, goToOptions],
+    "lowstack[mode=lowstack]": [lowStackRowModifier, goToOptions],
+    "tap/roll speed[mode=speed_test]": [goToOptions],
 };
 
 const extraSpriteStrings = ["pause", "block", "clear?", "sure?!", "confetti"];

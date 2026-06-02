@@ -409,6 +409,7 @@ ghostPieceFlag: .res 1
 hardDropFlag: .res 1
 noEntryDelayFlag: .res 1
 invisibleOptionFlag: .res 1
+killX2Flag: .res 1
 
 
 .if KEYBOARD = 1

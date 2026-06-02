@@ -153,9 +153,7 @@ stageSpriteForNextPiece:
         jmp loadSpriteIntoOamStaging
 
 @maybeDisplayNextPiece:
-        lda practiseType
-        cmp #MODE_HARDDROP
-        beq @displayNextPiece
-        lda debugFlag
+        lda hardDropFlag
+        ora debugFlag
         bne @displayNextPiece
         rts

@@ -22,7 +22,7 @@ displayModeText:
 
         ldy #6
 @writeChar:
-        lda modeText, x
+        lda modeText-6, x
         sta PPUDATA
         inx
         dey

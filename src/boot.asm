@@ -27,14 +27,18 @@
         bne @loop
 
         ; default pace to A
-        lda #$A
+        lda #$FF
         sta paceModifier
+        sta floorModifier
 
         lda #$10
 
         sta menuVarDas
         lda #$06
         sta menuVarArr
+
+        lda #MODE_TETRIS
+        sta practiseType
 
         lda #INITIAL_LINECAP_LEVEL
         sta linecapLevel

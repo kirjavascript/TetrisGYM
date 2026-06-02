@@ -21,8 +21,6 @@ MENU_STRIPE_WIDTH = 20
 MENU_ROWS = 9
 MENU_STACK = $DF ; $01C8 - $01DF intended range
 
-MODE_DEFAULT = 0 ; needs to be auto generated
-
 menuDataStart:
 .include "menudata.asm"
 .out .sprintf("Menu data: %d", *-menuDataStart)
@@ -115,6 +113,12 @@ gameTypeLoop:
     jsr stageBackgroundTiles
     jsr stageCurrentValues
 gameTypeLoopWait:
+    ldx activePage
+    lda pageTypes,x
+    and #$1F
+    beq @wait
+    sta practiseType
+@wait:
     jsr updateAudioWaitForNmiAndResetOamStaging
     jmp gameTypeLoop
 

@@ -49,9 +49,8 @@ gameModeState_initGameState:
         sta crashState
 
 ; initialize currentFloor if necessary
-        lda practiseType
-        cmp #MODE_FLOOR
-        bne @notFloor
+        lda floorModifier
+        bmi @notFloor
         lda floorModifier
         sta currentFloor
 @notFloor:

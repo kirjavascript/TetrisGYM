@@ -37,8 +37,8 @@ playState_checkForCompletedRows:
         beq @rowNotComplete
 
         ; lda practiseType ; accumulator is still practiseType
-        cmp #MODE_FLOOR
-        beq @floorCheck
+        lda floorModifier
+        bpl @floorCheck
         lda linecapState
         cmp #LINECAP_FLOOR
         beq @fullRowBurningCheck
@@ -141,9 +141,8 @@ playState_checkForCompletedRows:
 @tapQtyEnd:
 
         ; update top row for crunch
-        lda practiseType
-        cmp #MODE_CRUNCH
-        bne @crunchEnd
+        lda crunchModifier
+        beq @crunchEnd
         jsr advanceSides ; clobbers generalCounter3 and generalCounter4
 @crunchEnd:
 
