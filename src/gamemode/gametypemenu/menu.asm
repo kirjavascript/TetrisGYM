@@ -113,12 +113,6 @@ gameTypeLoop:
     jsr stageBackgroundTiles
     jsr stageCurrentValues
 gameTypeLoopWait:
-    ldx activePage
-    lda pageTypes,x
-    and #$1F
-    beq @wait
-    sta practiseType
-@wait:
     jsr updateAudioWaitForNmiAndResetOamStaging
     jmp gameTypeLoop
 
@@ -171,8 +165,11 @@ enterPage:
 
     lda pageTypes,x
     and #VALUE_MASK
-    sta unpackedPageValue ; always 0 for now
+    sta unpackedPageValue
+    beq @noStorePractiseType
+    sta practiseType
 
+@noStorePractiseType:
     lda pageTypes,x
     and #TYPE_MASK
     sta unpackedPageType

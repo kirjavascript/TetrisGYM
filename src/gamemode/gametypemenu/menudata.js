@@ -36,12 +36,12 @@ const crashModifier = [
     "crashModifier",
 ];
 const strictCrashFlag = ["TYPE_BOOL", "strict crash", "strictFlag"];
-const disablePause = ["TYPE_BOOL", "disable pause"];
-const goofyFlag = ["TYPE_BOOL", "goofy foot"];
-const debugFlag = ["TYPE_BOOL", "block tool"];
-const palFlag = ["TYPE_BOOL", "pal mode"];
+const disablePause = ["TYPE_BOOL", "disable pause", "disablePauseFlag"];
+const goofyFlag = ["TYPE_BOOL", "goofy foot", "goofyFlag"];
+const debugFlag = ["TYPE_BOOL", "block tool", "debugFlag"];
+const palFlag = ["TYPE_BOOL", "pal mode", "palFlag"];
 const keyboardFlag = ["TYPE_BOOL", "keyboard"];
-const qualFlag = ["TYPE_BOOL", "qual"];
+const qualFlag = ["TYPE_BOOL", "qual", "qualFlag"];
 
 const floorModifier = ["TYPE_FF_OFF", "floor", 16, "floorModifier"];
 const crunchModifier = ["TYPE_NUMBER", "crunch", 16, "crunchModifier"];
@@ -55,16 +55,15 @@ const horizMirror = ["TYPE_BOOL", "mirror horiz"];
 const vertMirror = ["TYPE_BOOL", "mirror vert"];
 
 const presetModifier = ["TYPE_NUMBER", "setups", 8, "presetModifier"];
-const typeBModifier = ["TYPE_NUMBER", "type-b height", 9];
-const checkerModifier = ["TYPE_NUMBER", "checker height", 9];
+const typeBModifier = ["TYPE_NUMBER", "type-b height", 9, "typeBModifier"];
+const checkerModifier = ["TYPE_NUMBER", "checker height", 9, "checkerModifier"];
 const quickTapLeftModifier = ["TYPE_NUMBER", "left cols", 20];
 const quickTapRightModifier = ["TYPE_NUMBER", "right cols", 20];
-const transitionModifier = ["TYPE_NUMBER", "transition", 16];
-const marathonModifier = ["TYPE_NUMBER", "marathon", 5];
-const tapqtyModifier = ["TYPE_NUMBER", "qty height", 16];
-const tapqtyLineClear = ["TYPE_BOOL", "lineclear", 16];
+const transitionModifier = ["TYPE_NUMBER", "transition", 16, "transitionModifier"];
+const marathonModifier = ["TYPE_NUMBER", "marathon", 5, "marathonModifier"];
+const tapqtyModifier = ["TYPE_NUMBER", "qty height", 16, "tapqtyModifier"];
 const garbageModifier = ["TYPE_NUMBER", "garbage", 5, "garbageModifier"];
-const droughtModifier = ["TYPE_NUMBER", "drought", 20];
+const droughtModifier = ["TYPE_NUMBER", "drought", 20, "droughtModifier"];
 const lowStackRowModifier = ["TYPE_NUMBER", "lowstack", 20, "lowStackRowModifier"];
 
 const anydasDas = ["TYPE_NUMBER", "das", 32];
@@ -154,20 +153,20 @@ const mainMenu = {
     "play tetris[mode=tetris]": [goToOptions, goToTournament],
     "t-spins[mode=tspins]": [goToOptions],
     "setups[mode=presets]": [presetModifier, goToOptions],
-    "stacking[mode=stacking]": [goToOptions],
+    "stacking[mode=stacking]": [goToOptions, goToTournament],
     "b-type[mode=typeb]": [typeBModifier, goToOptions],
     "(quick)tap[mode=tap]": [
         quickTapLeftModifier,
         quickTapRightModifier,
         goToOptions,
     ],
-    "tap quantity[mode=tapqty]": [tapqtyModifier, tapqtyLineClear, goToOptions],
-    "transition[mode=transition]": [transitionModifier, goToOptions],
-    "marathon[mode=marathon]": [marathonModifier, goToOptions],
-    "drought[mode=drought]": [droughtModifier, goToOptions],
-    "checkerboard[mode=checkerboard]": [checkerModifier, goToOptions],
-    "garbage[mode=garbage]": [garbageModifier, goToOptions],
-    "lowstack[mode=lowstack]": [lowStackRowModifier, goToOptions],
+    "tap quantity[mode=tapqty]": [tapqtyModifier, goToOptions],
+    "transition[mode=transition]": [transitionModifier, goToOptions, goToTournament],
+    "marathon[mode=marathon]": [marathonModifier, goToOptions, goToTournament],
+    "drought[mode=drought]": [droughtModifier, goToOptions, goToTournament],
+    "checkerboard[mode=checkerboard]": [checkerModifier, goToOptions, goToTournament],
+    "garbage[mode=garbage]": [garbageModifier, goToOptions, goToTournament],
+    "lowstack[mode=lowstack]": [lowStackRowModifier, goToOptions, goToTournament],
     "tap/roll speed[mode=speed_test]": [goToOptions],
 };
 

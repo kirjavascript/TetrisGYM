@@ -26,7 +26,6 @@
         ; cpx #0 ; dex sets z flag
         bne @loop
 
-        ; default pace to A
         lda #$FF
         sta paceModifier
         sta floorModifier
