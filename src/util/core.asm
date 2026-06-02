@@ -61,9 +61,12 @@ updateAudioWaitForNmiAndResetOamStaging:
         lda #$00
         sta verticalBlankingInterval
         nop
-@checkForNmi:
+
+checkForNmi:
         lda verticalBlankingInterval
-        beq @checkForNmi
+; label used for crash code to determine if nmi happened here or at the previous instruction
+nmiLoopMidpoint:
+        beq checkForNmi
 
 .if KEYBOARD = 1
 ; Read Family BASIC Keyboard
