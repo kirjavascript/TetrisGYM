@@ -6,8 +6,7 @@ gameModeState_checkForResetKeyCombo:
         inc gameModeState
         cmp #BUTTON_LEFT+BUTTON_DOWN+BUTTON_RIGHT
         bne @continue
-        lda #1
-        sta mainLoopWait
+        jsr updateAudioWaitForNmiAndResetOamStaging
 @continue:
         rts
 

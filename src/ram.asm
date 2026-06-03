@@ -26,7 +26,7 @@ startParity: .res 1 ; $0021 for crash
 lagState: .res 1 ; $0022 for lagged lines & score
     .res $F
 
-mainLoopWait: .res 1 ; $0032
+    .res 1 ; $0032
 verticalBlankingInterval: .res 1 ; $0033
 set_seed: .res 3 ; $0034 ; rng_seed, rng_seed+1, spawnCount
 set_seed_input: .res 3 ; $0037 ; copied to set_seed during gameModeState_initGameState
