@@ -7,7 +7,7 @@ practiseInitGameState:
         jsr practiseEachPiece
         lda floorModifier
         bmi @skipFloor
-        jmp advanceGameFloor
+        jsr advanceGameFloor
 @skipFloor:
         lda crunchModifier
         beq @skipCrunch
@@ -18,16 +18,16 @@ practiseInitGameState:
 practisePrepareNext:
         lda paceModifier
         bmi @skipPace
-        jmp prepareNextPace
+        jsr prepareNextPace
 @skipPace:
         lda practiseType
         cmp #MODE_GARBAGE
         bne @skipGarbo
-        jmp prepareNextGarbage
+        jsr prepareNextGarbage
 @skipGarbo:
         cmp #MODE_STACKING
         bne @skipParity
-        jmp prepareNextParity
+        jsr prepareNextParity
 @skipParity:
         jsr practiseEachPiece
         rts

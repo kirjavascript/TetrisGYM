@@ -1,16 +1,13 @@
 advanceGameTap:
+        @leftSide = $BF
+        @rightSide = $C6
+        @secondLoop = generalCounter
         jsr clearPlayfield
-        ldx tapModifier
-        ; cpx #0 ; ldx sets z flag
-        beq @skip ; skip if zero
-        ldy #$BF ; left side
-        cpx #$11
-        bmi @loop
-        ldy #$C6 ; right side
-        txa
-        sbc #$10
-        tax
-
+        lda #$00
+        sta @secondLoop
+        ldx tapLeftModifier
+        beq @checkRight
+        ldy #@leftSide
 @loop:
         lda #$7B
         sta $400, y
@@ -21,5 +18,13 @@ advanceGameTap:
         tay
         dex
         bne @loop
-@skip:
+        lda @secondLoop
+        bne @ret
+@checkRight:
+        inc @secondLoop
+        ldx tapRightModifier
+        beq @ret
+        ldy #@rightSide
+        bne @loop
+@ret:
         rts
