@@ -50,7 +50,6 @@ const ghostPiece = ["TYPE_BOOL", "ghost", "ghostPieceFlag"];
 const hardDrop = ["TYPE_BOOL", "hardDrop", "hardDropFlag"];
 const killX2 = ["TYPE_BOOL", "killX2", "killX2Flag"];
 
-const scrolltris = ["TYPE_BOOL", "scrolltris"];
 const horizMirror = ["TYPE_BOOL", "mirror horiz", "mirrorHorizFlag"];
 const vertMirror = ["TYPE_BOOL", "mirror vert", "mirrorVertFlag"];
 
@@ -82,12 +81,11 @@ const modsSubMenu = {
         ghostPiece,
         hardDrop,
         killX2,
+        horizMirror,
+        vertMirror,
     ],
 };
 
-const cursedSubmenu = {
-    "modifiers[mode=default]": [scrolltris, horizMirror, vertMirror],
-};
 
 const anydasSubMenu = {
     "anydas[mode=default]": [anydasDas, anydasArr, anydasEntryDelay],
@@ -132,7 +130,6 @@ const tournamentSubMenu = {
 
 const goToTournament = ["TYPE_SUBMENU", "tournament", tournamentSubMenu];
 const goToMods = ["TYPE_SUBMENU", "board", modsSubMenu];
-const goToCursed = ["TYPE_SUBMENU", "cursed", cursedSubmenu];
 const goToMore = ["TYPE_SUBMENU", "more", moreSubMenu];
 const goToDisplay = ["TYPE_SUBMENU", "display", displaySubMenu];
 const goToAnydas = ["TYPE_SUBMENU", "anydas", anydasSubMenu];
@@ -140,7 +137,6 @@ const goToAnydas = ["TYPE_SUBMENU", "anydas", anydasSubMenu];
 const optionsSubmenu = {
     "options[mode=default]": [
         goToMods,
-        goToCursed,
         goToDisplay,
         goToAnydas,
         goToMore,
