@@ -51,8 +51,8 @@ const hardDrop = ["TYPE_BOOL", "hardDrop", "hardDropFlag"];
 const killX2 = ["TYPE_BOOL", "killX2", "killX2Flag"];
 
 const scrolltris = ["TYPE_BOOL", "scrolltris"];
-const horizMirror = ["TYPE_BOOL", "mirror horiz"];
-const vertMirror = ["TYPE_BOOL", "mirror vert"];
+const horizMirror = ["TYPE_BOOL", "mirror horiz", "mirrorHorizFlag"];
+const vertMirror = ["TYPE_BOOL", "mirror vert", "mirrorVertFlag"];
 
 const presetModifier = ["TYPE_NUMBER", "setups", 8, "presetModifier"];
 const typeBModifier = ["TYPE_NUMBER", "type-b height", 9, "typeBModifier"];

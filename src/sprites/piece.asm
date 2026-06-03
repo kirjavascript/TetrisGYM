@@ -63,7 +63,9 @@ stageSpriteForCurrentPiece_actual:
 @currentTile = generalCounter5
         lda tetriminoX
         cmp #TETRIMINO_X_HIDE
-        beq stageSpriteForCurrentPiece_return
+        bne @notHidden
+        rts
+@notHidden:
         asl a
         asl a
         asl a
@@ -93,8 +95,15 @@ stageSpriteForCurrentPiece_actual:
         asl a
         clc
         adc generalCounter4
-        sta oamStaging,y
         sta originalY
+        sta oamStaging,y
+        lda mirrorVertFlag
+        beq @notMirrorVert
+        lda #$F6
+        sec
+        sbc originalY
+        sta oamStaging,y
+@notMirrorVert:
         inc oamStagingLength
         iny
         jsr tileModifierForCurrentPiece ; used to just load from orientationTable
@@ -126,6 +135,12 @@ stageSpriteForCurrentPiece_actual:
         asl a
         clc
         adc generalCounter3
+        sta oamStaging,y
+        lda mirrorHorizFlag
+        beq @finishLoop
+        lda #$08
+        sec
+        sbc oamStaging,y
         sta oamStaging,y
 @finishLoop:
         inc oamStagingLength

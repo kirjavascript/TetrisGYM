@@ -413,6 +413,8 @@ invisibleOptionFlag: .res 1
 killX2Flag: .res 1
 tapLeftModifier: .res 1
 tapRightModifier: .res 1
+mirrorHorizFlag: .res 1
+mirrorVertFlag: .res 1
 
 
 .if KEYBOARD = 1
