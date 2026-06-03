@@ -84,18 +84,46 @@ stringLookup:
         .byte stringFromBelowO-stringLookup
         .byte stringInvizO-stringLookup
         .byte stringHaltO-stringLookup
+        .byte stringPauseO-stringLookup
+        .byte stringBlockO-stringLookup
+        .byte stringClearO-stringLookup
+        .byte stringSureO-stringLookup
+        .byte stringConfettiO-stringLookup
 stringLevelO:
-        .byte $5,'L','E','V','E','L'
+        .byte $5,"LEVEL"
 stringLinesO:
-        .byte $5,'L','I','N','E','S'
+        .byte $5,"LINES"
 stringKSX2O:
-        .byte $4,'K','S',$69,'2'
+        .byte $4,"KS",$69,"2"
 stringFromBelowO:
-        .byte $5,'F','L','O','O','R'
+        .byte $5,"FLOOR"
 stringInvizO:
-        .byte $5,'I','N','V','I','Z'
+        .byte $5,"INVIZ"
 stringHaltO:
-        .byte $4,'H','A','L','T'
+        .byte $4,"HALT"
+stringPauseO:
+        .byte $5, "PAUSE"
+stringBlockO:
+        .byte $5, "BLOCK"
+stringClearO:
+    .byte $06,"CLEAR?"
+stringSureO:
+    .byte $06,"SURE?!"
+stringConfettiO:
+    .byte $08,"CONFETTI"
+.enum
+STRING_LEVEL_O
+STRING_LINES_O
+STRING_KSX2_O
+STRING_FLOOR_O
+STRING_INVIZ_O
+STRING_HALT_O
+STRING_PAUSE_O
+STRING_BLOCK_O
+STRING_CLEAR_O
+STRING_SURE_O
+STRING_CONFETTI_O
+.endenum
 ; stringBackgroundNotGood:
 ;         tax
 ;         lda choiceSetTable,x
