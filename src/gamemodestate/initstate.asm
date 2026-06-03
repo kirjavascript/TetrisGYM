@@ -153,7 +153,6 @@ gameModeState_initGameState:
         lda musicSelectionTable,x
         jsr setMusicTrack
         inc gameModeState ; 2
-        lda #4 ; acc should not be equal
 
 initGameState_return:
         rts
