@@ -17,7 +17,6 @@ gameModeState_handlePause:
         jsr pause
 
 @ret:   inc gameModeState ; 8
-        lda #$0 ; acc must not be equal
         rts
 
 pause:

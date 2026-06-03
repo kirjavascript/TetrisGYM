@@ -27,8 +27,8 @@ initRam:
 
 mainLoop:
         jsr branchOnGameMode
-        cmp gameModeState
-        bne @continue
+        lda mainLoopWait
+        beq @continue
         jsr updateAudioWaitForNmiAndResetOamStaging
 @continue:
         jmp mainLoop
