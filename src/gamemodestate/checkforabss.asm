@@ -4,7 +4,11 @@ gameModeState_checkForResetKeyCombo:
         cmp #BUTTON_A+BUTTON_B+BUTTON_START+BUTTON_SELECT
         beq @reset
         inc gameModeState
-        ; acc has to be heldButtons_player1 here
+        cmp #BUTTON_LEFT+BUTTON_DOWN+BUTTON_RIGHT
+        bne @continue
+        lda #1
+        sta mainLoopWait
+@continue:
         rts
 
 @reset: jsr updateAudio2

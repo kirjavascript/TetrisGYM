@@ -3,8 +3,6 @@ gameModeState_updateCountersAndNonPlayerState:
         lda #$00
         sta oamStagingLength
         inc fallTimer
-        ; next code makes acc behave as normal
-        ; (dont edit unless you know what you're doing)
         lda newlyPressedButtons_player1
         and #BUTTON_SELECT
         beq @ret

@@ -10,6 +10,8 @@
 ; vblankThenRunState2              gms: 2 acc eq (set to $2)
 
 branchOnGameModeState:
+        lda #0
+        sta mainLoopWait
         branchTo gameModeState, \
             gameModeState_initGameBackground, \
             gameModeState_initGameState, \
@@ -23,12 +25,13 @@ branchOnGameModeState:
 
 gameModeState_next: ; used to be updatePlayer2
         inc gameModeState
-        lda #$1 ; acc should not be equal
         rts
 
 gameModeState_vblankThenRunState2:
         lda #$02
         sta gameModeState
+        lda #$1
+        sta mainLoopWait
         rts
 
 .include "initbackground.asm"
