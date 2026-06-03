@@ -46,5 +46,4 @@ gameModeState_handleGameOver:
         rts
 
 @ret:   inc gameModeState ; 4
-        lda #$1 ; acc should not be equal (always $1 in original game)
         rts

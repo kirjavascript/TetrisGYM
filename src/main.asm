@@ -27,10 +27,6 @@ initRam:
 
 mainLoop:
         jsr branchOnGameMode
-        cmp gameModeState
-        bne @continue
-        jsr updateAudioWaitForNmiAndResetOamStaging
-@continue:
         jmp mainLoop
 
 .include "nmi/nmi.asm"
