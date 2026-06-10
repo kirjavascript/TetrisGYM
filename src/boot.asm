@@ -32,9 +32,9 @@
 
         lda #$10
 
-        sta menuVarDas
+        sta dasModifier
         lda #$06
-        sta menuVarArr
+        sta arrModifier
 
         lda #MODE_TETRIS
         sta practiseType
