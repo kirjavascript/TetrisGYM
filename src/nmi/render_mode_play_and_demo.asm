@@ -321,6 +321,13 @@ updatePaletteForLevel:
 @copyPalettes:
         and #$3F
         tax
+        ldy prideFlag
+        beq @checkPal
+        cpx #$0A        ; only modify 0-9
+        bcs @checkPal
+        adc #$41        ; clc unnecessary, carry already clear
+        tax
+@checkPal:
         lda palFlag
         beq @renderPalettes
         cpx #$35 ; Level 181 & 245 and'd with $3F (level 53 & 117 are properly mod10'd)
@@ -375,6 +382,10 @@ colorTable0:
         .byte   $06,$4C,$BD,$19
         .byte   $00,$01,$03,$05
         .byte   $21 ; level 181/245 pal (different from NTSC)
+; pride colors
+        .byte   $30,$30,$25,$30
+        .byte   $30,$30,$30,$30
+        .byte   $30,$30
 
 colorTable1:
         .byte   $21,$29,$24,$2A
@@ -394,6 +405,10 @@ colorTable1:
         .byte   $38,$2A,$4E,$60
         .byte   $00,$01,$04,$05
         .byte   $2b ; level 181/245 pal (same as NTSC)
+; pride colors
+        .byte   $00,$00,$11,$00
+        .byte   $28,$21,$27,$00
+        .byte   $25,$27
 
 colorTable2:
         .byte   $12,$1A,$14,$12
@@ -413,6 +428,10 @@ colorTable2:
         .byte   $E9,$99,$99,$00
         .byte   $01,$02,$04,$05
         .byte   $25 ; level 181/245 pal (same as NTSC)
+; pride colors
+        .byte   $21,$1a,$14,$25
+        .byte   $14,$2b,$11,$14
+        .byte   $21,$15
 
 incrementPieceStat:
         tax
