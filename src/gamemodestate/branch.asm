@@ -19,9 +19,7 @@ gameModeState_next: ; used to be updatePlayer2
 gameModeState_vblankThenRunState2:
         lda #$02
         sta gameModeState
-        lda #$1
-        sta mainLoopWait
-        rts
+        jmp updateAudioWaitForNmiAndResetOamStaging
 
 .include "initbackground.asm"
 .include "initstate.asm"
