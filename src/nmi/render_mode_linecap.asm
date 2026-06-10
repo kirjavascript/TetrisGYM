@@ -25,9 +25,9 @@ render_linecap_level_lines:
         jmp render_mode_static
 
 @linecapLines:
-        lda linecapLines+1
-        sta PPUDATA
         lda linecapLines
+        sta PPUDATA
+        lda linecapLines+1
         jsr twoDigsToPPU
 @ret:
         rts

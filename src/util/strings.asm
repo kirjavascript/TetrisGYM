@@ -78,8 +78,8 @@ stringSpriteLoop:
         rts
 
 stringLookup:
-        .byte stringLinesO-stringLookup
         .byte stringLevelO-stringLookup
+        .byte stringLinesO-stringLookup
         .byte stringKSX2O-stringLookup
         .byte stringFromBelowO-stringLookup
         .byte stringInvizO-stringLookup
