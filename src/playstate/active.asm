@@ -18,7 +18,7 @@ playState_playerControlsActiveTetrimino_return:
 
 harddrop_tetrimino:
         lda newlyPressedButtons
-        and #BUTTON_UP+BUTTON_SELECT
+        and #BUTTON_DOWN+BUTTON_SELECT
         beq playState_playerControlsActiveTetrimino_return
         lda tetriminoY
         sta tmpY
@@ -39,7 +39,7 @@ harddrop_tetrimino:
         rts
 @noSonic:
 
-        ; lda #$20
+        lda #$20
         sta vramRow
         lda #1
         sta playState

@@ -36,9 +36,9 @@ ghostPiece:
         adc #$0D
         sta pieceTileModifier
         jsr stageSpriteForCurrentPiece_actual
+@noGhost:
         lda tmp3
         sta tetriminoY
-@noGhost:
         rts
 
 tileModifierForCurrentPiece:
