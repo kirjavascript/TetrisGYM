@@ -1,20 +1,40 @@
 displayModeText:
-        ldx practiseType
 
-@drawModeName:
-        ; ldx practiseType
-        lda #0
-@loopAddr:
-        cpx #0
-        beq @addr
+        lda #$00
+        sta anydasFlag
+; set anydasFlag
+        lda entryDelayModifier
+        bne @anydas
+        lda palFlag
+        bne @pal
+        ldx #NTSC_DAS
+        ldy #NTSC_ARR
+        bne @testAnydas
+@pal:
+        ldx #PAL_DAS
+        ldy #PAL_ARR
+@testAnydas:
+        cpx dasModifier
+        bne @anydas
+
+        cpy arrModifier
+        bne @anydas
+        beq @notanydas
+@anydas:
+        inc anydasFlag
+@notanydas:
+        ldx #MODE_ANYDAS*6
+        lda anydasFlag
+        bne @drawMode
+        ; practiseType * 6
+        lda practiseType
+        asl
+        sta generalCounter
+        asl
         clc
-        adc #6
-        dex
-        jmp @loopAddr
-@addr:
-        ; offset in X
+        adc generalCounter
         tax
-
+@drawMode:
         lda tmp1
         sta PPUADDR
         lda tmp2

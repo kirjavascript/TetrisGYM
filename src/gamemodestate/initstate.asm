@@ -1,8 +1,10 @@
 gameModeState_initGameState:
-        lda #$EF
-        ldx #$04
-        ldy #$04
-        jsr memset_page
+        lda #EMPTY_TILE
+        ldx #$00
+@clearPlayfield:
+        sta playfield,x
+        inx
+        bne @clearPlayfield
         ldx #$0F
         lda #$00
 ; statsByType

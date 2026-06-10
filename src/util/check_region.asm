@@ -40,5 +40,9 @@ checkRegion:
         beq @ntsc
         lda #1
         sta palFlag
+        lda #PAL_DAS
+        sta dasModifier
+        lda #PAL_ARR
+        sta arrModifier
 @ntsc:
         rts

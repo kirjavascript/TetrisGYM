@@ -30,9 +30,9 @@
         sta paceModifier
         sta floorModifier
 
-        lda #$10
+        lda #NTSC_DAS
         sta dasModifier
-        lda #$06
+        lda #NTSC_ARR
         sta arrModifier
 
         lda #MODE_TETRIS

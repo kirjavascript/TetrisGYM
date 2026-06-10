@@ -417,6 +417,7 @@ mirrorHorizFlag: .res 1
 mirrorVertFlag: .res 1
 arrModifier: .res 1
 entryDelayModifier: .res 1
+anydasFlag: .res 1
 
 
 .if KEYBOARD = 1

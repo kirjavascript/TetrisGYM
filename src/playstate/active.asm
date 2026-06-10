@@ -419,9 +419,9 @@ shift_tetrimino:
         ldy palFlag
         ; cpy #0 ; ldy sets z flag
         beq @shiftTetrimino
-        lda #$0C
+        lda #PAL_DAS
         sta dasValueDelay
-        lda #$08
+        lda #PAL_DAS - PAL_ARR
         sta dasValuePeriod
 @shiftTetrimino:
 

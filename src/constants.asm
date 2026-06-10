@@ -84,7 +84,7 @@ MODE_CHECKERBOARD
 MODE_GARBAGE
 MODE_LOWSTACK
 MODE_SPEED_TEST
-MODE_GAME_QUANTITY
+MODE_ANYDAS
 .endenum
 
 ; .endum
@@ -150,6 +150,11 @@ MENU_SPRITE_Y_BASE := $46
 MENU_MAX_Y_SCROLL := $A0
 MENU_TOP_MARGIN_SCROLL := 7 ; in blocks
 
+NTSC_DAS = 16
+NTSC_ARR = 6
+
+PAL_DAS = 12
+PAL_ARR = 4
 
 .macro MODENAMES
     .byte   "TETRIS"
@@ -165,4 +170,6 @@ MENU_TOP_MARGIN_SCROLL := 7 ; in blocks
     .byte   "CKRBRD"
     .byte   "GARBGE"
     .byte   "LOWSTK"
+    .byte   "KILLX2"
+    .byte   "ANYDAS"
 .endmacro
