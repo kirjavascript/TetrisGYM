@@ -89,11 +89,6 @@ if (args.includes('-o')) {
     console.log('cnrom override for autodetect');
 }
 
-if (args.includes('-A')) {
-    compileFlags.push('-D', 'ANYDAS=1');
-    console.log('anydas enabled');
-}
-
 // pass additional arguments to ca65
 if (args.includes('--')) {
     const ca65Flags = args.slice(1+args.indexOf('--'));

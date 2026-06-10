@@ -391,7 +391,6 @@ framesPerDropTablePAL:
         .byte   $02,$02,$02,$01,$01,$01,$01,$01
         .byte   $01,$01,$01,$01,$01,$01
 shift_tetrimino:
-.if ANYDAS <> 1
         ; dasOnlyFlag
         lda dasOnlyShiftDisabled
         beq @dasOnlyEnd
@@ -412,9 +411,10 @@ shift_tetrimino:
 @dasOnlyEnd:
 
         ; region stuff
-        lda #$10
+        lda dasModifier
         sta dasValueDelay
-        lda #$A
+        sec
+        sbc arrModifier
         sta dasValuePeriod
         ldy palFlag
         ; cpy #0 ; ldy sets z flag
@@ -424,7 +424,6 @@ shift_tetrimino:
         lda #$08
         sta dasValuePeriod
 @shiftTetrimino:
-.endif
 
         lda tetriminoX
         sta originalY
@@ -437,31 +436,21 @@ shift_tetrimino:
         lda heldButtons
         and #$03
         beq @ret
-.if ANYDAS = 1
-        dec autorepeatX
-        lda autorepeatX
-        cmp #$01
-        bpl @ret
-@zeroDas:
-        lda anydasARRValue
-        sta autorepeatX
-        beq @zeroArr
-        bne @buttonHeldDown
-@resetAutorepeatX:
-        lda anydasDASValue
-        beq @zeroDas
-.else
         inc autorepeatX
         lda autorepeatX
         cmp dasValueDelay
         bmi @ret
+@zeroDas:
         lda dasValuePeriod
+        cmp dasValueDelay
+        beq @zeroArr
         sta autorepeatX
         jmp @buttonHeldDown
 
 @resetAutorepeatX:
+        lda dasValueDelay
+        beq @zeroDas
         lda #$00
-.endif
         sta autorepeatX
 @buttonHeldDown:
         lda heldButtons
@@ -488,15 +477,10 @@ shift_tetrimino:
 @restoreX:
         lda originalY
         sta tetriminoX
-.if ANYDAS = 1
-        lda #$01
-.else
         lda dasValueDelay
-.endif
         sta autorepeatX
 @ret:   rts
 
-.if ANYDAS = 1
 @zeroArr:
         lda heldButtons
         and #BUTTON_RIGHT
@@ -524,8 +508,7 @@ shift_tetrimino:
         dec tetriminoX
 @shiftBackToRight:
         inc tetriminoX
-        lda #$01
+        lda dasValueDelay
         sta autorepeatX
 @leftNotPressed:
         rts
-.endif

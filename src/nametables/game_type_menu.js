@@ -7,8 +7,6 @@ const {
     flatLookup,
 } = require('./nametables');
 
-const anydas = !!process.env['GYM_FLAGS']?.match(/-D ANYDAS=1/);
-
 const lookup = flatLookup(`
 0123456789ABCDEF
 GHIJKLMNOPQRSTUV

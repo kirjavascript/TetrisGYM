@@ -80,7 +80,6 @@ hzTap:
         lda #0
         sta hzDebounceCounter
 
-.if ANYDAS <> 1
         lda dasOnlyFlag
         beq :+
         lda #0
@@ -105,7 +104,6 @@ hzTap:
         lda #1
         sta dasOnlyShiftDisabled
 :
-.endif
 
         ; ignore 1 tap
         lda hzTapCounter

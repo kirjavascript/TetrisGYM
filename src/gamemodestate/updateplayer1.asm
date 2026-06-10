@@ -10,13 +10,12 @@ gameModeState_updatePlayer1:
         jsr checkDebugGameplay
         jsr practiseAdvanceGame
         jsr practiseGameHUD
-.if ANYDAS = 1
 ; do nothing while piece is active (playstate = 1)
         ldx playState
         dex
         beq @branchOnPlaystate
 ; do nothing if not kitaru charge
-        lda anydasARECharge
+        lda entryDelayModifier
         cmp #2
         bne @branchOnPlaystate
 ; do nothing when down is held
@@ -37,11 +36,10 @@ gameModeState_updatePlayer1:
         dec autorepeatX ; will clear zero flag
         bne @branchOnPlaystate
 @resetDas:
-        lda anydasDASValue
+        lda 0
         sta autorepeatX
 @branchOnPlaystate:
         jsr branchOnPlayStatePlayer1
-.endif
         jsr stageSpriteForCurrentPiece
         jsr stageSpriteForNextPiece
 
