@@ -103,6 +103,7 @@ const anydasEntryDelay = [
     ["off", "hydrant", "kitaru"],
     "entryDelayModifier",
 ];
+const trtFlag = ["TYPE_BOOL", "trt", "trtFlag"];
 
 const modsSubMenu = {
     "board[mode=default]": [
@@ -118,7 +119,7 @@ const modsSubMenu = {
 };
 
 const anydasSubMenu = {
-    "anydas[mode=default]": [anydasDas, anydasArr, anydasEntryDelay],
+    "anydas[mode=default]": [anydasDas, anydasArr, anydasEntryDelay, trtFlag,],
 };
 
 const displaySubMenu = {

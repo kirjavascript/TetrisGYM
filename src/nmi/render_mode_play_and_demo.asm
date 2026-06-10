@@ -15,13 +15,10 @@ render_mode_play_and_demo:
 
         lda     trtScratch+5
         beq     LFC0C
-        ; lda     gameMode
-        ; bne     LFC0C
-        lda     #$23
-        sta     PPUADDR
-        lda     #$38
-        sta     PPUADDR
-        lda     trtScratch+5
+        ldx     #$23
+        stx     PPUADDR
+        ldx     #$38
+        stx     PPUADDR
         jsr     twoDigsToPPU
 LFC0C:
 

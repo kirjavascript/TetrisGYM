@@ -10,6 +10,13 @@ gameModeState_initGameBackground:
         jsr copyRleNametableToPpu
         .addr   game_nametable
         jsr scoringBackground
+
+
+        lda trtFlag
+        beq @noTrtPatch
+        jsr bulkCopyToPpu
+        .addr trt_nametable
+@noTrtPatch:
         jsr debugNametableUI
 
         ldy #$20
@@ -220,6 +227,12 @@ seven_digit_nametable:
         .byte $21, $5E, $41, $37 ; -
         .byte $21, $1E, $41, $0  ; 0
         .byte $FF
+
+trt_nametable:
+        .byte   $23,$17,$4,$74,$34,$34,$75
+        .byte   $23,$37,$4,$35,$00,$00,$36
+        .byte   $23,$57,$4,$76,$37,$37,$77
+        .byte   $FF
 
 savestate_nametable:
         .byte   $22,$F7,$8,$74,$34,$34,$34,$34,$34,$34,$75

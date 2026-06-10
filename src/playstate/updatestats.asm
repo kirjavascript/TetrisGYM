@@ -181,7 +181,10 @@ checkLinecap: ; set linecapState
 @floorLinecapEnd:
 
 addPoints:
+        lda trtFlag
+        beq @noTetrisRate
         jsr trtCalculate
+@noTetrisRate:
         inc playState
         lda practiseType
         cmp #MODE_CHECKERBOARD
