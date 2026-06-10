@@ -31,7 +31,6 @@
         sta floorModifier
 
         lda #$10
-
         sta dasModifier
         lda #$06
         sta arrModifier

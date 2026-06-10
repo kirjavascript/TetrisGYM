@@ -387,7 +387,9 @@ tapqtyModifier: .res 1
 checkerModifier: .res 1
 garbageModifier: .res 1
 droughtModifier: .res 1
+.if ANYDAS <> 1
 dasModifier: .res 1
+.endif
 lowStackRowModifier: .res 1
 scoringModifier: .res 1
 crashModifier: .res 1
@@ -400,7 +402,9 @@ darkModifier: .res 1
 goofyFlag: .res 1
 debugFlag: .res 1
 linecapFlag: .res 1
+.if ANYDAS <> 1
 dasOnlyFlag: .res 1
+.endif
 qualFlag: .res 1
 palFlag: .res 1
 paletteFlag: .res 1
