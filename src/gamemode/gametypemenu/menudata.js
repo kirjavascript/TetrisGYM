@@ -102,8 +102,10 @@ const anydasEntryDelay = [
     "entry delay",
     ["off", "hydrant", "kitaru"],
     "entryDelayModifier",
+    "entryDelayModifier",
 ];
 const trtFlag = ["TYPE_BOOL", "trt", "trtFlag"];
+const dasMeterFlag = ["TYPE_BOOL", "das meter", "dasMeterFlag"];
 
 const modsSubMenu = {
     "board[mode=default]": [
@@ -119,7 +121,13 @@ const modsSubMenu = {
 };
 
 const anydasSubMenu = {
-    "anydas[mode=default]": [anydasDas, anydasArr, anydasEntryDelay, trtFlag,],
+    "anydas[mode=default]": [
+        anydasDas,
+        anydasArr,
+        anydasEntryDelay,
+        trtFlag,
+        dasMeterFlag,
+    ],
 };
 
 const displaySubMenu = {
@@ -161,9 +169,9 @@ const tournamentSubMenu = {
 
 const goToTournament = ["TYPE_SUBMENU", "tournament", tournamentSubMenu];
 const goToMods = ["TYPE_SUBMENU", "board", modsSubMenu];
-const goToMore = ["TYPE_SUBMENU", "more", moreSubMenu];
 const goToDisplay = ["TYPE_SUBMENU", "display", displaySubMenu];
-const goToAnydas = ["TYPE_SUBMENU", "anydas", anydasSubMenu];
+const goToAnydas = ["TYPE_SUBMENU", "anydas etc", anydasSubMenu];
+const goToMore = ["TYPE_SUBMENU", "more", moreSubMenu];
 
 const mainMenu = {
     "play tetris[mode=tetris]": [

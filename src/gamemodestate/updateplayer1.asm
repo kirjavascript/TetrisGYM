@@ -31,9 +31,9 @@ gameModeState_updatePlayer1:
         beq @branchOnPlaystate
 ; charge das (unless charged)
         ldx autorepeatX
-        dex
+        cpx dasModifier
         beq @branchOnPlaystate
-        dec autorepeatX ; will clear zero flag
+        inc autorepeatX ; will clear zero flag
         bne @branchOnPlaystate
 @resetDas:
         lda 0
@@ -42,6 +42,7 @@ gameModeState_updatePlayer1:
         jsr branchOnPlayStatePlayer1
         jsr stageSpriteForCurrentPiece
         jsr stageSpriteForNextPiece
+        jsr stageDasMeterSprites
 
         inc gameModeState ; 5
         rts

@@ -1,18 +1,34 @@
 stageDasMeterSprites:
+    lda dasMeterFlag
+    beq @ret
+    lda playState
+    beq @ret
+
 @dasValue = generalCounter
 @tile = generalCounter2
+@redCompare = generalCounter3
+@orangeCompare = generalCounter4
 @yCoordinate = 211
 @xStart = 103
+    lda dasModifier
+    lsr
+    lsr
+    sta @orangeCompare
+    inc @orangeCompare ; 5 when ntsc vanilla
+    lsr
+    sta @redCompare
+    inc @redCompare ; 3 when ntsc vanilla
+
     lda #$FE
     sta @tile
     lda autorepeatX
     lsr
     php
     sta @dasValue
-    cmp #5
+    cmp @orangeCompare
     bcs @stageSprites
     dec @tile
-    cmp #3
+    cmp @redCompare
     bcs @stageSprites
     dec @tile
 @stageSprites:
