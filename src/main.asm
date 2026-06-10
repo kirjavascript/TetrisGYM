@@ -88,6 +88,7 @@ mainLoop:
 .include "modes/qtap.asm"
 .include "modes/garbage.asm"
 .include "seeds.asm"
+.include "modes/dasmeter.asm"
 
 .align $100
 ; these tables benefit from page alignment

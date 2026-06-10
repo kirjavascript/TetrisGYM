@@ -57,6 +57,14 @@ random10:
 
 ; canon is waitForVerticalBlankingInterval
 updateAudioWaitForNmiAndResetOamStaging:
+        lda gameMode
+        cmp #4
+        bne @noDasMeter
+        lda gameModeState
+        cmp #2
+        bcc @noDasMeter
+        jsr stageDasMeterSprites
+@noDasMeter:
         jsr updateAudio_jmp
         lda #$00
         sta verticalBlankingInterval
