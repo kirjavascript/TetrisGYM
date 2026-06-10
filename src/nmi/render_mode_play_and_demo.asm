@@ -13,6 +13,18 @@ render_mode_play_and_demo:
         jsr render_playfield
 @renderLines:
 
+        lda     trtScratch+5
+        beq     LFC0C
+        ; lda     gameMode
+        ; bne     LFC0C
+        lda     #$23
+        sta     PPUADDR
+        lda     #$38
+        sta     PPUADDR
+        lda     trtScratch+5
+        jsr     twoDigsToPPU
+LFC0C:
+
         lda scoringModifier
         bne @modernLines
 

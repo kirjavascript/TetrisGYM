@@ -49,6 +49,9 @@ gameModeState_initGameState:
         sta invisibleFlag
         sta currentFloor
         sta crashState
+        sta trtLineCounter
+        sta trtLineCounter+1
+        sta trtScratch+5
 
 ; initialize currentFloor if necessary
         lda floorModifier
