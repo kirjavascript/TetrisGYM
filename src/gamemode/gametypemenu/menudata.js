@@ -81,7 +81,7 @@ const quickTapRightModifier = [
 const transitionModifier = [
     "TYPE_NUMBER",
     "transition",
-    16,
+    17,
     "transitionModifier",
 ];
 const marathonModifier = ["TYPE_NUMBER", "marathon", 5, "marathonModifier"];
