@@ -5,6 +5,7 @@
 ;
 ; TetrisGYM - A Tetris Practise ROM
 
+.include "macros.asm"
 .include "charmap.asm"
 .include "constants.asm"
 .include "io.asm"
@@ -12,7 +13,7 @@
 .include "chr.asm"
 
 .setcpu "6502"
-.feature force_range
+.linecont
 
 .segment    "PRG_chunk1": absolute
 
@@ -30,10 +31,6 @@ initRam:
 
 mainLoop:
         jsr branchOnGameMode
-        cmp gameModeState
-        bne @continue
-        jsr updateAudioWaitForNmiAndResetOamStaging
-@continue:
         jmp mainLoop
 
 
@@ -41,7 +38,7 @@ mainLoop:
 .include "nmi/render.asm"
 .include "nmi/pollcontroller.asm"
 .if KEYBOARD
-.include "nmi/pollkeyboard.asm"
+.include "keyboard/poll.asm"
 .endif
 
 .include "gamemode/branch.asm"
@@ -71,8 +68,6 @@ mainLoop:
 .include "sprites/piece.asm"
 
 .include "data/bytebcd.asm"
-.include "data/orientation.asm"
-.include "data/mult.asm"
 
 .include "palettes.asm"
 .include "nametables.asm"
@@ -98,7 +93,9 @@ mainLoop:
 .include "modes/qtap.asm"
 .include "modes/garbage.asm"
 
-.code
+.align $100
+; these tables benefit from page alignment
+.include "data/mult_orient.asm"
 
 .segment    "PRG_chunk3": absolute
 

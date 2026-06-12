@@ -76,14 +76,6 @@
         sta PPUMASK
         jsr LE006
         jsr updateAudio2
-        lda #$C0
-        sta stack
-        lda #$80
-        sta stack+1
-        lda #$35
-        sta stack+3
-        lda #$AC
-        sta stack+4
         jsr updateAudioWaitForNmiAndDisablePpuRendering
         jsr disableNmi
         jsr drawBlackBGPalette

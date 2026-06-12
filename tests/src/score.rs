@@ -1,4 +1,4 @@
-use rusticnes_core::nes::NesState;
+use rustico_core::nes::NesState;
 use crate::{labels, score, util};
 
 pub fn set(emu: &mut NesState, score: u32) {

@@ -1,5 +1,5 @@
 use crate::{labels, util};
-use rusticnes_core::nes::NesState;
+use rustico_core::nes::NesState;
 
 pub fn test() {
     test_standard();

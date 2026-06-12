@@ -5,9 +5,11 @@
 *.chr
 *.pyc
 *.bin
+*.txt
 tetris.lst
 tetris.lbl
 tetris.map
 tetris.dbg
 release/*
 target
+.env

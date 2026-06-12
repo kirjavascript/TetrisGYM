@@ -15,5 +15,4 @@ gameModeState_updatePlayer1:
         jsr stageSpriteForNextPiece
 
         inc gameModeState ; 5
-        lda #$FF ; acc from stateSpriteForNextPiece
         rts

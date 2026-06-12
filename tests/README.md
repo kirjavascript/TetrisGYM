@@ -12,4 +12,4 @@ to verify various behaviour in the game, first build the ROM then run;
 cargo run --release -- --test
 ```
 
-uses [rusticnes-core](https://github.com/zeta0134/rusticnes-core)
+uses [rustico-core](https://github.com/zeta0134/rustico)

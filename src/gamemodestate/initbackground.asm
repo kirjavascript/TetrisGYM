@@ -56,7 +56,6 @@ gameModeState_initGameBackground:
         lda #$01
         sta playState
         inc gameModeState ; 1
-        lda #0 ; acc should not be equal
         rts
 
 scoringBackground:

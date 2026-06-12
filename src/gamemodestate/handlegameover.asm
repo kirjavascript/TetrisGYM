@@ -17,7 +17,14 @@ gameModeState_handleGameOver:
 @gameOver:
         lda #$03
         sta renderMode
+.if KEYBOARD = 1
+        ; flag for keyboard poll to ignore mapped keys except start/return
+        inc highScoreEntryActive
         jsr handleHighScoreIfNecessary
+        dec highScoreEntryActive
+.else
+        jsr handleHighScoreIfNecessary
+.endif
         lda #$01
         sta playState
         lda #$EF
@@ -39,5 +46,4 @@ gameModeState_handleGameOver:
         rts
 
 @ret:   inc gameModeState ; 4
-        lda #$1 ; acc should not be equal (always $1 in original game)
         rts

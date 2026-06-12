@@ -133,8 +133,11 @@ levelMenuCheckStartGame:
         cpy #MODE_MARATHON
         bne @noLevelModification
         ldy marathonModifier
-        cpy #2 ; marathon mode 2 starts at level 0
+        cpy #2 ; marathon modes 2 & 4 starts at level 0
+        beq @startAtZero
+        cpy #4
         bne @noLevelModification
+@startAtZero:
         lda #0
 @noLevelModification:
         sta levelNumber
@@ -186,13 +189,12 @@ makeNotReady:
         rts
 
 levelControl:
-        lda levelControlMode
-        jsr switch_s_plus_2a
-        .addr   levelControlNormal
-        .addr   levelControlCustomLevel
-        .addr   levelControlHearts
-        .addr   levelControlClearHighScores
-        .addr   levelControlClearHighScoresConfirm
+        branchTo levelControlMode, \
+            levelControlNormal, \
+            levelControlCustomLevel, \
+            levelControlHearts, \
+            levelControlClearHighScores, \
+            levelControlClearHighScoresConfirm
 
 levelControlClearHighScores:
         lda #$20

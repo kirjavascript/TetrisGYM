@@ -1,11 +1,11 @@
 prepareNextGarbage:
-        lda garbageModifier
-        jsr switch_s_plus_2a
-        .addr garbageAlwaysTetrisReady
-        .addr garbageNormal
-        .addr garbageSmart
-        .addr garbageHard
-        .addr garbageTypeC ; infinite dig
+        branchTo garbageModifier, \
+            garbageAlwaysTetrisReady, \
+            garbageNormal, \
+            garbageSmart, \
+            garbageHard, \
+            garbageTypeC
+            ; garbageTypeC = infinite dig
 
 garbageTypeC:
         jsr findTopBulky

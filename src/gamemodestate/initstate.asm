@@ -46,6 +46,7 @@ gameModeState_initGameState:
         sta dasOnlyShiftDisabled
         sta invisibleFlag
         sta currentFloor
+        sta crashState
 
 ; initialize currentFloor if necessary
         lda practiseType
@@ -152,7 +153,6 @@ gameModeState_initGameState:
         lda musicSelectionTable,x
         jsr setMusicTrack
         inc gameModeState ; 2
-        lda #4 ; acc should not be equal
 
 initGameState_return:
         rts
@@ -298,7 +298,16 @@ L8824:  ldx #rng_seed
         tay
         lda #EMPTY_TILE
         sta playfield,y
+.if KEYBOARD = 1
+        ; this can probably be the same whether keyboard or not.
+        ; the keyboard code adds the keyboard reading right before the oam staging reset.
+        ; the additional keyboard reading cycles causes the b type setup to crash.
+        ; Using the wait routine that skips the oam staging reset (and keyboard read) for now and
+        ; keeping separate until b-type board test is developed.
+        jsr updateAudioAndWaitForNmi
+.else
         jsr updateAudioWaitForNmiAndResetOamStaging
+.endif
         dec generalCounter
         bne L87E7
 L884A:
