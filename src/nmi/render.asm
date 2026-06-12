@@ -1,5 +1,5 @@
 render: branchTo renderMode, \
-            render_mode_static, \
+            render_mode_0, \
             render_mode_scroll, \
             render_mode_congratulations_screen, \
             render_mode_play_and_demo, \

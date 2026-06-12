@@ -15,6 +15,7 @@ mod garbage;
 mod harddrop;
 mod mapper;
 mod palettes;
+mod parity;
 mod pushdown;
 mod rng;
 mod score;
@@ -26,10 +27,29 @@ mod nmi;
 mod constants;
 mod patch;
 
+use std::path::PathBuf;
 use gumdrop::Options;
 
 fn parse_hex(s: &str) -> Result<u32, std::num::ParseIntError> {
     u32::from_str_radix(s, 16)
+}
+
+#[derive(Debug, Options)]
+enum Command {
+    #[options(help = "run parity tests against vanilla rom")]
+    Parity(ParityOptions),
+}
+
+#[derive(Debug, Options)]
+struct ParityOptions {
+    #[options(help = ".fm2 file", free)]
+    tasfile: PathBuf,
+    #[options(help = "Write logfiles")]
+    write: bool,
+    #[options(help = "Be printy")]
+    verbose: bool,
+    #[options(help = "Show video")]
+    render: bool,
 }
 
 #[derive(Debug, Options)]
@@ -52,6 +72,8 @@ struct TestOptions {
     #[options(help = "list drought mode probabilities")]
     drought_probs: bool,
     foo: bool,
+    #[options(command)]
+    command: Option<Command>,
 }
 
 fn main() {
@@ -76,6 +98,22 @@ fn main() {
         ("crunch", crunch::test),
         ("harddrop", harddrop::test),
     ];
+
+    match options.command {
+        None => {}
+        Some(Command::Parity(ref opts)) => {
+            if *opts.tasfile == *"" {
+                println!("tas file required!");
+                return;
+            }
+            parity::compare(
+                &opts.tasfile,
+                &opts.write,
+                &opts.verbose,
+                &opts.render,
+            )
+        }
+    }
 
     // run tests
     if options.test {

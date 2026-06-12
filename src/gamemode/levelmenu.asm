@@ -28,6 +28,16 @@ gameMode_levelMenu:
         lda #RENDER_LINES
         sta renderFlags
         jsr resetScroll
+
+; skip an nmi cycle to align with vanilla
+        ldy #$10
+        ldx #$00
+@wait:
+        dex
+        bne @wait
+        dey
+        bne @wait
+
         jsr waitForVBlankAndEnableNmi
         jsr updateAudioWaitForNmiAndResetOamStaging
         jsr updateAudioWaitForNmiAndEnablePpuRendering

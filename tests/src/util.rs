@@ -35,6 +35,10 @@ pub fn set_controller_raw(emu: &mut NesState, buttons: u8) {
     emu.p1_input = flipped_buttons;
 }
 
+pub fn set_controller_emu_native(emu: &mut NesState, buttons: u8) {
+    emu.p1_input = buttons;
+}
+
 pub fn set_controller(emu: &mut NesState, button: char) {
     set_controller_raw(emu, match button {
         'L' => input::LEFT,

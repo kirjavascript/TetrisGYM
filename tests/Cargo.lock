@@ -3,6 +3,15 @@
 version = 4
 
 [[package]]
+name = "aho-corasick"
+version = "1.1.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ddd31a130427c27518df266943a5308ed92d4b226cc639f5a8f1002816174301"
+dependencies = [
+ "memchr",
+]
+
+[[package]]
 name = "autocfg"
 version = "1.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -94,6 +103,17 @@ name = "fastrand"
 version = "2.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "25cbce373ec4653f1a01a31e8a5e5ec0c622dc27ff9c4e6606eefef5cbbed4a5"
+
+[[package]]
+name = "filedescriptor"
+version = "0.8.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e40758ed24c9b2eeb76c35fb0aebc66c626084edd827e07e1552279814c6682d"
+dependencies = [
+ "libc",
+ "thiserror",
+ "winapi",
+]
 
 [[package]]
 name = "flips"
@@ -206,6 +226,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "gag"
+version = "1.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a713bee13966e9fbffdf7193af71d54a6b35a0bb34997cd6c9519ebeb5005972"
+dependencies = [
+ "filedescriptor",
+ "tempfile",
+]
+
+[[package]]
 name = "gumdrop"
 version = "0.8.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -231,9 +261,11 @@ version = "0.1.0"
 dependencies = [
  "flips",
  "flips-sys",
+ "gag",
  "gumdrop",
  "md5",
  "minifb",
+ "regex",
  "rustico-core",
 ]
 
@@ -456,6 +488,35 @@ dependencies = [
 ]
 
 [[package]]
+name = "regex"
+version = "1.12.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e10754a14b9137dd7b1e3e5b0493cc9171fdd105e0ab477f51b72e7f3ac0e276"
+dependencies = [
+ "aho-corasick",
+ "memchr",
+ "regex-automata",
+ "regex-syntax",
+]
+
+[[package]]
+name = "regex-automata"
+version = "0.4.14"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6e1dd4122fc1595e8162618945476892eefca7b88c52820e74af6262213cae8f"
+dependencies = [
+ "aho-corasick",
+ "memchr",
+ "regex-syntax",
+]
+
+[[package]]
+name = "regex-syntax"
+version = "0.8.10"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "dc897dd8d9e8bd1ed8cdad82b5966c3e0ecae09fb1907d58efaa013543185d0a"
+
+[[package]]
 name = "rustico-core"
 version = "0.2.0"
 source = "git+https://github.com/zeta0134/rustico.git?rev=d31d380b1e15bf7cc80e8827730e56a6df77ae46#d31d380b1e15bf7cc80e8827730e56a6df77ae46"
@@ -588,6 +649,26 @@ dependencies = [
  "redox_syscall",
  "rustix",
  "windows-sys 0.52.0",
+]
+
+[[package]]
+name = "thiserror"
+version = "1.0.55"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6e3de26b0965292219b4287ff031fcba86837900fe9cd2b34ea8ad893c0953d2"
+dependencies = [
+ "thiserror-impl",
+]
+
+[[package]]
+name = "thiserror-impl"
+version = "1.0.55"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "268026685b2be38d7103e9e507c938a1fcb3d7e6eb15e87870b617bf37b6d581"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 2.0.43",
 ]
 
 [[package]]

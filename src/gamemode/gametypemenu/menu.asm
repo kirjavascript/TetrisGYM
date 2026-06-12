@@ -22,6 +22,15 @@ gameMode_gameTypeMenu:
         sta tmp3
         jsr copyRleNametableToPpuOffset
         .addr   game_type_menu_nametable_extra
+
+        ; account for extra nametable loading time
+        inc frameCounter
+        bne :+
+        inc frameCounter+1
+:
+        ldx #rng_seed
+        jsr generateNextPseudorandomNumber
+
 .if INES_MAPPER <> 0
         lda #CHRBankSet0
         jsr changeCHRBanks
@@ -29,7 +38,8 @@ gameMode_gameTypeMenu:
         lda #NMIEnable
         sta currentPpuCtrl
         jsr waitForVBlankAndEnableNmi
-        jsr updateAudioWaitForNmiAndResetOamStaging
+; skip this wait, rng advanced manually above
+;        jsr updateAudioWaitForNmiAndResetOamStaging
         jsr updateAudioWaitForNmiAndEnablePpuRendering
         jsr updateAudioWaitForNmiAndResetOamStaging
 
