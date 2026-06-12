@@ -52,7 +52,7 @@ playState_spawnNextTetrimino:
         jsr incrementPieceStat
         jsr chooseNextTetrimino
         sta nextPiece
-        ldx entryDelayModifier
+        ldx entryChargeModifier
         beq @resetDownHold
         dex
         bne @resetDownHold ; kitaru charge handled in playstate branch

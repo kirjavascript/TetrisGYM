@@ -3,7 +3,7 @@ displayModeText:
         lda #$00
         sta anydasFlag
 ; set anydasFlag
-        lda entryDelayModifier
+        lda entryChargeModifier
         bne @anydas
         lda palFlag
         bne @pal

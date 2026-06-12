@@ -99,10 +99,9 @@ const anydasDas = ["TYPE_NUMBER", "das", 32, "dasModifier"];
 const anydasArr = ["TYPE_NUMBER", "arr", 32, "arrModifier"];
 const anydasEntryDelay = [
     "TYPE_CHOICES",
-    "entry delay",
+    "entry charge",
     ["off", "hydrant", "kitaru"],
-    "entryDelayModifier",
-    "entryDelayModifier",
+    "entryChargeModifier",
 ];
 const trtFlag = ["TYPE_BOOL", "trt", "trtFlag"];
 const dasMeterFlag = ["TYPE_BOOL", "das meter", "dasMeterFlag"];

@@ -15,7 +15,7 @@ gameModeState_updatePlayer1:
         dex
         beq @branchOnPlaystate
 ; do nothing if not kitaru charge
-        lda entryDelayModifier
+        lda entryChargeModifier
         cmp #2
         bne @branchOnPlaystate
 ; do nothing when down is held
