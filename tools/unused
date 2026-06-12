@@ -1,12 +1,9 @@
 #!/usr/bin/env bash
 
-# does not support whitespace in filenames
-mapfile -t sources < <(find -name '*.asm' ! -name 'ram.asm')
-mapfile -t variables < <(grep -oP '\w+(?=:\s*\.res)' src/ram.asm)
+mapfile -d '' -t sources < <(find -name '*.asm' ! -name 'ram.asm' -print0)
 
-for variable in "${variables[@]}"; do
-    count=$(wc -l < <(grep -P '\b'$variable'\b' "${sources[@]}"))
-    if [[ $count = 0 ]]; then
+for variable in $(grep -oP '\w+(?=:\s*\.res)' src/ram.asm); do
+    if ! grep -qP '\b'$variable'\b' "${sources[@]}"; then
         printf "Unused - %s\n" $variable
     fi
 done
