@@ -1,6 +1,8 @@
 SPAWN_NEXT_ADDONS := 1
 
 playState_spawnNextTetrimino:
+        lda hardDropFlag
+        bne :+
         lda vramRow
         cmp #$20
         bpl :+

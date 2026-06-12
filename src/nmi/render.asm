@@ -7,7 +7,8 @@ render: branchTo renderMode, \
             render_mode_rocket, \
             render_mode_speed_test, \
             render_mode_level_menu, \
-            render_mode_linecap_menu
+            render_mode_linecap_menu, \
+            render_mode_dump_playfield
 
 .include "render_mode_level_menu.asm" ; no rts / jmp
 

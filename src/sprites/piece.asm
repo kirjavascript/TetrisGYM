@@ -1,7 +1,11 @@
 stageSpriteForCurrentPiece:
         lda #$0
         sta pieceTileModifier
+        lda renderMode
+        cmp #9
+        beq @skipCurrent
         jsr stageSpriteForCurrentPiece_actual
+@skipCurrent:
         lda hardDropFlag
         bne ghostPiece
         lda ghostPieceFlag

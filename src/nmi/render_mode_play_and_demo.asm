@@ -496,3 +496,44 @@ L9996:  lda generalCounter
         ora #RENDER_STATS
         sta renderFlags
         rts
+
+stageFullPlayfield:
+    ldy #18
+@loop:
+    ldx multBy10Table,y
+.repeat 10,i
+    lda playfield+10+i,x
+    sta $100+(i*19),y
+.endrepeat
+    dey
+    bpl @loop
+    lda #9
+    sta renderMode
+    lda #$20
+    sta vramRow
+    rts
+
+render_mode_dump_playfield:
+    lda #$9C
+    sta PPUCTRL
+    tsx
+    txa
+    ldx #$FF
+    txs
+    tax
+    .repeat 10,i
+    lda #$20
+    sta PPUADDR
+    lda #$EC+i
+    sta PPUADDR
+    .repeat 19
+    pla
+    sta PPUDATA
+    .endrepeat
+    .endrepeat
+    txs
+    lda #$03
+    sta renderMode
+    rts
+
+.out .sprintf("instant harddrop rendering: %d", *-stageFullPlayfield)

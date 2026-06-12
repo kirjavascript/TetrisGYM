@@ -222,6 +222,7 @@ harddropShift:
         bpl @topRowLoop
         ; lda #TETRIMINO_X_HIDE
         ; sta tetriminoX
+        jsr stageFullPlayfield
 
 @noScore:
 
