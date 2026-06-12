@@ -11,7 +11,6 @@
 
 
 # Bugs
-* abss from game renders part of playfield in menu
 * lowstack line doesn't respond to vert mirror flag
 * lowstack nope gets mirrored with horiz mirror flag
 * ghost piece briefly flashes at the bottom of the board during entry delay
