@@ -3,7 +3,7 @@
 mapfile -d '' -t sources < <(find -name '*.asm' ! -name 'ram.asm' -print0)
 
 for variable in $(grep -oP '\w+(?=:\s*\.res)' src/ram.asm); do
-    if ! grep -qP '\b'$variable'\b' "${sources[@]}"; then
+    if ! grep -q '\b'$variable'\b' "${sources[@]}"; then
         printf "Unused - %s\n" $variable
     fi
 done
