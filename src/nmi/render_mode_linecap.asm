@@ -16,14 +16,18 @@ render_mode_linecap_menu:
 
 render_linecap_level_lines:
         lda linecapWhen
-        bne @linecapLines
+        cmp #LINECAP_LINES
+        beq @linecapLines
+        cmp #LINECAP_LEVEL
+        bne @ret
         lda linecapLevel
         jsr renderByteBCD
         jmp render_mode_static
 
 @linecapLines:
-        lda linecapLines+1
-        sta PPUDATA
         lda linecapLines
+        sta PPUDATA
+        lda linecapLines+1
         jsr twoDigsToPPU
+@ret:
         rts

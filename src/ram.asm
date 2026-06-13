@@ -24,12 +24,13 @@ allegroIndex: .res 1 ; $001F for crash
 wasAllegro: .res 1 ; $0020 for crash
 startParity: .res 1 ; $0021 for crash
 lagState: .res 1 ; $0022 for lagged lines & score
-    .res $10
+    .res $F
 
+mainLoopWait: .res 1 ; $0032
 verticalBlankingInterval: .res 1 ; $0033
 set_seed: .res 3 ; $0034 ; rng_seed, rng_seed+1, spawnCount
-set_seed_input: .res 3 ; $0037 ; copied to set_seed during gameModeState_initGameState
-    .res 6
+.res 3
+.res 6
 
 tetriminoX: .res 1 ; $0040
 tetriminoY: .res 1 ; $0041
@@ -76,7 +77,56 @@ pztemp := mathRAM+$D
 byteSpriteAddr: .res 2
 byteSpriteTile: .res 1
 byteSpriteLen: .res 1
-    .res $2A
+
+; (up to) 32 bytes menu scratch ram.  can be reused in any other mode
+; can also overlap with mathram
+; this is to spread out for easier thinking
+
+; needs to be the same shape as lr* below
+udPointer: .res $2
+udAdjust: .res $1
+udMin: .res $1
+udMax: .res $1
+; needs to be the same shape ud* above
+lrPointer: .res $2
+lrAdjust: .res $1
+lrMin: .res $1
+lrMax: .res $1
+
+activeItem: .res $1
+MENU_PTR_DISTANCE = lrPointer-udPointer
+stringSetPtr: .res $2
+stackPtr: .res $1
+
+unpackedPageType: .res $1
+unpackedPageValue: .res $1
+unpackedItemType: .res $1
+unpackedItemValue: .res $1
+digitPtr: .res $2
+originalPage: .res $1
+nybbleTemp: .res $1
+blankCounter: .res $1
+rowCounter: .res $1
+
+; probably no value here
+APressed: .res $1
+startPressed: .res $1
+startOrAPressed: .res $1
+BPressed: .res $1
+selectPressed: .res $1
+
+actualPage: .res $1
+gameStarted: .res $1
+.res $1
+
+; lr page    ; mem address never changes (activePage)
+; lr column  ; mem address never changes (activeColumn)
+; lr value   ; current item is set every time anyway
+; ud item    ; mem address never changes (activeItem)
+; ud value   ; mem address never changes (expandedDigit)
+
+
+    .res $A
 
 spriteXOffset: .res 1 ; $00A0
 spriteYOffset: .res 1 ; $00A1
@@ -162,15 +212,17 @@ currentPpuCtrl: .res 1 ; $00FF
 stack: .res $FF ; $0100
     .res 1
 oamStaging: .res $100 ; $0200                        ; format: https://wiki.nesdev.com/w/index.php/PPU_programmer_reference#OAM
-    .res $F0
+trtLineCounter: .res $2
+trtScratch: .res $6
+trtRam: .res $8
+    .res $E0
 statsByType: .res $E ; $03F0
     .res 2
 playfield: .res $c8 ; $0400
     .res $38 ; still technically part of playfield
 
     .res $100 ; $500 ; 2 player playfield
-
-practiseType: .res 1 ; $600
+.res 1
 spawnDelay: .res 1 ; $601
 dasValueDelay: .res 1 ; $602
 dasValuePeriod: .res 1 ; $603
@@ -354,8 +406,42 @@ linecapFlag: .res 1
 dasOnlyFlag: .res 1
 qualFlag: .res 1
 palFlag: .res 1
+paletteFlag: .res 1
+seedEnabled: .res 1
+seededPieces: .res 1
+ghostPieceFlag: .res 1
+hardDropFlag: .res 1
+noEntryDelayFlag: .res 1
+invisibleOptionFlag: .res 1
+killX2Flag: .res 1
+tapLeftModifier: .res 1
+tapRightModifier: .res 1
+mirrorHorizFlag: .res 1
+mirrorVertFlag: .res 1
+arrModifier: .res 1
+entryChargeModifier: .res 1
+anydasFlag: .res 1
+trtFlag: .res 1
+dasMeterFlag: .res 1
+noWallChargeFlag: .res 1
+disableDasFlag: .res 1
+
+
 .if KEYBOARD = 1
 keyboardFlag: .res 1
 .endif
+
+
+set_seed_input: .res 3 ; $0037 ; copied to set_seed during gameModeState_initGameState
+practiseType: .res 1 ; $600
+; menu
+activeMenu: .res 1
+activePage: .res 1
+activeRow: .res 1
+activeColumn: .res 1
+menuStackPtr: .res 1
+; cursorToggle:    .res 1  ; change this to flag if you need it later
+
+.include "gamemode/gametypemenu/menuram.asm"
 
 ; ... $7FF

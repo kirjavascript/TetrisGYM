@@ -1,8 +1,10 @@
 gameModeState_initGameState:
-        lda #$EF
-        ldx #$04
-        ldy #$04
-        jsr memset_page
+        lda #EMPTY_TILE
+        ldx #$00
+@clearPlayfield:
+        sta playfield,x
+        inx
+        bne @clearPlayfield
         ldx #$0F
         lda #$00
 ; statsByType
@@ -47,18 +49,19 @@ gameModeState_initGameState:
         sta invisibleFlag
         sta currentFloor
         sta crashState
+        sta trtLineCounter
+        sta trtLineCounter+1
+        sta trtScratch+5
 
 ; initialize currentFloor if necessary
-        lda practiseType
-        cmp #MODE_FLOOR
-        bne @notFloor
+        lda floorModifier
+        bmi @notFloor
         lda floorModifier
         sta currentFloor
 @notFloor:
 
-        lda practiseType
-        cmp #MODE_INVISIBLE
-        bne @notInvisible
+        lda invisibleOptionFlag
+        beq @notInvisible
         sta invisibleFlag
 @notInvisible:
 

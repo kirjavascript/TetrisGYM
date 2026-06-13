@@ -5,30 +5,29 @@ practiseInitGameState:
         jsr initChecker
 @skipChecker:
         jsr practiseEachPiece
-        cmp #MODE_FLOOR
-        bne @skipFloor
-        jmp advanceGameFloor
+        lda floorModifier
+        bmi @skipFloor
+        jsr advanceGameFloor
 @skipFloor:
-        lda practiseType
-        cmp #MODE_CRUNCH
-        bne @skipCrunch
+        lda crunchModifier
+        beq @skipCrunch
         jsr advanceGameCrunch
 @skipCrunch:
         rts
 
 practisePrepareNext:
-        lda practiseType
-        cmp #MODE_PACE
-        bne @skipPace
-        jmp prepareNextPace
+        lda paceModifier
+        bmi @skipPace
+        jsr prepareNextPace
 @skipPace:
+        lda practiseType
         cmp #MODE_GARBAGE
         bne @skipGarbo
-        jmp prepareNextGarbage
+        jsr prepareNextGarbage
 @skipGarbo:
-        cmp #MODE_PARITY
+        cmp #MODE_STACKING
         bne @skipParity
-        jmp prepareNextParity
+        jsr prepareNextParity
 @skipParity:
         jsr practiseEachPiece
         rts
@@ -42,6 +41,7 @@ practiseAdvanceGame:
         rts
 
 practiseEachPiece: ; only used in this file
+        lda practiseType ; not necessary, but explicit
         cmp #MODE_TAPQTY
         bne @skipTapQuantity
         jsr prepareNextTapQuantity
@@ -62,9 +62,8 @@ practiseGameHUD:
         jsr controllerInputDisplay
 @noInput:
 
-        lda practiseType
-        cmp #MODE_PACE
-        bne @skipPace
+        lda paceModifier
+        bmi @skipPace
         jsr gameHUDPace
 @skipPace:
 

@@ -23,6 +23,7 @@ if (args.includes('-h')) {
 
 -m  mapper
 -a  faster aeppoz + press select to end game
+-A  build anydas
 -s  disable highscores/SRAM
 -k  Famicom Keyboard support
 -w  force WASM compiler
@@ -96,6 +97,13 @@ if (args.includes('--')) {
 }
 
 console.log();
+
+// build menu
+if (!args.includes('-M')) {
+    console.time('menu');
+    require('./src/gamemode/gametypemenu/menu');
+    console.timeEnd('menu');
+}
 
 // build / compress nametables
 

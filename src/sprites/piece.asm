@@ -1,11 +1,15 @@
 stageSpriteForCurrentPiece:
         lda #$0
         sta pieceTileModifier
+        lda renderMode
+        cmp #9
+        beq @skipCurrent
         jsr stageSpriteForCurrentPiece_actual
-
-        lda practiseType
-        cmp #MODE_HARDDROP
-        beq ghostPiece
+@skipCurrent:
+        lda hardDropFlag
+        bne ghostPiece
+        lda ghostPieceFlag
+        bne ghostPiece
         rts
 
 ghostPiece:
@@ -26,6 +30,9 @@ ghostPiece:
         cmp tmp3
         beq @noGhost
 
+        lda ghostPieceFlag
+        beq @noGhost
+
         lda frameCounter
         and #1
         asl
@@ -33,9 +40,9 @@ ghostPiece:
         adc #$0D
         sta pieceTileModifier
         jsr stageSpriteForCurrentPiece_actual
+@noGhost:
         lda tmp3
         sta tetriminoY
-@noGhost:
         rts
 
 tileModifierForCurrentPiece:
@@ -60,7 +67,9 @@ stageSpriteForCurrentPiece_actual:
 @currentTile = generalCounter5
         lda tetriminoX
         cmp #TETRIMINO_X_HIDE
-        beq stageSpriteForCurrentPiece_return
+        bne @notHidden
+        rts
+@notHidden:
         asl a
         asl a
         asl a
@@ -90,8 +99,15 @@ stageSpriteForCurrentPiece_actual:
         asl a
         clc
         adc generalCounter4
-        sta oamStaging,y
         sta originalY
+        sta oamStaging,y
+        lda mirrorVertFlag
+        beq @notMirrorVert
+        lda #$F6
+        sec
+        sbc originalY
+        sta oamStaging,y
+@notMirrorVert:
         inc oamStagingLength
         iny
         jsr tileModifierForCurrentPiece ; used to just load from orientationTable
@@ -107,7 +123,7 @@ stageSpriteForCurrentPiece_actual:
         inc oamStagingLength
         dey
         lda #$FF
-        sta oamStaging,y
+        sta oamStaging-1,y
         iny
         iny
         lda #$00
@@ -123,6 +139,12 @@ stageSpriteForCurrentPiece_actual:
         asl a
         clc
         adc generalCounter3
+        sta oamStaging,y
+        lda mirrorHorizFlag
+        beq @finishLoop
+        lda #$08
+        sec
+        sbc oamStaging,y
         sta oamStaging,y
 @finishLoop:
         inc oamStagingLength
@@ -150,9 +172,7 @@ stageSpriteForNextPiece:
         jmp loadSpriteIntoOamStaging
 
 @maybeDisplayNextPiece:
-        lda practiseType
-        cmp #MODE_HARDDROP
-        beq @displayNextPiece
-        lda debugFlag
+        lda hardDropFlag
+        ora debugFlag
         bne @displayNextPiece
         rts

@@ -1,7 +1,6 @@
 playState_playerControlsActiveTetrimino:
-        lda practiseType
-        cmp #MODE_HARDDROP
-        bne @notHard
+        lda hardDropFlag
+        beq @notHard
         jsr harddrop_tetrimino
         lda playState
         cmp #8
@@ -40,7 +39,8 @@ harddrop_tetrimino:
         rts
 @noSonic:
 
-        ; hard drop
+        lda #$20
+        sta vramRow
         lda #1
         sta playState
         lda #0
@@ -222,6 +222,7 @@ harddropShift:
         bpl @topRowLoop
         ; lda #TETRIMINO_X_HIDE
         ; sta tetriminoX
+        jsr stageFullPlayfield
 
 @noScore:
 
@@ -282,9 +283,8 @@ drop_tetrimino:
         lda linecapState
         cmp #LINECAP_KILLX2
         beq @killX2
-        lda practiseType
-        cmp #MODE_KILLX2
-        bne @normal
+        lda killX2Flag
+        beq @normal
 @killX2:
         jsr lookupDropSpeed
         sta tmpY
@@ -411,30 +411,18 @@ shift_tetrimino:
         rts
 @dasOnlyEnd:
 
-        lda practiseType
-        cmp #MODE_DAS
-        bne @normalDAS
+        ; region stuff
         lda dasModifier
         sta dasValueDelay
-        lda palFlag
-        eor #1
-        asl
-        adc #$8
-        sta dasValuePeriod
-        jmp @shiftTetrimino
-@normalDAS:
-
-        ; region stuff
-        lda #$10
-        sta dasValueDelay
-        lda #$A
+        sec
+        sbc arrModifier
         sta dasValuePeriod
         ldy palFlag
         ; cpy #0 ; ldy sets z flag
         beq @shiftTetrimino
-        lda #$0C
+        lda #PAL_DAS
         sta dasValueDelay
-        lda #$08
+        lda #PAL_DAS - PAL_ARR
         sta dasValuePeriod
 @shiftTetrimino:
 
@@ -449,15 +437,22 @@ shift_tetrimino:
         lda heldButtons
         and #$03
         beq @ret
+        lda disableDasFlag
+        bne @ret
         inc autorepeatX
         lda autorepeatX
         cmp dasValueDelay
         bmi @ret
+@zeroDas:
         lda dasValuePeriod
+        cmp dasValueDelay
+        beq @zeroArr
         sta autorepeatX
         jmp @buttonHeldDown
 
 @resetAutorepeatX:
+        lda dasValueDelay
+        beq @zeroDas
         lda #$00
         sta autorepeatX
 @buttonHeldDown:
@@ -485,6 +480,42 @@ shift_tetrimino:
 @restoreX:
         lda originalY
         sta tetriminoX
+        lda noWallChargeFlag
+        bne @ret
         lda dasValueDelay
         sta autorepeatX
 @ret:   rts
+
+@zeroArr:
+        lda heldButtons
+        and #BUTTON_RIGHT
+        beq @checkLeftPressed
+@shiftRight:
+        inc tetriminoX
+        jsr isPositionValid
+        bne @shiftBackToLeft
+        lda #$03
+        sta soundEffectSlot1Init
+        jmp @shiftRight
+@checkLeftPressed:
+        lda heldButtons
+        and #BUTTON_LEFT
+        beq @leftNotPressed
+@shiftLeft:
+        dec tetriminoX
+        jsr isPositionValid
+        bne @shiftBackToRight
+        lda #$03
+        sta soundEffectSlot1Init
+        jmp @shiftLeft
+@shiftBackToLeft:
+        dec tetriminoX
+        dec tetriminoX
+@shiftBackToRight:
+        inc tetriminoX
+        lda noWallChargeFlag
+        bne @leftNotPressed
+        lda dasValueDelay
+        sta autorepeatX
+@leftNotPressed:
+        rts

@@ -26,19 +26,24 @@
         ; cpx #0 ; dex sets z flag
         bne @loop
 
-        ; default pace to A
-        lda #$A
+        lda #$FF
         sta paceModifier
+        sta floorModifier
 
-        lda #$10
+        lda #NTSC_DAS
         sta dasModifier
+        lda #NTSC_ARR
+        sta arrModifier
+
+        lda #MODE_TETRIS
+        sta practiseType
 
         lda #INITIAL_LINECAP_LEVEL
         sta linecapLevel
-        lda #INITIAL_LINECAP_LINES
-        sta linecapLines
-        lda #INITIAL_LINECAP_LINES_1
+        lda #INITIAL_LINECAP_LINES_LO
         sta linecapLines+1
+        lda #INITIAL_LINECAP_LINES_HI
+        sta linecapLines
 
         jsr resetScores
 

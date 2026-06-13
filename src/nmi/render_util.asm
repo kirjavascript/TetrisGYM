@@ -88,7 +88,19 @@ copyPlayfieldRowToVRAM:
         cpx #$15
         bpl @ret
         lda multBy10Table,x
+        ldy mirrorHorizFlag
+        beq @notHorizMirror
+        clc
+        adc #$9
+@notHorizMirror:
         tay
+        lda mirrorVertFlag
+        beq @notVertMirror
+        lda #$13
+        sec
+        sbc vramRow
+        tax
+@notVertMirror:
         txa
         asl a
         tax
@@ -96,15 +108,16 @@ copyPlayfieldRowToVRAM:
         lda vramPlayfieldRows,x
         sta PPUADDR
         dex
-
         lda vramPlayfieldRows,x
         sta PPUADDR
 @copyRow:
         ldx #$0A
         lda invisibleFlag
         bne @copyRowInvisible
+        lda mirrorHorizFlag
+        bne @copyRowMirrorHoriz
 @copyByte:
-        lda (playfieldAddr),y
+        lda playfield,y
         sta PPUDATA
         iny
         dex
@@ -124,4 +137,12 @@ copyPlayfieldRowToVRAM:
         sta PPUDATA
         dex
         bne @copyByteInvisible
+        jmp @rowCopied
+
+@copyRowMirrorHoriz:
+        lda playfield,y
+        sta PPUDATA
+        dey
+        dex
+        bne @copyRowMirrorHoriz
         jmp @rowCopied

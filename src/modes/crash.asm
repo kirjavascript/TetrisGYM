@@ -1,8 +1,8 @@
 ; Hydrant's crash theory sheet https://docs.google.com/spreadsheets/d/1zAQIo_mnkk0c9e4-hpeDvVxrl9r_HvLSx8V4h4ttmrs/edit#gid=1013692687
 
 testCrash:
-		lda #$00
-		sta lagState ;clearing lag state between calculations
+        lda #$00
+        sta lagState ;clearing lag state between calculations
         lda #$1C ; setting all cycles which always happen. for optimizing, this can be removed if all compared numbers are reduced by $6F1C.
         sta cycleCount
         lda #$6F
@@ -460,7 +460,7 @@ confettiHandler:
         sta spriteYOffset ;either frameCounter or 80 loaded to A depending on confetti type
         lda #$A8 ;center of playfield
         sta spriteXOffset
-        lda #$19 ;ID for "confetti" text
+        lda #STRING_CONFETTI
         sta spriteIndexInOamContentLookup
         jsr stringSpriteAlignRight ;draw to screen
         lda #$00

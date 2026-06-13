@@ -20,10 +20,16 @@ gameMode_levelMenu:
         sta tmp2
         jsr displayModeText
         jsr showHighScores
-        lda linecapFlag
+        lda linecapWhen
         beq @noLinecapInfo
         jsr levelMenuLinecapInfo
 @noLinecapInfo:
+        jsr checkIfSeeded
+        ; patch if seeded
+        ldy #$20
+        ldx #$B5
+        jsr patchSeed
+
         ; render lines when loading screen
         lda #RENDER_LINES
         sta renderFlags
@@ -201,7 +207,7 @@ levelControlClearHighScores:
         sta spriteXOffset
         lda #$C8
         sta spriteYOffset
-        lda #$C
+        lda #STRING_CLEAR_O
         sta spriteIndexInOamContentLookup
         jsr stringSprite
 
@@ -222,7 +228,7 @@ levelControlClearHighScoresConfirm:
         sta spriteXOffset
         lda #$C8
         sta spriteYOffset
-        lda #$D
+        lda #STRING_SURE_O
         sta spriteIndexInOamContentLookup
         jsr stringSprite
 

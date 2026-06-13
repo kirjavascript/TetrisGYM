@@ -1,6 +1,8 @@
 SPAWN_NEXT_ADDONS := 1
 
 playState_spawnNextTetrimino:
+        lda hardDropFlag
+        bne :+
         lda vramRow
         cmp #$20
         bpl :+
@@ -52,6 +54,12 @@ playState_spawnNextTetrimino:
         jsr incrementPieceStat
         jsr chooseNextTetrimino
         sta nextPiece
+        ldx entryChargeModifier
+        beq @resetDownHold
+        dex
+        bne @resetDownHold ; kitaru charge handled in playstate branch
+        lda dasModifier
+        sta autorepeatX ; store full charge for hydrant/1
 @resetDownHold:
         lda #$00
         sta autorepeatY
@@ -96,18 +104,19 @@ pickTetriminoPre:
         lda practiseType
         cmp #MODE_TSPINS
         beq pickTetriminoT
-        ; lda practiseType ; accumulator is still practiseType
-        cmp #MODE_SEED
-        beq pickTetriminoSeed
-        ; lda practiseType
         cmp #MODE_TAPQTY
         beq pickTetriminoLongbar
-        ; lda practiseType
         cmp #MODE_TAP
         beq pickTetriminoLongbar
-        ; lda practiseType
         cmp #MODE_PRESETS
         beq pickTetriminoPreset
+        lda seedEnabled
+        beq pickRandomTetrimino
+        lda seedEnabled
+        beq @pickRandomTetrimino
+        lda seededPieces
+        bne pickTetriminoSeed
+@pickRandomTetrimino:
         jmp pickRandomTetrimino
 
 pickTetriminoT:

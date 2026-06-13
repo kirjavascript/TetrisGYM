@@ -1,3 +1,11 @@
+; stringLineCapWhen:
+;         ldx linecapWhen
+;         lda choiceSetOfflineslevel, x
+;         jmp stringBackground
+; stringLineCapHow:
+;         ldx linecapHow
+;         lda choiceSetKs2floorinvizhalt, x
+
 stringBackground:
         ldx stringIndexLookup
         lda stringLookup, x
@@ -70,98 +78,115 @@ stringSpriteLoop:
         rts
 
 stringLookup:
-        .byte stringClassic-stringLookup
-        .byte stringLetters-stringLookup
-        .byte stringSevenDigit-stringLookup
-        .byte stringFloat-stringLookup
-        .byte stringScorecap-stringLookup
-        .byte stringHidden-stringLookup
-        .byte stringNull-stringLookup ; reserved for future use
-        .byte stringNull-stringLookup
-        .byte stringOff-stringLookup ; 8
-        .byte stringOn-stringLookup
-        .byte stringPause-stringLookup
-        .byte stringDebug-stringLookup
-        .byte stringClear-stringLookup
-        .byte stringConfirm-stringLookup
-        .byte stringV4-stringLookup
-        .byte stringV5-stringLookup ; F
-        .byte stringLevel-stringLookup
-        .byte stringLines-stringLookup
-        .byte stringKSX2-stringLookup
-        .byte stringFromBelow-stringLookup
-        .byte stringInviz-stringLookup
-        .byte stringHalt-stringLookup
-        .byte stringShown-stringLookup ;16
-        .byte stringTopout-stringLookup
-        .byte stringCrash-stringLookup
-        .byte stringConfetti-stringLookup ;19
-        .byte stringStrict-stringLookup
-        .byte stringNeon-stringLookup
-        .byte stringLite-stringLookup
-        .byte stringTeal-stringLookup
-        .byte stringOG-stringLookup
-stringClassic:
-        .byte $7,'C','L','A','S','S','I','C'
-stringLetters:
-        .byte $7,'L','E','T','T','E','R','S'
-stringSevenDigit:
-        .byte $6,'7','D','I','G','I','T'
-stringFloat:
-        .byte $1,'M'
-stringScorecap:
-        .byte $6,'C','A','P','P','E','D'
-stringHidden:
-        .byte $6,'H','I','D','D','E','N'
-stringOff:
-        .byte $3,'O','F','F'
-stringOn:
-        .byte $2,'O','N'
-stringPause:
-        .byte $5,'P','A','U','S','E'
-stringDebug:
-        .byte $5,'B','L','O','C','K'
-stringClear:
-.if SAVE_HIGHSCORES
-        .byte $6,'C','L','E','A','R','?'
-.endif
-stringConfirm:
-.if SAVE_HIGHSCORES
-        .byte $6,'S','U','R','E','?','!'
-.endif
-stringV4:
-        .byte $2,'V','4'
-stringV5:
-        .byte $2,'V','5'
-stringLines:
-        .byte $5,'L','I','N','E','S'
-stringLevel:
-        .byte $5,'L','E','V','E','L'
-stringKSX2:
-        .byte $4,'K','S',$69,'2'
-stringFromBelow:
-        .byte $5,'F','L','O','O','R'
-stringInviz:
-        .byte $5,'I','N','V','I','Z'
-stringHalt:
-        .byte $4,'H','A','L','T'
-stringNull:
-        .byte $0
-stringShown:
-        .byte $4,'S','H','O','W'
-stringTopout:
-        .byte $6,'T','O','P','O','U','T'
-stringCrash:
-        .byte $5,'C','R','A','S','H'
-stringConfetti:
-        .byte $8,'C','O','N','F','E','T','T','I'
-stringStrict:
-        .byte $6,'S','T','R','I','C','T'
-stringNeon:
-        .byte $4,'N','E','O','N'
-stringTeal:
-        .byte $4,'T','E','A','L'
-stringLite:
-        .byte $4,'L','I','T','E'
-stringOG:
-        .byte $2,'O','G'
+        .byte stringLevelO-stringLookup
+        .byte stringLinesO-stringLookup
+        .byte stringKSX2O-stringLookup
+        .byte stringFromBelowO-stringLookup
+        .byte stringInvizO-stringLookup
+        .byte stringHaltO-stringLookup
+        .byte stringPauseO-stringLookup
+        .byte stringBlockO-stringLookup
+        .byte stringClearO-stringLookup
+        .byte stringSureO-stringLookup
+        .byte stringConfettiO-stringLookup
+stringLevelO:
+        .byte $5,"LEVEL"
+stringLinesO:
+        .byte $5,"LINES"
+stringKSX2O:
+        .byte $4,"KS",$69,"2"
+stringFromBelowO:
+        .byte $5,"FLOOR"
+stringInvizO:
+        .byte $5,"INVIZ"
+stringHaltO:
+        .byte $4,"HALT"
+stringPauseO:
+        .byte $5, "PAUSE"
+stringBlockO:
+        .byte $5, "BLOCK"
+stringClearO:
+    .byte $06,"CLEAR?"
+stringSureO:
+    .byte $06,"SURE?!"
+stringConfettiO:
+    .byte $08,"CONFETTI"
+.enum
+STRING_LEVEL_O
+STRING_LINES_O
+STRING_KSX2_O
+STRING_FLOOR_O
+STRING_INVIZ_O
+STRING_HALT_O
+STRING_PAUSE_O
+STRING_BLOCK_O
+STRING_CLEAR_O
+STRING_SURE_O
+STRING_CONFETTI_O
+.endenum
+; stringBackgroundNotGood:
+;         tax
+;         lda choiceSetTable,x
+;         beq @ret
+;         tay
+;         inx
+; @loop:
+;         lda choiceSetTable, x
+;         sta PPUDATA
+;         inx
+;         dey
+;         bne @loop
+; @ret:
+;         rts
+;
+; stringSpriteNotGood:
+;         ldx spriteIndexInOamContentLookup
+;         lda stringTable, x
+;         sta tmpZ
+;         inx
+;         lda spriteXOffset
+;         sta tmpX
+;         jmp stringSpriteLoop
+;
+; stringSpriteAlignRightNotGood:
+;         ldx spriteIndexInOamContentLookup
+; stringSpriteAlignRightANotGood:
+;         tax
+;         lda stringTable, x
+;         inx
+;         sta tmpZ
+;         lda tmpZ
+;         asl
+;         asl
+;         asl
+;         sta tmpX
+;         clc
+;         lda spriteXOffset
+;         sbc tmpX
+;         sta tmpX
+;
+; stringSpriteLoopNotGood:
+;         ldy oamStagingLength
+;         sec
+;         lda spriteYOffset
+;         sta oamStaging, y
+;         lda stringTable, x
+;         inx
+;         sta oamStaging+1, y
+;         lda #$00
+;         sta oamStaging+2, y
+;         lda tmpX
+;         sta oamStaging+3, y
+;         clc
+;         adc #$8
+;         sta tmpX
+;         ; increase OAM index
+;         lda #$04
+;         clc
+;         adc oamStagingLength
+;         sta oamStagingLength
+;
+;         dec tmpZ
+;         lda tmpZ
+;         bne stringSpriteLoop
+;         rts
