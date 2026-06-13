@@ -74,11 +74,14 @@ updateMusicSpeed:
         ldy #50 ; replaces above
 
 ; check if crunch mode
-        ldx crunchModifier
+        ldx crunchLeftModifier
+        bne @crunch
+        ldx crunchRightModifier
         beq @notCrunch
 
+@crunch:
         ; add crunch left columns to y
-        jsr unpackCrunchModifier
+        jsr copyCrunchModifier
         tya
         clc
         adc crunchLeftColumns ; offset y with left column count (generalCounter3)

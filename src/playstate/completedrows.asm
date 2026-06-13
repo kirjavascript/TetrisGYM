@@ -141,8 +141,6 @@ playState_checkForCompletedRows:
 @tapQtyEnd:
 
         ; update top row for crunch
-        lda crunchModifier
-        beq @crunchEnd
         jsr advanceSides ; clobbers generalCounter3 and generalCounter4
 @crunchEnd:
 

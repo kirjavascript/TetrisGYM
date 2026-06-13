@@ -54,43 +54,43 @@ const keyboardFlag = ["TYPE_BOOL", "keyboard"];
 const qualFlag = ["TYPE_BOOL", "qual", "qualFlag"];
 
 const floorModifier = ["TYPE_FF_OFF", "floor", 16, "floorModifier"];
-const crunchModifier = ["TYPE_NUMBER", "crunch", 16, "crunchModifier"];
+const crunchLeftModifier = ["TYPE_NUMBER", "crunch left", 4, "crunchLeftModifier"];
+const crunchRightModifier = ["TYPE_NUMBER", "crunch right", 4, "crunchRightModifier"];
 const invisibleFlag = ["TYPE_BOOL", "invisible", "invisibleOptionFlag"];
 const ghostPiece = ["TYPE_BOOL", "ghost", "ghostPieceFlag"];
 const hardDrop = ["TYPE_BOOL", "hardDrop", "hardDropFlag"];
-const killX2 = ["TYPE_BOOL", "killX2", "killX2Flag"];
 
 const horizMirror = ["TYPE_BOOL", "mirror horiz", "mirrorHorizFlag"];
 const vertMirror = ["TYPE_BOOL", "mirror vert", "mirrorVertFlag"];
 
-const presetModifier = ["TYPE_NUMBER", "setups", 8, "presetModifier"];
-const typeBModifier = ["TYPE_NUMBER", "type-b height", 9, "typeBModifier"];
-const checkerModifier = ["TYPE_NUMBER", "checker height", 9, "checkerModifier"];
+const presetModifier = ["TYPE_NUMBER", "preset", 8, "presetModifier"];
+const typeBModifier = ["TYPE_NUMBER", "height", 9, "typeBModifier"];
+const checkerModifier = ["TYPE_NUMBER", "height", 9, "checkerModifier"];
 const quickTapLeftModifier = [
     "TYPE_NUMBER",
-    "left cols",
+    "left",
     20,
     "tapLeftModifier",
 ];
 const quickTapRightModifier = [
     "TYPE_NUMBER",
-    "right cols",
+    "right",
     20,
     "tapRightModifier",
 ];
 const transitionModifier = [
     "TYPE_NUMBER",
-    "transition",
+    "modifier",
     17,
     "transitionModifier",
 ];
-const marathonModifier = ["TYPE_NUMBER", "marathon", 5, "marathonModifier"];
-const tapqtyModifier = ["TYPE_NUMBER", "qty height", 16, "tapqtyModifier"];
-const garbageModifier = ["TYPE_NUMBER", "garbage", 5, "garbageModifier"];
-const droughtModifier = ["TYPE_NUMBER", "drought", 20, "droughtModifier"];
+const marathonModifier = ["TYPE_NUMBER", "modifier", 5, "marathonModifier"];
+const tapqtyModifier = ["TYPE_NUMBER", "height", 16, "tapqtyModifier"];
+const garbageModifier = ["TYPE_NUMBER", "modifier", 5, "garbageModifier"];
+const droughtModifier = ["TYPE_NUMBER", "modifier", 20, "droughtModifier"];
 const lowStackRowModifier = [
     "TYPE_NUMBER",
-    "lowstack",
+    "height",
     20,
     "lowStackRowModifier",
 ];
@@ -116,11 +116,11 @@ const dasMeterFlag = ["TYPE_BOOL", "das meter", "dasMeterFlag"];
 const modsSubMenu = {
     "mods[mode=default]": [
         floorModifier,
-        crunchModifier,
+        crunchLeftModifier,
+        crunchRightModifier,
         invisibleFlag,
         ghostPiece,
         hardDrop,
-        killX2,
         horizMirror,
         vertMirror,
     ],
@@ -216,6 +216,7 @@ const mainMenu = {
     "garbage[mode=garbage]": [garbageModifier, goToTournament, ...shared],
     "lowstack[mode=lowstack]": [lowStackRowModifier, goToTournament, ...shared],
     "tap/roll speed[mode=speed_test]": [...shared],
+    "kill*2[mode=killX2]": [...shared],
 };
 
 const extraSpriteStrings = ["pause", "block", "clear?", "sure?!", "confetti"];

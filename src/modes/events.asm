@@ -9,11 +9,7 @@ practiseInitGameState:
         bmi @skipFloor
         jsr advanceGameFloor
 @skipFloor:
-        lda crunchModifier
-        beq @skipCrunch
-        jsr advanceGameCrunch
-@skipCrunch:
-        rts
+        jmp advanceGameCrunch
 
 practisePrepareNext:
         lda paceModifier

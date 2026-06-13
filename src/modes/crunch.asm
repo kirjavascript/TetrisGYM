@@ -19,6 +19,11 @@
 ; clobbers generalCounter3 & generalCounter4 (defined in playstate/util.asm)
 
 advanceGameCrunch:
+    ldx crunchLeftModifier
+    bne @crunch
+    ldx crunchRightModifier
+    beq crunchReturn
+@crunch:
 ; initialize playfield row 19 to 0
     ldx #$13
 @nextRow:
@@ -35,7 +40,7 @@ crunchReturn:
 advanceSides:
     ; called in playState_checkForCompletedRows and in advanceGameCrunch
     ; draws to row defined in playfieldAddr, which defaults to 0
-    jsr unpackCrunchModifier
+    jsr copyCrunchModifier
 
     lda #BLOCK_TILES
 
@@ -57,12 +62,9 @@ advanceSides:
     bpl @rightLoop ; unconditional
 
 
-unpackCrunchModifier:
-    lda crunchModifier
-    lsr
-    lsr
+copyCrunchModifier:
+    lda crunchLeftModifier
     sta crunchLeftColumns ; generalCounter3
-    lda crunchModifier
-    and #$03
+    lda crunchRightModifier
     sta crunchRightColumns ; generalCounter4
     rts

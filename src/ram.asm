@@ -382,7 +382,8 @@ paceModifier: .res 1
 presetModifier: .res 1
 typeBModifier: .res 1
 floorModifier: .res 1
-crunchModifier: .res 1
+crunchLeftModifier: .res 1
+crunchRightModifier: .res 1
 tapModifier: .res 1
 transitionModifier: .res 1
 marathonModifier: .res 1

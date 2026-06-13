@@ -77,6 +77,8 @@ gameMode_gameTypeMenu:
     lda #$1
     sta renderMode
     lda #0
+    sta ppuScrollX
+    sta ppuScrollY
     sta hideNextPiece
     sta byteSpriteTile
     sta gameStarted
@@ -97,7 +99,27 @@ gameMode_gameTypeMenu:
 gameTypeLoop:
     lda gameStarted
     beq @noGame
+    lda #0
+    sta killX2Flag
+    lda practiseType
+    cmp #MODE_SPEED_TEST
+    bne @notSpeedTest
+    lda #7
+    sta gameMode
+    bne @sfx
+@notSpeedTest:
+    lda practiseType  ; is already in A, but this is explicit
+    cmp #MODE_KILLX2
+    bne @notKillX2
+    lda #0
+    sta renderMode
+    sta gameModeState
+    lda #1
+    sta killX2Flag
     inc gameMode
+@notKillX2:
+    inc gameMode
+@sfx:
     lda #$2
     sta soundEffectSlot1Init
     rts
