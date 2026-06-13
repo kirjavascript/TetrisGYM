@@ -95,19 +95,26 @@ const lowStackRowModifier = [
     "lowStackRowModifier",
 ];
 
-const anydasDas = ["TYPE_NUMBER", "das", 32, "dasModifier"];
-const anydasArr = ["TYPE_NUMBER", "arr", 32, "arrModifier"];
+const noWallChargeFlag = [
+    "TYPE_CHOICES",
+    "wall charge",
+    ["on", "off"],
+    "noWallChargeFlag",
+];
+const disableDasFlag = ["TYPE_CHOICES", "das", ["on", "off"], "disableDasFlag"];
+const anydasDas = ["TYPE_NUMBER", "delay", 32, "dasModifier"];
+const anydasArr = ["TYPE_NUMBER", "arrrr", 32, "arrModifier"];
 const anydasEntryDelay = [
     "TYPE_CHOICES",
     "entry charge",
     ["off", "hydrant", "kitaru"],
     "entryChargeModifier",
 ];
-const trtFlag = ["TYPE_BOOL", "trt", "trtFlag"];
+const trtFlag = ["TYPE_BOOL", "tetris rate", "trtFlag"];
 const dasMeterFlag = ["TYPE_BOOL", "das meter", "dasMeterFlag"];
 
 const modsSubMenu = {
-    "board[mode=default]": [
+    "mods[mode=default]": [
         floorModifier,
         crunchModifier,
         invisibleFlag,
@@ -119,11 +126,21 @@ const modsSubMenu = {
     ],
 };
 
-const anydasSubMenu = {
-    "anydas[mode=default]": [
+const dasSubMenu = {
+    "das[mode=default]": [
         anydasDas,
         anydasArr,
         anydasEntryDelay,
+        disableDasFlag,
+        noWallChargeFlag,
+    ],
+};
+
+const infoSubMenu = {
+    "info[mode=default]": [
+        hzFlag,
+        inputDisplayFlag,
+        paceModifier,
         trtFlag,
         dasMeterFlag,
     ],
@@ -132,9 +149,6 @@ const anydasSubMenu = {
 const displaySubMenu = {
     "display[mode=default]": [
         scoringModifier,
-        paceModifier,
-        hzFlag,
-        inputDisplayFlag,
         disableFlash,
         darkMode,
         paletteSelection,
@@ -167,110 +181,41 @@ const tournamentSubMenu = {
 };
 
 const goToTournament = ["TYPE_SUBMENU", "tournament", tournamentSubMenu];
-const goToMods = ["TYPE_SUBMENU", "board", modsSubMenu];
+const goToMods = ["TYPE_SUBMENU", "mods", modsSubMenu];
 const goToDisplay = ["TYPE_SUBMENU", "display", displaySubMenu];
-const goToAnydas = ["TYPE_SUBMENU", "anydas etc", anydasSubMenu];
+const goToDas = ["TYPE_SUBMENU", "das", dasSubMenu];
+const goToInfo = ["TYPE_SUBMENU", "info", infoSubMenu];
 const goToMore = ["TYPE_SUBMENU", "more", moreSubMenu];
 
+const shared = [goToMods, goToInfo, goToDisplay, goToDas, goToMore];
+
 const mainMenu = {
-    "play tetris[mode=tetris]": [
-        goToTournament,
-        goToMods,
-        goToDisplay,
-        goToAnydas,
-        goToMore,
-    ],
-    "t-spins[mode=tspins]": [goToMods, goToDisplay, goToAnydas, goToMore],
-    "setups[mode=presets]": [
-        presetModifier,
-        goToMods,
-        goToDisplay,
-        goToAnydas,
-        goToMore,
-    ],
-    "stacking[mode=stacking]": [
-        goToTournament,
-        goToMods,
-        goToDisplay,
-        goToAnydas,
-        goToMore,
-    ],
-    "b-type[mode=typeb]": [
-        typeBModifier,
-        goToMods,
-        goToDisplay,
-        goToAnydas,
-        goToMore,
-    ],
+    "play tetris[mode=tetris]": [goToTournament, ...shared],
+    "t-spins[mode=tspins]": [...shared],
+    "setups[mode=presets]": [presetModifier, ...shared],
+    "stacking[mode=stacking]": [goToTournament, ...shared],
+    "b-type[mode=typeb]": [typeBModifier, ...shared],
     "(quick)tap[mode=tap]": [
         quickTapLeftModifier,
         quickTapRightModifier,
-        goToMods,
-        goToDisplay,
-        goToAnydas,
-        goToMore,
+        ...shared,
     ],
-    "tap quantity[mode=tapqty]": [
-        tapqtyModifier,
-        goToMods,
-        goToDisplay,
-        goToAnydas,
-        goToMore,
-    ],
+    "tap quantity[mode=tapqty]": [tapqtyModifier, ...shared],
     "transition[mode=transition]": [
         transitionModifier,
         goToTournament,
-        goToMods,
-        goToDisplay,
-        goToAnydas,
-        goToMore,
+        ...shared,
     ],
-    "marathon[mode=marathon]": [
-        marathonModifier,
-        goToTournament,
-        goToMods,
-        goToDisplay,
-        goToAnydas,
-        goToMore,
-    ],
-    "drought[mode=drought]": [
-        droughtModifier,
-        goToTournament,
-        goToMods,
-        goToDisplay,
-        goToAnydas,
-        goToMore,
-    ],
+    "marathon[mode=marathon]": [marathonModifier, goToTournament, ...shared],
+    "drought[mode=drought]": [droughtModifier, goToTournament, ...shared],
     "checkerboard[mode=checkerboard]": [
         checkerModifier,
         goToTournament,
-        goToMods,
-        goToDisplay,
-        goToAnydas,
-        goToMore,
+        ...shared,
     ],
-    "garbage[mode=garbage]": [
-        garbageModifier,
-        goToTournament,
-        goToMods,
-        goToDisplay,
-        goToAnydas,
-        goToMore,
-    ],
-    "lowstack[mode=lowstack]": [
-        lowStackRowModifier,
-        goToTournament,
-        goToMods,
-        goToDisplay,
-        goToAnydas,
-        goToMore,
-    ],
-    "tap/roll speed[mode=speed_test]": [
-        goToMods,
-        goToDisplay,
-        goToAnydas,
-        goToMore,
-    ],
+    "garbage[mode=garbage]": [garbageModifier, goToTournament, ...shared],
+    "lowstack[mode=lowstack]": [lowStackRowModifier, goToTournament, ...shared],
+    "tap/roll speed[mode=speed_test]": [...shared],
 };
 
 const extraSpriteStrings = ["pause", "block", "clear?", "sure?!", "confetti"];

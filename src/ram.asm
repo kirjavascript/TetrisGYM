@@ -423,6 +423,8 @@ entryChargeModifier: .res 1
 anydasFlag: .res 1
 trtFlag: .res 1
 dasMeterFlag: .res 1
+noWallChargeFlag: .res 1
+disableDasFlag: .res 1
 
 
 .if KEYBOARD = 1

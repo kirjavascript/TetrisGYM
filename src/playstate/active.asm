@@ -437,6 +437,8 @@ shift_tetrimino:
         lda heldButtons
         and #$03
         beq @ret
+        lda disableDasFlag
+        bne @ret
         inc autorepeatX
         lda autorepeatX
         cmp dasValueDelay
@@ -478,6 +480,8 @@ shift_tetrimino:
 @restoreX:
         lda originalY
         sta tetriminoX
+        lda noWallChargeFlag
+        bne @ret
         lda dasValueDelay
         sta autorepeatX
 @ret:   rts
@@ -509,6 +513,8 @@ shift_tetrimino:
         dec tetriminoX
 @shiftBackToRight:
         inc tetriminoX
+        lda noWallChargeFlag
+        bne @leftNotPressed
         lda dasValueDelay
         sta autorepeatX
 @leftNotPressed:

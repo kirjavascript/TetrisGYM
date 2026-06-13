@@ -3,25 +3,33 @@ displayModeText:
         lda #$00
         sta anydasFlag
 ; set anydasFlag
+        lda disableDasFlag
+        bne @anydas
+        lda noWallChargeFlag
+        bne @anydas
         lda entryChargeModifier
         bne @anydas
         lda palFlag
         bne @pal
+
+; set regional differences
         ldx #NTSC_DAS
         ldy #NTSC_ARR
         bne @testAnydas
 @pal:
         ldx #PAL_DAS
         ldy #PAL_ARR
+
+; test das & arr values
 @testAnydas:
         cpx dasModifier
         bne @anydas
 
         cpy arrModifier
-        bne @anydas
         beq @notanydas
 @anydas:
         inc anydasFlag
+
 @notanydas:
         ldx #MODE_ANYDAS*6
         lda anydasFlag
