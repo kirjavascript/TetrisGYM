@@ -114,6 +114,8 @@ gameTypeLoop:
     lda #0
     sta renderMode
     sta gameModeState
+    lda #39
+    sta levelNumber
     lda #1
     sta killX2Flag
     inc gameMode
