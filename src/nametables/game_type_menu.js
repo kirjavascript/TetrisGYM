@@ -5,7 +5,9 @@ const {
     drawRect,
     drawAttrs,
     flatLookup,
-} = require('./nametables');
+} = require("./nametables");
+
+const { spawnSync } = require("child_process");
 
 const lookup = flatLookup(`
 0123456789ABCDEF
@@ -27,9 +29,11 @@ WXYZ-,˙>########
 `);
 
 const buffer = blankNT();
-const extra = [...buffer];
 
-drawTiles(buffer, lookup, `
+drawTiles(
+    buffer,
+    lookup,
+    `
 #a                            d#
 #a                            d#
 #a                            d#
@@ -57,14 +61,16 @@ drawTiles(buffer, lookup, `
 #a                            d#
 #a                            d#
 #a                            d#
-#a V67                        d#
 #a                            d#
 #a                            d#
-`);
+#a                            d#
+`,
+);
 
-if (process.env['GYM_FLAGS']?.match(/-D KEYBOARD=1/)) {
-    drawTiles(extra, lookup, "KEYBOARD", 32 * 15 + 6);
-    }
+const gitTag = spawnSync("git", ["describe", "--tags"]).stdout.toString();
+[...gitTag.trim()].forEach(
+    (c, i) => (buffer[32 * 28 + 6 + i] = lookup.indexOf(c.toUpperCase())),
+);
 
 const background = `
 ɢ##############################ɳ
@@ -101,15 +107,16 @@ const background = `
 
 drawTiles(buffer, lookup, background);
 
-drawRect(buffer, 8, 2, 10, 5, 0xB0); // draw logo
+drawRect(buffer, 8, 2, 10, 5, 0xb0); // draw logo
 
-const urlX = 3;
-const urlY = 27;
+// const urlX = 3;
+// const urlY = 27;
 
-drawRect(buffer, urlX, urlY, 12, 1, 0x74);
-drawRect(buffer, urlX+12, urlY, 12, 1, 0x84);
+// drawRect(buffer, urlX, urlY, 12, 1, 0x74);
+// drawRect(buffer, urlX+12, urlY, 12, 1, 0x84);
 
-drawAttrs(buffer, [`
+drawAttrs(buffer, [
+    `
     2222222222222222
     2222211111122222
     2222211111122222
@@ -118,7 +125,8 @@ drawAttrs(buffer, [`
     2222222222222222
     2222222222222222
     2222222222222222
-`,`
+`,
+    `
     2222222222222222
     2222222222222222
     2222222222222222
@@ -127,9 +135,7 @@ drawAttrs(buffer, [`
     2333333333333332
     2222222222222222
     2222222222222222
-`]);
+`,
+]);
 
-writeRLE(
-    __dirname + '/game_type_menu_nametable_practise.bin',
-    buffer,
-);
+writeRLE(__dirname + "/game_type_menu_nametable_practise.bin", buffer);
