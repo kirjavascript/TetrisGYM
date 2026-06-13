@@ -30,11 +30,6 @@ renderHzInputRows:
         lda #2
         sta inputLogCounter
 
-        ; enable vertical drawing
-        lda PPUCTRL
-        ora #%100
-        sta PPUCTRL
-
         jsr getInputAddr
         tya
         sta PPUADDR
@@ -51,10 +46,6 @@ renderHzInputRows:
         sta PPUADDR
 
         jsr clearInputLine
-
-        lda PPUCTRL
-        and #%11111011
-        sta PPUCTRL
 
 
 @checkLimit:
