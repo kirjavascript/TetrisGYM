@@ -27,7 +27,7 @@ const mainMenu = () => [
 
 const seedMenu = () => [
     [type.seed, 'SEED', 0, 'seedModifier'],
-    [type.bool, 'BAR', 0, 'barModifier'],
+    [type.bool, 'BAR', 0, 'bar2Modifier'],
     [type.nav, 'BACK', mainMenu],
 ];
 
@@ -96,6 +96,7 @@ const stringsASM = [...strings].map(string => {
 
 // generate RAM
 
+const seen = new Set();
 const offsets = [];
 
 menus.forEach(([, menu]) => {
@@ -105,6 +106,10 @@ menus.forEach(([, menu]) => {
         if (size > 0) {
             if (!_ident) {
                 console.error(`Items with RAM must have an ident (${_text})`);
+            } else if (seen.has(_ident)) {
+                console.error(`Duplicate RAM ident (${_ident})`);
+            } else {
+                seen.add(_ident);
             }
 
             offsets.push([_ident, size]);
