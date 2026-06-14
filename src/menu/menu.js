@@ -27,7 +27,7 @@ const mainMenu = () => [
 
 const seedMenu = () => [
     [type.seed, 'SEED', 0, 'seedModifier'],
-    [type.bool, 'BAR', 0, 'bar2Modifier'],
+    [type.bool, 'BAR', 0, 'barModifier'],
     [type.nav, 'BACK', mainMenu],
 ];
 
@@ -45,7 +45,7 @@ const listASM = `menuList:
 ${menus.map(([key]) => `    .addr ${key}`).join('\n')}`;
 
 const lengthsASM = `menuLengths:
-${menus.map(([key]) => `    MENU_LENGTH (${key}, ${key}End)`).join('\n')}`;
+${menus.map(([key]) => `    MENU_LENGTH ${key}, ${key}End`).join('\n')}`;
 
 // generate menu data
 
@@ -69,7 +69,7 @@ const menusASM = menus.map(([ident, menu]) => {
             console.error(`Unhandled type ${_type.key}`);
         }
 
-        return `    MENU_ITEM ${_type.ident} ${getStringIdent(text)}, $${config.toString(16).toUpperCase()}`;
+        return `    MENU_ITEM ${_type.ident}, ${getStringIdent(text)}, $${config.toString(16).toUpperCase()}`;
     }).join('\n');
 
     return `${ident}:\n${items}\n${ident}End:`;

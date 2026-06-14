@@ -104,6 +104,12 @@ process.env['GYM_FLAGS'] = compileFlags.join(' ');
 require('./src/nametables/build');
 console.timeEnd('nametables');
 
+// generate menu data
+
+console.time('menu');
+require('./src/menu/menu');
+console.timeEnd('menu');
+
 // PNG -> CHR
 
 console.time('CHR');

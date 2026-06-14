@@ -14,10 +14,10 @@ getMenuItemOffset:
     tax
     rts
 
-; getMenuDataOffset
 ; in: menuIndex, menuItemIndex
-; out: A = offset into menuData
+; out: X = offset into menuData
 ; clobbers: X, Y, tmp1-3, tmpX
+; eg. lda menuData,x
 getMenuDataOffset:
     lda #0
     sta tmp3
@@ -60,5 +60,5 @@ getMenuDataOffset:
     bne @loop
 
 @done:
-    lda tmp3
+    ldx tmp3
     rts

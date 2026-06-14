@@ -12,6 +12,7 @@ RENDER_MENU_ITEM := 1
 RENDER_MENU_FULL := 2
 
 .include "menu/definition.asm"
+.include "menu/data.generated.asm"
 .include "menu/util.asm"
 
 menu:
