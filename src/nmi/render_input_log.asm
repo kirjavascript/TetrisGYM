@@ -31,7 +31,7 @@ renderHzInputRows:
         sta inputLogCounter
 
         ; enable vertical drawing
-        lda PPUCTRL
+        lda currentPpuCtrl
         ora #%100
         sta PPUCTRL
 
@@ -52,8 +52,7 @@ renderHzInputRows:
 
         jsr clearInputLine
 
-        lda PPUCTRL
-        and #%11111011
+        lda currentPpuCtrl
         sta PPUCTRL
 
 
@@ -94,8 +93,11 @@ renderHzInputRows:
         rts
 
 clearInputLine:
+        lda #28
+        sec
+        sbc inputLogCounter
+        tax
         lda #$FF
-        ldx #26
 @clearRow:
         sta PPUDATA
         dex
