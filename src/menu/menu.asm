@@ -2,12 +2,11 @@
 ; TODO: rename stuff
 
 ; reset menuIndex, etc (if not already in boot)
-; reuse menuRAM
 
 menuIndex := menuRAM
+menuItemIndex := menuRAM+1
 
-; (!) figure out ram allocation from type alone
-; autogenerate it via JS???
+menuData := menuRAM+2
 
 RENDER_MENU_ITEM := 1
 RENDER_MENU_FULL := 2
@@ -16,15 +15,16 @@ RENDER_MENU_FULL := 2
 .include "menu/util.asm"
 
 menu:
+        ; reset stuff
         jsr makeNotReady
         lda #0
         sta menuScrollY
         lda #0
         sta hideNextPiece
 
+        ; set render
         lda #RENDER_MENU_FULL
         sta renderFlags
-
         lda #$1
         sta renderMode
         jsr updateAudioWaitForNmiAndDisablePpuRendering

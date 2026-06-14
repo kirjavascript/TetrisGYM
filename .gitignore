@@ -13,3 +13,4 @@ tetris.dbg
 release/*
 target
 .env
+*.generated.*
