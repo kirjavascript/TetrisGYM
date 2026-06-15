@@ -1,51 +1,51 @@
 ; mul by 5
 getMenuItemOffset:
-    sta tmpX
-    asl
-    asl
-    clc
-    adc tmpX
-    tax
-    rts
+        sta tmpX
+        asl
+        asl
+        clc
+        adc tmpX
+        tax
+        rts
 
 ; menuDataOffsets[menuIndex] + ram data index from current menu
 getMenuDataOffset:
-    ldx menuIndex
-    lda menuDataOffsets,x
-    sta tmp3
+        ldx menuIndex
+        lda menuDataOffsets,x
+        sta tmp3
 
-    lda menuItemIndex
-    beq @done
-    sta tmpX
+        lda menuItemIndex
+        beq @done
+        sta tmpX
 
-    txa
-    asl
-    tay
-    lda menuList,y
-    sta tmp1
-    lda menuList+1,y
-    sta tmp2
+        txa
+        asl
+        tay
+        lda menuList,y
+        sta tmp1
+        lda menuList+1,y
+        sta tmp2
 
-    ldy #0
+        ldy #0
 @loop:
-    lda (tmp1),y
-    tax
-    lda menuTypeSizes,x
-    clc
-    adc tmp3
-    sta tmp3
+        lda (tmp1),y
+        tax
+        lda menuTypeSizes,x
+        clc
+        adc tmp3
+        sta tmp3
 
-    tya
-    clc
-    adc #.sizeof(MenuItem)
-    tay
+        tya
+        clc
+        adc #.sizeof(MenuItem)
+        tay
 
-    dec tmpX
-    bne @loop
+        dec tmpX
+        bne @loop
 
 @done:
-    ldx tmp3
-    rts
+        ldx tmp3
+        rts
 
 ; set PPUADDR for tile row A, column X
 setPPURowCol:
