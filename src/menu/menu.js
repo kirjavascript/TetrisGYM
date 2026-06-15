@@ -20,14 +20,46 @@ const typeIdents = Object.entries(type).map(([key, value]) => {
 
 const mainMenu = () => [
     [type.nav, 'SEED MENU', seedMenu],
+    [type.nav, 'TEST', seedMenu],
+    [type.nav, 'TEST', seedMenu],
+    [type.nav, 'TEST', seedMenu],
+    [type.nav, 'TEST', seedMenu],
+    [type.nav, 'TEST', seedMenu],
+    [type.nav, 'TEST', seedMenu],
+    [type.nav, 'TEST', seedMenu],
     [type.byte, 'FOO', 0xa14, 'fooModifier'], // TODO helper
     [type.bool, 'BAR', 0, 'barModifier'],
-    [type.ord, 'ORDINAL', ['FOO', 'BAR', 'BAZ'], 'ordModifier'],
+    [type.ord, 'ORDINAL', ['FOO', 'BAR', 'BAZABC'], 'ordModifier'],
+    [type.ord, 'ORDINAL', ['FOO', 'BARB', 'BARBY'], 'ord2Modifier'],
 ];
 
 const seedMenu = () => [
+    [type.nav, 'BACK', mainMenu],
     [type.seed, 'SEED', 0, 'seedModifier'],
     [type.bool, 'BAR', 0, 'bar2Modifier'],
+    [type.nav, 'BACK', mainMenu],
+    [type.nav, 'BACK', mainMenu],
+    [type.nav, 'BACK', mainMenu],
+    [type.nav, 'BACK', mainMenu],
+    [type.nav, 'BACK', mainMenu],
+    [type.nav, 'BACK', mainMenu],
+    [type.nav, 'BACK', mainMenu],
+    [type.nav, 'BACK', mainMenu],
+    [type.nav, 'BACK', mainMenu],
+    [type.nav, 'BACK', mainMenu],
+    [type.nav, 'BACK', mainMenu],
+    [type.nav, 'BACK', mainMenu],
+    [type.nav, 'BACK', mainMenu],
+    [type.nav, 'BACK', mainMenu],
+    [type.nav, 'BACK', mainMenu],
+    [type.nav, 'BACK', mainMenu],
+    [type.nav, 'BACK', mainMenu],
+    [type.nav, 'BACK', mainMenu],
+    [type.nav, 'BACK', mainMenu],
+    [type.nav, 'BACK', mainMenu],
+    [type.nav, 'BACK', mainMenu],
+    [type.nav, 'BACK', mainMenu],
+    [type.nav, 'BACK', mainMenu],
     [type.nav, 'BACK', mainMenu],
 ];
 
@@ -54,7 +86,7 @@ const getStringIdent = s => (
 );
 
 const menusASM = menus.map(([ident, menu]) => {
-    const items = menu().map(([_type, text, _config]) => {
+    const items = menu().map(([_type, text, _config, _ident]) => {
         let config = 0;
 
         if (_type.key === 'byte') {
@@ -62,14 +94,15 @@ const menusASM = menus.map(([ident, menu]) => {
         } else if (_type.key === 'nav') {
             config = menus.findIndex(([, value]) => value === _config);
         } else if (_type.key === 'ord') {
-            config = _config.length;
+            config = `ordTable_${_ident}`;
         } else if (['bool', 'seed'].includes(_type.key)) {
             // noop
         } else {
-            console.error(`Unhandled type ${_type.key}`);
+            console.error(`unhandled type ${_type.key}`);
         }
 
-        return `    MENU_ITEM ${_type.ident}, ${getStringIdent(text)}, $${config.toString(16).toUpperCase()}`;
+        const configStr = typeof config === 'number' ? "$" + config.toString(16).toUpperCase() : config;
+        return `    MENU_ITEM ${_type.ident}, ${getStringIdent(text)}, ${configStr}`;
     }).join('\n');
 
     return `${ident}:\n${items}\n${ident}End:`;
@@ -94,6 +127,21 @@ const stringsASM = [...strings].map(string => {
     .byte $${string.length.toString(16)}, ${JSON.stringify(string)}`
 }).join('\n\n');
 
+// generate ordinal lookup tables
+
+const ordTables = [];
+menus.forEach(([, menu]) => {
+    menu().forEach(([_type, _text, _config, _ident]) => {
+        if (_type.key === 'ord') {
+            const maxLen = Math.max(..._config.map(opt => opt.length));
+            const addrs = _config.map(opt => `    .addr ${getStringIdent(opt)}`).join('\n');
+            ordTables.push(`ordTable_${_ident}:\n    .byte ${_config.length}, ${maxLen}\n${addrs}`);
+        }
+    });
+});
+
+const ordTablesASM = ordTables.join('\n\n');
+
 // generate RAM
 
 const seen = new Set();
@@ -105,9 +153,9 @@ menus.forEach(([, menu]) => {
 
         if (size > 0) {
             if (!_ident) {
-                console.error(`Items with RAM must have an ident (${_text})`);
+                console.error(`items with RAM must have an ident (${_text})`);
             } else if (seen.has(_ident)) {
-                console.error(`Duplicate RAM ident (${_ident})`);
+                console.error(`duplicate RAM ident (${_ident})`);
             } else {
                 seen.add(_ident);
             }
@@ -130,6 +178,18 @@ const ramASM = offsets.map(([ident, size]) => {
 const typeSizesASM = `menuTypeSizes:
 ${Object.values(type).map(t => `    .byte ${t.size} ; ${t.key.toUpperCase()}`).join('\n')}`;
 
+// generate per-menu data offsets
+
+let dataCursor = 0;
+const menuDataOffsetsValues = menus.map(([, menu]) => {
+    const offset = dataCursor;
+    menu().forEach(([_type]) => { dataCursor += _type.size; });
+    return offset;
+});
+
+const menuDataOffsetsASM = `menuDataOffsets:
+${menuDataOffsetsValues.map(o => `    .byte ${o}`).join('\n')}`;
+
 // output
 
 const output = `${typeASM}
@@ -140,9 +200,13 @@ ${listASM}
 
 ${lengthsASM}
 
+${menuDataOffsetsASM}
+
 ${menusASM}
 
 ${stringsASM}
+
+${ordTablesASM}
 
 ${ramASM}
 `;

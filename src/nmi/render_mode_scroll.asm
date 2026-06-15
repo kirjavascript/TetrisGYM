@@ -20,12 +20,21 @@ render_mode_scroll:
         dec menuScrollY
 @endscroll:
 
-        lda menuScrollY
-        cmp #MENU_MAX_Y_SCROLL
-        bcc @uncapped
-        lda #MENU_MAX_Y_SCROLL
+        ldx menuIndex
+        lda menuLengths,x
+        sec
+        sbc #(30 - MENU_BG_BASE_ROW - 3)
+        bcs @hasScroll
+        lda #0
+@hasScroll:
+        asl
+        asl
+        asl
+        cmp menuScrollY
+        bcs @uncapped
         sta menuScrollY
 @uncapped:
+        lda menuScrollY
 
         sta ppuScrollY
         rts

@@ -17,29 +17,7 @@
         jmp @continueWarmBootInit
 
 @coldBoot:
-        ; zero out config memory
-        lda #$0
-        ldx #$A0
-@loop:
-        dex
-        sta menuRAM, x
-        ; cpx #0 ; dex sets z flag
-        bne @loop
-
-        ; default pace to A
-        lda #$A
-        sta paceModifier
-
-        lda #$10
-        sta dasModifier
-
-        lda #INITIAL_LINECAP_LEVEL
-        sta linecapLevel
-        lda #INITIAL_LINECAP_LINES
-        sta linecapLines
-        lda #INITIAL_LINECAP_LINES_1
-        sta linecapLines+1
-
+        jsr coldMenuInit
         jsr resetScores
 
 .if SAVE_HIGHSCORES
