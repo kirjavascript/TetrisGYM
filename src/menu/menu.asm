@@ -143,6 +143,12 @@ menuValueControls:
         lda (menuItemPtr),y
         cmp #MENU_TYPE_NAV
         beq @done
+        cmp #MENU_TYPE_JMP
+        beq @done
+        cmp #MENU_TYPE_JSR
+        beq @done
+        cmp #MENU_TYPE_RTS
+        beq @done
         cmp #MENU_TYPE_SEED
         bne @notSeed
         jmp menuSeedControls
@@ -217,6 +223,45 @@ menuAction:
         ldy #MenuItem::settingsAddress
         lda (menuItemPtr),y
         sta menuIndex
+        jmp @navigate
+@notNav:
+        cmp #MENU_TYPE_JMP
+        bne @notJmp
+        ldy #MenuItem::settingsAddress
+        lda (menuItemPtr),y
+        sta menuItemAddr
+        iny
+        lda (menuItemPtr),y
+        sta menuItemAddr+1
+        pla
+        pla
+        jmp (menuItemAddr)
+@notJmp:
+        cmp #MENU_TYPE_JSR
+        bne @notJsr
+        ldy #MenuItem::settingsAddress
+        lda (menuItemPtr),y
+        sta menuItemAddr
+        iny
+        lda (menuItemPtr),y
+        sta menuItemAddr+1
+        lda #$02
+        sta soundEffectSlot1Init
+        jsr @jsrTrampoline
+        jsr menuRedraw
+        rts
+@jsrTrampoline:
+        jmp (menuItemAddr)
+@notJsr:
+        cmp #MENU_TYPE_RTS
+        bne @notRts
+        pla
+        pla
+        rts
+@notRts:
+        rts
+
+@navigate:
         lda #0
         sta menuItemIndex
         sta menuPrevItemIndex
@@ -226,7 +271,6 @@ menuAction:
         sta soundEffectSlot1Init
         jsr cacheMenuDataOff
         jsr menuRedraw
-@notNav:
         rts
 
 menuSeedControls:

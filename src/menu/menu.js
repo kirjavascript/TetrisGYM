@@ -2,8 +2,10 @@ const fs = require('fs');
 const path = require('path');
 
 const type = {
-    // jmp: { size: 0 },
     nav: { size: 0 },
+    jmp: { size: 0 },
+    jsr: { size: 0 },
+    rts: { size: 0 },
     byte: { size: 1 },
     bool: { size: 1 },
     seed: { size: 3 },
@@ -31,10 +33,13 @@ const mainMenu = () => [
     [type.bool, 'BAR', 0, 'barModifier'],
     [type.ord, 'ORDINAL', ['FOO', 'BAR', 'BAZABC'], 'ordModifier'],
     [type.ord, 'ORDINAL', ['FOO', 'BARB', 'BARBY'], 'ord2Modifier'],
+    [type.jmp, 'START GAME', 'gameMode_levelMenu'],
+    [type.jsr, 'OPTIONS', 'menu'],
+    [type.rts, 'RTS'],
 ];
 
 const seedMenu = () => [
-    [type.nav, 'BACK', mainMenu],
+    [type.rts, 'BACK'],
     [type.seed, 'SEED', 0, 'seedModifier'],
     [type.bool, 'BAR', 0, 'bar2Modifier'],
     [type.nav, 'BACK', mainMenu],
@@ -93,6 +98,10 @@ const menusASM = menus.map(([ident, menu]) => {
             config = _config;
         } else if (_type.key === 'nav') {
             config = menus.findIndex(([, value]) => value === _config);
+        } else if (_type.key === 'jmp' || _type.key === 'jsr') {
+            config = _config;
+        } else if (_type.key === 'rts') {
+            // noop
         } else if (_type.key === 'ord') {
             config = `ordTable_${_ident}`;
         } else if (['bool', 'seed'].includes(_type.key)) {

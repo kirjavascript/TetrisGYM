@@ -168,6 +168,12 @@ renderMenuValue:
         lda (menuItemPtr),y
         cmp #MENU_TYPE_NAV
         beq @done
+        cmp #MENU_TYPE_JMP
+        beq @done
+        cmp #MENU_TYPE_JSR
+        beq @done
+        cmp #MENU_TYPE_RTS
+        beq @done
         sta menuItemType
 
         cmp #MENU_TYPE_ORD
