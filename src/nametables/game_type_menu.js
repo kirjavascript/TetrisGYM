@@ -38,7 +38,6 @@ drawTiles(buffer, lookup, `
 #a                            d#
 #a                            d#
 #a                            d#
-#a                            d#
 #a    TETRIS                  d#
 #a    T-SPINS                 d#
 #a    SEED                    d#
@@ -53,6 +52,7 @@ drawTiles(buffer, lookup, `
 #a    MARATHON                d#
 #a    TAP QUANTITY            d#
 #a    CHECKERBOARD            d#
+#a    TETRIS ONLY             d#
 #a    GARBAGE                 d#
 #a    DROUGHT                 d#
 #a    DAS DELAY               d#
