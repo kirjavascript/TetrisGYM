@@ -6,8 +6,4 @@ render_mode_speed_test:
         lda #0
         sta renderFlags
 @noUpdate:
-        lda #$B0
-        sta ppuScrollX
-        lda #$0
-        sta ppuScrollY
         rts

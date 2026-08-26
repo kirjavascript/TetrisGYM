@@ -56,3 +56,30 @@
     .endif
 .endscope
 .endmacro
+
+
+
+.macro stagePatch patchAddr
+        ldx #<patchAddr
+        ldy #>patchAddr
+        jsr copyPatchAtXYToQueue
+.endmacro
+
+.macro stagePatchThenDump patchAddr
+        ldx #<patchAddr
+        ldy #>patchAddr
+        jsr copyPatchAtXYToQueue
+        jsr render_mode_queue
+.endmacro
+
+.macro stagePatchThenWaitForNmi patchAddr
+; can be made subroutine if needed to save space
+        stagePatch patchAddr
+        lda renderMode
+        pha
+        lda #RENDER_QUEUE
+        sta renderMode
+        jsr updateAudioWaitForNmiAndResetOamStaging
+        pla
+        sta renderMode
+.endmacro

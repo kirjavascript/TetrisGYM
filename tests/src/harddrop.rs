@@ -179,23 +179,22 @@ pub fn test() {
 fn test_harddropped_piece(emu: &mut NesState, start: &str, finish: &str, piece: u8 ) -> (u32,u32) {
     emu.reset();
 
-    for _ in 0..3 { emu.run_until_vblank(); }
+    for _ in 0..5 { emu.run_until_vblank(); }
 
     let game_mode = labels::get("gameMode") as usize;
     let main_loop = labels::get("mainLoop");
     let level_number = labels::get("levelNumber") as usize;
     let practise_type = labels::get("practiseType") as usize;
-    let mode_harddrop = labels::get("MODE_HARDDROP") as u8;
+    emu.memory.iram_raw[labels::get("hardDropFlag") as usize] = 1;
     let button_up = labels::get("BUTTON_UP") as u8;
     let newly_pressed_buttons = labels::get("newlyPressedButtons") as usize;
     let active_tetrimino = labels::get("playState_playerControlsActiveTetrimino");
     let stage_sprite = labels::get("stageSpriteForCurrentPiece");
 
-    emu.memory.iram_raw[practise_type] = mode_harddrop;
+    emu.memory.iram_raw[practise_type] = labels::get("MODE_TETRIS") as u8;
     emu.memory.iram_raw[game_mode] = 4;
     emu.memory.iram_raw[level_number] = 18;
     emu.registers.pc = main_loop;
-    emu.memory.iram_raw[labels::get("playfieldAddr") as usize + 1] = 4;
 
     playfield::clear(emu);
     util::run_n_vblanks(emu, 7);

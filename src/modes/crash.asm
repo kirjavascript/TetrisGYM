@@ -1,8 +1,8 @@
 ; Hydrant's crash theory sheet https://docs.google.com/spreadsheets/d/1zAQIo_mnkk0c9e4-hpeDvVxrl9r_HvLSx8V4h4ttmrs/edit#gid=1013692687
 
 testCrash:
-		lda #$00
-		sta lagState ;clearing lag state between calculations
+        lda #$00
+        sta lagState ;clearing lag state between calculations
         lda #$1C ; setting all cycles which always happen. for optimizing, this can be removed if all compared numbers are reduced by $6F1C.
         sta cycleCount
         lda #$6F
@@ -410,11 +410,7 @@ testCrash:
         sta allegroIndex
         lda lagState
         beq @noLag ;if lag should happen, wait a frame here so that sprite staging doesn't happen.
-        lda #$00
-        sta verticalBlankingInterval
-@checkForNmi:
-        lda verticalBlankingInterval ;busyloop
-        beq @checkForNmi
+        jsr waitForNmi
 @noLag:	rts
 @crashGraphics:
         lda #$00
@@ -458,16 +454,13 @@ confettiHandler:
         beq @endConfetti
 @drawConfetti:
         sta spriteYOffset ;either frameCounter or 80 loaded to A depending on confetti type
-        lda #$A8 ;center of playfield
+        lda #$68 ; center of playfield
         sta spriteXOffset
-        lda #$19 ;ID for "confetti" text
-        sta spriteIndexInOamContentLookup
-        jsr stringSpriteAlignRight ;draw to screen
+        ldx #>STR_CONFETTI
+        ldy #<STR_CONFETTI
+        jsr stringSpriteXY ;draw to screen
         lda #$00
-        sta verticalBlankingInterval ;wait until next frame
-@checkForNmi:
-        lda verticalBlankingInterval ;busyloop
-        beq @checkForNmi
+        jsr waitForNmi
         jmp confettiHandler
 @infiniteConfetti:
         lda palFlag
@@ -483,11 +476,7 @@ confettiHandler:
 satanSpawn: ; copied from routine vanilla game's memset_ppu_page_and_more which is no longer present in gym
         lda palFlag
         beq @ntsc
-        lda #$00
-        sta verticalBlankingInterval
-@checkForNmi:
-        lda verticalBlankingInterval ;busyloop
-        beq @checkForNmi
+        jsr waitForNmi
         ldx #$FF
         ldy #$00
 
@@ -531,11 +520,7 @@ LAC61:  sty     PPUDATA
 LAC67:  ldx     tmp2
         rts
 blackBox: ;copied from patchToPpu from original game as it's no longer present in gym
-        lda #$00
-        sta verticalBlankingInterval
-@checkForNmi:
-        lda verticalBlankingInterval ;busyloop
-        beq @checkForNmi
+        jsr waitForNmi
         ldy #$00
 @patchAddr:
         lda patchData,y

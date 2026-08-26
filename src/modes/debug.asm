@@ -76,14 +76,12 @@ debugDrawPieces:
         adc #$2F
         sta spriteYOffset
 
-        lda #$16
-        sta spriteIndexInOamContentLookup
+        lda #SPRITE_DEBUGLEVELEDIT
+        sta spriteIndex
         jsr loadSpriteIntoOamStaging
         rts
 debugPauseDrawPieces:
-        jsr stageSpriteForNextPiece
-        jsr stageSpriteForCurrentPiece
-        rts
+        jmp stageCurrentAndNextPieces
 
 debugMode:
 
@@ -154,7 +152,7 @@ debugContinue:
         beq @notPressedB
         dec currentPiece
         bpl @notPressedB
-        lda #$12
+        lda #$13
         sta currentPiece
 @notPressedB:
 
@@ -163,7 +161,7 @@ debugContinue:
         beq @notPressedA
         inc currentPiece
         lda currentPiece
-        cmp #$13
+        cmp #$14
         bne @notPressedA
         lda #$00
         sta currentPiece
@@ -315,7 +313,7 @@ renderDebugHUD:
         lda #$C8
         sta spriteYOffset
         lda saveStateSpriteType
-        sta spriteIndexInOamContentLookup
+        sta spriteIndex
         jsr loadSpriteIntoOamStaging
 @noSprite:
         rts

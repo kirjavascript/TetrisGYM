@@ -1,13 +1,13 @@
 controllerInputTiles:
         ; .byte "RLDUSSBA"
-        .byte $D0, $D1, $D2, $D3
-        .byte $D4, $D4, $D5, $D5
+        .byte $D5, $D5, $D4, $D4
+        .byte $D3, $D2, $D1, $D0
 controllerInputX:
-        .byte $9, $0, $5, $5
-        .byte $1D, $14, $28, $31
+        .byte $31, $28, $14, $1D
+        .byte $05, $05, $00, $09
 controllerInputY:
-        .byte $0, $0, $5, $FB
-        .byte $0, $0, $FF, $FF
+        .byte $FF, $FF, $00, $00
+        .byte $FB, $05, $00, $00
 
 controllerInputDisplay: ; called in events, speedtest
         lda #0
@@ -15,7 +15,7 @@ controllerInputDisplay: ; called in events, speedtest
 controllerInputDisplayX:
         lda heldButtons_player1
         sta tmp1
-        ldy #0
+        ldy #7
 @inputLoop:
         lda tmp1
         and #1
@@ -44,10 +44,7 @@ controllerInputDisplayX:
         adc oamStagingLength
         sta oamStagingLength
 @inputContinue:
-        lda tmp1
-        ror
-        sta tmp1
-        iny
-        cpy #8
-        bmi @inputLoop
+        ror tmp1
+        dey
+        bpl @inputLoop
         rts

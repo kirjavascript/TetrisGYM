@@ -58,4 +58,4 @@ prepareNextTapQuantity:
         tax
         cpx #$c8
         bcc @nextLoop
-        rts
+        jmp stageFullPlayfield

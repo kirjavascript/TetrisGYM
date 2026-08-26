@@ -1,4 +1,5 @@
 playState_receiveGarbage:
+        jsr secretGradeGrading
         ldy pendingGarbage
         beq @ret
         lda multBy10Table,y
@@ -7,9 +8,9 @@ playState_receiveGarbage:
         sta generalCounter
 @shiftPlayfieldUp:
         ldy generalCounter2
-        lda (playfieldAddr),y
+        lda playfield,y
         ldy generalCounter
-        sta (playfieldAddr),y
+        sta playfield,y
         inc generalCounter
         inc generalCounter2
         lda generalCounter2
@@ -26,7 +27,7 @@ playState_receiveGarbage:
 @hole:
         lda #EMPTY_TILE ; was $FF ?
 @set:
-        sta (playfieldAddr),y
+        sta playfield,y
         inx
         cpx #$0A
         bne @inc
@@ -36,7 +37,8 @@ playState_receiveGarbage:
         bne @fillGarbage
         lda #$00
         sta pendingGarbage
-        sta vramRow
+        jsr stageFullPlayfield
+
 @ret:   inc playState
         lda #$00 ; earliest possible measured point
         sta hzSpawnDelay

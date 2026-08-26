@@ -1,6 +1,9 @@
 ; Adjusts high score table and handles data entry, if necessary
 handleHighScoreIfNecessary:
+        lda disableScoreSaving
+        bne @ret
         ldy #0
+        sty kbInputThrottle
         sty highScoreEntryRawPos
 @compareWithPos:
 
@@ -111,33 +114,30 @@ copyHighscore:
 highScoreEntryScreen:
         lda #$09
         jsr setMusicTrack
-        lda #$02
-        sta renderMode
-        jsr updateAudioWaitForNmiAndDisablePpuRendering
-        jsr disableNmi
+        jsr hideSpritesAndBackground
 .if INES_MAPPER <> 0
         lda #CHRBankSet0
         jsr changeCHRBanks
 .endif
-        lda #NMIEnable
-        sta PPUCTRL
-        sta currentPpuCtrl
-        jsr bulkCopyToPpu
-        .addr   menu_palette
+        stagePatchThenWaitForNmi menuPalette
+
+        ldx #RLE_NT_HIGH_SCORE
         jsr copyRleNametableToPpu
-        .addr   enter_high_score_nametable
+
         jsr showHighScores
         lda #$21
         sta tmp1
         lda #$89
         sta tmp2
         jsr displayModeText
-        lda #$02
+
+; reenable display
+        jsr resetScroll
+        lda #NMIEnable
+        sta currentPpuCtrl
+        lda #RENDER_CONGRATS
         sta renderMode
-        jsr waitForVBlankAndEnableNmi
-        jsr updateAudioWaitForNmiAndResetOamStaging
-        jsr updateAudioWaitForNmiAndEnablePpuRendering
-        jsr updateAudioWaitForNmiAndResetOamStaging
+        jsr showSpriteAndBackground
 
         ldx highScoreEntryRawPos
         lda highScoreEntryRowOffsetLookup, x
@@ -159,13 +159,13 @@ highScoreEntryScreen:
         asl
         adc #$20
         sta spriteXOffset
-        lda #$0E
-        sta spriteIndexInOamContentLookup
+        lda #SPRITE_HIGHSCORENAMECURSOR
+        sta spriteIndex
         lda frameCounter
         and #$03
         bne @flickerStateSelected_checkForStartPressed
-        lda #$02
-        sta spriteIndexInOamContentLookup
+        lda #SPRITE_BLANK
+        sta spriteIndex
 @flickerStateSelected_checkForStartPressed:
         jsr loadSpriteIntoOamStaging
         lda newlyPressedButtons_player1
@@ -177,7 +177,6 @@ highScoreEntryScreen:
 
 @checkForAOrRightPressed:
 
-.if KEYBOARD = 1
         jsr readKbHighScoreEntry
         bmi @noKeyboardInput
         beq @nextTile
@@ -186,7 +185,6 @@ highScoreEntryScreen:
         jmp @waitForVBlank
 @noKeyboardInput:
 
-.endif
         lda #BUTTON_RIGHT
         jsr menuThrottle
         bne @nextTile

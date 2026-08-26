@@ -1,3 +1,5 @@
+.include "magicnumbers.asm"
+
 .ifndef INES_MAPPER ; is set via ca65 flags
 INES_MAPPER := 1000 ; 0 (NROM), 1 (MMC1), 3 (CNROM), 4 (MMC3), 5 (MMC5), and 1000 (autodetect 1/3)
 .endif
@@ -11,10 +13,6 @@ SAVE_HIGHSCORES := 1
 AUTO_WIN := 0
 .endif
 
-.ifndef KEYBOARD
-KEYBOARD := 0
-.endif
-
 .ifndef CNROM_OVERRIDE
 CNROM_OVERRIDE := 0
 .endif
@@ -26,13 +24,13 @@ NO_SCORING := 0 ; breaks pace
 NO_SFX := 0
 NO_MENU := 0
 ALWAYS_CURTAIN := 0
-QUAL_BOOT := 0
-SWAP_DUTY_CYCLES := 0 ; counters the duty cycle swap present in some clone consoles
 
 INITIAL_CUSTOM_LEVEL := 29
 INITIAL_LINECAP_LEVEL := 39
-INITIAL_LINECAP_LINES := $30 ; bcd
-INITIAL_LINECAP_LINES_1 := 3 ; hex (lol)
+
+INITIAL_LINECAP_LINES_LO := $30 ; bcd
+INITIAL_LINECAP_LINES_HI := $03 ; bcd input, converted to binary in linecapLinesBinHi
+
 BTYPE_START_LINES := $25 ; bcd
 MENU_HIGHLIGHT_COLOR := $12 ; $12 in gym, $16 in original
 BLOCK_TILES := $7B
@@ -56,152 +54,96 @@ BUTTON_SELECT := $20
 BUTTON_START := $10
 BUTTON_DPAD := BUTTON_UP | BUTTON_DOWN | BUTTON_LEFT | BUTTON_RIGHT
 
-RENDER_LINES = $01
-RENDER_LEVEL = $02
-RENDER_SCORE = $04
-RENDER_DEBUG = $08
-RENDER_HZ = $10
-RENDER_STATS = $40
-RENDER_HIGH_SCORE_LETTER = $80
+RENDER_LINES := $01
+RENDER_LEVEL := $02
+RENDER_SCORE := $04
+RENDER_DEBUG := $08
+RENDER_HZ := $10
+RENDER_LEVEL_ACTUAL := $20
+RENDER_STATS := $40
+RENDER_HIGH_SCORE_LETTER := $80
 
 .enum
+MODE_DEFAULT
 MODE_TETRIS
 MODE_TSPINS
-MODE_SEED
-MODE_PARITY
-MODE_PACE
+MODE_STACKING
 MODE_PRESETS
 MODE_TYPEB
-MODE_FLOOR
-MODE_CRUNCH
 MODE_TAP
-MODE_TRANSITION
 MODE_MARATHON
 MODE_TAPQTY
 MODE_CHECKERBOARD
 MODE_GARBAGE
 MODE_DROUGHT
-MODE_DAS
 MODE_LOWSTACK
 MODE_KILLX2
-MODE_INVISIBLE
-MODE_HARDDROP
+MODE_CALIBRATE
 MODE_SPEED_TEST
-MODE_SCORE_DISPLAY
-MODE_CRASH
-MODE_STRICT
-MODE_HZ_DISPLAY
-MODE_INPUT_DISPLAY
-MODE_DISABLE_FLASH
-MODE_DISABLE_PAUSE
-MODE_DARK
-MODE_GOOFY
-MODE_DEBUG
-MODE_LINECAP
-MODE_DASONLY
-MODE_QUAL
-MODE_PAL
-.if KEYBOARD = 1
-MODE_KEYBOARD
-.endif
 .endenum
 
-.if KEYBOARD = 1
-MODE_QUANTITY = MODE_KEYBOARD + 1
-.else
-MODE_QUANTITY = MODE_PAL + 1
-.endif
+.enum
+SCORING_CLASSIC
+SCORING_LETTERS
+SCORING_SEVENDIGIT
+SCORING_FLOAT
+SCORING_SCORECAP
+SCORING_HIDDEN
+.endenum
 
-MODE_GAME_QUANTITY = MODE_HARDDROP + 1
+.enum
+LINECAP_INACTIVE
+LINECAP_KILLX2
+LINECAP_FLOOR
+LINECAP_INVISIBLE
+LINECAP_HALT
+.endenum
 
-SCORING_CLASSIC := 0 ; for scoringModifier
-SCORING_LETTERS := 1
-SCORING_SEVENDIGIT := 2
-SCORING_FLOAT := 3
-SCORING_SCORECAP := 4
-SCORING_HIDDEN := 5
+.enum
+LINECAP_OFF
+LINECAP_LEVEL
+LINECAP_LINES
+.endenum
 
-LINECAP_KILLX2 := 1
-LINECAP_FLOOR := 2
-LINECAP_INVISIBLE := 3
-LINECAP_HALT := 4
+.enum
+CRASH_OFF
+CRASH_SHOW
+CRASH_TOPOUT
+CRASH_CRASH
+.endenum
 
-CRASH_OFF := 0
-CRASH_SHOW := 1
-CRASH_TOPOUT := 2
-CRASH_CRASH := 3
-
-LINECAP_WHEN_STRING_OFFSET := $10
-LINECAP_HOW_STRING_OFFSET := $12
+LINECAP_WHEN_STRING_OFFSET := $FF
+LINECAP_HOW_STRING_OFFSET := $2
 
 MENU_SPRITE_Y_BASE := $46
 MENU_MAX_Y_SCROLL := $A0
 MENU_TOP_MARGIN_SCROLL := 7 ; in blocks
 
-; menuConfigSizeLookup
-; menu ram is defined at menuRAM in ./ram.asm
-.macro MENUSIZES
-    .byte $0    ; MODE_TETRIS
-    .byte $0    ; MODE_TSPINS
-    .byte $0    ; MODE_SEED
-    .byte $0    ; MODE_PARITY
-    .byte $F    ; MODE_PACE
-    .byte $7    ; MODE_PRESETS
-    .byte $8    ; MODE_TYPEB
-    .byte $C    ; MODE_FLOOR
-    .byte $F    ; MODE_CRUNCH
-    .byte $20   ; MODE_TAP
-    .byte $10   ; MODE_TRANSITION
-    .byte $4    ; MODE_MARATHON
-    .byte $1F   ; MODE_TAPQTY
-    .byte $8    ; MODE_CHECKERBOARD
-    .byte $4    ; MODE_GARBAGE
-    .byte $12   ; MODE_DROUGHT
-    .byte $10   ; MODE_DAS
-    .byte $12   ; MODE_LOWSTACK
-    .byte $0    ; MODE_KILLX2
-    .byte $0    ; MODE_INVISIBLE
-    .byte $0    ; MODE_HARDDROP
-    .byte $0    ; MODE_SPEED_TEST
-    .byte $5    ; MODE_SCORE_DISPLAY
-    .byte $3	; MODE_CRASH
-    .byte $1	; MODE_STRICT
-    .byte $1    ; MODE_HZ_DISPLAY
-    .byte $1    ; MODE_INPUT_DISPLAY
-    .byte $1    ; MODE_DISABLE_FLASH
-    .byte $1    ; MODE_DISABLE_PAUSE
-    .byte $5    ; MODE_DARK
-    .byte $1    ; MODE_GOOFY
-    .byte $1    ; MODE_DEBUG
-    .byte $1    ; MODE_LINECAP
-    .byte $1    ; MODE_DASONLY
-    .byte $1    ; MODE_QUAL
-    .byte $1    ; MODE_PAL
-.if KEYBOARD = 1
-    .byte $1    ; MODE_KEYBOARD
-.endif
-.endmacro
+NTSC_DAS = 16
+NTSC_ARR = 6
+
+PAL_DAS = 12
+PAL_ARR = 4
 
 .macro MODENAMES
     .byte   "TETRIS"
     .byte   "TSPINS"
-    .byte   " SEED "
     .byte   "STACKN"
-    .byte   " PACE "
     .byte   "SETUPS"
     .byte   "B-TYPE"
-    .byte   "FLOOR "
-    .byte   "CRUNCH"
     .byte   "QCKTAP"
-    .byte   "TRNSTN"
     .byte   "MARTHN"
     .byte   "TAPQTY"
     .byte   "CKRBRD"
     .byte   "GARBGE"
     .byte   "LOBARS"
-    .byte   "DASDLY"
     .byte   "LOWSTK"
     .byte   "KILLX2"
-    .byte   "INVZBL"
-    .byte   "HRDDRP"
+    .byte   " TEST "
 .endmacro
+
+.enum
+FILL_NONE
+FILL_B
+FILL_CHECKER
+.endenum

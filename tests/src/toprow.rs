@@ -1,9 +1,11 @@
-use crate::{util, labels, playfield};
+use crate::{labels, playfield, util};
 
 pub fn test() {
     let mut emu = util::emulator(None);
 
-    for _ in 0..3 { emu.run_until_vblank(); }
+    for _ in 0..8 {
+        emu.run_until_vblank();
+    }
 
     let game_mode = labels::get("gameMode") as usize;
     let main_loop = labels::get("mainLoop");
@@ -13,17 +15,22 @@ pub fn test() {
     emu.memory.iram_raw[game_mode] = 4;
     emu.registers.pc = main_loop;
 
-    for _ in 0..5 { emu.run_until_vblank(); }
+    for _ in 0..8 {
+        emu.run_until_vblank();
+    }
 
     // 4 lines
 
+    emu.memory.iram_raw[labels::get("playState") as usize] = 0x1;
     emu.memory.iram_raw[labels::get("currentPiece") as usize] = 0x11;
     emu.memory.iram_raw[labels::get("tetriminoX") as usize] = 0x5;
     emu.memory.iram_raw[labels::get("tetriminoY") as usize] = 0x0;
     emu.memory.iram_raw[labels::get("autorepeatY") as usize] = 0;
     emu.memory.iram_raw[labels::get("vramRow") as usize] = 0;
 
-    playfield::set_str(&mut emu, r##"
+    playfield::set_str(
+        &mut emu,
+        r##"
 ##### ####
 ##### ####
 ##### ####
@@ -43,13 +50,15 @@ pub fn test() {
 #  # # # #
 ## # # # #
 #  # # # #
-#  ### ###"##);
+#  ### ###"##,
+    );
 
     for _ in 0..55 {
         emu.run_until_vblank();
     }
 
-    assert_eq!(r##"
+    assert_eq!(
+        r##"
 
 
 
@@ -68,10 +77,13 @@ pub fn test() {
 ###### ###
 #  # # # #
 ## # # # #
-#  # # # #"##, playfield::get_str(&emu));
+#  # # # #"##,
+        playfield::get_str(&emu)
+    );
 
     // 3 lines
 
+    emu.memory.iram_raw[labels::get("playState") as usize] = 0x1;
     emu.memory.iram_raw[labels::get("currentPiece") as usize] = 0x11;
     emu.memory.iram_raw[labels::get("tetriminoX") as usize] = 0x5;
     emu.memory.iram_raw[labels::get("tetriminoY") as usize] = 0x0;
@@ -79,7 +91,9 @@ pub fn test() {
     emu.memory.iram_raw[labels::get("vramRow") as usize] = 0;
 
     playfield::clear(&mut emu);
-    playfield::set_str(&mut emu, r##"
+    playfield::set_str(
+        &mut emu,
+        r##"
 ##### ####
 ##### ####
 ##### ####
@@ -99,13 +113,15 @@ pub fn test() {
 #  # # # #
 ## # # # #
 #  # # # #
-#  ### ###"##);
+#  ### ###"##,
+    );
 
-    for _ in 0..50 {
+    for _ in 0..40 {
         emu.run_until_vblank();
     }
 
-    assert_eq!(r##"
+    assert_eq!(
+        r##"
 
 
 
@@ -124,10 +140,13 @@ pub fn test() {
 ###### ###
 #  # # # #
 ## # # # #
-#  # # # #"##, playfield::get_str(&emu));
+#  # # # #"##,
+        playfield::get_str(&emu)
+    );
 
     // 2 lines
 
+    emu.memory.iram_raw[labels::get("playState") as usize] = 0x1;
     emu.memory.iram_raw[labels::get("currentPiece") as usize] = 0x2;
     emu.memory.iram_raw[labels::get("tetriminoX") as usize] = 0x5;
     emu.memory.iram_raw[labels::get("tetriminoY") as usize] = 0x0;
@@ -135,7 +154,9 @@ pub fn test() {
     emu.memory.iram_raw[labels::get("vramRow") as usize] = 0;
 
     playfield::clear(&mut emu);
-    playfield::set_str(&mut emu, r##"
+    playfield::set_str(
+        &mut emu,
+        r##"
 ####   ###
 ##### ####
      #
@@ -155,13 +176,15 @@ pub fn test() {
 #  # # # #
 ## # # # #
 #  # # # #
-#  ### ###"##);
+#  ### ###"##,
+    );
 
     for _ in 0..40 {
         emu.run_until_vblank();
     }
 
-    assert_eq!(r##"
+    assert_eq!(
+        r##"
 
 
      #
@@ -180,10 +203,13 @@ pub fn test() {
 ###### ###
 #  # # # #
 ## # # # #
-#  # # # #"##, playfield::get_str(&emu));
+#  # # # #"##,
+        playfield::get_str(&emu)
+    );
 
     // 1 line
 
+    emu.memory.iram_raw[labels::get("playState") as usize] = 0x1;
     emu.memory.iram_raw[labels::get("currentPiece") as usize] = 0x12;
     emu.memory.iram_raw[labels::get("tetriminoX") as usize] = 0x5;
     emu.memory.iram_raw[labels::get("tetriminoY") as usize] = 0x0;
@@ -191,7 +217,9 @@ pub fn test() {
     emu.memory.iram_raw[labels::get("vramRow") as usize] = 0;
 
     playfield::clear(&mut emu);
-    playfield::set_str(&mut emu, r##"
+    playfield::set_str(
+        &mut emu,
+        r##"
 ###    ###
      #
 
@@ -211,13 +239,15 @@ pub fn test() {
 #  # # # #
 ## # # # #
 #  # # # #
-#  ### ###"##);
+#  ### ###"##,
+    );
 
     for _ in 0..41 {
         emu.run_until_vblank();
     }
 
-    assert_eq!(r##"
+    assert_eq!(
+        r##"
 
      #
 
@@ -236,10 +266,13 @@ pub fn test() {
 ###### ###
 #  # # # #
 ## # # # #
-#  # # # #"##, playfield::get_str(&emu));
+#  # # # #"##,
+        playfield::get_str(&emu)
+    );
 
     // normal burn
 
+    emu.memory.iram_raw[labels::get("playState") as usize] = 0x1;
     emu.memory.iram_raw[labels::get("currentPiece") as usize] = 0x2;
     emu.memory.iram_raw[labels::get("tetriminoX") as usize] = 0x5;
     emu.memory.iram_raw[labels::get("tetriminoY") as usize] = 0x0;
@@ -247,7 +280,9 @@ pub fn test() {
     emu.memory.iram_raw[labels::get("vramRow") as usize] = 0;
 
     playfield::clear(&mut emu);
-    playfield::set_str(&mut emu, r##"
+    playfield::set_str(
+        &mut emu,
+        r##"
 # ##   # #
 ##### ####
      #  #
@@ -267,13 +302,15 @@ pub fn test() {
 #  # # # #
 ## # # # #
 #  # # # #
-#  ### ###"##);
+#  ### ###"##,
+    );
 
     for _ in 0..40 {
         emu.run_until_vblank();
     }
 
-    assert_eq!(r##"
+    assert_eq!(
+        r##"
 # ###### #
      #  #
 
@@ -292,10 +329,13 @@ pub fn test() {
 #  # # # #
 ## # # # #
 #  # # # #
-#  ### ###"##, playfield::get_str(&emu));
+#  ### ###"##,
+        playfield::get_str(&emu)
+    );
 
     // flat I should burn
 
+    emu.memory.iram_raw[labels::get("playState") as usize] = 0x1;
     emu.memory.iram_raw[labels::get("currentPiece") as usize] = 0x12;
     emu.memory.iram_raw[labels::get("tetriminoX") as usize] = 0x5;
     emu.memory.iram_raw[labels::get("tetriminoY") as usize] = 0x0f;
@@ -309,7 +349,8 @@ pub fn test() {
         emu.run_until_vblank();
     }
 
-    assert_eq!(r##"
+    assert_eq!(
+        r##"
 
 
 
@@ -328,5 +369,7 @@ pub fn test() {
 
 
 
-   ####"##, playfield::get_str(&emu));
+   ####"##,
+        playfield::get_str(&emu)
+    );
 }

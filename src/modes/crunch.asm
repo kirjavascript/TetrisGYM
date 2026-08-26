@@ -1,68 +1,91 @@
-; crunch start variants:
-; 0 - 0 left 0 right
-; 1 - 0 left 1 right
-; 2 - 0 left 2 right
-; 3 - 0 left 3 right
-; 4 - 1 left 0 right
-; 5 - 1 left 1 right
-; 6 - 1 left 2 right
-; 7 - 1 left 3 right
-; 8 - 2 left 0 right
-; 9 - 2 left 1 right
-; A - 2 left 2 right
-; B - 2 left 3 right
-; C - 3 left 0 right
-; D - 3 left 1 right
-; E - 3 left 2 right
-; F - 3 left 3 right
-
 ; clobbers generalCounter3 & generalCounter4 (defined in playstate/util.asm)
 
-advanceGameCrunch:
+initGameCrunch:
+; ignore for garbage mode
+    lda practiseType
+    cmp #MODE_GARBAGE
+    beq crunchReturn
+    ldx crunchLeftModifier
+    bne @crunch
+    ldx crunchRightModifier
+    beq crunchReturn
+@crunch:
 ; initialize playfield row 19 to 0
-    ldx #$13
+    lda #$13
+    sta generalCounter
 @nextRow:
-    lda multBy10Table,x
-    sta playfieldAddr ; restored to 0 at end of loop
-    jsr advanceSides
-    dex
+    ldx generalCounter
+    ldy multBy10Table,x
+    ldx #0
+@loop:
+    lda topRowBuffer,x
+    bmi @noTile
+    sta playfield,y
+@noTile:
+    iny
+    inx
+    cpx #$0A
+    bne @loop
+    dec generalCounter
     bpl @nextRow
-    inx ; x is FF, increase to store 0 in vramRow
-    stx vramRow
+    lda #0
+    sta vramRow
 crunchReturn:
     rts
 
-advanceSides:
-    ; called in playState_checkForCompletedRows and in advanceGameCrunch
-    ; draws to row defined in playfieldAddr, which defaults to 0
-    jsr unpackCrunchModifier
+refreshTopRow:
+    lda practiseType ; ignore crunch for tap quantity
+    cmp #MODE_TAPQTY
+    beq @ret
+    cmp #MODE_GARBAGE ; also for garbage
+    beq @ret
+    ldx #9
+@loop:
+    lda topRowBuffer,x
+    sta playfield,x
+    dex
+    bpl @loop
+@ret:
+    rts
 
-    lda #BLOCK_TILES
+initializeTopRowBuffer:
+    ldy #9
+    lda #EMPTY_TILE
+@initLoop:
+    sta topRowBuffer,y
+    dey
+    bpl @initLoop
 
+    jsr copyCrunchModifier
+    lda #BLOCK_TILES+3
     ldy #$0
 @leftLoop:
     dec crunchLeftColumns
     bmi @initRight
-    sta (playfieldAddr),y
+    sta topRowBuffer,y
     iny
     bpl @leftLoop ; unconditional
-
 @initRight:
     ldy #$9
 @rightLoop:
     dec crunchRightColumns
-    bmi crunchReturn
-    sta (playfieldAddr),y
+    bmi @ret
+    sta topRowBuffer,y
     dey
     bpl @rightLoop ; unconditional
+@ret:
+    rts
 
-
-unpackCrunchModifier:
-    lda crunchModifier
-    lsr
-    lsr
+copyCrunchModifier:
+    lda crunchLeftModifier
     sta crunchLeftColumns ; generalCounter3
-    lda crunchModifier
-    and #$03
+    lda crunchRightModifier
+    sta crunchRightColumns ; generalCounter4
+    rts
+
+copyCrunchModifierMirrored:
+    lda crunchRightModifier
+    sta crunchLeftColumns ; generalCounter3
+    lda crunchLeftModifier
     sta crunchRightColumns ; generalCounter4
     rts

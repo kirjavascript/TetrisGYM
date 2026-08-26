@@ -2,8 +2,11 @@ playState_prepareNext:
         lda practiseType
         cmp #MODE_CHECKERBOARD
         bne @checkBType
-        lda completedRow+3
-        cmp #$13
+        ; check to see if bottom row for checkerboard has been cleared
+        lda #$13
+        sec
+        sbc currentFloor
+        cmp completedRow+3
         bne endOfEndingCode
         jsr typeBEndingStuff
         rts
@@ -19,12 +22,21 @@ playState_prepareNext:
 
 addBTypeBonus:
         ; patch levelNumber with score multiplier
+        lda heightOrRows
+        beq @byHeight
+        ldx rowsModifier
+        lda rowsToHeight,x
+        jmp @store
+@byHeight:
+        lda heightModifier
+@store:
+        sta generalCounter
         ldx levelNumber
         stx tmp3 ; and save a copy
         lda levelDisplayTable, x
         and #$F
         clc
-        adc typeBModifier
+        adc generalCounter
         sta levelNumber
         beq @typeBScoreDone
         dec levelNumber
@@ -62,6 +74,7 @@ endOfEndingCode:
         rts
 
 typeBEndingStuff:
+        inc gameTimerStop
         ldx #<typebSuccessGraphic
         ldy #>typebSuccessGraphic
 copyGraphic:
@@ -83,9 +96,9 @@ typeBEndingStuffEnd:
 
 sleep_gameplay_nextSprite:
         sta sleepCounter
-        jsr stageSpriteForNextPiece
+        jsr stageCurrentAndNextPieces
 @loop:  jsr updateAudioWaitForNmiAndResetOamStaging
-        jsr stageSpriteForNextPiece
+        jsr stageCurrentAndNextPieces
         lda sleepCounter
         bne @loop
         rts
@@ -110,6 +123,9 @@ copyGraphicToPlayfieldAtCustomRow:
         bne @copySuccessGraphic
 @graphicCopied: ; 0 in accumulator
         sta vramRow
+        ; override if full playfield rendermode
+        lda #RENDER_PLAY
+        sta renderMode
         rts
 
 ; $28 is ! in game tileset

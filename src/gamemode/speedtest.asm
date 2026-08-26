@@ -1,6 +1,9 @@
+speedTestColorPatch:
+        .byte $3f, $0b, $00, $30
+        .byte $0
+
 gameMode_speedTest:
-        lda #$6
-        sta renderMode
+        jsr hideSpritesAndBackground
         ; reset some stuff for input log rendering
         lda #$EF
         sta inputLogCounter
@@ -8,31 +11,28 @@ gameMode_speedTest:
         sta hzFrameCounter+1
 
         jsr hzStart
-        jsr updateAudioWaitForNmiAndDisablePpuRendering
-        jsr disableNmi
         jsr clearNametable
-        jsr bulkCopyToPpu
-        .addr speedtest_nametable_patch
-        jsr bulkCopyToPpu
-        .addr game_palette
-        ; patch color
-        lda #$3f
-        sta PPUADDR
-        lda #$b
-        sta PPUADDR
-        lda #$30
-        sta PPUDATA
-        lda #NMIEnable|BGPattern1|SpritePattern1
-        sta currentPpuCtrl
+
+        stagePatch speedtestNametablePatch
+        stagePatch gamePalette
+        stagePatch speedTestColorPatch
+        jsr render_mode_queue
+
 .if INES_MAPPER <> 0
         lda #CHRBankSet0
         jsr changeCHRBanks
 .endif
 
-        jsr waitForVBlankAndEnableNmi
-        jsr updateAudioWaitForNmiAndResetOamStaging
-        jsr updateAudioWaitForNmiAndEnablePpuRendering
-        jsr updateAudioWaitForNmiAndResetOamStaging
+; reenable display
+        lda #$B0
+        sta ppuScrollX
+        lda #$0
+        sta ppuScrollY
+        lda #NMIEnable|BGPattern1|SpritePattern1
+        sta currentPpuCtrl
+        lda #RENDER_SPEED_TEST
+        sta renderMode
+        jsr showSpriteAndBackground
 
 @loop:
         lda heldButtons_player1
@@ -48,6 +48,11 @@ gameMode_speedTest:
         jmp @loop
 
 @back:
+        lda #RENDER_IDLE
+        sta renderMode
+        lda currentPpuMask
+        and #$E7
+        sta PPUMASK
         lda #$02
         sta soundEffectSlot1Init
         sta gameMode

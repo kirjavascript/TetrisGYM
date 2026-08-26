@@ -73,12 +73,10 @@ copyToApuChannel:
         ldy #$00
 @copyByte:
         lda (AUDIOTMP3),y
-.if SWAP_DUTY_CYCLES
         cpy #0
         bne @notFirstByte
         jsr swapDutyCycles
 @notFirstByte:
-.endif
         sta (AUDIOTMP1),y
         iny
         tya
@@ -473,9 +471,7 @@ soundEffectSlot1_chirpChirpPlaying:
         and #$03
         tay
         lda soundEffectSlot1_chirpChirpSq1Vol_table,y
-.if SWAP_DUTY_CYCLES
         jsr swapDutyCycles
-.endif
         sta SQ1_VOL
         inc soundEffectSlot1SecondaryCounter
         lda soundEffectSlot1SecondaryCounter
@@ -626,10 +622,8 @@ LE442:  jsr copyToSq1Channel
         sta SQ1_LO
         ldy soundEffectSlot1SecondaryCounter
         lda sq1vol_unknown2_table,y
-.if SWAP_DUTY_CYCLES
         jsr swapDutyCycles
         tay ; set z flag based on a; y can be safely clobbered
-.endif
         sta SQ1_VOL
         bne LE46F
         lda soundEffectSlot1Playing
@@ -1077,9 +1071,7 @@ updateMusicFrame_setChanVol:
         bne @ret
         tya
         ldy musicChannelOffset
-.if SWAP_DUTY_CYCLES
         jsr swapDutyCycles
-.endif
         sta SQ1_VOL,y
 @ret:   rts
 
@@ -1360,9 +1352,7 @@ updateMusicFrame_updateChannel:
 @useDirectVolume:
         lda AUDIOTMP1
 @setMmio:
-.if SWAP_DUTY_CYCLES
         jsr swapDutyCycles
-.endif
         sta SQ1_VOL,y
         lda musicStagingSq1Sweep,x
         sta SQ1_SWEEP,y
@@ -1475,14 +1465,20 @@ musicGetNextInstructionByte:
         lda (musicChanTmpAddr),y
         rts
 
-.if SWAP_DUTY_CYCLES
 ; input a: byte to be written to $4000 or $4004. output a: the same byte with the duty cycle index mapped from (0, 1, 2, 3) to (0, 2, 1, 3), counteracting the behavior of some clone consoles
 swapDutyCycles:
+        pha ; use stack to preserve x & y
+        lda swapDutyCyclesFlag
+        beq @normal
+        pla
         cmp #%01000000
         bmi @ret ; branch if upper bits are not %01 or %10
         eor #%11000000 ; swap between %01 and %10
-@ret:   rts
-.endif
+@ret:
+        rts
+@normal:
+        pla
+        rts
 
 musicChanVolControlTable:
 noteToWaveTable:

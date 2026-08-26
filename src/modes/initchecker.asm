@@ -1,16 +1,28 @@
 initChecker:
-CHECKERBOARD_TILE := BLOCK_TILES
+CHECKERBOARD_TILE := BLOCK_TILES+3
 CHECKERBOARD_FLIP := CHECKERBOARD_TILE ^ EMPTY_TILE
         lda #0
         sta vramRow
-        ldx checkerModifier
-        lda typeBBlankInitCountByHeightTable, x
-        tax
-        cpx #$C8 ; edge case for height 0
+        lda heightOrRows
+        bne @byRows
+        ldx heightModifier
         bne @notZero
-        ldx #$BE
+        ldy #1
+        bne @load
 @notZero:
+        ldy heightToRows,x
+        jmp @load
+@byRows:
+        ldy rowsModifier
+@load:
+        ldx typeBBlankInitCountByRowsTable,y
+        lda seededPieces
+        beq @random
+        lda set_seed_input+1
+        jmp @branch
+@random:
         lda frameCounter
+@branch:
         and #1
         beq @checkerStartA
         lda #CHECKERBOARD_TILE
@@ -28,6 +40,6 @@ CHECKERBOARD_FLIP := CHECKERBOARD_TILE ^ EMPTY_TILE
 @notA:  sta playfield, x
         eor #CHECKERBOARD_FLIP
         inx
-        cpx #$C8
+        cpx #200
         bcc @loop
         rts

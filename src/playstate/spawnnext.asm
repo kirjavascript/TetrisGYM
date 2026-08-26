@@ -1,6 +1,8 @@
 SPAWN_NEXT_ADDONS := 1
 
 playState_spawnNextTetrimino:
+        lda hardDropFlag
+        bne :+
         lda vramRow
         cmp #$20
         bpl :+
@@ -52,6 +54,12 @@ playState_spawnNextTetrimino:
         jsr incrementPieceStat
         jsr chooseNextTetrimino
         sta nextPiece
+        ldx entryChargeModifier
+        beq @resetDownHold
+        dex
+        bne @resetDownHold ; kitaru charge handled in playstate branch
+        lda dasModifier
+        sta autorepeatX ; store full charge for hydrant/1
 @resetDownHold:
         lda #$00
         sta autorepeatY
@@ -71,7 +79,7 @@ pickRandomTetrimino:
         tax
         lda spawnTable,x
         cmp spawnID
-        bne useNewSpawnID
+        bne @useNewSpawnID
 @invalidIndex:
         ldx #rng_seed
         jsr generateNextPseudorandomNumber
@@ -79,44 +87,55 @@ pickRandomTetrimino:
         and #$07
         clc
         adc spawnID
-L992A:  cmp #$07
-        bcc L9934
+; check if valid before checking palpepFlag
+        cmp #$07
+        bcc @valid
+        ldx palpepFlag
+        bne @longbar
+; mod7 loop only if not palpep
+@mod7:  cmp #$07
+        bcc @valid
         sec
         sbc #$07
-        jmp L992A
-
-L9934:  tax
+        jmp @mod7
+@valid: tax
         lda spawnTable,x
-useNewSpawnID:
+@useNewSpawnID:
         sta spawnID
-        jsr pickTetriminoPost
-        rts
+        jmp pickTetriminoPost
+@longbar:
+        lda #PIECE_I_HORIZ
+        bne @useNewSpawnID
 
 pickTetriminoPre:
         lda practiseType
         cmp #MODE_TSPINS
         beq pickTetriminoT
-        ; lda practiseType ; accumulator is still practiseType
-        cmp #MODE_SEED
-        beq pickTetriminoSeed
-        ; lda practiseType
         cmp #MODE_TAPQTY
         beq pickTetriminoLongbar
-        ; lda practiseType
         cmp #MODE_TAP
         beq pickTetriminoLongbar
-        ; lda practiseType
         cmp #MODE_PRESETS
-        beq pickTetriminoPreset
+        bne @notPreset
+        jmp pickTetriminoPreset
+@notPreset:
+        lda seedEnabled
+        beq pickRandomTetrimino
+        lda seedEnabled
+        beq @pickRandomTetrimino
+        lda seededPieces
+        bne pickTetriminoSeed
+@pickRandomTetrimino:
         jmp pickRandomTetrimino
 
 pickTetriminoT:
-        lda #$2
+        lda #PIECE_T_DOWN
         sta spawnID
         rts
 
 pickTetriminoLongbar:
-        lda #$12
+        ldx practisePiece
+        lda spawnTable,x
         sta spawnID
         rts
 
@@ -169,19 +188,28 @@ pickTetriminoSeed:
         and #$07
         clc
         adc spawnID
-@L992A:
+
+; check if valid before checking palep
         cmp #$07
-        bcc @L9934
+        bcc @valid
+        ldx palpepFlag
+        bne @longbar
+; mod7 only if not palpep
+@mod7:
+        cmp #$07
+        bcc @valid
         sec
         sbc #$07
-        jmp @L992A
-
-@L9934:
+        jmp @mod7
+@valid:
         tax
         lda spawnTable,x
 @useNewSpawnID:
         sta spawnID
-        rts
+        jmp pickTetriminoPost
+@longbar:
+        lda #PIECE_I_HORIZ
+        bne @useNewSpawnID
 
 setSeedNextRNG:
         ldx #set_seed
@@ -225,13 +253,25 @@ pickTetriminoPost:
         cmp #MODE_DROUGHT
         beq pickTetriminoDrought
         lda spawnID ; restore A
+        ldx splitSquareFlag
+        beq @ret
+        cmp #PIECE_O
+        bne @ret
+        lda #PIECE_SPLIT_SQUARE
+        sta spawnID
+@ret:
         rts
 
 pickTetriminoDrought:
+        ldx #rng_seed+1
+        lda seedEnabled
+        beq @notSeeded
+        ldx #set_seed+1
+@notSeeded:
         lda spawnID ; restore A
-        cmp #$12
+        cmp #PIECE_I_HORIZ
         bne @droughtDone
-        lda rng_seed+1
+        lda $00,x
         and #$F
         adc #1 ; always adds 1 so code continues as normal if droughtModifier is 0
         cmp droughtModifier
@@ -240,4 +280,11 @@ pickTetriminoDrought:
 @droughtDone:
         rts
 @pickRando:
+        lda seedEnabled
+        beq @vanillaRng
+        jmp pickTetriminoSeed
+@vanillaRng:
         jmp pickRandomTetrimino
+
+spawnTable:                                                     ; 7
+        .byte   $02,$07,$08,$0A,$0B,$0E,$12

@@ -140,37 +140,15 @@ detectKeyboard:
         lda JOY2_APUFC
         and #KB_MASK
         bne @noKeyboard
-        inc keyboardFlag
+        lda #1
+        sta keyboardFlag
 @noKeyboard:
         rts
-
-; Seed Entry
-
-
-readKbSeedEntry:
-        ldx #seedEntryCharCount
-@readLoop:
-        lda seedEntryTable,x
-        jsr readKey
-        bne @seedEntered
-        dex
-        bpl @readLoop
-@seedEntered:
-        cpx kbHeldInput
-        beq @noInput
-        stx kbHeldInput
-        txa
-        rts
-@noInput:
-        lda #$FF
-        rts
-
 
 ; high score entry
 
 
 readKbHighScoreEntry:
-@kbInputThrottle := generalCounter4
 ; 2 frames to complete action
 ; first reads key, determines action and stores key (unless key is action only)
 ; second returns cursor action
@@ -216,7 +194,7 @@ readKbHighScoreEntry:
         cpx kbHeldInput
         bne @newInput
 
-        inc @kbInputThrottle
+        inc kbInputThrottle
         bne @noKeyPressed
 
         lda #<-4
@@ -227,7 +205,7 @@ readKbHighScoreEntry:
         lda #<-16
 
 @storeThrottle:
-        sta @kbInputThrottle
+        sta kbInputThrottle
 
 @placeInput:
         lda highScoreEntryNameOffsetForLetter

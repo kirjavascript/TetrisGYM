@@ -28,7 +28,7 @@ playState_updateLinesAndStatistics:
         sec
         sbc generalCounter
         sta lines
-        bpl @checkForBorrow
+        bcs @checkForBorrow
         lda #$00
         sta lines
         jmp addPoints
@@ -84,18 +84,11 @@ checkLevelUp:
         beq @lineLoop
         cmp #MODE_MARATHON
         bne @notMarathon
-        lda marathonModifier
-        beq @lineLoop ; marathon mode 0 does not transition
-        bne @notSXTOKL
+        lda marathonLevelModifier
+        beq @lineLoop
 @notMarathon:
-        cmp #MODE_TRANSITION
-        bne @notSXTOKL
-        lda transitionModifier
-        cmp #$10
-        bne @notSXTOKL
-        jmp @nextLevel
-@notSXTOKL:
-
+        lda sxtoklFlag
+        bne @nextLevel
         lda lines+1
         sta generalCounter2
         lda lines
@@ -131,22 +124,21 @@ checkLevelUp:
 
 checkLinecap: ; set linecapState
         ; check if enabled
-        lda linecapFlag
+        ldx linecapWhen
         beq @linecapEnd
-        ; skip check if already set
         lda linecapState
         bne @linecapEnd
-
-        lda linecapWhen
+        dex
         beq @linecapLevelCheck
 
 ;linecapLinesCheck
+@linecapLines:
 
         lda lines+1
-        cmp linecapLines+1
+        cmp linecapLinesBinHi
         bcc @linecapEnd
         lda lines
-        cmp linecapLines
+        cmp linecapLines+1
         bcc @linecapEnd
         bcs @linecapApply
 
@@ -162,8 +154,14 @@ checkLinecap: ; set linecapState
         sta linecapState
 
         cmp #LINECAP_INVISIBLE
-        bne @linecapEnd
+        bne @checkInitialFloor
         sta invisibleFlag
+        bne @linecapEnd
+
+@checkInitialFloor:
+        cmp #LINECAP_FLOOR
+        bne @floorLinecapEnd
+        beq @increaseFloor
 
 @linecapEnd:
 
@@ -174,15 +172,19 @@ checkLinecap: ; set linecapState
         ; check level up was possible
         tya
         beq @floorLinecapEnd
-        lda #$A
-        sta garbageHole
-        lda #1
-        sta pendingGarbage
+@increaseFloor:
         inc currentFloor
+        jsr drawFloorTopRow
 @floorLinecapEnd:
 
 addPoints:
+        lda trtFlag
+        beq @noTetrisRate
+        jsr trtCalculate
+@noTetrisRate:
         inc playState
+        lda tetrisOnlyFlag
+        bne handlePointsTetrisOnly
         lda practiseType
         cmp #MODE_CHECKERBOARD
         beq handlePointsCheckerboard
@@ -211,7 +213,6 @@ addPointsRaw:
 .if NO_SCORING
         rts
 .endif
-
         lda holdDownPoints
         cmp #$02
         bmi @noPushDown
@@ -251,6 +252,62 @@ handlePointsCheckerboard:
 
 checkerboardPoints:
         .byte 0, 10, 20, 30, 40
+
+handlePointsTetrisOnly:
+        jsr calcScaledLineClearPoints ; -> product24 = pointsTable[completedLines] * (level+1)
+
+        lda completedLines
+        cmp #4
+        beq @addPoints
+
+        ; 1-3 lines: subtract the same scaled points a normal
+        ; clear would have earned, clamped at zero
+        sec
+        lda binScore
+        sbc product24
+        sta binScore
+        lda binScore+1
+        sbc product24+1
+        sta binScore+1
+        lda binScore+2
+        sbc product24+2
+        sta binScore+2
+        lda binScore+3
+        sbc #0
+        sta binScore+3
+        bcs @finish
+        lda #0
+        sta binScore
+        sta binScore+1
+        sta binScore+2
+        sta binScore+3
+        jmp @finish
+
+@addPoints:
+        clc
+        lda binScore
+        adc product24
+        sta binScore
+        lda binScore+1
+        adc product24+1
+        sta binScore+1
+        lda binScore+2
+        adc product24+2
+        sta binScore+2
+        lda binScore+3
+        adc #0
+        sta binScore+3
+
+@finish:
+        jsr setupScoreForRender
+        lda renderFlags
+        ora #RENDER_SCORE
+        sta renderFlags
+        lda #$0
+        sta completedLines
+        lda #$0
+        sta holdDownPoints
+        rts
 
 ones := tmpX
 hundredths := tmpY
@@ -342,36 +399,7 @@ div16mul10:
         rts
 
 addLineClearPoints:
-        lda #0
-        sta factorA24+1
-        sta factorA24+2
-        lda levelNumber
-        ldy practiseType
-        cpy #MODE_MARATHON
-        bne @notMarathon
-        ldy marathonModifier
-        cpy #3 ; Marathon modes 3 + 4 score normally
-        bcs @notMarathon
-        lda startLevel
-@notMarathon:
-        sta factorA24+0
-        inc factorA24+0
-        bne @noverflow
-        inc factorA24+1
-@noverflow:
-
-        lda completedLines
-        beq addLineClearPoints_end ; skip with 0 completed lines
-        asl
-        tax
-        lda pointsTable, x
-        sta factorB24+0
-        lda pointsTable+1, x
-        sta factorB24+1
-        lda #0
-        sta factorB24+2
-
-        jsr unsigned_mul24 ; points to add in product24
+        jsr calcScaledLineClearPoints
 
         clc
         lda binScore
@@ -425,6 +453,43 @@ clearPoints:
         sta binScore+2
         sta binScore+3
         rts
+
+calcScaledLineClearPoints:
+        lda #0
+        sta factorA24+1
+        sta factorA24+2
+        lda levelNumber
+        ldy practiseType
+        cpy #MODE_MARATHON
+        bne @notMarathon
+        ldy marathonScoreFlag
+        bne @notMarathon
+        lda startLevel
+@notMarathon:
+        sta factorA24+0
+        inc factorA24+0
+        bne @noverflow
+        inc factorA24+1
+@noverflow:
+
+        lda completedLines
+        bne @hasLines
+        lda #0
+        sta product24
+        sta product24+1
+        sta product24+2
+        rts
+@hasLines:
+        asl
+        tax
+        lda pointsTable, x
+        sta factorB24+0
+        lda pointsTable+1, x
+        sta factorB24+1
+        lda #0
+        sta factorB24+2
+
+        jmp unsigned_mul24 ; tail call - product24 set, rts returns to our caller
 
 pointsTable:
         .word   0,40,100,300,1200

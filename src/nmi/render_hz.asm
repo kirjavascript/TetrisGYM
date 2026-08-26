@@ -23,7 +23,6 @@ renderHz:
 renderHzSpeedTest:
 
         ; palette
-
         lda #$3F
         sta PPUADDR
         lda #$07

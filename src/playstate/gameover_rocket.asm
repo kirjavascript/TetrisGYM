@@ -21,11 +21,11 @@ playState_checkStartGameOver:
         tay
         lda #$00
         sta generalCounter3
-        lda #$13
+        lda #PIECE_HIDDEN
         sta currentPiece
 @drawCurtainRow:
         lda #$4F
-        sta (playfieldAddr),y
+        sta playfield,y
         iny
         inc generalCounter3
         lda generalCounter3
@@ -62,8 +62,8 @@ playState_checkStartGameOver:
 
 @checkForStartButton:
         lda newlyPressedButtons_player1
-        cmp #$10
-        bne @ret2
+        and #BUTTON_START
+        beq @ret2
 @exitGame:
         lda #$00
         sta playState
@@ -78,19 +78,17 @@ sleep_gameplay:
         rts
 
 endingAnimation: ; rocket_screen
-        jsr updateAudioWaitForNmiAndDisablePpuRendering
-        jsr disableNmi
+        jsr hideSpritesAndBackground
 .if INES_MAPPER <> 0
         ; NROM will use a smaller ufo in the game tileset
         lda #CHRBankSet1
         jsr changeCHRBanks
 .endif
-        lda #NMIEnable
-        sta currentPpuCtrl
+        ldx #RLE_NT_ROCKET
         jsr copyRleNametableToPpu
-        .addr rocket_nametable
-        jsr bulkCopyToPpu
-        .addr rocket_palette
+
+        stagePatch rocketPalette
+        jsr render_mode_queue
 
         ; lines
         lda #$21
@@ -133,17 +131,16 @@ endingAnimation: ; rocket_screen
         lda levelNumber
         jsr renderByteBCDNoPad
 
-        jsr waitForVBlankAndEnableNmi
-        jsr updateAudioWaitForNmiAndResetOamStaging
-        jsr updateAudioWaitForNmiAndEnablePpuRendering
-.if INES_MAPPER <> 3
-        jsr updateAudioWaitForNmiAndResetOamStaging
-.endif
+; reenable display
+        jsr resetScroll
+        lda #NMIEnable
+        sta currentPpuCtrl
+        lda #RENDER_ROCKET
+        sta renderMode
+        jsr showSpriteAndBackground
 
         lda #0
         sta screenStage
-        lda #$5
-        sta renderMode
         lda #$1
         sta endingSleepCounter
         lda #$80 ; timed in bizhawk tasstudio to be 1 frame longer than usual (probably a lag frame)
@@ -152,6 +149,8 @@ endingAnimation: ; rocket_screen
 endingLoop:
         jsr updateAudioWaitForNmiAndResetOamStaging
         jsr handleRocket
+
+        jsr showQualWait
 
         lda screenStage
         bne @waitEnd

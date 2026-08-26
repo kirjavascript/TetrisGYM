@@ -232,4 +232,4 @@ renderLettersHighByte:
         rts
 
 linesDash:
-        .byte $15, $12, $17, $E, $1C, $24
+        .byte "LINES", $24

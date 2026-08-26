@@ -65,21 +65,22 @@ updatePlayfield:
 crunchLeftColumns = generalCounter3
 crunchRightColumns = generalCounter4
 
-updateMusicSpeed:
 
-        ; ldx #$05
-        ; lda multBy10Table,x ;this piece of code is parameterized for no reason but the crash checking code relies on the index being 50-59 so if you ever optimize this part out of the code please also adjust the crash test, specifically the part which handles cycles for allegro.
-        ; tay
+crunchAdjustYSetXHorizMirror:
+        jsr copyCrunchModifierMirrored
+        jmp _crunchAdjust
+crunchAdjustYSetX:
+        jsr copyCrunchModifier
+        ; add left columns to Y
+        ; set X to playable columns
+_crunchAdjust:
+        ldx crunchLeftModifier
+        bne @crunch
+        ldx crunchRightModifier
+        beq @notCrunch
 
-        ldy #50 ; replaces above
-
-; check if crunch mode
-        ldx practiseType
-        cpx #MODE_CRUNCH
-        bne @notCrunch
-
+@crunch:
         ; add crunch left columns to y
-        jsr unpackCrunchModifier
         tya
         clc
         adc crunchLeftColumns ; offset y with left column count (generalCounter3)
@@ -91,17 +92,36 @@ updateMusicSpeed:
         sbc crunchLeftColumns ; generalCounter3
         sbc crunchRightColumns ; generalCounter4
         tax
-        bne @checkForBlockInRow ; unconditional, expected range 4 - 10
-
+        bne @ret ; unconditional, expected range 4 - 10
 @notCrunch:
         ldx #$0A
+@ret:
+        rts
+
+isBlockInRowAtY:
+; y = start of row
+; negative flag clear if block found
+; check if crunch mode
+        jsr crunchAdjustYSetX
 @checkForBlockInRow:
-        lda (playfieldAddr),y
-        cmp #EMPTY_TILE
-        bne @foundBlockInRow
+        lda playfield,y
+        bpl @foundBlock
         iny
         dex
         bne @checkForBlockInRow
+        lda #$80 ; set negative flag
+@foundBlock:
+        rts
+
+updateMusicSpeed:
+
+        ; ldx #$05
+        ; lda multBy10Table,x ;this piece of code is parameterized for no reason but the crash checking code relies on the index being 50-59 so if you ever optimize this part out of the code please also adjust the crash test, specifically the part which handles cycles for allegro.
+        ; tay
+
+        ldy #50 ; replaces above
+        jsr isBlockInRowAtY
+        bpl @foundBlockInRow
         lda allegro
         sta wasAllegro
         beq @ret
@@ -128,23 +148,13 @@ updateMusicSpeed:
 @ret:   rts
 
 checkIfAboveLowStackLine:
-; carry set - block found
+; negative clear - block found
         sec
         lda #19
         sbc lowStackRowModifier
         tax
         ldy multBy10Table,x
-        ldx #$0A
-        sec
-@checkForBlockInRow:
-        lda playfield,y
-        bpl @foundBlockInRow
-        iny
-        dex
-        bne @checkForBlockInRow
-        clc
-@foundBlockInRow:
-        rts
+        jmp isBlockInRowAtY
 
 ; canon is adjustMusicSpeed
 setMusicTrack:

@@ -15,7 +15,7 @@ branchOnPlayStatePlayer1:
             playState_incrementPlayState
 
 playState_unassignOrientationId:
-        lda #$13
+        lda #PIECE_HIDDEN
         sta currentPiece
         rts
 
@@ -32,5 +32,6 @@ playState_noop:
 .include "garbage.asm"
 .include "spawnnext.asm"
 .include "gameover_rocket.asm"
+.include "trt.asm"
 
 .include "util.asm"

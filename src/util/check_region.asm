@@ -40,5 +40,21 @@ checkRegion:
         beq @ntsc
         lda #1
         sta palFlag
+        sta detectedRegion
+
+        ; check to see if custom settings are applied
+        ; leave alone if not vanilla
+        lda dasModifier
+        cmp #NTSC_DAS
+        bne @ntsc
+        lda arrModifier
+        cmp #NTSC_ARR
+        bne @ntsc
+
+; vanilla - ok to change
+        lda #PAL_DAS
+        sta dasModifier
+        lda #PAL_ARR
+        sta arrModifier
 @ntsc:
         rts

@@ -33,21 +33,25 @@ renderByteBCDStart:
         lda byteToBcdTable, x
 
 twoDigsToPPU:
-        sta generalCounter
+        pha
         and #$F0
         lsr a
         lsr a
         lsr a
         lsr a
         sta PPUDATA
-        lda generalCounter
+        pla
         and #$0F
         sta PPUDATA
         rts
 
 render_playfield:
-        lda #$04
-        sta playfieldAddr+1
+        lda skipNormalPlayfieldRender
+        beq @normalRender
+        lda #0
+        sta skipNormalPlayfieldRender
+        rts
+@normalRender:
         jsr copyPlayfieldRowToVRAM
         jsr copyPlayfieldRowToVRAM
         jsr copyPlayfieldRowToVRAM
@@ -66,17 +70,41 @@ vramPlayfieldRows:
         .word   $22CC,$22EC,$230C,$232C
 
 copyLowStackRowToVram:
+@lowstackLine = tmpZ
+        lda #LOW_STACK_LINE
+        sta @lowstackLine
+        ldy #0
+        lda mirrorHorizFlag
+        beq @notHorizMirror
+        jsr crunchAdjustYSetXHorizMirror
+        jmp @checkVert
+@notHorizMirror:
+        jsr crunchAdjustYSetX
+@checkVert:
+        txa
+        pha
+        lda mirrorVertFlag
+        beq @notVertMirror
+        lda #LOW_STACK_LINE-16
+        sta @lowstackLine
+        lda lowStackRowModifier
+        jmp @continue
+@notVertMirror:
         sec
         lda #19
         sbc lowStackRowModifier
+@continue:
         asl
         tax
         lda vramPlayfieldRows+1,x
         sta PPUADDR
-        lda vramPlayfieldRows,x
+        tya
+        clc
+        adc vramPlayfieldRows,x
         sta PPUADDR
-        ldx #$0A
-        lda #LOW_STACK_LINE
+        pla
+        tax
+        lda @lowstackLine
 @drawLine:
         sta PPUDATA
         dex
@@ -88,7 +116,19 @@ copyPlayfieldRowToVRAM:
         cpx #$15
         bpl @ret
         lda multBy10Table,x
+        ldy mirrorHorizFlag
+        beq @notHorizMirror
+        clc
+        adc #$9
+@notHorizMirror:
         tay
+        lda mirrorVertFlag
+        beq @notVertMirror
+        lda #$13
+        sec
+        sbc vramRow
+        tax
+@notVertMirror:
         txa
         asl a
         tax
@@ -96,15 +136,16 @@ copyPlayfieldRowToVRAM:
         lda vramPlayfieldRows,x
         sta PPUADDR
         dex
-
         lda vramPlayfieldRows,x
         sta PPUADDR
 @copyRow:
         ldx #$0A
         lda invisibleFlag
         bne @copyRowInvisible
+        lda mirrorHorizFlag
+        bne @copyRowMirrorHoriz
 @copyByte:
-        lda (playfieldAddr),y
+        lda playfield,y
         sta PPUDATA
         iny
         dex
@@ -124,4 +165,12 @@ copyPlayfieldRowToVRAM:
         sta PPUDATA
         dex
         bne @copyByteInvisible
+        jmp @rowCopied
+
+@copyRowMirrorHoriz:
+        lda playfield,y
+        sta PPUDATA
+        dey
+        dex
+        bne @copyRowMirrorHoriz
         jmp @rowCopied

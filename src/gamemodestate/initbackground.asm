@@ -1,27 +1,49 @@
 gameModeState_initGameBackground:
-        jsr updateAudioWaitForNmiAndDisablePpuRendering
-        jsr disableNmi
+        jsr hideSpritesAndBackground
+        jsr updateAudioWaitForNmiAndResetOamStaging
 .if INES_MAPPER <> 0
         lda #CHRBankSet0
         jsr changeCHRBanks
 .endif
-        jsr bulkCopyToPpu
-        .addr   game_palette
+        stagePatchThenWaitForNmi gamePalette
+
+        ldx #RLE_NT_GAME
         jsr copyRleNametableToPpu
-        .addr   game_nametable
+
         jsr scoringBackground
+        lda trtFlag
+        beq @noTrtPatch
+        stagePatch trtNametable
+@noTrtPatch:
+
+        lda dasMeterFlag
+        beq @noDasMeter
+        stagePatch dasMeterNametable
+@noDasMeter:
+
         jsr debugNametableUI
 
-        ldy darkModifier
-        beq @notDarkMode
-        jsr drawDarkMode
-@notDarkMode:
+        ldy #$20
+        ldx #$A3
+        jsr patchSeed
+
+        lda splitSquareFlag
+        beq @noSplitSquares
+
+        stagePatch splitSquareNametable
+@noSplitSquares:
 
         lda hzFlag
         beq @noHz
-        jsr bulkCopyToPpu
-        .addr hzStats
+        stagePatch hzStats
 @noHz:
+
+; flush queue here
+        lda #RENDER_QUEUE
+        sta renderMode
+        jsr updateAudioWaitForNmiAndResetOamStaging
+        lda #RENDER_DISABLE
+        sta renderMode
 
         lda #$20
         sta tmp1
@@ -45,14 +67,24 @@ gameModeState_initGameBackground:
         sta PPUDATA
 @heartEnd:
 
-        lda #NMIEnable|BGPattern1|SpritePattern1
-        sta PPUCTRL
-        sta currentPpuCtrl
+; dark mode last to get all possible corner mods
+        ldy darkModifier
+        beq @notDarkMode
+
+        ; skip NMI tasks during darkmode setup
+        lda #RENDER_DISABLE
+        sta renderMode
+        jsr drawDarkMode
+@notDarkMode:
+
+; reenable display
         jsr resetScroll
-        jsr waitForVBlankAndEnableNmi
-        jsr updateAudioWaitForNmiAndResetOamStaging
-        jsr updateAudioWaitForNmiAndEnablePpuRendering
-        jsr updateAudioWaitForNmiAndResetOamStaging
+        lda #NMIEnable|BGPattern1|SpritePattern1
+        sta currentPpuCtrl
+        lda #RENDER_PLAY
+        sta renderMode
+        jsr showSpriteAndBackground
+
         lda #$01
         sta playState
         inc gameModeState ; 1
@@ -92,8 +124,7 @@ scoringBackground:
         ; 7 digit
         cmp #SCORING_SEVENDIGIT
         bne @noSevenDigit
-        jsr bulkCopyToPpu
-        .addr seven_digit_nametable
+        stagePatch sevenDigitNametable
 
 @noSevenDigit:
 
@@ -143,8 +174,7 @@ MODENAMES
 debugNametableUI:
         lda debugFlag
         beq @notDebug
-        jsr bulkCopyToPpu
-        .addr savestate_nametable
+        stagePatchThenWaitForNmi savestateNametable
         jsr saveSlotNametablePatch
 @notDebug:
         rts
@@ -178,52 +208,68 @@ statisticsNametablePatch:
         rts
 
 showPaceDiffText:
-        lda practiseType
-        cmp #MODE_PACE
-        bne @done
-        jsr bulkCopyToPpu
-        .addr paceDiffText
+        lda paceModifier
+        bmi @done
+        stagePatch paceDiffText
         lda #0
 @done:
         rts
 
 paceDiffText: ; stripe
-        .byte $20, $98, $4, $D, $12, $F, $F, $FF
+        .byte $20, $98, $3, $D, $12, $F, $F, $0
 
 hzStats: ; stripe
-        .byte $21, $63, $43, $FF
-        .byte $21, $83, $46, $FF
-        .byte $21, $C3, $46, $FF
-        .byte $21, $E3, $42, $FF
-        .byte $22, $03, $46, $FF
-        .byte $22, $03, $46, $FF
-        .byte $22, $43, $46, $FF
-        .byte $22, $83, $46, $FF
-        .byte $22, $c3, $46, $FF
-        .byte $21, $A8, $1, $EC ; hz
-        .byte $21, $A5, $1, $ED ; .
-        .byte $23, $D8, $2, $B7, $25 ; hz palette
-        .byte $22, $23, $3, $1D, $A, $19 ; tap
-        .byte $22, $63, $3, $D, $15, $22 ; dly
-        .byte $22, $A3, $3, $D, $12, $1B ; dir
-        .byte $FF
+        .byte $21, $63, $2, $FF, $FF, $FF
+        .byte $21, $83, $5, $FF, $FF, $FF, $FF, $FF, $FF
+        .byte $21, $C3, $5, $FF, $FF, $FF, $FF, $FF, $FF
+        .byte $21, $E3, $1, $FF, $FF
+        .byte $22, $03, $5, $FF, $FF, $FF, $FF, $FF, $FF
+        .byte $22, $03, $5, $FF, $FF, $FF, $FF, $FF, $FF
+        .byte $22, $43, $5, $FF, $FF, $FF, $FF, $FF, $FF
+        .byte $22, $83, $5, $FF, $FF, $FF, $FF, $FF, $FF
+        .byte $22, $c3, $5, $FF, $FF, $FF, $FF, $FF, $FF
+        .byte $21, $A8, $0, $EC ; hz
+        .byte $21, $A5, $0, $ED ; .
+        .byte $23, $D8, $1, $B7, $25 ; hz palette
+        .byte $22, $23, $2, $1D, $A, $19 ; tap
+        .byte $22, $63, $2, $D, $15, $22 ; dly
+        .byte $22, $A3, $2, $D, $12, $1B ; dir
+        .byte $0
 
-seven_digit_nametable:
-        .byte $20, $5F, $41, $75 ; -
-        .byte $20, $7f, $C7, $36 ; |
-        .byte $21, $5F, $41, $77 ; -
-        .byte $20, $7E, $C7, $FF ; |
-        .byte $20, $5E, $41, $34 ; -
-        .byte $21, $5E, $41, $37 ; -
-        .byte $21, $1E, $41, $0  ; 0
-        .byte $FF
+sevenDigitNametable:
+        .byte $20, $5E, $1, $34, $75 ; -
+        .byte $20, $7E, $1, $FF, $36 ; |
+        .byte $20, $9E, $1, $FF, $36 ; |
+        .byte $20, $BE, $1, $FF, $36 ; |
+        .byte $20, $DE, $1, $FF, $36 ; |
+        .byte $20, $FE, $1, $FF, $36 ; |
+        .byte $21, $1E, $1, $00, $36 ; 0
+        .byte $21, $3E, $1, $FF, $36 ; |
+        .byte $21, $5E, $1, $37, $77 ; -
+        .byte $0
 
-savestate_nametable:
-        .byte   $22,$F7,$8,$74,$34,$34,$34,$34,$34,$34,$75
-        .byte   $23,$17,$8,$35,$1C,$15,$18,$1D,$FF,$FF,$36
-        .byte   $23,$37,$8,$35,$FF,$FF,$FF,$FF,$FF,$FF,$36
-        .byte   $23,$57,$8,$76,$37,$37,$37,$37,$37,$37,$77
-        .byte   $FF
+trtNametable:
+        .byte   $23,$17,$3,$74,$34,$34,$75
+        .byte   $23,$37,$3,$35,$00,$00,$36
+        .byte   $23,$57,$3,$76,$37,$37,$77
+        .byte   $0
+
+splitSquareNametable:
+        .byte   $22,$23,$1,$B0,$B1
+        .byte   $22,$43,$1,$B2,$B3
+        .byte   $0
+
+savestateNametable:
+        .byte   $22,$F7,$7,$74,$34,$34,$34,$34,$34,$34,$75
+        .byte   $23,$17,$7,$35,$1C,$15,$18,$1D,$FF,$FF,$36
+        .byte   $23,$37,$7,$35,$FF,$FF,$FF,$FF,$FF,$FF,$36
+        .byte   $23,$57,$7,$76,$37,$37,$37,$37,$37,$37,$77
+        .byte   $0
+
+dasMeterNametable:
+        .byte   $23,$6C,$8,$74,$34,$34,$34,$34,$34,$34,$34,$75
+        .byte   $23,$8C,$8,$76,$37,$37,$37,$37,$37,$37,$37,$77
+        .byte   $0
 
 NORMAL_CORNER_TILES := $70
 DARK_CORNER_TILES := $80

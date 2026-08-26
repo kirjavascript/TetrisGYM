@@ -15,22 +15,15 @@ gameModeState_handleGameOver:
         beq @gameOver
         jmp @ret
 @gameOver:
-        lda #$03
+        lda #RENDER_PLAY
         sta renderMode
-.if KEYBOARD = 1
         ; flag for keyboard poll to ignore mapped keys except start/return
         inc highScoreEntryActive
         jsr handleHighScoreIfNecessary
         dec highScoreEntryActive
-.else
-        jsr handleHighScoreIfNecessary
-.endif
         lda #$01
         sta playState
-        lda #$EF
-        ldx #$04
-        ldy #$04 ; used to be 5, but we dont need to clear 2p playfield
-        jsr memset_page
+        jsr clearPlayfield
         lda #$00
         sta vramRow
         lda #$01
@@ -39,9 +32,9 @@ gameModeState_handleGameOver:
         ldx #3 ; levelMenu
         lda practiseType
         cmp #MODE_KILLX2
-        bne @notGameTypeMenu
+        bne @storeX
         dex
-@notGameTypeMenu:
+@storeX:
         stx gameMode
         rts
 

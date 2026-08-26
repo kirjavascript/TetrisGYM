@@ -1,8 +1,8 @@
 clearPlayfield:
+        ldx #0
         lda #EMPTY_TILE
-        ldx #$C8
 @loop:
-        sta $0400, x
+        sta playfield,x
         dex
         bne @loop
         rts
@@ -10,6 +10,7 @@ clearPlayfield:
 clearNametable:
         lda #$20
         sta PPUADDR
+clearNametableOffset:
         lda #$0
         sta PPUADDR
         lda #EMPTY_TILE
@@ -26,24 +27,29 @@ clearNametable:
         rts
 
 drawBlackBGPalette:
+        ldx renderQueuePointer
         lda #$3F
-        sta PPUADDR
+        sta stack,x
+        inx
         lda #$0
-        sta PPUADDR
-        ldx #$10
-@loadPaletteLoop:
+        sta stack,x
+        inx
+        ldy #31
+        tya
+        sta stack,x
         lda #$F
-        sta PPUDATA
-        dex
-        bne @loadPaletteLoop
+@loadPaletteLoop:
+        sta stack,x
+        inx
+        dey
+        bpl @loadPaletteLoop
+        inc renderQueueLength
         rts
 
 resetScroll:
         lda #0
         sta ppuScrollX
-        sta PPUSCROLL
         sta ppuScrollY
-        sta PPUSCROLL
         rts
 
 random10:
@@ -60,18 +66,13 @@ updateAudioWaitForNmiAndResetOamStaging:
         jsr updateAudio_jmp
         lda #$00
         sta verticalBlankingInterval
-        nop
-
 checkForNmi:
         lda verticalBlankingInterval
 ; label used for crash code to determine if nmi happened here or at the previous instruction
 nmiLoopMidpoint:
         beq checkForNmi
-
-.if KEYBOARD = 1
 ; Read Family BASIC Keyboard
         jsr pollKeyboard
-.endif
 resetOAMStaging:
 ; Hide a sprite by moving it down offscreen, by writing any values between #$EF-#$FF here.
 ; Sprites are never displayed on the first line of the picture, and it is impossible to place
@@ -88,157 +89,48 @@ resetOAMStaging:
         bne @hideY
         rts
 
+; 7  bit  0
+; ---- ----
+; BGRs bMmG
+; |||| ||||
+; |||| |||+- Greyscale (0: normal color, 1: greyscale)
+; |||| ||+-- 1: Show background in leftmost 8 pixels of screen, 0: Hide
+; |||| |+--- 1: Show sprites in leftmost 8 pixels of screen, 0: Hide
+; |||| +---- 1: Enable background rendering
+; |||+------ 1: Enable sprite rendering
+; ||+------- Emphasize red (green on PAL/Dendy)
+; |+-------- Emphasize green (red on PAL/Dendy)
+; +--------- Emphasize blue
+
+hideSpritesAndBackground:
+        lda #RENDER_IDLE
+        sta renderMode
+        lda #0
+        sta PPUMASK
+        rts
+
+showSpriteAndBackground:
+        lda renderMode
+        pha
+        lda #RENDER_IDLE
+        sta renderMode
+        jsr waitForNmi
+        lda #%00011110
+        sta PPUMASK
+        pla
+        sta renderMode
+        rts
+
 updateAudioAndWaitForNmi:
         jsr updateAudio_jmp
+waitForNmi:
         lda #$00
         sta verticalBlankingInterval
-        nop
 @checkForNmi:
         lda verticalBlankingInterval
         beq @checkForNmi
         rts
 
-updateAudioWaitForNmiAndDisablePpuRendering:
-        jsr updateAudioAndWaitForNmi
-        lda currentPpuMask
-        and #$E1
-_updatePpuMask:
-        sta PPUMASK
-        sta currentPpuMask
-        rts
-
-updateAudioWaitForNmiAndEnablePpuRendering:
-        jsr updateAudioAndWaitForNmi
-        jsr copyCurrentScrollAndCtrlToPPU
-        lda currentPpuMask
-        ora #$1E
-        bne _updatePpuMask
-waitForVBlankAndEnableNmi:
-        lda PPUSTATUS
-        and #$80
-        bne waitForVBlankAndEnableNmi
-        lda currentPpuCtrl
-        ora #$80
-        bne _updatePpuCtrl
-disableNmi:
-        lda currentPpuCtrl
-        and #$7F
-_updatePpuCtrl:
-        sta PPUCTRL
-        sta currentPpuCtrl
-        rts
-
-copyCurrentScrollAndCtrlToPPU:
-        lda ppuScrollX
-        sta PPUSCROLL
-        lda ppuScrollY
-        sta PPUSCROLL
-        lda currentPpuCtrl
-        sta PPUCTRL
-        rts
-
-bulkCopyToPpu:
-        jsr copyAddrAtReturnAddressToTmp_incrReturnAddrBy2
-        jmp copyToPpu
-
-LAA9E:  pha
-        sta PPUADDR
-        iny
-        lda (tmp1),y
-        sta PPUADDR
-        iny
-        lda (tmp1),y
-        asl a
-        pha
-        lda currentPpuCtrl
-        ora #$04
-        bcs LAAB5
-        and #$FB
-LAAB5:  sta PPUCTRL
-        sta currentPpuCtrl
-        pla
-        asl a
-        php
-        bcc LAAC2
-        ora #$02
-        iny
-LAAC2:  plp
-        clc
-        bne LAAC7
-        sec
-LAAC7:  ror a
-        lsr a
-        tax
-LAACA:  bcs LAACD
-        iny
-LAACD:  lda (tmp1),y
-        sta PPUDATA
-        dex
-        bne LAACA
-        pla
-        cmp #$3F
-        bne LAAE6
-        sta PPUADDR
-        stx PPUADDR
-        stx PPUADDR
-        stx PPUADDR
-LAAE6:  sec
-        tya
-        adc tmp1
-        sta tmp1
-        lda #$00
-        adc tmp2
-        sta tmp2
-; Address to read from stored in tmp1/2
-copyToPpu:
-        ldx PPUSTATUS
-        ldy #$00
-        lda (tmp1),y
-        bpl LAAFC
-        rts
-
-LAAFC:  cmp #$60
-        bne LAB0A
-        pla
-        sta tmp2
-        pla
-        sta tmp1
-        ldy #$02
-        bne LAAE6
-LAB0A:  cmp #$4C
-        bne LAA9E
-        lda tmp1
-        pha
-        lda tmp2
-        pha
-        iny
-        lda (tmp1),y
-        tax
-        iny
-        lda (tmp1),y
-        sta tmp2
-        stx tmp1
-        bcs copyToPpu
-copyAddrAtReturnAddressToTmp_incrReturnAddrBy2:
-        tsx
-        lda stack+3,x
-        sta tmpBulkCopyToPpuReturnAddr
-        lda stack+4,x
-        sta tmpBulkCopyToPpuReturnAddr+1
-        ldy #$01
-        lda (tmpBulkCopyToPpuReturnAddr),y
-        sta tmp1
-        iny
-        lda (tmpBulkCopyToPpuReturnAddr),y
-        sta tmp2
-        clc
-        lda #$02
-        adc tmpBulkCopyToPpuReturnAddr
-        sta stack+3,x
-        lda #$00
-        adc tmpBulkCopyToPpuReturnAddr+1
-        sta stack+4,x
-        rts
 
 ;reg x: zeropage addr of seed
 generateNextPseudorandomNumber5x:
@@ -264,31 +156,39 @@ generateNextPseudorandomNumber:
         sta oneThirdPRNG
         rts
 
-; canon is initializeOAM
-copyOamStagingToOam:
-        lda #$00
-        sta OAMADDR
-        lda #$02
-        sta OAMDMA
-        rts
-
-
-; reg a: value; reg x: start page; reg y: end page (inclusive)
-memset_page:
-        pha
-        txa
-        sty tmp2
-        clc
-        sbc tmp2
-        tax
-        pla
-        ldy #$00
-        sty tmp1
-@setByte:
-        sta (tmp1),y
-        dey
-        bne @setByte
-        dec tmp2
-        inx
-        bne @setByte
-        rts
+copyPatchAtXYToQueue:
+    stx patchPtr
+    sty patchPtr+1
+@counter = generalCounter
+    ldx renderQueuePointer
+    ldy #0
+@stripe:
+; high ppu byte or end marker
+    lda (patchPtr),y
+    beq @end
+    sta stack,x
+    iny
+    inx
+; low ppu byte
+    lda (patchPtr),y
+    sta stack,x
+    iny
+    inx
+; length
+    lda (patchPtr),y
+    sta stack,x
+    sta @counter
+    inx
+    iny
+@tile:
+    lda (patchPtr),y
+    sta stack,x
+    inx
+    iny
+    dec @counter
+    bpl @tile
+    inc renderQueueLength
+    bne @stripe
+@end:
+    stx renderQueuePointer
+    rts

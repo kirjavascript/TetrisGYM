@@ -63,7 +63,7 @@ saveState:
         ; jsr saveSlot
 
 
-        lda #$17
+        lda #SPRITE_STATESAVE
         sta saveStateSpriteType
         lda #$20
         sta saveStateSpriteDelay
@@ -112,7 +112,7 @@ loadState:
         ; lda #7
         ; sta renderFlags
 
-        lda #$18
+        lda #SPRITE_STATELOAD
         sta saveStateSpriteType
         lda #$20
         sta saveStateSpriteDelay

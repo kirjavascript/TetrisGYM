@@ -1,37 +1,30 @@
 practiseInitGameState:
         lda practiseType
+        cmp #MODE_TAP
+        bne @skipTap
+        jmp initGameTap
+@skipTap:
+        cmp #MODE_PRESETS
+        bne @skipPresets
+        jmp advanceGamePreset
+@skipPresets:
         cmp #MODE_CHECKERBOARD
+        beq @initChecker
+        lda fillType
+        cmp #FILL_CHECKER
         bne @skipChecker
+@initChecker:
+        lda fillType
+        cmp #FILL_B
+        beq @skipChecker
         jsr initChecker
 @skipChecker:
-        jsr practiseEachPiece
-        cmp #MODE_FLOOR
-        bne @skipFloor
-        jmp advanceGameFloor
+        jsr initGameCrunch
+        lda floorModifier
+        beq @skipFloor
+        jsr initGameFloor
 @skipFloor:
-        lda practiseType
-        cmp #MODE_CRUNCH
-        bne @skipCrunch
-        jsr advanceGameCrunch
-@skipCrunch:
-        rts
-
-practisePrepareNext:
-        lda practiseType
-        cmp #MODE_PACE
-        bne @skipPace
-        jmp prepareNextPace
-@skipPace:
-        cmp #MODE_GARBAGE
-        bne @skipGarbo
-        jmp prepareNextGarbage
-@skipGarbo:
-        cmp #MODE_PARITY
-        bne @skipParity
-        jmp prepareNextParity
-@skipParity:
-        jsr practiseEachPiece
-        rts
+        jmp practiseEachPiece
 
 practiseAdvanceGame:
         lda practiseType
@@ -41,19 +34,27 @@ practiseAdvanceGame:
 @skipTSpins:
         rts
 
+practisePrepareNext:
+        lda paceModifier
+        bmi @skipPace
+        jsr prepareNextPace
+@skipPace:
+        lda practiseType
+        cmp #MODE_GARBAGE
+        bne @skipGarbo
+        jsr prepareNextGarbage
+@skipGarbo:
+        cmp #MODE_STACKING
+        bne @skipParity
+        jsr prepareNextParity
+@skipParity:
+
 practiseEachPiece: ; only used in this file
+        lda practiseType
         cmp #MODE_TAPQTY
         bne @skipTapQuantity
         jsr prepareNextTapQuantity
 @skipTapQuantity:
-        cmp #MODE_TAP
-        bne @skipTap
-        jmp advanceGameTap
-@skipTap:
-        cmp #MODE_PRESETS
-        bne @skipPresets
-        jmp advanceGamePreset
-@skipPresets:
         rts
 
 practiseGameHUD:
@@ -62,9 +63,8 @@ practiseGameHUD:
         jsr controllerInputDisplay
 @noInput:
 
-        lda practiseType
-        cmp #MODE_PACE
-        bne @skipPace
+        lda paceModifier
+        bmi @skipPace
         jsr gameHUDPace
 @skipPace:
 
@@ -72,6 +72,12 @@ practiseGameHUD:
         cmp #MODE_TAPQTY
         bne @skipTapQuantity
 
+        lda #$34
+        ldy mirrorVertFlag
+        beq @drawTapQty
+        lda #$B8
+@drawTapQty:
+        sta generalCounter
         ldy #0
         ldx oamStagingLength
 @drawQTY:
@@ -80,7 +86,7 @@ practiseGameHUD:
         asl
         asl
         asl
-        adc #$34
+        adc generalCounter
         sta tmpY
         sta oamStaging, x
         inx

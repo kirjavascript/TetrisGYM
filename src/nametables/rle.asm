@@ -36,7 +36,7 @@ copyRleNametableToPpu:
         lda #$20
         sta addrOff
 copyRleNametableToPpuOffset:
-        jsr copyAddrAtReturnAddressToTmp_incrReturnAddrBy2
+        jsr loadRleNametableXToTmp
         ldx PPUSTATUS
         lda addrOff
         sta PPUADDR

@@ -18,7 +18,7 @@ multOrientBegin:
 multBy10Table:                                                  ; 20
         .byte   $00,$0A,$14,$1E,$28,$32,$3C,$46
         .byte   $50,$5A,$64,$6E,$78,$82,$8C,$96
-        .byte   $A0,$AA,$B4,$BE
+        .byte   $A0,$AA,$B4,$BE,$C8
 
 multBy32Table:                                                  ; 8
         .byte   0,32,64,96,128,160,192,224
@@ -27,10 +27,31 @@ multBy100Table:                                                 ; 10
         .byte   $00,$64,$C8,$2C,$90
         .byte   $F4,$58,$BC,$20,$84
 
-spawnTable:                                                     ; 7
-        .byte   $02,$07,$08,$0A,$0B,$0E,$12
+.enum
+PIECE_T_UP
+PIECE_T_RIGHT
+PIECE_T_DOWN
+PIECE_T_LEFT
+PIECE_J_LEFT
+PIECE_J_UP
+PIECE_J_RIGHT
+PIECE_J_DOWN
+PIECE_Z_HORIZ
+PIECE_Z_VERT
+PIECE_O
+PIECE_S_HORIZ
+PIECE_S_VERT
+PIECE_L_RIGHT
+PIECE_L_DOWN
+PIECE_L_LEFT
+PIECE_L_UP
+PIECE_I_VERT
+PIECE_I_HORIZ
+PIECE_SPLIT_SQUARE
+PIECE_HIDDEN
+.endenum
 
-tetriminoTypeFromOrientation:                                   ; 19
+tetriminoTypeFromOrientation:                                   ; 20
         .byte   $00,$00,$00,$00 ; t
         .byte   $01,$01,$01,$01 ; j
         .byte   $02,$02         ; z
@@ -38,8 +59,9 @@ tetriminoTypeFromOrientation:                                   ; 19
         .byte   $04,$04         ; s
         .byte   $05,$05,$05,$05 ; l
         .byte   $06,$06         ; i
+        .byte   $03             ; split square
 
-tetriminoTileFromOrientation:                                   ; 20
+tetriminoTileFromOrientation:                                   ; 21
         .byte   $7B,$7B,$7B,$7B ; t
         .byte   $7D,$7D,$7D,$7D ; j
         .byte   $7C,$7C         ; z
@@ -47,9 +69,10 @@ tetriminoTileFromOrientation:                                   ; 20
         .byte   $7D,$7D         ; s
         .byte   $7C,$7C,$7C,$7C ; l
         .byte   $7B,$7B         ; i
+        .byte   $7B             ; split square
         .byte   $FF             ; hidden
 
-orientationTableY:                                              ; 80
+orientationTableY:                                              ; 84
         .byte   $00,$00,$00,$FF ; $00 t up
         .byte   $FF,$00,$00,$01 ; $01 t right
         .byte   $00,$00,$00,$01 ; $02 t down
@@ -69,9 +92,10 @@ orientationTableY:                                              ; 80
         .byte   $FF,$00,$00,$00 ; $10 l up
         .byte   $FE,$FF,$00,$01 ; $11 i vertical
         .byte   $00,$00,$00,$00 ; $12 i horizontal
-        .byte   $00,$00,$00,$00 ; $13 hidden
+        .byte   $00,$00,$01,$01 ; $13 split square
+        .byte   $00,$00,$00,$00 ; $14 hidden
 
-orientationTableX:                                              ; 80
+orientationTableX:                                              ; 84
         .byte   $FF,$00,$01,$00 ; $00 t up
         .byte   $00,$00,$01,$00 ; $01 t right
         .byte   $FF,$00,$01,$00 ; $02 t down
@@ -91,11 +115,12 @@ orientationTableX:                                              ; 80
         .byte   $01,$FF,$00,$01 ; $10 l up
         .byte   $00,$00,$00,$00 ; $11 i vertical
         .byte   $FE,$FF,$00,$01 ; $12 i horizontal
-        .byte   $00,$00,$00,$00 ; $13 hidden
+        .byte   $FF,$01,$FF,$01 ; $13 split square
+        .byte   $00,$00,$00,$00 ; $14 hidden
 
-; unused.  padding required for mult10Tail
-.repeat 10
-    .byte $00
+; padding to keep mult10Tail aligned to end of page
+.repeat 6
+.byte 0
 .endrepeat
 
 ; needs to be last table in this page

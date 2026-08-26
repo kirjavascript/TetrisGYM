@@ -44,12 +44,12 @@ _setMMC1Control:
 
 changeCHRBanks:
         ; accum should be 0 or 2 (CHRBankset0 or CHRBankset1)
-        sta     generalCounter
+        sta generalCounter
 
 ; autodetect
 .if INES_MAPPER = 1000
-        ldx     mapperId
-        beq     @cnrom
+        ldx mapperId
+        beq @cnrom
         changeCHRBanksMMC1
         rts
 @cnrom:

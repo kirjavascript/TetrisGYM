@@ -6,16 +6,17 @@ tmpX: .res 1 ;  $0003
 tmpY: .res 1 ;  $0004
 tmpZ: .res 1 ;  $0005
 
-tmpBulkCopyToPpuReturnAddr: .res 2 ;  $0006 ; 2 bytes
+.res 2
 binScore: .res 4 ;  $8 ; 4 bytes binary
 score: .res 4 ;  $C ; 4 bytes BCD
 nmiReturnAddr: .res 1 ; $0010 ; used for crash
 crashState: .res 1 ; $0011 ; used for crash
 cycleCount: .res 2 ; $0012 ; 2 bytes ; used for crash
 oneThirdPRNG: .res 1 ; $0014 ; used for crash
-    .res $2
+b_seed: .res 2 ; loaded with rng_seed unless seeded
 
 rng_seed: .res 2 ; $0017
+rng_seed_hi:= rng_seed + 1
 spawnID: .res 1 ; $0019
 spawnCount: .res 1 ; $001A
 pointerAddr: .res 2 ; $001B ; used in debug, harddrop
@@ -24,13 +25,16 @@ allegroIndex: .res 1 ; $001F for crash
 wasAllegro: .res 1 ; $0020 for crash
 startParity: .res 1 ; $0021 for crash
 lagState: .res 1 ; $0022 for lagged lines & score
-    .res $10
+    .res $F
 
+.res 1 ; $0032
 verticalBlankingInterval: .res 1 ; $0033
 set_seed: .res 3 ; $0034 ; rng_seed, rng_seed+1, spawnCount
-set_seed_input: .res 3 ; $0037 ; copied to set_seed during gameModeState_initGameState
-    .res 6
-
+patchPtr: .res 2
+.res 1
+.res 4
+renderQueueLength: .res 1
+renderQueuePointer: .res 1
 tetriminoX: .res 1 ; $0040
 tetriminoY: .res 1 ; $0041
 currentPiece: .res 1 ; $0042                    ; Current piece as an orientation ID
@@ -51,7 +55,7 @@ linesTileQueue: .res 1 ; $54
     .res 1
 completedLines: .res 1 ; $0056
 lineIndex: .res 1 ; $0057                        ; Iteration count of playState_checkForCompletedRows
-startHeight: .res 1 ; $0058
+.res 1
 garbageHole: .res 1 ; $0059                        ; Position of hole in received garbage
 garbageDelay: .res 1 ; $005A
 pieceTileModifier: .res 1 ; $005B ; above $80 - use a single one, below - use an offset
@@ -76,13 +80,61 @@ pztemp := mathRAM+$D
 byteSpriteAddr: .res 2
 byteSpriteTile: .res 1
 byteSpriteLen: .res 1
-    .res $2A
+
+; (up to) 32 bytes menu scratch ram.  can be reused in any other mode
+; can also overlap with mathram
+; this is to spread out for easier thinking
+
+; needs to be the same shape as lr* below
+udPointer: .res $2
+udAdjust: .res $1
+udMin: .res $1
+udMax: .res $1
+; needs to be the same shape ud* above
+lrPointer: .res $2
+lrAdjust: .res $1
+lrMin: .res $1
+lrMax: .res $1
+
+activeItem: .res $1
+MENU_PTR_DISTANCE = lrPointer-udPointer
+stringSetPtr: .res $2
+.res $1
+
+unpackedPageType: .res $1
+unpackedPageValue: .res $1
+unpackedItemType: .res $1
+unpackedItemValue: .res $1
+pageItemCount: .res 1
+digitPtr: .res $2
+originalPage: .res $1
+nybbleTemp: .res $1
+blankCounter: .res $1
+rowCounter: .res $1
+
+.res 4
+
+actualPage: .res $1
+gameStarted: .res $1
+.res $1
+
+; lr page    ; mem address never changes (activePage)
+; lr column  ; mem address never changes (activeColumn)
+; lr value   ; current item is set every time anyway
+; ud item    ; mem address never changes (activeItem)
+; ud value   ; mem address never changes (expandedDigit)
+
+
+    .res $A
 
 spriteXOffset: .res 1 ; $00A0
 spriteYOffset: .res 1 ; $00A1
-stringIndexLookup:
-spriteIndexInOamContentLookup: .res 1 ; $00A2
-renderFlags: .res 1 ; $00A3
+stringAttrib: .res 1 ; $00A2
+spriteTile:
+stringLength: .res 1 ; $00A3
+stringIndex:
+spriteIndex: .res 1 ; can probably be the same as stringIndex
+renderFlags: .res 1 ; $00A5
 ; gameplay
 ; Bit 0-lines 1-level 2-score 3-debug 4-hz 6-stats 7-high score entry letter
 ; speedtest
@@ -90,7 +142,7 @@ renderFlags: .res 1 ; $00A3
 ; level menu
 ; 0-customLevel
 
-    .res $3
+    .res $1
 
 gameModeState: .res 1 ; $00A7                    ; For values, see playState_checkForCompletedRows
 generalCounter: .res 1 ; $00A8                    ; canon is legalScreenCounter2
@@ -103,12 +155,12 @@ originalY: .res 1 ; $00AE
 dropSpeed: .res 1 ; $00AF
 tmpCurrentPiece: .res 1 ; $00B0                    ; Only used as a temporary
 frameCounter: .res 2 ; $00B1
+frameCounterHi:= frameCounter + 1
 oamStagingLength: .res 1 ; $00B3
     .res 1
 newlyPressedButtons: .res 1 ; $00B5                 ; Active player's buttons
 heldButtons: .res 1 ; $00B6                        ; Active player's buttons
-    .res 1
-playfieldAddr: .res 2 ; $00B8                    ; HI byte is leftPlayfield in canon. Current playfield being processed: $0400 (left; 1st player) or $0500 (right; 2nd player)
+    .res 3
 allegro: .res 1 ; $00BA
 pendingGarbage: .res 1 ; $00BB                    ; Garbage waiting to be delivered to the current player. This is exchanged with pendingGarbageInactivePlayer when swapping players.
     .res 1
@@ -123,7 +175,9 @@ endingSleepCounter: .res 2 ; $00C4
 endingRocketCounter: .res 1 ; $00C6
 endingRocketX: .res 1 ; $C7
 endingRocketY: .res 1 ; $C8
-    .res 5
+gameTimer: .res 2
+gameTimerStop: .res 1
+    .res 2
     .res 6 ; used to be demo stuff
 highScoreEntryNameOffsetForLetter: .res 1 ; $00D4   ; Relative to current row
 highScoreEntryRawPos: .res 1 ; $00D5                ; High score position 0=1st type A, 1=2nd... 4=1st type B... 7=4th/extra type B
@@ -144,14 +198,11 @@ soundRngSeed: .res 2 ; $00EB                    ; Set, but not read
 currentSoundEffectSlot: .res 1 ; $00ED              ; Temporary
 musicChannelOffset: .res 1 ;  $00EE                  ; Temporary. Added to $4000-3 for MMIO
 currentAudioSlot: .res 1 ; $00EF                    ; Temporary
-    .res 1
-unreferenced_buttonMirror: .res 3 ; $00F1          ; Mirror of $F5-F8
-    .res 1
+    .res 5
 newlyPressedButtons_player1: .res 1 ; $00F5         ; $80-a $40-b $20-select $10-start $08-up $04-down $02-left $01-right
 newlyPressedButtons_player2: .res 1 ; $00F6
 heldButtons_player1: .res 1 ; $00F7
-heldButtons_player2: .res 1 ; $00F8
-    .res 2
+    .res 3
 joy1Location: .res 1 ; $00FB                    ; normal=0; 1 or 3 for expansion
 ppuScrollY: .res 1 ; $00FC
 ppuScrollX: .res 1 ; $00FD
@@ -162,15 +213,20 @@ currentPpuCtrl: .res 1 ; $00FF
 stack: .res $FF ; $0100
     .res 1
 oamStaging: .res $100 ; $0200                        ; format: https://wiki.nesdev.com/w/index.php/PPU_programmer_reference#OAM
-    .res $F0
+
+
+; todo:  find out which need to be preserved
+trtLineCounter: .res $2
+trtScratch: .res $6
+trtRam: .res $8
+    .res $E0
 statsByType: .res $E ; $03F0
     .res 2
 playfield: .res $c8 ; $0400
     .res $38 ; still technically part of playfield
 
     .res $100 ; $500 ; 2 player playfield
-
-practiseType: .res 1 ; $600
+.res 1
 spawnDelay: .res 1 ; $601
 dasValueDelay: .res 1 ; $602
 dasValuePeriod: .res 1 ; $603
@@ -206,34 +262,49 @@ tqtyCurrent: .res 1 ; $621
 tqtyNext: .res 1 ; $622
 
 ; hard drop ram is pretty big, but can be reused in other modes
-; 22 bytes total
+; 23 bytes total
 completedLinesCopy: .res 1 ; $623
 lineOffset: .res 1 ; $624
-harddropBuffer: .res $14 ; $625 ; 20 bytes (!)
+harddropBuffer: .res $15 ; $625 ; 21 bytes (!)
 
-linecapState: .res 1 ; $639 ; 0 if not triggered, 1 + linecapHow otherwise, reset on game init
+linecapState: .res 1 ; $63A ; 0 if not triggered, 1 + linecapHow otherwise, reset on game init
 
-dasOnlyShiftDisabled: .res 1 ; $63A
+dasOnlyShiftDisabled: .res 1 ; $63B
 
-invisibleFlag: .res 1 ; $63B  ; 0 for normal mode, non-zero for Invisible playfield rendering.  Reset on game init and game over.
-currentFloor: .res 1 ; $63C floorModifier is copied here at game init.  Set to 0 otherwise and incremented when linecap floor.
-mapperId: .res 1 ; $63D ; For INES_MAPPER 1000 (autodetect).  0 = CNROM.  1 = MMC1.
-hardDropGhostY: .res 1 ; ghost Y used as a shortcut for hard/sonic drop
+invisibleFlag: .res 1 ; $63C  ; 0 for normal mode, non-zero for Invisible playfield rendering.  Reset on game init and game over.
+currentFloor: .res 1 ; $63D floorModifier is copied here at game init.  Set to 0 otherwise and incremented when linecap floor.
+mapperId: .res 1 ; $63E ; For INES_MAPPER 1000 (autodetect).  0 = CNROM.  1 = MMC1.
+hardDropGhostY: .res 1 ; $63F ; ghost Y used as a shortcut for hard/sonic drop
+anydasFlag: .res 1 ; $640
+seededPieces: .res 1 ; $641
+killX2Flag: .res 1 ; $642
+skipNormalPlayfieldRender: .res 1 ; $643
 
-.if KEYBOARD
-kbReadState: .res 1 ; $063F - used for high score entry
-kbHeldInput: .res 1 ; $0640 - high score input throttling
-kbRawInput: .res 9 ; $0641  - all 72 keys' input
+kbReadState: .res 1 ; $644 - used for high score entry
+kbHeldInput: .res 1 ; $645 - high score input throttling
+kbRawInput: .res 9 ; $646  - all 72 keys' input
+kbInputThrottle: .res 1 ; $64F
 
 ; used to track state of high score entry screen.  Can possibly use the address of the nmi interrupted
 ; routine in the stack to track instead
-highScoreEntryActive: .res 1  ; $064A
-.else
-    .res $C
-.endif
+highScoreEntryActive: .res 1  ; $650
+trtLines: .res 2 ; $651 ; fix for now for transition mode/trt compat
 
-    .res $35
+menuStack: .res 28 ; $653
 
+; only important in menu mode
+prevGoofy: .res 1 ; $66F
+
+topRowBuffer: .res 10 ; $670
+
+secretGrade: .res 1 ; $67A
+secretGradePending: .res 1 ; $67B
+detectedRegion: .res 1 ; $67C ; set at same time as palFlag but not user configurable
+
+linecapLinesBinHi: .res 1 ; $67D ; menu input is BCD, converted to binary and stored here
+                          ; low byte is also BCD but is treated by game as BCD
+
+.segment "MUSIC_RAM": absolute
 musicStagingSq1Lo: .res 1 ; $0680
 musicStagingSq1Hi: .res 1 ; $0681
 audioInitialized: .res 1 ; $0682
@@ -297,8 +368,10 @@ soundEffectSlot2Playing: .res 1 ; $06FA
 soundEffectSlot3Playing: .res 1 ; $06FB
 soundEffectSlot4Playing: .res 1 ; $06FC
 currentlyPlayingMusicTrack: .res 1 ; $06FD          ; Copied from musicTrack
-    .res 1
-unreferenced_soundRngTmp: .res 1 ; $06FF
+    .res 2
+
+
+.segment "SCORE_RAM": absolute
 highscores: ; $700
 ; scores are name - score - lines - startlevel - level
 highScoreQuantity := 3
@@ -311,51 +384,28 @@ highScoreLength := highScoreNameLength + highScoreScoreLength + highScoreLinesLe
     .res 43
 initMagic: .res 5 ; $075B                        ; Initialized to a hard-coded number. When resetting, if not correct number then it knows this is a cold boot
 
+
+.segment "VARS_RAM": absolute
 menuRAM:  ; $760
-menuSeedCursorIndex: .res 1
-menuScrollY: .res 1
 menuMoveThrottle: .res 1
 menuThrottleTmp: .res 1
 levelControlMode: .res 1
-customLevel: .res 1
 classicLevel: .res 1
 heartsAndReady: .res 1   ; high nybble used for ready
-linecapCursorIndex: .res 1
-linecapWhen: .res 1
-linecapHow: .res 1
-linecapLevel: .res 1
-linecapLines: .res 2
-menuVars: ; $76E
-paceModifier: .res 1
-presetModifier: .res 1
-typeBModifier: .res 1
-floorModifier: .res 1
-crunchModifier: .res 1
-tapModifier: .res 1
-transitionModifier: .res 1
-marathonModifier: .res 1
-tapqtyModifier: .res 1
-checkerModifier: .res 1
-garbageModifier: .res 1
-droughtModifier: .res 1
-dasModifier: .res 1
-lowStackRowModifier: .res 1
-scoringModifier: .res 1
-crashModifier: .res 1
-strictFlag: .res 1 ;used for crash detection. If 1, the game will register a crash anytime there is a possibility of one.
-hzFlag: .res 1
-inputDisplayFlag: .res 1
-disableFlashFlag: .res 1
-disablePauseFlag: .res 1
-darkModifier: .res 1
-goofyFlag: .res 1
-debugFlag: .res 1
-linecapFlag: .res 1
-dasOnlyFlag: .res 1
-qualFlag: .res 1
-palFlag: .res 1
-.if KEYBOARD = 1
-keyboardFlag: .res 1
-.endif
+practiseType: .res 1
+customLevel: .res 1
+
+; menu
+activeMenu: .res 1
+activePage: .res 1
+activeRow: .res 1
+activeColumn: .res 1
+menuStackPtr: .res 1
+
+menuVars:
+.include "menu/menuram.asm"
+sramVariableLength := * - menuVars
+menuRAMLength = * - menuRAM
+
 
 ; ... $7FF

@@ -53,20 +53,13 @@ pollController:
 
         lda goofyFlag
         beq @noGoofy
-        lda newlyPressedButtons_player1
-        asl
-        and #$AA
-        sta tmp3
-        lda newlyPressedButtons_player1
-        and #$AA
-        lsr
-        ora tmp3
-        sta newlyPressedButtons_player1
+        ldx #<newlyPressedButtons_player1
+        ldy #>newlyPressedButtons_player1
+        jsr applyGoofy
 @noGoofy:
 
 diffOldAndNewButtons:
         ldx #$01
-.if KEYBOARD = 1
 ; clear controller input when keyboard is active
 ; disable keyboard when reset sequence is pressed
         lda keyboardFlag
@@ -80,7 +73,6 @@ diffOldAndNewButtons:
         plp
         bne @ret
         sta keyboardFlag
-.endif
 @diffForPlayer:
         lda newlyPressedButtons_player1,x
         tay

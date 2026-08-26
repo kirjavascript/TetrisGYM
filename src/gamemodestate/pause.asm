@@ -1,6 +1,6 @@
 gameModeState_handlePause:
         lda renderMode
-        cmp #$03
+        cmp #RENDER_PLAY
         bne @ret
 
         lda newlyPressedButtons_player1
@@ -30,7 +30,7 @@ pause:
         lda #$16
         sta PPUMASK
 @pauseSetupNotClassic:
-        lda #$04 ; render_mode_pause
+        lda #RENDER_PAUSE
         sta renderMode
 
 @pauseSetupPart2:
@@ -54,11 +54,14 @@ pause:
         sta spriteYOffset
 
 @pauseLoopCommon:
-        clc
-        lda #$A
-        adc debugFlag
-        sta spriteIndexInOamContentLookup
-        jsr stringSprite
+        ldx #>STR_PAUSE
+        ldy #<STR_PAUSE
+        lda debugFlag
+        beq @notDebug
+        ldx #>STR_BLOCK
+        ldy #<STR_BLOCK
+@notDebug:
+        jsr stringSpriteXY
 
         ; block tool hud - X/Y/Piece
         lda debugFlag
@@ -98,6 +101,6 @@ pause:
         lda #$00
         sta musicStagingNoiseHi
         sta vramRow
-        lda #$03
+        lda #RENDER_PLAY
         sta renderMode
         rts

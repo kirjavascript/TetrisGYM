@@ -3,6 +3,7 @@ use crate::{
     labels,
     playfield,
     util,
+    // video,
 };
 use rustico_core::nes::NesState;
 
@@ -69,7 +70,7 @@ pub fn test_tilesets(rom: Option<&[u8]>) {
     let tile_select = get_tile_select(&mut emu);
     let current_tileset = get_current_tilesets(&mut emu);
     assert_eq!(tile_select, 0);
-    assert_eq!(current_tileset, tileset1);
+    assert_eq!(current_tileset, tileset2);
 
     // test game mode
     let practise_type = labels::get("practiseType") as usize;

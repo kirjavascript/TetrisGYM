@@ -1,17 +1,45 @@
+stageCurrentAndNextPieces:
+        jsr stageDasMeterSprites
+        jsr stageSpriteForNextPiece
 stageSpriteForCurrentPiece:
+        jsr secretGradeSprite
+        lda gameTimerFlag
+        beq @noGameTimer
+        lda #$C0
+        sta spriteXOffset
+        lda #$17
+        sta spriteYOffset
+        lda #gameTimer
+        sta byteSpriteAddr
+        lda #0
+        sta byteSpriteAddr+1
+        lda #0
+        sta byteSpriteTile
+        lda #2
+        sta byteSpriteLen
+        jsr byteSprite
+
+@noGameTimer:
         lda #$0
         sta pieceTileModifier
-        jsr stageSpriteForCurrentPiece_actual
-
+        ; skip for harddrop, not tap qty
         lda practiseType
-        cmp #MODE_HARDDROP
-        beq ghostPiece
+        cmp #MODE_TAPQTY
+        beq @noSkip
+        lda renderMode
+        cmp #RENDER_TOPROWS
+        beq @skipCurrent
+@noSkip:
+        jsr stageSpriteForCurrentPiece_actual
+@skipCurrent:
+        lda hardDropFlag
+        bne ghostPiece
+        lda ghostPieceFlag
+        bne ghostPiece
+@ret:
         rts
 
 ghostPiece:
-        lda playState
-        cmp #3
-        bpl @noGhost
         lda tetriminoY
         sta tmp3
 @loop:
@@ -25,7 +53,18 @@ ghostPiece:
         ; check if equal to current position
         cmp tmp3
         beq @noGhost
-
+        lda ghostPieceFlag
+        beq @noGhost
+; no ghost piece during entry delay
+        lda playState
+        cmp #1
+        beq @ghost
+        cmp #8
+        bne @noGhost
+@ghost:
+        lda currentPiece
+        cmp #PIECE_HIDDEN
+        beq @noGhost
         lda frameCounter
         and #1
         asl
@@ -33,9 +72,9 @@ ghostPiece:
         adc #$0D
         sta pieceTileModifier
         jsr stageSpriteForCurrentPiece_actual
+@noGhost:
         lda tmp3
         sta tetriminoY
-@noGhost:
         rts
 
 tileModifierForCurrentPiece:
@@ -60,7 +99,9 @@ stageSpriteForCurrentPiece_actual:
 @currentTile = generalCounter5
         lda tetriminoX
         cmp #TETRIMINO_X_HIDE
-        beq stageSpriteForCurrentPiece_return
+        bne @notHidden
+        rts
+@notHidden:
         asl a
         asl a
         asl a
@@ -90,8 +131,15 @@ stageSpriteForCurrentPiece_actual:
         asl a
         clc
         adc generalCounter4
-        sta oamStaging,y
         sta originalY
+        sta oamStaging,y
+        lda mirrorVertFlag
+        beq @notMirrorVert
+        lda #$F6
+        sec
+        sbc originalY
+        sta oamStaging,y
+@notMirrorVert:
         inc oamStagingLength
         iny
         jsr tileModifierForCurrentPiece ; used to just load from orientationTable
@@ -107,7 +155,7 @@ stageSpriteForCurrentPiece_actual:
         inc oamStagingLength
         dey
         lda #$FF
-        sta oamStaging,y
+        sta oamStaging-1,y
         iny
         iny
         lda #$00
@@ -124,6 +172,12 @@ stageSpriteForCurrentPiece_actual:
         clc
         adc generalCounter3
         sta oamStaging,y
+        lda mirrorHorizFlag
+        beq @finishLoop
+        lda #$08
+        sec
+        sbc oamStaging,y
+        sta oamStaging,y
 @finishLoop:
         inc oamStagingLength
         iny
@@ -135,24 +189,23 @@ stageSpriteForCurrentPiece_return:
 
 stageSpriteForNextPiece:
         lda hideNextPiece
-        bne @maybeDisplayNextPiece
-
+        bne @ret
 @displayNextPiece:
         lda #$C8
         sta spriteXOffset
         lda #$77
         sta spriteYOffset
         ldx nextPiece
+        cpx #PIECE_SPLIT_SQUARE
+        bne @normal
+        lda #7
+        bne @store
+@normal:
         lda tetriminoTypeFromOrientation,x
-        clc
-        adc #$6 ; piece sprites start at index 6
-        sta spriteIndexInOamContentLookup
-        jmp loadSpriteIntoOamStaging
-
-@maybeDisplayNextPiece:
-        lda practiseType
-        cmp #MODE_HARDDROP
-        beq @displayNextPiece
-        lda debugFlag
-        bne @displayNextPiece
+@store:
+        sta spriteIndex
+        lda tetriminoTileFromOrientation,x
+        sta spriteTile
+        jmp loadNextPieceIntoOamStaging
+@ret:
         rts

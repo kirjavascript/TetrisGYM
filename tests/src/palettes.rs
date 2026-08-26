@@ -269,20 +269,21 @@ pub fn test() {
 
 
     // spend a few frames bootstrapping
-    for _ in 0..3 {
-        emu.run_until_vblank();
+    for _ in 0..6 {
+        util::run_until_241(&mut emu);
     }
 
     emu.memory.iram_raw[game_mode] = 4;
     emu.registers.pc = main_loop;
 
     for _ in 0..11 {
-        emu.run_until_vblank();
+        util::run_until_241(&mut emu);
     }
 
     for level in 0..256 {
         emu.memory.iram_raw[level_number] = level as u8;
         emu.memory.iram_raw[render_flags] = labels::get("RENDER_LEVEL") as u8;
+        emu.run_until_vblank();
         emu.run_until_vblank();
         let bg_palette = &emu.ppu.palette[9..12];
         let sprite_palette = &emu.ppu.palette[25..28];
@@ -296,7 +297,8 @@ pub fn test() {
     for level in 0..256 {
         emu.memory.iram_raw[level_number] = level as u8;
         emu.memory.iram_raw[render_flags] = labels::get("RENDER_LEVEL") as u8;
-        emu.run_until_vblank();
+        util::run_until_241(&mut emu);
+        util::run_until_241(&mut emu);
         let bg_palette = &emu.ppu.palette[9..12];
         let sprite_palette = &emu.ppu.palette[25..28];
 

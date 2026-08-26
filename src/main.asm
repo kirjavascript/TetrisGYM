@@ -16,7 +16,10 @@
 .linecont
 
 .segment    "PRG_chunk1": absolute
-
+.align $100
+; these tables benefit from page alignment
+.include "data/mult_orient.asm"
+.include "nmi/render_mode_queue.asm"
 ; region code at start of page to keep cycle count consistent
 .include "util/check_region.asm"
 .include "audio.asm"
@@ -32,9 +35,7 @@ mainLoop:
 .include "nmi/nmi.asm"
 .include "nmi/render.asm"
 .include "nmi/pollcontroller.asm"
-.if KEYBOARD
 .include "keyboard/poll.asm"
-.endif
 
 .include "gamemode/branch.asm"
     ; -> playAndEnding
@@ -87,10 +88,10 @@ mainLoop:
 .include "modes/crunch.asm"
 .include "modes/qtap.asm"
 .include "modes/garbage.asm"
-
-.align $100
-; these tables benefit from page alignment
-.include "data/mult_orient.asm"
+.include "seeds.asm"
+.include "modes/dasmeter.asm"
+.include "modes/calibrate.asm"
+.include "modes/secretgrade.asm"
 
 .segment    "PRG_chunk3": absolute
 

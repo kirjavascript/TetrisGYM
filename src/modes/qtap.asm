@@ -1,16 +1,14 @@
-advanceGameTap:
-        jsr clearPlayfield
-        ldx tapModifier
-        ; cpx #0 ; ldx sets z flag
-        beq @skip ; skip if zero
-        ldy #$BF ; left side
-        cpx #$11
-        bmi @loop
-        ldy #$C6 ; right side
-        txa
-        sbc #$10
-        tax
-
+initGameTap:
+        @secondLoop = generalCounter
+        lda #$00
+        sta @secondLoop
+        ldx tapLeftModifier
+        beq @checkRight
+        lda #190
+        clc
+        adc tapLeftColumn
+@startLoop:
+        tay
 @loop:
         lda #$7B
         sta $400, y
@@ -21,5 +19,15 @@ advanceGameTap:
         tay
         dex
         bne @loop
-@skip:
+        lda @secondLoop
+        bne @ret
+@checkRight:
+        inc @secondLoop
+        lda #190
+        clc
+        adc tapRightColumn
+        ldx tapRightModifier
+        beq @ret
+        bne @startLoop
+@ret:
         rts

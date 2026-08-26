@@ -66,12 +66,12 @@ fn test_standard() {
         use crate::input::*;
         run_input_string(&mut emu, "LB.L.LL.");
         util::set_controller_raw(&mut emu, LEFT + UP);
-        emu.run_until_vblank();
-        emu.run_until_vblank();
+        util::run_until_241(&mut emu);
+        util::run_until_241(&mut emu);
         run_input_string(&mut emu, ".");
         util::set_controller_raw(&mut emu, LEFT + UP);
-        emu.run_until_vblank();
-        emu.run_until_vblank();
+        util::run_until_241(&mut emu);
+        util::run_until_241(&mut emu);
     }
     assert_hz_display(&mut emu, HzSpeed(21, 85), 5, 0, Dir::Left);
 }
@@ -80,7 +80,7 @@ fn test_tspin() {
     let mut emu = util::emulator(None);
 
     for _ in 0..4 {
-        emu.run_until_vblank();
+        util::run_until_241(&mut emu);
     }
 
     let practise_type = labels::get("practiseType") as usize;
@@ -112,7 +112,7 @@ fn test_tspin() {
 fn run_input_string(emu: &mut NesState, inputs: &str) {
     for button in inputs.chars() {
         util::set_controller(emu, button);
-        emu.run_until_vblank();
+        util::run_until_241(&mut *emu);
     }
     util::set_controller(emu, '.');
 }

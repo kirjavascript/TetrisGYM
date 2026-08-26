@@ -1,37 +1,48 @@
 gameMode_levelMenu:
-        lda #NMIEnable
-        sta currentPpuCtrl
-        jsr updateAudio2
-        lda #$7
+        ; lag frame for tas compatibility
+        lda #RENDER_DISABLE
         sta renderMode
-        jsr updateAudioWaitForNmiAndDisablePpuRendering
-        jsr disableNmi
+        jsr waitForNmi
+        jsr hideSpritesAndBackground
 .if INES_MAPPER <> 0
         lda #CHRBankSet0
         jsr changeCHRBanks
 .endif
-        jsr bulkCopyToPpu
-        .addr   menu_palette
+        stagePatchThenWaitForNmi menuPalette
+
+        ldx #RLE_NT_LEVEL_MENU
         jsr copyRleNametableToPpu
-        .addr   level_menu_nametable
+
         lda #$20
         sta tmp1
         lda #$96 ; $6D is OEM position
         sta tmp2
         jsr displayModeText
         jsr showHighScores
-        lda linecapFlag
+        lda linecapWhen
         beq @noLinecapInfo
         jsr levelMenuLinecapInfo
 @noLinecapInfo:
+        ; patch if seeded
+        ldy #$20
+        ldx #$B6
+        jsr patchSeed
+
         ; render lines when loading screen
         lda #RENDER_LINES
         sta renderFlags
+
+; reenable display
         jsr resetScroll
-        jsr waitForVBlankAndEnableNmi
-        jsr updateAudioWaitForNmiAndResetOamStaging
-        jsr updateAudioWaitForNmiAndEnablePpuRendering
-        jsr updateAudioWaitForNmiAndResetOamStaging
+        lda #NMIEnable
+        sta currentPpuCtrl
+        lda #RENDER_LEVEL_MENU
+        sta renderMode
+        jsr showSpriteAndBackground
+
+        ; set sleep counter to wait 1 frame before shredding seed (tas compatibility)
+        lda #1
+        sta sleepCounter
         lda #$00
         sta originalY
         sta dropSpeed
@@ -44,26 +55,41 @@ gameMode_levelMenu:
         sta classicLevel
         jmp @forceStartLevelToRange
 
+linecapWhenStrings:
+        .word STR_LEVEL
+        .word STR_LINES
+
+linecapHowStrings:
+        .word STR_KS2
+        .word STR_FLOOR
+        .word STR_INVIZ
+        .word STR_HALT
+
 levelMenuLinecapInfo:
         lda #$20
         sta PPUADDR
         lda #$F5
         sta PPUADDR
-        clc
-        lda #LINECAP_WHEN_STRING_OFFSET
-        adc linecapWhen
-        sta stringIndexLookup
-        jsr stringBackground
+        lda linecapWhen
+        asl
+        tay
+        ; use offset, linecapWhen will be 1 or 2, never 0
+        ldx linecapWhenStrings-1,y
+        lda linecapWhenStrings-2,y
+        tay
+        jsr stringBackgroundXY
 
         lda #$21
         sta PPUADDR
         lda #$15
         sta PPUADDR
-        clc
-        lda #LINECAP_HOW_STRING_OFFSET
-        adc linecapHow
-        sta stringIndexLookup
-        jsr stringBackground
+        lda linecapHow
+        asl
+        tay
+        ldx linecapHowStrings+1,y
+        lda linecapHowStrings+0,y
+        tay
+        jsr stringBackgroundXY
 
         lda #$20
         sta PPUADDR
@@ -71,6 +97,7 @@ levelMenuLinecapInfo:
         sta PPUADDR
         jsr render_linecap_level_lines
         rts
+
 
 gameMode_levelMenu_processPlayer1Navigation:
         ; this copying is an artefact of the original
@@ -132,12 +159,9 @@ levelMenuCheckStartGame:
         ldy practiseType
         cpy #MODE_MARATHON
         bne @noLevelModification
-        ldy marathonModifier
-        cpy #2 ; marathon modes 2 & 4 starts at level 0
-        beq @startAtZero
-        cpy #4
+        ldy marathonLevelModifier
+        cpy #2
         bne @noLevelModification
-@startAtZero:
         lda #0
 @noLevelModification:
         sta levelNumber
@@ -165,6 +189,8 @@ levelMenuCheckGoBack:
 shredSeedAndContinue:
         ; seed shredder
 @chooseRandomHole_player1:
+        lda sleepCounter
+        bne @noShred ; skip first frame of seed shredding for tas compatibility
         ldx #rng_seed
         jsr generateNextPseudorandomNumber
         lda rng_seed
@@ -178,7 +204,7 @@ shredSeedAndContinue:
         and #$0F
         cmp #$0A
         bpl @chooseRandomHole_player2
-
+@noShred:
         jsr updateAudioWaitForNmiAndResetOamStaging
         jmp gameMode_levelMenu_processPlayer1Navigation
 
@@ -201,9 +227,9 @@ levelControlClearHighScores:
         sta spriteXOffset
         lda #$C8
         sta spriteYOffset
-        lda #$C
-        sta spriteIndexInOamContentLookup
-        jsr stringSprite
+        ldx #>STR_CLEAR
+        ldy #<STR_CLEAR
+        jsr stringSpriteXY
 
         jsr highScoreClearUpOrLeave
 
@@ -222,9 +248,9 @@ levelControlClearHighScoresConfirm:
         sta spriteXOffset
         lda #$C8
         sta spriteYOffset
-        lda #$D
-        sta spriteIndexInOamContentLookup
-        jsr stringSprite
+        ldx #>STR_SURE
+        ldy #<STR_SURE
+        jsr stringSpriteXY
 
 highScoreClearUpOrLeave:
         lda newlyPressedButtons_player1
@@ -253,8 +279,8 @@ levelControlCustomLevel:
         sta spriteYOffset
         lda #$B0
         sta spriteXOffset
-        lda #$21
-        sta spriteIndexInOamContentLookup
+        lda #SPRITE_CUSTOMLEVELCURSOR
+        sta spriteIndex
         jsr loadSpriteIntoOamStaging
 @indicatorEnd:
 
@@ -275,8 +301,16 @@ levelControlCustomLevel:
 @checkDownPressed:
         lda #BUTTON_DOWN
         jsr menuThrottle
-        beq @checkLeftPressed
+        beq @checkRightPressed
         dec customLevel
+        jsr @changeLevel
+@checkRightPressed:
+        lda #BUTTON_RIGHT
+        jsr menuThrottle
+        beq @checkLeftPressed
+        lda #$0
+        sta levelControlMode
+        sta classicLevel
         jsr @changeLevel
 @checkLeftPressed:
 
@@ -287,6 +321,8 @@ levelControlCustomLevel:
         sta soundEffectSlot1Init
         lda #$0
         sta levelControlMode
+        lda #$9
+        sta classicLevel
 @ret:
         rts
 
@@ -379,7 +415,7 @@ levelControlNormal:
         lda #$01
         sta soundEffectSlot1Init
         lda classicLevel
-        beq @checkDownPressed
+        beq @toCustomLevel
         dec classicLevel
 @checkDownPressed:
         lda newlyPressedButtons
@@ -424,8 +460,8 @@ levelControlNormal:
         ldx classicLevel
         lda levelToSpriteYOffset,x
         sta spriteYOffset
-        lda #$00
-        sta spriteIndexInOamContentLookup
+        lda #SPRITE_LEVELSELECTCURSOR
+        sta spriteIndex
         ldx classicLevel
         lda levelToSpriteXOffset,x
         sta spriteXOffset
@@ -434,8 +470,8 @@ levelControlNormal:
         rts
 
 levelMenuRenderHearts:
-        lda #$1E
-        sta spriteIndexInOamContentLookup
+        lda #SPRITE_HEARTCURSOR
+        sta spriteIndex
         lda #$7A
         sta spriteYOffset
         lda #$38
@@ -460,8 +496,8 @@ levelMenuRenderHearts:
         lda frameCounter
         and #$03
         beq @skipCursor
-        lda #$1F
-        sta spriteIndexInOamContentLookup
+        lda #SPRITE_HEART
+        sta spriteIndex
         jsr loadSpriteIntoOamStaging
 @skipCursor:
         rts
@@ -474,8 +510,8 @@ levelMenuRenderReady:
         sta spriteYOffset
         lda #$88
         sta spriteXOffset
-        lda #$20
-        sta spriteIndexInOamContentLookup
+        lda #SPRITE_READY
+        sta spriteIndex
         jsr loadSpriteIntoOamStaging
 @notReady:
         rts

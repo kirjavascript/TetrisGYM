@@ -14,8 +14,13 @@ render_mode_rocket:
         cmp #1
         bne @stage2
         inc screenStage
-        jsr bulkCopyToPpu
-        .addr rocket_nametable_patch
+
+
+        ldx #<rocketNametablePatch
+        ldy #>rocketNametablePatch
+        jsr copyPatchAtXYToQueue
+        jsr render_mode_queue
+
 @stage2:
 @rocketEnd:
         jsr resetScroll

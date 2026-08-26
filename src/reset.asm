@@ -16,9 +16,9 @@ reset:  cld
 @clrmem:
         sta $0000,x
         sta $0100,x
-        sta $0200,x
+        ; oam staging cleared separately
         sta $0300,x
-        sta $0400,x
+        ; playfield cleared separately
         sta $0500,x
         sta $0600,x
         inx
@@ -31,6 +31,17 @@ reset:  cld
 
         dex ; $FF for stack pointer
         txs
+        jsr clearPlayfield
+        jsr resetOAMStaging
+        jsr drawBlackBGPalette
+
+        lda #NMIEnable
+        sta currentPpuCtrl
+        sta PPUCTRL
+        lda #RENDER_QUEUE
+        sta renderMode
+        jsr waitForNmi
+        jsr hideSpritesAndBackground
         jsr mapperInit
         jsr setHorizontalMirroring
 .if INES_MAPPER <> 0

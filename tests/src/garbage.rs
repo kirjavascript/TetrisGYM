@@ -15,7 +15,7 @@ pub fn test_garbage4_crash() {
     let wait_loop_end: u16 = labels::get("resetOAMStaging") as u16;
 
     // spend a few frames bootstrapping
-    for _ in 0..3 {
+    for _ in 0..4 {
         emu.run_until_vblank();
     }
 

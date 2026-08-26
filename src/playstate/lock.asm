@@ -1,8 +1,19 @@
 playState_lockTetrimino:
+VITS_SCORE = 100000
 @currentTile = generalCounter5
         jsr isPositionValid
         beq @notGameOver
 @gameOver:
+        lda secretGradingFlag
+        beq @notSecretGrade
+
+        lda practiseType
+        cmp #MODE_LOWSTACK
+        beq @notSecretGrade  ; locking lst piece breaks lowstack.  fix by skipping for now
+
+        jsr @noWait ; lock last piece in playfield for secret grade
+@notSecretGrade:
+        inc gameTimerStop
         lda practiseType
         cmp #MODE_TYPEB
         bne @revealScore
@@ -45,14 +56,56 @@ playState_lockTetrimino:
 @notGameOver:
         lda vramRow
         cmp #$20
-        bmi @ret
+        bpl @noWait
+        rts
+@noWait:
         ldy tetriminoY
         lda multBy10Table,y
         clc
         adc tetriminoX
         sta generalCounter
+
+; score if vits
+        ldx vitsScoreFlag
+        beq @noVits
         ldx currentPiece
+        cpx #PIECE_I_VERT
+        bne @noVits
+        ; check if tile exists above
+        sec
+        sbc #30
+        tax
+        lda playfield,x
+        bmi @noVits
+        ; tile exists
+        clc
+        lda #<VITS_SCORE
+        adc binScore
+        sta binScore
+        lda #>VITS_SCORE
+        adc binScore+1
+        sta binScore+1
+        lda #^VITS_SCORE
+        adc binScore+2
+        sta binScore+2
+        lda #0
+        adc binScore+3
+        sta binScore+3
+        jsr setupScoreForRender
+        lda renderFlags
+        ora #RENDER_SCORE
+        sta renderFlags
+@noVits:
+        ldx currentPiece
+        lda #EMPTY_TILE
+        ldy practiseType
+        cpy #MODE_TAP
+        beq @storeTile
+        cpy #MODE_PRESETS
+        beq @storeTile
+;normal tile
         lda tetriminoTileFromOrientation,x
+@storeTile:
         sta @currentTile
         txa
         asl a
@@ -82,7 +135,7 @@ playState_lockTetrimino:
         cmp #MODE_LOWSTACK
         bne @notAboveLowStack
         jsr checkIfAboveLowStackLine
-        bcc @notAboveLowStack
+        bmi @notAboveLowStack
         ldx #<lowStackNopeGraphic
         ldy #>lowStackNopeGraphic
         sec
@@ -104,4 +157,4 @@ playState_lockTetrimino:
         jsr updatePlayfield
         jsr updateMusicSpeed
         inc playState
-@ret:   rts
+        jmp secretGradeGrading

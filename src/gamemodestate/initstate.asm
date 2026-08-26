@@ -1,8 +1,5 @@
 gameModeState_initGameState:
-        lda #$EF
-        ldx #$04
-        ldy #$04
-        jsr memset_page
+        jsr clearPlayfield
         ldx #$0F
         lda #$00
 ; statsByType
@@ -26,6 +23,22 @@ gameModeState_initGameState:
         lda set_seed_input+2
         sta set_seed+2
 
+        ; convert bcd linecap high byte to binary
+        lda linecapLines
+        lsr
+        lsr
+        lsr
+        lsr
+        tay
+        lda multBy10Table,y
+        sta generalCounter
+        lda linecapLines
+        and #$F
+        clc
+        adc generalCounter
+        sta linecapLinesBinHi
+
+
         ; paceResult init
         lda #$B0
         sta paceResult
@@ -33,6 +46,9 @@ gameModeState_initGameState:
         sta paceSign
         sta paceResult+1
         sta paceResult+2
+        sta gameTimer
+        sta gameTimer+1
+        sta gameTimerStop
 
         ; misc
         sta spawnDelay
@@ -47,18 +63,27 @@ gameModeState_initGameState:
         sta invisibleFlag
         sta currentFloor
         sta crashState
+        sta trtLineCounter
+        sta trtLineCounter+1
+        sta trtScratch+5
+        sta trtLines
+        sta trtLines+1
+        sta secretGrade
+        lda nextBoxStart
+        sta hideNextPiece
 
 ; initialize currentFloor if necessary
-        lda practiseType
-        cmp #MODE_FLOOR
-        bne @notFloor
+        lda practiseType ; ignore for tap quantity
+        cmp #MODE_TAPQTY
+        beq @notFloor
+
         lda floorModifier
+        beq @notFloor
         sta currentFloor
 @notFloor:
 
-        lda practiseType
-        cmp #MODE_INVISIBLE
-        bne @notInvisible
+        lda invisibleOptionFlag
+        beq @notInvisible
         sta invisibleFlag
 @notInvisible:
 
@@ -87,7 +112,7 @@ gameModeState_initGameState:
         sta allegro
         sta holdDownPoints
         sta spawnID
-        lda #$03
+        lda #RENDER_PLAY
         sta renderMode
         ldx #$A0
         lda palFlag
@@ -102,24 +127,26 @@ gameModeState_initGameState:
         jsr generateNextPseudorandomNumber
         jsr chooseNextTetrimino
         sta nextPiece
-
-        lda practiseType
-        cmp #MODE_TRANSITION
-        bne @notTransition
         jsr transitionModeSetup
-@notTransition:
-
         lda practiseType
         cmp #MODE_TYPEB
         bne @notTypeB
-        lda #BTYPE_START_LINES
+        lda bTypeLines
         sta lines
 @notTypeB:
 
         lda practiseType
         cmp #MODE_CHECKERBOARD
         bne @noChecker
-        lda checkerModifier
+
+        lda heightOrRows
+        beq @byHeight
+        ldx rowsModifier
+        lda rowsToHeight,x
+        jmp @setCheckerScore
+@byHeight:
+        lda heightModifier
+@setCheckerScore:
         rol
         rol
         rol
@@ -139,13 +166,18 @@ gameModeState_initGameState:
 
         lda practiseType
         cmp #MODE_TYPEB
+        beq @initBType
+        lda fillType
+        cmp #FILL_B
         bne @noTypeBPlayfield
+@initBType:
         jsr initPlayfieldForTypeB
 @noTypeBPlayfield:
 
         jsr hzStart
         lda #0
         sta hzSpawnDelay
+        jsr initializeTopRowBuffer
         jsr practiseInitGameState
         jsr resetScroll
 
@@ -158,79 +190,41 @@ initGameState_return:
         rts
 
 transitionModeSetup:
-        lda transitionModifier
-        cmp #$10 ; (SXTOKL compat)
+        lda headStartFlag
         beq initGameState_return
-        ; set score
-        rol
-        rol
-        rol
-        rol
-        sta bcd32+2
         lda #0
-        sta bcd32
-        sta bcd32+1
-        sta bcd32+3
-        jsr presetScoreFromBCD
-
-        lda levelNumber
-        cmp #129 ; everything after 128 transitions immediately
-        bpl initGameState_return
-
-@addLinesLoop:
-        ldx #$A
-        lda lines
-        sta tmpX
-        lda lines+1
-        sta tmpY
-@incrementLines:
-        inc lines
-        lda lines
-        and #$0F
-        cmp #$0A
-        bmi @checkTransition
-        lda lines
-        clc
-        adc #$06
-        sta lines
-        and #$F0
-        cmp #$A0
-        bcc @checkTransition
-        lda lines
-        and #$0F
-        sta lines
-        inc lines+1
-
-@checkTransition:
-        lda lines
-        and #$0F
-        bne @lineLoop
-
-        lda lines+1
-        sta generalCounter2
-        lda lines
-        sta generalCounter
-        lsr generalCounter2
-        ror generalCounter
-        lsr generalCounter2
-        ror generalCounter
-        lsr generalCounter2
-        ror generalCounter
-        lsr generalCounter2
-        ror generalCounter
-        lda levelNumber
-        cmp generalCounter
-        bpl @lineLoop
-
-@nextLevel:
-        lda tmpX
-        sta lines
-        lda tmpY
+        sta factorB24+1
+        sta factorB24+2
         sta lines+1
-        rts
-@lineLoop:  dex
-        bne @incrementLines
-        jmp @addLinesLoop
+
+        ldx startLines
+        lda levelDisplayTable,x
+        sta lines
+        ldx #4
+@shift:
+        asl lines
+        rol lines+1
+        dex
+        bne @shift
+
+        sta bcd32+0
+        lda #<100000
+        sta factorA24+0
+        lda #>100000
+        sta factorA24+1
+        lda #^100000
+        sta factorA24+2
+
+        lda startScore
+        sta factorB24
+        jsr unsigned_mul24
+        lda product24+0
+        sta binScore+0
+        lda product24+1
+        sta binScore+1
+        lda product24+2
+        sta binScore+2
+        jmp setupScoreForRender
 
 presetScoreFromBCD:
         jsr BCD_BIN
@@ -240,19 +234,41 @@ presetScoreFromBCD:
         sta binScore+1
         lda binary32+2
         sta binScore+2
-        jsr setupScoreForRender
-        rts
+        jmp setupScoreForRender
+
 
 initPlayfieldForTypeB:
-        lda typeBModifier
-        cmp #$6
-        bmi @normalStart
-        sbc #$5
-        asl
-        adc #$0c
-        jmp @abnormalStart
-@normalStart:
-        lda #$0C
+; decide which seed to use
+        lda typeBSeedFlag
+        beq @notSeeded
+; seeded
+        lda b_seed_input
+        sta b_seed
+        lda b_seed_input+1
+        sta b_seed+1
+        jmp @checkModifier
+
+@notSeeded:
+        lda rng_seed
+        sta b_seed
+        sta b_seed_input
+        lda rng_seed+1
+        sta b_seed+1
+        sta b_seed_input+1
+
+
+@checkModifier:
+        lda heightOrRows
+        bne @byRows
+        ldy heightModifier
+        lda heightToRows,y
+        jmp @determineStart
+@byRows:
+        lda rowsModifier
+@determineStart:
+        cmp #13
+        bcs @abnormalStart
+        lda #12
 @abnormalStart:
         sta generalCounter
 L87E7:  lda generalCounter
@@ -261,13 +277,13 @@ L87E7:  lda generalCounter
         sec
         sbc generalCounter
         sta generalCounter2
-        lda #$00
+        lda #$20
         sta vramRow
         lda #$09
         sta generalCounter3
-L87FC:  ldx #rng_seed
+L87FC:  ldx #b_seed
         jsr generateNextPseudorandomNumber
-        lda rng_seed
+        lda b_seed
         and #$07
         tay
         lda rngTable,y
@@ -284,9 +300,9 @@ L87FC:  ldx #rng_seed
         dec generalCounter3
         jmp L87FC
 
-L8824:  ldx #rng_seed
+L8824:  ldx #b_seed
         jsr generateNextPseudorandomNumber
-        lda rng_seed
+        lda b_seed
         and #$0F
         cmp #$0A
         bpl L8824
@@ -298,21 +314,19 @@ L8824:  ldx #rng_seed
         tay
         lda #EMPTY_TILE
         sta playfield,y
-.if KEYBOARD = 1
-        ; this can probably be the same whether keyboard or not.
-        ; the keyboard code adds the keyboard reading right before the oam staging reset.
-        ; the additional keyboard reading cycles causes the b type setup to crash.
-        ; Using the wait routine that skips the oam staging reset (and keyboard read) for now and
-        ; keeping separate until b-type board test is developed.
         jsr updateAudioAndWaitForNmi
-.else
-        jsr updateAudioWaitForNmiAndResetOamStaging
-.endif
         dec generalCounter
         bne L87E7
 L884A:
-        ldx typeBModifier
-        lda typeBBlankInitCountByHeightTable,x
+        lda heightOrRows
+        bne @byRows
+        ldy heightModifier
+        ldx heightToRows,y
+        jmp @blank
+@byRows:
+        ldx rowsModifier
+@blank:
+        lda typeBBlankInitCountByRowsTable,x
         tay
         lda #EMPTY_TILE
 L885D:  sta playfield,y
@@ -323,9 +337,58 @@ L885D:  sta playfield,y
         sta vramRow
         rts
 
-        ; 0 3 5 8 10 12 -> 14 16 18
-typeBBlankInitCountByHeightTable:
-        .byte $C8,$AA,$96,$78,$64,$50,$3C,$28,$14
+heightToRows:
+        .byte 0
+        .byte 3
+        .byte 5
+        .byte 8
+        .byte 10
+        .byte 12
+        .byte 14
+        .byte 16
+        .byte 18
+
+rowsToHeight:
+        .byte 0
+        .byte 0
+        .byte 0
+        .byte 1
+        .byte 1
+        .byte 2
+        .byte 2
+        .byte 2
+        .byte 3
+        .byte 3
+        .byte 4
+        .byte 4
+        .byte 5
+        .byte 5
+        .byte 6
+        .byte 6
+        .byte 7
+        .byte 7
+        .byte 8
+
+typeBBlankInitCountByRowsTable:
+        .byte 200
+        .byte 190
+        .byte 180
+        .byte 170
+        .byte 160
+        .byte 150
+        .byte 140
+        .byte 130
+        .byte 120
+        .byte 110
+        .byte 100
+        .byte 90
+        .byte 80
+        .byte 70
+        .byte 60
+        .byte 50
+        .byte 40
+        .byte 30
+        .byte 20
 rngTable:
         .byte EMPTY_TILE,BLOCK_TILES,EMPTY_TILE,BLOCK_TILES+1
         .byte BLOCK_TILES+2,BLOCK_TILES+2,EMPTY_TILE,EMPTY_TILE

@@ -106,6 +106,7 @@ renderTSpin:
         sta tmp1
 
         lda #$FF
+        sec
         sbc tspinX ; sub X
         sbc tmp1 ; sub Y
         tax

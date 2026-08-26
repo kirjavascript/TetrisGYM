@@ -22,27 +22,6 @@ kbMappedKeyMasks:
         expandKeyMask kbMappedB
         expandKeyMask kbMappedA
 
-
-seedEntryTable:
-        .byte key0
-        .byte key1
-        .byte key2
-        .byte key3
-        .byte key4
-        .byte key5
-        .byte key6
-        .byte key7
-        .byte key8
-        .byte key9
-        .byte keyA
-        .byte keyB
-        .byte keyC
-        .byte keyD
-        .byte keyE
-        .byte keyF
-seedEntryTableEnd:
-seedEntryCharCount = <(seedEntryTableEnd - seedEntryTable) - 1
-
 scoreEntryTable:
         .byte keySpace
         .byte keyA

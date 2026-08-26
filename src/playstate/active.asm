@@ -1,7 +1,6 @@
 playState_playerControlsActiveTetrimino:
-        lda practiseType
-        cmp #MODE_HARDDROP
-        bne @notHard
+        lda hardDropFlag
+        beq @notHard
         jsr harddrop_tetrimino
         lda playState
         cmp #8
@@ -20,7 +19,17 @@ playState_playerControlsActiveTetrimino_return:
 harddrop_tetrimino:
         lda newlyPressedButtons
         and #BUTTON_UP+BUTTON_SELECT
+
+; secret grade checking deferred until frame following a harddrop
+        bne @hardDrop
+        lda secretGradePending
         beq playState_playerControlsActiveTetrimino_return
+        lda #0
+        sta secretGradePending
+        jmp secretGradeGrading
+@hardDrop:
+        lda #1
+        sta secretGradePending
         lda tetriminoY
         sta tmpY
         lda hardDropGhostY ; value set by previous frame's sprite staging
@@ -40,14 +49,16 @@ harddrop_tetrimino:
         rts
 @noSonic:
 
-        ; hard drop
+        lda #$20
+        sta vramRow
         lda #1
         sta playState
         lda #0
         sta autorepeatY
         sta completedLines
+        sta completedRow+3 ; for checkerboard clearing
 
-        ldy #$13
+        ldy #$14
 @clearBuffer:
         sta harddropBuffer,y
         dey
@@ -101,6 +112,35 @@ harddropAddr = pointerAddr
         sta harddropAddr+3
 
 harddropMarkCleared:
+; check top row separately
+        lda teppozFlag
+        beq @checkTopRow
+        jmp harddropShift
+@checkTopRow:
+        lda playfield
+        ora playfield+1
+        ora playfield+2
+        ora playfield+3
+        ora playfield+4
+        ora playfield+5
+        ora playfield+6
+        ora playfield+7
+        ora playfield+8
+        ora playfield+9
+        bmi @normalBoardHandling
+        inc harddropBuffer ; mark top row as cleared
+        ldx #245
+@shiftPlayfield:
+        ; no page boundries crossed to avoid +1 cycle penalty
+        lda playfield,x
+        sta playfield+10,x
+        dex
+        ; loop stops at zero to avoid comparison
+        bne @shiftPlayfield
+        ; last tile omitted in loop, handle separately
+        lda playfield
+        sta playfield+10
+@normalBoardHandling:
         sec
         lda tetriminoY
         sbc #3
@@ -108,33 +148,33 @@ harddropMarkCleared:
         clc
         adc #4
         sta tmpY ; row
-@lineLoop:
-        ; A should always be tmpY
-
-        tax
-        lda multBy10Table, x
-        sta harddropAddr
-
-        ; check for empty row
-        ldy #$9
-@minoLoop:
-        lda (harddropAddr), y
-        bmi @noLineClear ; EMPTY_TILE sets negative flag, normal tiles do not
-
-        dey
-        bpl @minoLoop
-
-@lineClear:
-        lda #1
-        jmp @write
-@noLineClear:
+        lda tmpX
+        bpl @lineLoop
         lda #0
-@write:
-        ; X should be tmpY
-        sta harddropBuffer, x
-
+        sta tmpX ; sets lower limit to row 1
+@lineLoop:
+        lda #$14
+        sec
+        sbc tmpY ; contains current row being checked
+        cmp currentFloor
+        bcc @skipRow ; ignore floor rows
+        ldx tmpY
+        ldy multBy10Table, x
+        lda playfield,y
+        ora playfield+1,y
+        ora playfield+2,y
+        ora playfield+3,y
+        ora playfield+4,y
+        ora playfield+5,y
+        ora playfield+6,y
+        ora playfield+7,y
+        ora playfield+8,y
+        ora playfield+9,y
+        eor #$80
+        asl
+        rol harddropBuffer,x
+@skipRow:
         dec tmpY
-
         lda tmpY
         cmp tmpX
         bne @lineLoop
@@ -145,9 +185,8 @@ harddropShift:
         adc #1
         sta tmpY ; row
 @lineLoop:
-        ; A should always be tmpY
-
-        tax
+        ldx tmpY
+        beq @noLineClear ; ignore top row
         lda harddropBuffer, x
         beq @noLineClear
 
@@ -166,7 +205,6 @@ harddropShift:
         ldx tmpY
 @offsetLoop:
         dex
-
         lda harddropBuffer, x
         bne @lineIsFull
         dec completedLinesCopy
@@ -200,35 +238,86 @@ harddropShift:
 
 @nextLine:
         dec tmpY
-        lda tmpY
         beq @addScore
         jmp @lineLoop
 
-
-
 @addScore:
+        lda harddropBuffer
+        beq @noTopRowClear
+        inc completedLines
+@noTopRowClear:
         lda completedLines
         beq @noScore
+
+; refresh rows * completed lines
+        ldy completedLines
+        ldx multBy10Table,y
+        dex
+        ldy #9
+@topRowLoop:
+        lda topRowBuffer,y
+        sta playfield, x
+        dey
+        bpl @noReset
+        ldy #9
+@noReset:
+        dex
+        bpl @topRowLoop
+        jsr drawFloorTopRow
+
+; next tap quantity
+        lda practiseType
+        cmp #MODE_TAPQTY
+        bne @tapQtyEnd
+        lda completedLines
+        beq @tapQtyEnd
+        ; mark as complete
+        lda tqtyNext
+        sta tqtyCurrent
+@tapQtyEnd:
+
         jsr playState_updateLinesAndStatistics
         lda #0
         sta vramRow
-        sta completedLines
-        ; emty top row
-        lda #EMPTY_TILE
-        ldx #9
-@topRowLoop:
-        sta playfield, x
-        dex
-        bpl @topRowLoop
+
         ; lda #TETRIMINO_X_HIDE
         ; sta tetriminoX
-
+        jsr stageFullPlayfield
+        lda #PIECE_HIDDEN
+        sta currentPiece
 @noScore:
+        jsr playState_prepareNext
+        lda playState
+        cmp #$A
+        bne @notGameOver
+        rts
+
+@notGameOver:
+        lda practiseType
+        cmp #MODE_CHECKERBOARD
+        bne @notChecker
+        ; check to see if bottom row for checkerboard has been cleared
+        lda #$13
+        sec
+        sbc currentFloor
+        tax
+        lda harddropBuffer,x
+        beq @notChecker
+        jmp typeBEndingStuff
+@notChecker:
+        jsr playState_receiveGarbage
+
 
         lda #8 ; jump straight to spawnTetrimino
         sta playState
+        lda #PIECE_HIDDEN
+        sta currentPiece
         lda dropSpeed
         sta fallTimer
+        ; skip drop sound if levelup sound is loaded
+        lda soundEffectSlot1Init
+        cmp #6
+        beq @ret
         lda #$7
         sta soundEffectSlot1Init
 @ret:
@@ -277,14 +366,13 @@ rotationTable:
         .dbyt   $0705,$0406,$0507,$0604
         .dbyt   $0909,$0808,$0A0A,$0C0C
         .dbyt   $0B0B,$100E,$0D0F,$0E10
-        .dbyt   $0F0D,$1212,$1111
+        .dbyt   $0F0D,$1212,$1111,$1313
 drop_tetrimino:
         lda linecapState
         cmp #LINECAP_KILLX2
         beq @killX2
-        lda practiseType
-        cmp #MODE_KILLX2
-        bne @normal
+        lda killX2Flag
+        beq @normal
 @killX2:
         jsr lookupDropSpeed
         sta tmpY
@@ -411,31 +499,19 @@ shift_tetrimino:
         rts
 @dasOnlyEnd:
 
-        lda practiseType
-        cmp #MODE_DAS
-        bne @normalDAS
+        ; region stuff
         lda dasModifier
         sta dasValueDelay
-        lda palFlag
-        eor #1
-        asl
-        adc #$8
+        sec
+        sbc arrModifier
         sta dasValuePeriod
-        jmp @shiftTetrimino
-@normalDAS:
-
-        ; region stuff
-        lda #$10
-        sta dasValueDelay
-        lda #$A
-        sta dasValuePeriod
-        ldy palFlag
-        ; cpy #0 ; ldy sets z flag
-        beq @shiftTetrimino
-        lda #$0C
-        sta dasValueDelay
-        lda #$08
-        sta dasValuePeriod
+        ; ldy palFlag
+        ; ; cpy #0 ; ldy sets z flag
+        ; beq @shiftTetrimino
+        ; lda #PAL_DAS
+        ; sta dasValueDelay
+        ; lda #PAL_DAS - PAL_ARR
+        ; sta dasValuePeriod
 @shiftTetrimino:
 
         lda tetriminoX
@@ -449,15 +525,22 @@ shift_tetrimino:
         lda heldButtons
         and #$03
         beq @ret
+        lda disableDasFlag
+        bne @ret
         inc autorepeatX
         lda autorepeatX
         cmp dasValueDelay
         bmi @ret
+@zeroDas:
         lda dasValuePeriod
+        cmp dasValueDelay
+        beq @zeroArr
         sta autorepeatX
         jmp @buttonHeldDown
 
 @resetAutorepeatX:
+        lda dasValueDelay
+        beq @zeroDas
         lda #$00
         sta autorepeatX
 @buttonHeldDown:
@@ -476,6 +559,10 @@ shift_tetrimino:
         and #BUTTON_LEFT
         beq @ret
         dec tetriminoX
+        bne @normal
+        lda no5TapFlag
+        bne @restoreX
+@normal:
         jsr isPositionValid
         bne @restoreX
         lda #$03
@@ -485,6 +572,42 @@ shift_tetrimino:
 @restoreX:
         lda originalY
         sta tetriminoX
+        lda noWallChargeFlag
+        bne @ret
         lda dasValueDelay
         sta autorepeatX
 @ret:   rts
+
+@zeroArr:
+        lda heldButtons
+        and #BUTTON_RIGHT
+        beq @checkLeftPressed
+@shiftRight:
+        inc tetriminoX
+        jsr isPositionValid
+        bne @shiftBackToLeft
+        lda #$03
+        sta soundEffectSlot1Init
+        jmp @shiftRight
+@checkLeftPressed:
+        lda heldButtons
+        and #BUTTON_LEFT
+        beq @leftNotPressed
+@shiftLeft:
+        dec tetriminoX
+        jsr isPositionValid
+        bne @shiftBackToRight
+        lda #$03
+        sta soundEffectSlot1Init
+        jmp @shiftLeft
+@shiftBackToLeft:
+        dec tetriminoX
+        dec tetriminoX
+@shiftBackToRight:
+        inc tetriminoX
+        lda noWallChargeFlag
+        bne @leftNotPressed
+        lda dasValueDelay
+        sta autorepeatX
+@leftNotPressed:
+        rts

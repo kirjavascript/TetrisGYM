@@ -10,6 +10,7 @@ tetris.lst
 tetris.lbl
 tetris.map
 tetris.dbg
+src/magicnumbers.asm
 release/*
 target
 .env
