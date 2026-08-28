@@ -243,6 +243,7 @@ highScoreClearUpOrLeave:
 @ret:
         rts
 
+levelModifier := generalCounter
 
 levelControlCustomLevel:
         jsr handleReadyInput
@@ -258,6 +259,14 @@ levelControlCustomLevel:
         jsr loadSpriteIntoOamStaging
 @indicatorEnd:
 
+; A pressed means a jump of 10 instead of 1
+        ldx #$01
+        lda heldButtons_player1
+        and #BUTTON_A
+        beq @aNotPressed
+        ldx #$0A
+@aNotPressed:
+        stx levelModifier
         ; lda #BUTTON_RIGHT
         ; jsr menuThrottle
         ; beq @checkUpPressed
@@ -270,13 +279,20 @@ levelControlCustomLevel:
         lda #BUTTON_UP
         jsr menuThrottle
         beq @checkDownPressed
-        inc customLevel
+        lda customLevel
+        clc
+        adc levelModifier
+        sta customLevel
+@skipIncrement:
         jsr @changeLevel
 @checkDownPressed:
         lda #BUTTON_DOWN
         jsr menuThrottle
         beq @checkLeftPressed
-        dec customLevel
+        lda customLevel
+        sec
+        sbc levelModifier
+        sta customLevel
         jsr @changeLevel
 @checkLeftPressed:
 
