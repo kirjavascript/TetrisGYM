@@ -45,11 +45,24 @@ gameModeState_initGameBackground:
         sta PPUDATA
 @heartEnd:
 
+
         lda #NMIEnable|BGPattern1|SpritePattern1
         sta PPUCTRL
         sta currentPpuCtrl
         jsr resetScroll
         jsr waitForVBlankAndEnableNmi
+
+
+
+        ; this no longer applies:
+        ; gym setup takes longer than vanilla, skip a frame to line up
+        ; jsr updateAudioWaitForNmiAndResetOamStaging
+
+
+        ; https://github.com/kirjavascript/TetrisGYM/pull/154
+        ; restored wait jsr after mainloop wait inlining
+        ; the changes in this branch may have introduced a bug that have been fixed.
+        ; exact cause tbd (if ever)
         jsr updateAudioWaitForNmiAndResetOamStaging
         jsr updateAudioWaitForNmiAndEnablePpuRendering
         jsr updateAudioWaitForNmiAndResetOamStaging

@@ -17,7 +17,12 @@
 
 .segment    "PRG_chunk1": absolute
 
+; consumes exactly 1 page
+.assert <* = 0, error, "mult_orient needs to be at page boundary"
+.include "data/mult_orient.asm"
+
 ; region code at start of page to keep cycle count consistent
+.assert <* = 0, error, "check_region needs to be at page boundary"
 .include "util/check_region.asm"
 .include "audio.asm"
 
@@ -88,9 +93,6 @@ mainLoop:
 .include "modes/qtap.asm"
 .include "modes/garbage.asm"
 
-.align $100
-; these tables benefit from page alignment
-.include "data/mult_orient.asm"
 
 .segment    "PRG_chunk3": absolute
 

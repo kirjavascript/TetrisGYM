@@ -7,7 +7,7 @@ pub fn test() {
     let main_loop = labels::get("mainLoop");
     let game_mode = labels::get("gameMode") as usize;
     let level_number = labels::get("levelNumber") as usize;
-    let nmi_label = labels::get("nmi");
+    let _nmi_label = labels::get("nmi");
     let hz_flag = labels::get("hzFlag") as usize;
     let render_flags = labels::get("renderFlags") as usize;
 

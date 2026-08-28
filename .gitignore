@@ -6,6 +6,7 @@
 *.pyc
 *.bin
 *.txt
+*.log
 tetris.lst
 tetris.lbl
 tetris.map

@@ -3,7 +3,7 @@ use crate::{util, labels, playfield};
 pub fn test() {
     let mut emu = util::emulator(None);
 
-    for _ in 0..4 {
+    for _ in 0..6 {
         emu.run_until_vblank();
     }
 
