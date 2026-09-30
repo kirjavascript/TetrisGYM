@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+# ensure fresh build
+node build.js >/dev/null
+
+# find jsr followed by rts
+LANG=C grep -obUaP '\x20..\x60' tetris.nes | while read offset; do
+    offset=${offset%%:*}
+    printf '%04X\n' $(( $offset + 32752 ))
+done | while read address; do
+    grep $address tetris.txt
+done

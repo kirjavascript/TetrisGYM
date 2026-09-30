@@ -12,8 +12,7 @@ displayModeText:
         lda set_seed_input+1
         jsr twoDigsToPPU
         lda set_seed_input+2
-        jsr twoDigsToPPU
-        rts
+        jmp twoDigsToPPU
 
 @drawModeName:
         ; ldx practiseType

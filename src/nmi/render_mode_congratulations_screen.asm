@@ -22,5 +22,4 @@ render_mode_congratulations_screen:
         lda #0
         sta renderFlags
 @ret:
-        jsr resetScroll
-        rts
+        jmp resetScroll

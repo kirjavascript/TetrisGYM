@@ -54,8 +54,7 @@ debugDrawPieces:
         lda debugLevelEdit
         and #1
         bne @handleX
-        jsr stageSpriteForCurrentPiece
-        rts
+        jmp stageSpriteForCurrentPiece
 
 @handleX:
         ; load X
@@ -78,12 +77,10 @@ debugDrawPieces:
 
         lda #$16
         sta spriteIndexInOamContentLookup
-        jsr loadSpriteIntoOamStaging
-        rts
+        jmp loadSpriteIntoOamStaging
 debugPauseDrawPieces:
         jsr stageSpriteForNextPiece
-        jsr stageSpriteForCurrentPiece
-        rts
+        jmp stageSpriteForCurrentPiece
 
 debugMode:
 
@@ -277,7 +274,7 @@ checkSaveStateControlsDebug:
         sta saveStateSlot
 @noWrap:
         dec saveStateSlot
-        jsr renderDebugSaveSlot
+        jmp renderDebugSaveSlot
 @notPressedDown:
         rts
 
@@ -316,6 +313,6 @@ renderDebugHUD:
         sta spriteYOffset
         lda saveStateSpriteType
         sta spriteIndexInOamContentLookup
-        jsr loadSpriteIntoOamStaging
+        jmp loadSpriteIntoOamStaging
 @noSprite:
         rts

@@ -290,8 +290,7 @@ highScoreEntryScreen:
         jsr updateAudioWaitForNmiAndResetOamStaging
         jmp @renderFrame
 
-@ret:   jsr updateAudioWaitForNmiAndResetOamStaging
-        rts
+@ret:   jmp updateAudioWaitForNmiAndResetOamStaging
 
 highScorePosToY:
         .byte   $9F,$AF,$BF

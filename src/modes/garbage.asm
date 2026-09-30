@@ -67,13 +67,11 @@ swapMino:
 
 garbageNormal:
         jsr randomHole
-        jsr randomGarbage
-        rts
+        jmp randomGarbage
 
 garbageSmart:
         jsr smartHole
-        jsr randomGarbage
-        rts
+        jmp randomGarbage
 
 findTop:
         ldx #$0

@@ -240,8 +240,7 @@ presetScoreFromBCD:
         sta binScore+1
         lda binary32+2
         sta binScore+2
-        jsr setupScoreForRender
-        rts
+        jmp setupScoreForRender
 
 initPlayfieldForTypeB:
         lda typeBModifier

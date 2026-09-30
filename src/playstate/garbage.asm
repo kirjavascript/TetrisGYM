@@ -41,8 +41,7 @@ playState_receiveGarbage:
         lda #$00 ; earliest possible measured point
         sta hzSpawnDelay
         ldx #$83 ; -3 tap delay
-        jsr checkNegativeDelay
-        rts
+        jmp checkNegativeDelay
 
 
 garbageLines:

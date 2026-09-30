@@ -5,8 +5,7 @@ playState_spawnNextTetrimino:
         cmp #$20
         bpl :+
         ldx #$82 ; -2 tap delay
-        jsr checkNegativeDelay
-        rts
+        jmp checkNegativeDelay
 
 :
 .if SPAWN_NEXT_ADDONS
@@ -89,8 +88,7 @@ L9934:  tax
         lda spawnTable,x
 useNewSpawnID:
         sta spawnID
-        jsr pickTetriminoPost
-        rts
+        jmp pickTetriminoPost
 
 pickTetriminoPre:
         lda practiseType
@@ -185,8 +183,7 @@ pickTetriminoSeed:
 
 setSeedNextRNG:
         ldx #set_seed
-        jsr generateNextPseudorandomNumber
-        rts
+        jmp generateNextPseudorandomNumber
 
 pickTetriminoPreset:
 presetBitmask := tmp2
