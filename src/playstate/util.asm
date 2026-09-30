@@ -124,7 +124,7 @@ updateMusicSpeed:
         adc #$04
         tax
         lda musicSelectionTable,x
-        jsr setMusicTrack
+        jmp setMusicTrack
 @ret:   rts
 
 checkIfAboveLowStackLine:

@@ -5,8 +5,7 @@ playState_prepareNext:
         lda completedRow+3
         cmp #$13
         bne endOfEndingCode
-        jsr typeBEndingStuff
-        rts
+        jmp typeBEndingStuff
 
         ; bTypeGoalCheck
 @checkBType:
@@ -78,8 +77,7 @@ typeBEndingStuffEnd:
         lda #$0A ; playState_checkStartGameOver
         sta playState
         lda #$30
-        jsr sleep_gameplay_nextSprite
-        rts
+        jmp sleep_gameplay_nextSprite
 
 sleep_gameplay_nextSprite:
         sta sleepCounter

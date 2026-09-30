@@ -25,5 +25,4 @@ render_linecap_level_lines:
         lda linecapLines+1
         sta PPUDATA
         lda linecapLines
-        jsr twoDigsToPPU
-        rts
+        jmp twoDigsToPPU

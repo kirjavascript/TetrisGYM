@@ -12,5 +12,4 @@ render_mode_pause:
         beq @done
         jsr render_playfield
 @done:
-        jsr resetScroll
-        rts
+        jmp resetScroll

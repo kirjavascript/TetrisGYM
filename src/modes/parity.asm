@@ -45,8 +45,7 @@ prepareNextParity:
 
 highlightParity:
         jsr highlightOrphans
-        jsr highlightGaps
-        rts
+        jmp highlightGaps
 
 highlightGaps:
         ldx parityIndex

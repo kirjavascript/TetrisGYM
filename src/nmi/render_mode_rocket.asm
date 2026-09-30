@@ -18,5 +18,4 @@ render_mode_rocket:
         .addr rocket_nametable_patch
 @stage2:
 @rocketEnd:
-        jsr resetScroll
-        rts
+        jmp resetScroll

@@ -251,8 +251,7 @@ LE1D8:  lda #$0F
         sta SND_CHN
         lda #$55
         sta soundRngSeed
-        jsr soundEffectSlot2_makesNoSound
-        rts
+        jmp soundEffectSlot2_makesNoSound
 
 initAudioAndMarkInited:
         inc audioInitialized
@@ -1115,7 +1114,7 @@ updateMusicFrame_progLoadNextScript:
         jmp updateMusicFrame_progLoadRoutine
 
 updateMusicFrame_progEnd:
-        jsr soundEffectSlot2_makesNoSound
+        jmp soundEffectSlot2_makesNoSound
 updateMusicFrame_ret:
         rts
 

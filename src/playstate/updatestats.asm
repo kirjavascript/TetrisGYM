@@ -219,8 +219,7 @@ addPointsRaw:
 @noPushDown:
         lda #$0
         sta holdDownPoints
-        jsr addLineClearPoints
-        rts
+        jmp addLineClearPoints
 
 handlePointsCheckerboard:
         lda score+1

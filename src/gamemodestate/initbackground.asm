@@ -116,9 +116,7 @@ scoringBackground:
         lda highscores+highScoreNameLength+2
         jsr twoDigsToPPU
         lda highscores+highScoreNameLength+3
-        jsr twoDigsToPPU
-
-        rts
+        jmp twoDigsToPPU
 
 @otherTopScore:
         ldx highscores+highScoreNameLength
@@ -133,7 +131,7 @@ scoringBackground:
         lda highscores+highScoreNameLength+2
         jsr twoDigsToPPU
         lda highscores+highScoreNameLength+3
-        jsr twoDigsToPPU
+        jmp twoDigsToPPU
 @skipTop:
         rts
 
@@ -145,7 +143,7 @@ debugNametableUI:
         beq @notDebug
         jsr bulkCopyToPpu
         .addr savestate_nametable
-        jsr saveSlotNametablePatch
+        jmp saveSlotNametablePatch
 @notDebug:
         rts
 

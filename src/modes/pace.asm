@@ -248,5 +248,4 @@ gameHUDPace:
         stx byteSpriteTile
         lda #3
         sta byteSpriteLen
-        jsr byteSprite
-        rts
+        jmp byteSprite

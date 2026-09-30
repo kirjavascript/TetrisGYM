@@ -15,8 +15,7 @@ render_mode_static:
         lda currentPpuCtrl
         and #$FC
         sta currentPpuCtrl
-        jsr resetScroll
-        rts
+        jmp resetScroll
 
 .include "render_mode_linecap.asm"
 .include "render_mode_pause.asm"

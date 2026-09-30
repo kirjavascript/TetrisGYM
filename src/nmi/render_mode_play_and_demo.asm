@@ -232,8 +232,7 @@ render_mode_play_and_demo:
         bne @noFlash
         stx PPUDATA
 @noFlash:
-        jsr resetScroll
-        rts
+        jmp resetScroll
 
 pieceToPpuStatAddr:
         .dbyt   $2186,$21C6,$2206,$2246

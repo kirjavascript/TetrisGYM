@@ -69,8 +69,7 @@ linecapMenuRenderSprites:
         sta spriteXOffset
         lda #$1D
         sta spriteIndexInOamContentLookup
-        jsr loadSpriteIntoOamStaging
-        rts
+        jmp loadSpriteIntoOamStaging
 
 linecapMenuControls:
         lda #BUTTON_DOWN
@@ -100,8 +99,7 @@ linecapMenuControls:
         sta linecapCursorIndex
 @upEnd:
 
-        jsr linecapMenuControlsLR
-        rts
+        jmp linecapMenuControlsLR
 
 linecapMenuControlsLR:
         branchTo linecapCursorIndex, \
@@ -138,7 +136,7 @@ linecapMenuControlsLinesLevel:
         lda linecapWhen
         bne linecapMenuControlsAdjLinesDown
         lda #$FF
-        jsr linecapMenuControlsAdjLevel
+        jmp linecapMenuControlsAdjLevel
 @notLeft:
         rts
 

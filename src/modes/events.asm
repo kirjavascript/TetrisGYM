@@ -12,7 +12,7 @@ practiseInitGameState:
         lda practiseType
         cmp #MODE_CRUNCH
         bne @skipCrunch
-        jsr advanceGameCrunch
+        jmp advanceGameCrunch
 @skipCrunch:
         rts
 
@@ -30,8 +30,7 @@ practisePrepareNext:
         bne @skipParity
         jmp prepareNextParity
 @skipParity:
-        jsr practiseEachPiece
-        rts
+        jmp practiseEachPiece
 
 practiseAdvanceGame:
         lda practiseType

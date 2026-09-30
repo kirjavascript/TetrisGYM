@@ -319,7 +319,7 @@ menuConfigControls:
         inc menuVars, x
         lda #$01
         sta soundEffectSlot1Init
-        jsr assertValues
+        jmp assertValues
 @skipRightConfig:
 @configEnd:
         rts

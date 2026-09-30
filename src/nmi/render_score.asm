@@ -19,8 +19,7 @@ renderLowScore:
         lda score+1
         jsr twoDigsToPPU
         lda score
-        jsr twoDigsToPPU
-        rts
+        jmp twoDigsToPPU
 
 renderLettersScore:
         jsr scoreSetupPPU
@@ -38,16 +37,14 @@ renderScoreCap:
         lda #$99
         jsr twoDigsToPPU
         lda #$99
-        jsr twoDigsToPPU
-        rts
+        jmp twoDigsToPPU
 
 renderSevenDigit:
         jsr scoreSetupPPU
         lda score+3
         and #$F
         sta PPUDATA
-        jsr renderBCDScoreData
-        rts
+        jmp renderBCDScoreData
 
 renderFloat:
         lda #$21
@@ -138,7 +135,7 @@ renderModernLines:
         lda linesBCDHigh
         jsr twoDigsToPPU
         lda lines
-        jsr twoDigsToPPU
+        jmp twoDigsToPPU
 @doneRenderLines:
         rts
 
@@ -155,8 +152,7 @@ renderClassicHighByte:
         txa ; either branch clobbers accumulator.  txa sets z, saves 1 byte.
         bne @startWrap
         lda tmpY ; score+2
-        jsr twoDigsToPPU
-        rts
+        jmp twoDigsToPPU
 @startWrap:
 
         jsr getScoreDiv100k
@@ -211,8 +207,7 @@ renderLettersHighByte:
         txa ; either branch clobbers accumulator.  txa sets z, saves 1 byte.
         bne @startWrap
         lda tmpY ; score+2
-        jsr twoDigsToPPU
-        rts
+        jmp twoDigsToPPU
 @startWrap:
 
         jsr getScoreDiv100k

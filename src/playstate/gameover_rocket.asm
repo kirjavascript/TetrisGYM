@@ -252,5 +252,4 @@ handleRocket:
         lda #>spriteCathedralFire1
         sta $1
 @otherFrame:
-        jsr loadRectIntoOamStaging
-        rts
+        jmp loadRectIntoOamStaging
