@@ -79,6 +79,7 @@ MODE_TRANSITION
 MODE_MARATHON
 MODE_TAPQTY
 MODE_CHECKERBOARD
+MODE_TETRISONLY
 MODE_GARBAGE
 MODE_DROUGHT
 MODE_DAS
@@ -134,7 +135,7 @@ CRASH_CRASH := 3
 LINECAP_WHEN_STRING_OFFSET := $10
 LINECAP_HOW_STRING_OFFSET := $12
 
-MENU_SPRITE_Y_BASE := $46
+MENU_SPRITE_Y_BASE := $3E
 MENU_MAX_Y_SCROLL := $A0
 MENU_TOP_MARGIN_SCROLL := 7 ; in blocks
 
@@ -155,6 +156,7 @@ MENU_TOP_MARGIN_SCROLL := 7 ; in blocks
     .byte $4    ; MODE_MARATHON
     .byte $1F   ; MODE_TAPQTY
     .byte $8    ; MODE_CHECKERBOARD
+    .byte $0    ; MODE_TETRISONLY
     .byte $4    ; MODE_GARBAGE
     .byte $12   ; MODE_DROUGHT
     .byte $10   ; MODE_DAS
@@ -197,6 +199,7 @@ MENU_TOP_MARGIN_SCROLL := 7 ; in blocks
     .byte   "MARTHN"
     .byte   "TAPQTY"
     .byte   "CKRBRD"
+    .byte   "TETONL"
     .byte   "GARBGE"
     .byte   "LOBARS"
     .byte   "DASDLY"

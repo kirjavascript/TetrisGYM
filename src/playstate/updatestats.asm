@@ -186,6 +186,8 @@ addPoints:
         lda practiseType
         cmp #MODE_CHECKERBOARD
         beq handlePointsCheckerboard
+        cmp #MODE_TETRISONLY
+        beq handlePointsTetrisOnly
         cmp #MODE_TAPQTY
         bne @notTapQuantity
         lda completedLines
@@ -250,6 +252,62 @@ handlePointsCheckerboard:
 
 checkerboardPoints:
         .byte 0, 10, 20, 30, 40
+
+handlePointsTetrisOnly:
+        jsr calcScaledLineClearPoints ; -> product24 = pointsTable[completedLines] * (level+1)
+
+        lda completedLines
+        cmp #4
+        beq @addPoints
+
+        ; 1-3 lines: subtract the same scaled points a normal
+        ; clear would have earned, clamped at zero
+        sec
+        lda binScore
+        sbc product24
+        sta binScore
+        lda binScore+1
+        sbc product24+1
+        sta binScore+1
+        lda binScore+2
+        sbc product24+2
+        sta binScore+2
+        lda binScore+3
+        sbc #0
+        sta binScore+3
+        bcs @finish
+        lda #0
+        sta binScore
+        sta binScore+1
+        sta binScore+2
+        sta binScore+3
+        jmp @finish
+
+@addPoints:
+        clc
+        lda binScore
+        adc product24
+        sta binScore
+        lda binScore+1
+        adc product24+1
+        sta binScore+1
+        lda binScore+2
+        adc product24+2
+        sta binScore+2
+        lda binScore+3
+        adc #0
+        sta binScore+3
+
+@finish:
+        jsr setupScoreForRender
+        lda renderFlags
+        ora #RENDER_SCORE
+        sta renderFlags
+        lda #$0
+        sta completedLines
+        lda #$0
+        sta holdDownPoints
+        rts
 
 ones := tmpX
 hundredths := tmpY
@@ -341,36 +399,7 @@ div16mul10:
         rts
 
 addLineClearPoints:
-        lda #0
-        sta factorA24+1
-        sta factorA24+2
-        lda levelNumber
-        ldy practiseType
-        cpy #MODE_MARATHON
-        bne @notMarathon
-        ldy marathonModifier
-        cpy #3 ; Marathon modes 3 + 4 score normally
-        bcs @notMarathon
-        lda startLevel
-@notMarathon:
-        sta factorA24+0
-        inc factorA24+0
-        bne @noverflow
-        inc factorA24+1
-@noverflow:
-
-        lda completedLines
-        beq addLineClearPoints_end ; skip with 0 completed lines
-        asl
-        tax
-        lda pointsTable, x
-        sta factorB24+0
-        lda pointsTable+1, x
-        sta factorB24+1
-        lda #0
-        sta factorB24+2
-
-        jsr unsigned_mul24 ; points to add in product24
+        jsr calcScaledLineClearPoints
 
         clc
         lda binScore
@@ -424,6 +453,44 @@ clearPoints:
         sta binScore+2
         sta binScore+3
         rts
+
+calcScaledLineClearPoints:
+        lda #0
+        sta factorA24+1
+        sta factorA24+2
+        lda levelNumber
+        ldy practiseType
+        cpy #MODE_MARATHON
+        bne @notMarathon
+        ldy marathonModifier
+        cpy #3 ; Marathon modes 3 + 4 score normally
+        bcs @notMarathon
+        lda startLevel
+@notMarathon:
+        sta factorA24+0
+        inc factorA24+0
+        bne @noverflow
+        inc factorA24+1
+@noverflow:
+
+        lda completedLines
+        bne @hasLines
+        lda #0
+        sta product24
+        sta product24+1
+        sta product24+2
+        rts
+@hasLines:
+        asl
+        tax
+        lda pointsTable, x
+        sta factorB24+0
+        lda pointsTable+1, x
+        sta factorB24+1
+        lda #0
+        sta factorB24+2
+
+        jmp unsigned_mul24 ; tail call - product24 set, rts returns to our caller
 
 pointsTable:
         .word   0,40,100,300,1200
